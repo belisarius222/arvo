@@ -19,7 +19,7 @@
 =/  p  ~(. fo p.para)                                   ::  ops mod p
 =/  n  ~(. fo n.para)                                   ::  ops mod n
   ::
-::::
+::::  ecdsa
 ::
 |%
 ++  priv-to-pub                                         ::  get pub from priv
@@ -63,11 +63,7 @@
   =/  x  r.sig
   =/  ysq  (sum.p b.para (exp.p 3 x))                   ::  omits A=0
   =/  bet  (exp.p (div +(p.para) 4) ysq)
-  =/  y
-    ?.  =(0 (mix (mod v.sig 2) (mod bet 2)))
-      bet
-    (dif.p 0 bet)
-  ::=/  y  ?:(=(1 (end 0 1 (mix v.sig bet))) bet (dif.p 0 bet))
+  =/  y  ?:(=(1 (end 0 1 (mix v.sig bet))) bet (dif.p 0 bet))
   ?>  =(0 (dif.p ysq (pro.p y y)))
   ?<  =(0 (sit.n r.sig))
   ?<  =(0 (sit.n s.sig))
@@ -76,7 +72,7 @@
   =/  qr  (add:jc gz xy)
   (from:jc (mul:jc qr (inv.n r.sig)))
 ::
-++  test-roundtrip
+++  test
   |.
   =/  prv  0x792e.ca68.2b89.0b31.3562.47f2.b046.62bf.
              f448.b6bb.19ea.1c8a.b48d.a222.c894.ef9b
@@ -108,9 +104,9 @@
   ~&  %ecdsa-raw-recover-ok
   ~
   ::
-::::
+::::  jacobian ops
 ::
-++  mul                                                 ::  multiply points
+++  mul                                                 ::  point x scalar
   |=  {a/pont n/@}
   ^-  pont
   (from:jc (mul:jc (into:jc a) n))
@@ -120,7 +116,7 @@
   ^-  pont
   (from:jc (add:jc (into:jc a) (into:jc b)))
 ::
-++  jc                                                  ::  jacobian ops
+++  jc                                                  ::  jacobian core
   |%
   ++  add                                               ::  addition
     |=  {a/jaco b/jaco}
@@ -158,7 +154,7 @@
     =/  nz  :(pro.p 2 y.a z.a)
     [nx ny nz]
   ::
-  ++  mul                                               :: multiply by scalar
+  ++  mul                                               :: jaco x scalar
     |=  {a/jaco n/@}
     ^-  jaco
     ?:  =(0 y.a)
@@ -173,13 +169,13 @@
       (dub $(n (div n 2)))
     (add a (dub $(n (div n 2))))
   ::
-  ++  from                                              :: to point
+  ++  from                                              :: jaco -> point
     |=  a/jaco
     ^-  pont
     =/  z  (inv.p z.a)
     [:(pro.p x.a z z) :(pro.p y.a z z z)]
   ::
-  ++  into                                              :: from point
+  ++  into                                              :: point -> jaco
     |=  pont
     ^-  jaco
     [x y z=1]
