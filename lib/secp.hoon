@@ -27,14 +27,25 @@
   ^-  pont
   (mul g.para prv)
 ::
+++  hmc
+    |=  {a/@ b/@ c/@ d/@}
+    ^-  @
+    (swap 3 (hml:scr (swap 3 a) b (swap 3 c) d))
+::
 ++  make-k                                              ::  deterministic nonce
   |=  {has/@uvI prv/@}
   ^-  @
   =/  v  (fil 3 32 1)
-  =/  k  (hml:scr 0 32 [+ -]:(taco (can 3 [32 v] [1 0x0] [32 has] [32 prv] ~)))
-  =.  v  (hmc:scr k v)
-  =.  k  (hmc:scr k (can 3 [32 v] [1 0x1] [32 has] [32 prv] ~))
-  (hmc:scr k (hmc:scr k v))  ::  REVIEW double hash?
+  =/  k  0
+  =.  k  (hmc k 32 [+ -]:(taco (can 3 [32 has] [32 prv] [1 0x0] [32 v] ~)))
+  ~&  [k=`@ux`k v=`@ux`v]
+  =.  v  (hmc k 32 v 32)
+  ~&  [k=`@ux`k v=`@ux`v]
+  =.  k  (hmc k 32 [+ -]:(taco (can 3 [32 has] [32 prv] [1 0x1] [32 v] ~)))
+~&  [k=`@ux`k v=`@ux`v]
+  =.  v  (hmc k 32 v 32)
+  ~&  [k=`@ux`k v=`@ux`v]
+  (hmc k 32 v 32)
 ::
 ++  ecdsa-raw-sign                                      ::  generate signature
   |=  {has/@uvI prv/@}
@@ -62,6 +73,38 @@
   =/  xy  (mul:jc [x y 1] s.sig)
   =/  qr  (add:jc gz xy)
   (from:jc (mul:jc qr (inv.n r.sig)))
+::
+++  test-roundtrip
+  |.
+  =/  prv  0x792e.ca68.2b89.0b31.3562.47f2.b046.62bf.
+             f448.b6bb.19ea.1c8a.b48d.a222.c894.ef9b
+  =/  pub
+  :*  x=0x2c4a.ab44.7fc5.b593.be6a.2bd1.c54a.2737.
+          666c.88e0.dd74.b998.81a5.2532.a1d7.d126
+      y=0x9f61.40a0.1a67.19a5.1b49.88a3.8135.af5e.
+          de06.72ab.01af.a6b1.18e8.f38b.6616.66ad
+  ==
+  =/  sig
+  :*  v=27
+      r=0xc12f.850a.091d.a920.a6fc.c4aa.3dec.58db.
+          5e7a.a00c.acd5.1580.6a1a.d8e0.f71f.7fe9
+      s=0x1fba.758e.b8c1.d7f3.dec5.040c.3bf3.6176.
+          e276.40d1.b87a.f71b.6ec1.3cb2.0361.aa4d
+  ==
+  =/  k  0xa556.3d27.07d3.333f.d4b7.1bf9.17bf.21a5.
+           ec99.3871.01b4.7c2d.7808.bf61.3674.6ef1
+  ?>  =(pub (priv-to-pub prv))
+  ::
+  =/  msg  (fil 3 32 0x35)
+  =/  kreal  (make-k msg prv)
+  ~&  [kact=`@ux`kreal kexp=k]
+  ?>  =(k kreal)
+  ~&  %make-k-ok
+  ?>  =(sig (ecdsa-raw-sign msg prv))
+  ~&  %ecdsa-raw-sign-ok
+  ?>  =(pub (ecdsa-raw-recover msg sig))
+  ~&  %ecdsa-raw-recover-ok
+  ~
   ::
 ::::
 ::
