@@ -27,10 +27,10 @@
   ^-  pont
   (mul g.para prv)
 ::
-++  hmc
-    |=  {a/@ b/@ c/@ d/@}
+++  hmc                                                 ::  hmac swap endianness
+    |=  {k/@ kl/@ t/@ tl/@}
     ^-  @
-    (swap 3 (hml:scr (swap 3 a) b (swap 3 c) d))
+    (swap 3 (hml:scr (swap 3 k) kl (swap 3 t) tl))
 ::
 ++  make-k                                              ::  deterministic nonce
   |=  {has/@uvI prv/@}
@@ -38,13 +38,9 @@
   =/  v  (fil 3 32 1)
   =/  k  0
   =.  k  (hmc k 32 [+ -]:(taco (can 3 [32 has] [32 prv] [1 0x0] [32 v] ~)))
-  ~&  [k=`@ux`k v=`@ux`v]
   =.  v  (hmc k 32 v 32)
-  ~&  [k=`@ux`k v=`@ux`v]
   =.  k  (hmc k 32 [+ -]:(taco (can 3 [32 has] [32 prv] [1 0x1] [32 v] ~)))
-~&  [k=`@ux`k v=`@ux`v]
   =.  v  (hmc k 32 v 32)
-  ~&  [k=`@ux`k v=`@ux`v]
   (hmc k 32 v 32)
 ::
 ++  ecdsa-raw-sign                                      ::  generate signature
@@ -65,10 +61,16 @@
   ^-  pont
   ?>  ?&((lte 27 v.sig) (lte v.sig 34))
   =/  x  r.sig
-  =/  cub  (sum.p b.para (exp.p x 3))
-  =/  bet  (exp.p cub (div +(p.para) 4))
-  =/  y  ?:(=(1 (end 0 1 (mix v.sig bet))) bet (dif.p 0 bet))
-  ?<  |(=(cub (pro.p y y)) =(0 (sit.n r.sig)) =(0 (sit.n s.sig)))
+  =/  ysq  (sum.p b.para (exp.p 3 x))                   ::  omits A=0
+  =/  bet  (exp.p (div +(p.para) 4) ysq)
+  =/  y
+    ?.  =(0 (mix (mod v.sig 2) (mod bet 2)))
+      bet
+    (dif.p 0 bet)
+  ::=/  y  ?:(=(1 (end 0 1 (mix v.sig bet))) bet (dif.p 0 bet))
+  ?>  =(0 (dif.p ysq (pro.p y y)))
+  ?<  =(0 (sit.n r.sig))
+  ?<  =(0 (sit.n s.sig))
   =/  gz  (mul:jc [x y 1]:g.para (dif.n 0 has))
   =/  xy  (mul:jc [x y 1] s.sig)
   =/  qr  (add:jc gz xy)
@@ -93,16 +95,16 @@
   ==
   =/  k  0xa556.3d27.07d3.333f.d4b7.1bf9.17bf.21a5.
            ec99.3871.01b4.7c2d.7808.bf61.3674.6ef1
-  ?>  =(pub (priv-to-pub prv))
+  ?>  =((priv-to-pub prv) pub)
   ::
   =/  msg  (fil 3 32 0x35)
   =/  kreal  (make-k msg prv)
-  ~&  [kact=`@ux`kreal kexp=k]
-  ?>  =(k kreal)
+  ?>  =(kreal k)
   ~&  %make-k-ok
-  ?>  =(sig (ecdsa-raw-sign msg prv))
+  ?>  =((ecdsa-raw-sign msg prv) sig)
   ~&  %ecdsa-raw-sign-ok
-  ?>  =(pub (ecdsa-raw-recover msg sig))
+  =/  rec  (ecdsa-raw-recover msg sig)
+  ?>  =(rec pub)
   ~&  %ecdsa-raw-recover-ok
   ~
   ::
