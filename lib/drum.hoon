@@ -85,8 +85,6 @@
   |=  our/ship
   %-  ~(gas in *(set gill))
   ^-  (list gill)
-  ?:  ?=($earl (clan our))
-    [[(sein our) %talk] [our %dojo] ~]
   [[our %talk] [our %dojo] ~]
 ::
 ++  drum-make                                           ::  initial part
