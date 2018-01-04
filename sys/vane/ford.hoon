@@ -43,7 +43,7 @@
       jav/(map * calx)                                  ::  cache
       deh/deps                                          ::  dephash definitions
       sup/(jug @uvH duct)                               ::  hash listeners
-      ::  XX  (set {beam care})
+      ::  XX  (set {beam care:clay})
       out/(set beam)                                    ::  listening beams
   ==                                                    ::
 ++  deps                                                ::
@@ -85,7 +85,7 @@
   ==                                                    ::
 ++  nozzle  {sub/(jug dent dent) sup/(jug dent dent)}   ::  bidirectional deps
 ++  dent                                                ::  individual dep
-  $%  {$beam bem/beam ren/care}
+  $%  {$beam bem/beam ren/care:clay}
       {$boil bem/beam bom/beam arg/coin}
       {$load bem/beam mar/mark}
   ==
@@ -140,7 +140,7 @@
   ::
   ++  add-sub
     |=  {k/dent dez/(set dent)}  ^+  a
-    =/  liz  (~(tap in dez))
+    =/  liz  ~(tap in dez)
     |-  ^+  a
     ?~  liz  a
     $(liz t.liz, a (put k i.liz))
@@ -159,7 +159,7 @@
 ++  de-dup-subdirs
   |=  sep/(set dent)  ^+  sep
   %-  silt
-  %+  skim  (~(tap in sep))
+  %+  skim  ~(tap in sep)
   |=  den/dent  ^-  ?
   ?.  ?=($beam -.den)  &
   ?~  s.bem.den  &
@@ -319,20 +319,20 @@
                     ^=  p
                     %-  silt
                     %+  turn  p.faw
-                    |=(a/{vane care beam} [-.a +<.a +>.a *tang])
+                    |=(a/{vane care:clay beam} [-.a +<.a +>.a *tang])
                 $|  [%2 p=*(set dent) q=p.faw]
               ==
           ^=  faw
-          |-  ^-  (each (list (trel vane care beam)) tang)
+          |-  ^-  (each (list (trel vane care:clay beam)) tang)
           ?~  p.ton  [%& ~]
           =+  nex=$(p.ton t.p.ton)
           =+  err=|=(a/tape [%| leaf+a ?:(?=($& -.nex) ~ p.nex)])
           =+  pax=(path i.p.ton)
           ?~  pax  (err "blocking empty")
-          =+  ren=((soft care) (rsh 3 1 i.pax))
+          =+  ren=((soft care:clay) (rsh 3 1 i.pax))
           ?~  ren
             (err "blocking not care: {<i.pax>}")
-          =+  zis=(tome t.pax)
+          =+  zis=(en-beam t.pax)
           ?~  zis
             (err "blocking not beam: {<t.pax>}")
           ?:  ?=($g (end 3 1 i.pax))
@@ -394,7 +394,7 @@
   ::
   ++  mota  ;~(pfix pat mota:vez)                       ::  atom odor
   ++  hath  (sear plex (stag %conl poor)):vez           ::  hood path
-  ++  have  (sear tome ;~(pfix fas hath))               ::  hood beam
+  ++  have  (sear en-beam ;~(pfix fas hath))            ::  hood beam
   ++  hith                                              ::  static path
     =>  vez
     (sear plex (stag %conl (more fas hasp)))
@@ -581,11 +581,11 @@
     ?~  p.sih  +>                                       :: acknowledged
     =.  out.bay  (~(del in out.bay) bem)
     ::
-    =+  `{ren/care wen/case *}`p.u.rit
+    =+  `{ren/care:clay wen/case *}`p.u.rit
     =.  this  (on-update bem ren -.bem(r wen))
     ::
     ::  TODO: make sure we don't need this:
-    ::  (dep-warps dep (~(del in p.dap) bem) |=({beam care} ~))
+    ::  (dep-warps dep (~(del in p.dap) bem) |=({beam care:clay} ~))
     ::
     ::  TODO  only report hashes of changed builds
     =/  den/dent  [%beam bem ren]
@@ -649,7 +649,7 @@
     =/  des/(set dent)  (~(got by def.deh.bay) dep)
     =/  bes/(list beam)
       %+  turn  ~(tap in (dep-beams des))
-      |=([beam care] +<-)
+      |=([beam care:clay] +<-)
     ::
     |^  ?:(ask start cancel)
     ++  start
@@ -694,7 +694,7 @@
   ::
   ++  downstream-dents
     |=  des/(set dent)  ^-  (set dent)
-    %+  roll  (~(tap in des))
+    %+  roll  ~(tap in des)
     |=  {den/dent dos/(set dent)}  ^+  des
     =.  dos
       ?:  ?=($beam -.den)  dos
@@ -704,16 +704,16 @@
   ::+|
   ::
   ++  on-update
-    |=  {bem/beam ren/care new/beak}  ^+  this
+    |=  {bem/beam ren/care:clay new/beak}  ^+  this
     =/  den  (sy [%beam bem ren] ~)
     =/  dos  (downstream-dents den)
     ::  ~&  [%on-update ren (tope bem) (tope new ~) dos]
-    =/  todo  (~(tap in dos))
+    =/  todo  ~(tap in dos)
     =^  old  this  (rebuild new den todo)
     ~|  old=old
     (promote-unchanged old new)
   ::
-  ++  rebuild  !.
+  ++  rebuild  ::  !.  TODO: reinstate !.
     =|  old/(set dent)
     |=  {bek/beak new/(set dent) todo/(list dent)}  ^+  [old this]
     ?~  todo  [old this]
@@ -721,13 +721,13 @@
     ?:  (~(has in old) i.todo)  $(todo t.todo)
     =/  dez  (~(get ju sub.gaf.bay) i.todo)
     ::  TODO add ++skip and ++skim for sets
-    =.  dez  (silt (skip (~(tap in dez)) |=(a/dent ?=($beam -.a))))
+    =.  dez  (silt (skip ~(tap in dez) |=(a/dent ?=($beam -.a))))
     =.  dez  (~(dif in dez) old)
     ?:  =(~ dez)
       $(old (~(put in old) i.todo), todo t.todo)
     =.  dez  (~(dif in dez) new)
     ?.  =(~ dez)
-      $(todo (weld (~(tap in dez)) todo))
+      $(todo (weld ~(tap in dez) todo))
     ::
     =/  taz/task  [hen [bek *silk] ~ ~] ::XX real silk?
     =^  bil  ..zo  (~(exec-dent zo *@u taz) i.todo(-.bem bek))
@@ -778,21 +778,21 @@
   ::+|
   ::
   ++  dep-warps                                       ::  create %warp's
-    |=  {dep/@uvH bes/(set dent) rav/$-({beam care} (unit rave))}
+    |=  {dep/@uvH bes/(set dent) rav/$-({beam care:clay} (unit rave:clay))}
     (warp-beams dep (dep-beams bes) rav)
   ::
   ++  dep-beams  ::DEPRECATED only needed for @uvH handling
-    |=  des/(set dent)  ^-  (set {beam care})
-    %+  roll  (~(tap in des))
-    |=  {den/dent bes/(set {beam care})}  ^+  bes
+    |=  des/(set dent)  ^-  (set {beam care:clay})
+    %+  roll  ~(tap in des)
+    |=  {den/dent bes/(set {beam care:clay})}  ^+  bes
     ?:  ?=($beam -.den)
       (~(put in bes) +.den)
     (~(uni in bes) ^$(des (~(get ju sub.gaf.bay) den)))
   ::
   ++  warp-beams
-    |=  {dep/@uvH bes/(set {beam care}) rav/$-({beam care} (unit rave))}
-    %+  turn  (~(tap in bes))
-    |=  {bem/beam ren/care}  ^-  move
+    |=  {dep/@uvH bes/(set {beam care:clay}) rav/$-({beam care:clay} (unit rave:clay))}
+    %+  turn  ~(tap in bes)
+    |=  {bem/beam ren/care:clay}  ^-  move
     :^  hen  %pass  [(scot %p our) (scot %uv dep) (en-beam bem)]
     [%c [%warp [our p.bem] q.bem (rav bem ren)]]
   ::
@@ -1005,8 +1005,8 @@
         $0  abut:(give [%made dep q.q.bot])
         $2  abut:(give [%made dep %| q.q.bot])
         $1  =<  abet
-            %+  roll  (~(tap in p.q.bot) ~)
-            =+  [*{van/vane ren/care bem/beam tan/tang} ..exec]
+            %+  roll  ~(tap in p.q.bot)
+            =+  [*{van/vane ren/care:clay bem/beam tan/tang} ..exec]
             |.  ^+  ..exec
             (camp van ren bem)
       ==
@@ -1349,7 +1349,7 @@
       |=  {cof/cafe mal/(map mark $~)}
       ?:  (~(has by mal) for)
         (tug:bo (lace cof for bem) (with:bo some))
-      =+  opt=(silt (turn (~(tap by mal)) head))        ::  XX asymptotics
+      =+  opt=(silt (turn ~(tap by mal) head))        ::  XX asymptotics
       %+  tug:bo  (find-translation-path cof for opt)
       |=  {cof/cafe wuy/(list @tas)}
       ?~  wuy  (new:bo cof ~)
@@ -1448,7 +1448,7 @@
       |=  {cof/cafe fro/(set mark)}  ^-  (bolt (list mark))
       ?:  (~(has in tag) p.won)
         (new:bo cof (flop pax))
-      =+  for=(skip (~(tap by fro)) ~(has by war))
+      =+  for=(skip ~(tap by fro) ~(has by war))
       =.  for  (sort for aor)         ::  XX useful?
       =:  q.won  (~(gas to q.won) for)
           war  (~(gas by war) (turn for |=(mark [+< pax])))
@@ -1875,7 +1875,7 @@
           ?~  tuz  (err:bo cof leaf+"bad tusk: {<p.hon>}" ~)
           =+  pax=(plex:vez %clsg u.tuz)
           ?~  pax  (err:bo cof leaf+"bad path: {<u.tuz>}" ~)
-          =+  bem=(tome u.pax)
+          =+  bem=(en-beam u.pax)
           ?~  bem  (err:bo cof leaf+"bad beam: {<u.pax>}" ~)
           $(hon q.hon, how u.bem)
         ::

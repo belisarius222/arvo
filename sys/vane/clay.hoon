@@ -8,7 +8,7 @@
 ::  Here are the structures.  `++raft` is the formal arvo state.  It's also
 ::  worth noting that many of the clay-related structures are defined in zuse.
 ::
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 |=  pit/vase
 =,  clay
 =>  |%
@@ -699,7 +699,7 @@
         $sing  ~
         $next
       ?~  (case-to-aeon:ze q.p.rov)  ~
-      %+  skim  (~(tap in ~(key by qyx)))
+      %+  skim  ~(tap in ~(key by qyx))
       |=  a/rove  ^-  ?
       ?&  ?=($next -.a)
           =(p.a p.rov(q q.p.a))
@@ -708,7 +708,7 @@
     ::
         $many
       ?~  (case-to-aeon:ze p.q.rov)  ~
-      %+  skim  (~(tap in ~(key by qyx)))
+      %+  skim  ~(tap in ~(key by qyx))
       |=  a/rove  ^-  ?
       ?&  ?=($many -.a)
           =(a rov(p.q p.q.a))
@@ -832,7 +832,7 @@
       =+  nab=(case-to-aeon:ze p.q.rav)
       ?~  nab
         ?>  =(~ (case-to-aeon:ze q.q.rav))
-        (duce [- p q ~]:rav)
+        (duce (rive rav))
       =+  huy=(case-to-aeon:ze q.q.rav)
       ?:  &(?=(^ huy) |((lth u.huy u.nab) &(=(0 u.huy) =(0 u.nab))))
         (blub hen)
@@ -844,7 +844,7 @@
         (blub hen)
       =+  ^=  ptr  ^-  case
           [%ud +(let.dom)]
-      (duce `rove`[%many p.rav [ptr q.q.rav r.q.rav] ear])
+      (duce `rove`[%many p=p.rav q=[ptr q.q.rav r.q.rav] r=ear])
     ==
   ::
   ::  Print a summary of changes to dill.
@@ -1050,45 +1050,6 @@
       ==
     ==
   ::
-  ::  Handle result of insertion.
-  ::
-  ::  For commit flow overview, see ++edit.
-  ::
-  ::  Insertions are cast to the correct mark, and here we put the result in
-  ::  ins.dok.  If dif and mut are full in dok (i.e. we've already processed
-  ::  diffs and mutations), then we go ahead and run ++apply-edit.
-  ++  apply-edit
-    ~/  %apply-edit
-    |=  wen/@da
-    ^+  +>
-    =+  ^-  sim/(list (pair path misu))
-        ?~  dok
-          ~|(%no-changes !!)
-        ?>  ?=(^ ins.u.dok)
-        ?>  ?=(^ dif.u.dok)
-        ?>  ?=(^ mut.u.dok)
-        ;:  weld
-          ^-  (list (pair path misu))
-          (turn del.u.dok |=(pax/path [pax %del ~]))
-        ::
-          ^-  (list (pair path misu))
-          (turn ink.u.dok |=({pax/path cay/cage} [pax %ins cay]))
-        ::
-          ^-  (list (pair path misu))
-          (turn u.ins.u.dok |=({pax/path cay/cage} [pax %ins cay]))
-        ::
-          ^-  (list (pair path misu))
-          (turn u.dif.u.dok |=({pax/path cal/{lobe cage}} [pax %dif cal]))
-        ::
-          ^-  (list (pair path misu))
-          (turn u.mut.u.dok |=({pax/path cal/{lobe cage}} [pax %dif cal]))
-        ==
-    =+  hat=(edit:ze wen %& sim)
-    ?~  dok  ~&  %no-changes  !!
-    ?~  -.hat
-      ([echo(dok ~)]:.(+>.$ +.hat) wen %& sim)
-    (checkout-ankh(lat.ran lat.ran.+.hat) u.-.hat)
-  ::
   ++  take-inserting
     ~/  %take-inserting
     |=  {wen/@da res/gage:ford}
@@ -1104,6 +1065,7 @@
           (apply-edit wen)
         +>.$
     ^-  (list (pair path cage))
+    ~|  res+res
     %+  turn  (gage-to-success-cages res)
     |=  {pax/cage cay/cage}
     ?.  ?=($path p.pax)
@@ -1222,6 +1184,7 @@
   ::  of the content at the current aeon).
   ::
   ++  apply-edit
+    ~/  %apply-edit
     |=  wen/@da
     ^+  +>
     ::  XX we do the same in ++take-patch, which is confusing and smells foul.
@@ -1266,6 +1229,7 @@
   ::  ++take-patch to apply the result to our current ankh and update unix.
   ::
   ++  checkout-ankh
+    ~/  %checkout-ankh
     |=  hat/(map path lobe)
     ^+  +>
     %-  emit
@@ -1408,83 +1372,6 @@
         [(slag len pax) (~(got by can) pax)]
     ==
   ::
-  ::  Called when a foreign ship answers one of our requests.
-  ::  See ++edit for a description of the commit flow.
-  ++  checkout-ankh
-    ~/  %checkout-ankh
-    |=  hat/(map path lobe)
-    ^+  +>
-    %-  emit
-    :*  hen  %pass  [%patching (scot %p her) syd ~]  %f
-        %exec  our  :^  ~  [her syd %da now]  %tabl
-        ^-  (list (pair silk silk))
-        %+  turn  (~(tap by hat))
-        |=  {a/path b/lobe}
-        ^-  (pair silk silk)
-        :-  [%$ %path-hash !>([a b])]
-        (lobe-to-silk:ze a b)
-    ==
-  ::
-  ::  After updating ref (our request manager), we handle %x, %w, and %y
-  ::  responses.  For %x, we call ++validate-x to validate the type of the
-  ::  response.  For %y, we coerce the result to an arch.
-  ++  apply-foreign-update                              ::  apply subscription
-    ~/  %apply-foreign-update
-    |=  $:  lem/(unit @da)                              ::  complete up to
-            gar/(map aeon tako)                         ::  new ids
-            let/aeon                                    ::  next id
-            lar/(set yaki)                              ::  new commits
-            bar/(set blob)                              ::  new content
-        ==
-    ^+  +>
-    =<  wake
-    =+  ^-  nut/(map tako yaki)
-        %-  molt  ^-  (list (pair tako yaki))
-        %+  turn  (~(tap in lar))
-        |=  yak/yaki
-        [r.yak yak]
-    =+  ^-  nat/(map lobe blob)
-        %-  molt  ^-  (list (pair lobe blob))
-        %+  turn  (~(tap in bar))
-        |=  bol/blob
-        [p.bol bol]
-    ~|  :*  %bad-foreign-update
-            :*  gar=gar
-                let=let
-                nut=(~(run by nut) $~)
-                nat=(~(run by nat) $~)
-            ==
-            :*  hitdom=hit.dom
-                letdom=let.dom
-                hutran=(~(run by hut.ran) $~)
-                latran=(~(run by lat.ran) $~)
-            ==
-        ==
-    =+  hit=(~(uni by hit.dom) gar)
-    =+  let=let
-    =+  hut=(~(uni by hut.ran) nut)
-    =+  lat=(~(uni by lat.ran) nat)
-    =+  ?:  =(0 let)  ~
-        =+  yon=`aeon`1                                 ::  sanity check
-        |-
-        ~|  yon=yon
-        =+  tak=(~(got by hit) yon)
-        =+  yak=(~(got by hut) tak)
-        =+  %-  ~(urn by q.yak)
-            |=  {pax/path lob/lobe}
-            ~|  [pax=path lob=lobe]
-            (~(got by lat) lob)
-        ?:  =(let yon)
-          ~
-        $(yon +(yon))
-    %=  +>.$
-      lim       (max (fall lem lim) lim)
-      hit.dom   hit
-      let.dom   (max let let.dom)
-      hut.ran   hut
-      lat.ran   lat
-    ==
-  ::
   ::  For %w, we check to see if it's a @ud response (e.g. for
   ::  cw+//~sampel-sipnym/desk/~time-or-label).  If so, it's easy.  Otherwise,
   ::  we look up our subscription request, then assert the response was a nako.
@@ -1594,13 +1481,6 @@
   ::  Check that given data is actually of the mark it claims to be.
   ::
   ::  Result is handled in ++take-foreign-x
-  ++  vale-page
-    ~/  %vale-page
-    |=  a/page
-    ^-  silk
-    ?.  ?=($hoon p.a)  [%vale a]
-    ?.  ?=(@t q.a)  [%dude |.(>%weird-hoon<) %ride [%fail ~] %$ *cage]
-    [%$ p.a [%atom %t ~] q.a]
   ::
   ++  validate-x
     ~/  %validate-x
@@ -1651,6 +1531,7 @@
   ::  by this state change.
   ::
   ++  apply-foreign-update                              ::  apply subscription
+    ~/  %apply-foreign-update
     |=  $:  lem/(unit @da)                              ::  complete up to
             gar/(map aeon tako)                         ::  new ids
             let/aeon                                    ::  next id
@@ -1791,7 +1672,7 @@
   ++  rive
     |=  rav/{$many p/? q/moat}
     ^-  rove
-    [%many p.rav p.q.rav q.q.rav r.q.rav ~]
+    [%many p=p.rav q=q.rav r=~]
   ::
   ::  Loop through open subscriptions and check if we can fill any of them.
   ::
@@ -2169,59 +2050,7 @@
       :-  (~(put by lut) p.bar bar)
       (~(put by gar) pat p.bar)
     ::
-    ++  edit                                            ::    edit:ze
-      ~/  %edit
-      |=  {wen/@da lem/nuri}                            ::  edit
-      ^-  {(unit (map path lobe)) _..ze}
-      ?-  -.lem
-        $&
-           =^  yak  lat.ran                             ::  merge objects
-               %+  forge-yaki  wen
-               ?:  =(let.dom 0)                         ::  initial import
-                 [~ p.lem]
-               [(some r:(aeon-to-yaki let.dom)) p.lem]
-           ?.  ?|  =(0 let.dom)
-                   !=((lent p.yak) 1)
-                   !(equiv q.yak q:(aeon-to-yaki let.dom))
-               ==
-             `..ze                                      ::  silently ignore
-           =:  let.dom  +(let.dom)
-               hit.dom  (~(put by hit.dom) +(let.dom) r.yak)
-               hut.ran  (~(put by hut.ran) r.yak yak)
-           ==
-           [`q.yak ..ze]
-           ::  +>.$(ank (checkout-ankh q.yak))
-        $|
-           ?<  (~(has by lab.dom) p.lem)
-           [~ ..ze(lab.dom (~(put by lab.dom) p.lem let.dom))]
-      ==
-    ::
     ::  Gets a map of the data at the given path and all children of it.
-    ++  equiv                                           ::  test paths
-      ~/  %equiv
-      |=  {p/(map path lobe) q/(map path lobe)}
-      ^-  ?
-      =-  ?.  qat  %.n
-          %+  levy  (~(tap by q) ~)
-          |=  {pat/path lob/lobe}
-          (~(has by p) pat)
-      ^=  qat
-      %+  levy  (~(tap by p) ~)
-      |=  {pat/path lob/lobe}
-      =+  zat=(~(get by q) pat)
-      ?~  zat  %.n
-      =(u.zat lob)
-      ::  =((lobe-to-cage u.zat) (lobe-to-cage lob))
-    ::
-    ++  forge-yaki                                      ::    forge-yaki:ze
-      ~/  %forge-yaki
-      |=  {wen/@da par/(unit tako) lem/suba}            ::  forge yaki
-      =+  ^=  per
-          ?~  par  ~
-          ~[u.par]
-      =+  gar=(update-lat (apply-changes lem) lat.ran)
-      :-  (make-yaki per +.gar wen)                     ::  from existing diff
-      -.gar                                             ::  fix lat
     ::
     ++  lobes-at-path                                   ::    lobes-at-path:ze
       ~/  %lobes-at-path
@@ -2257,43 +2086,6 @@
       ?:  =(0 b)
         [~ ~]
       (data-twixt-takos (~(get by hit.dom) a) (aeon-to-tako b))
-    ::
-    ::  Gets the data between two commit hashes, assuming the first is an
-    ::  ancestor of the second.
-    ++  query                                           ::    query:ze
-      ~/  %query
-      |=  ren/$?($u $v $x $y $z)                        ::  endpoint query
-      ^-  (unit cage)
-      ?-  ren
-        $u  !!  ::  [~ %null [%atom %n] ~]
-        $v  [~ %dome !>(dom)]
-        $x  !!  ::  ?~(q.ank.dom ~ [~ q.u.q.ank.dom])
-        $y  !!  ::  [~ %arch !>(as-arch)]
-        $z  !!  ::  [~ %ankh !>(ank.dom)]
-      ==
-    ::
-    ::  Get all the takos before `a`, then get all takos before `b` except the
-    ::  ones we found before `a`.  Then convert the takos to yakis and also get
-    ::  all the data in all the yakis.
-    ++  new-lobes                                       ::  object hash set
-      ~/  %new-lobes
-      |=  {b/(set lobe) a/(set tako)}                   ::  that aren't in b
-      ^-  (set lobe)
-      %+  roll  (~(tap in a) ~)
-      |=  {tak/tako bar/(set lobe)}
-      ^-  (set lobe)
-      =+  yak=(tako-to-yaki tak)
-      %+  roll  (~(tap by q.yak) ~)
-      =<  .(far bar)
-      |=  {{path lob/lobe} far/(set lobe)}
-      ^-  (set lobe)
-      ?~  (~(has in b) lob)                             ::  don't need
-        far
-      =+  gar=(lobe-to-blob lob)
-      ?-  -.gar
-        $direct    (~(put in far) lob)
-        $delta     (~(put in $(lob q.q.gar)) lob)
-      ==
     ::
     ++  data-twixt-takos
       ~/  %data-twixt-takos
@@ -2588,19 +2380,6 @@
       ::    =+  (lobe-to-blob a)
       ::    ?-(-.- %direct q.-, %delta !!)
       ::`+>.$(ank.dom (map-to-ankh -), let.dom yon)
-    ::
-    ::  Traverse an ankh.
-    ++  update-lat                                      ::   update-lat:ze
-      ~/  %update-lat
-      |=  {lag/(map path blob) sta/(map lobe blob)}     ::  fix lat
-      ^-  {(map lobe blob) (map path lobe)}
-      %+  roll  (~(tap by lag) ~)
-      =<  .(lut sta)
-      |=  {{pat/path bar/blob} {lut/(map lobe blob) gar/(map path lobe)}}
-      ?~  (~(has by lut) p.bar)
-        [lut (~(put by gar) pat p.bar)]
-      :-  (~(put by lut) p.bar bar)
-      (~(put by gar) pat p.bar)
     ::
     ++  zu                                              ::  filesystem
       |=  ank/ankh                                      ::  filesystem state
