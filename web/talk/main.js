@@ -363,6 +363,7 @@ module.exports = recl({
           key: "speech"
         }, url);
       case !exp:
+        exp.res = exp.res || ["evaluating..."];
         return div({}, exp.exp, div({
           className: "fat"
         }, pre({}, exp.res.join("\n"))));
@@ -865,7 +866,7 @@ module.exports = recl({
     return indexOf.call(src, s) < 0 && indexOf.call(s, "/") >= 0 && s[0] === "~" && s.length >= 5;
   },
   onKeyUp: function(e) {
-    var $input, v;
+    var $input, d, v;
     $('.menu.depth-1 .add').removeClass('valid-false');
     if (e.keyCode === 13) {
       $input = $(e.target);
@@ -874,6 +875,8 @@ module.exports = recl({
         v = "~" + v;
       }
       if (this.validateSource(v)) {
+        d = new Date(new Date() - 24 * 3600 * 1000);
+        v = v + "/" + window.urb.util.toDate(d);
         StationActions.addSources(this.state.station, [v]);
         $input.val('');
         return $input.blur();
@@ -1351,6 +1354,9 @@ module.exports = recl({
     if (valid === true) {
       stan = $('#audience .input').text() || util.mainStationPath(window.urb.user);
       stan = (stan.split(/\ +/)).map(function(v) {
+        if (v.indexOf("/") === -1) {
+          v = v + "/inbox";
+        }
         if (v[0] === "~") {
           return v;
         } else {

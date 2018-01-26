@@ -391,6 +391,7 @@
           {$ogre p/@tas}                                ::  delete mount point
           {$send p/lane:ames q/@}                       ::  transmit packet
           {$writ p/riot}                                ::  response
+          {$wris p/case p/(set (pair care path))}       ::  many changes
       ==                                                ::
     ++  task                                            ::  in request ->$
       $%  {$boat $~}                                    ::  pier rebooted
@@ -466,6 +467,7 @@
   ++  moat  {p/case q/case r/path}                      ::  change range
   ++  mode  (list {path (unit mime)})                   ::  external files
   ++  mood  {p/care q/case r/path}                      ::  request in desk
+  ++  mool  {p/case q/(set (pair care path))}           ::  requests in desk
   ++  nori                                              ::  repository action
     $%  {$& p/soba}                                     ::  delta
         {$| p/@tas}                                     ::  label
@@ -481,13 +483,14 @@
         lat/(map lobe blob)                             ::  data
     ==                                                  ::
   ++  rant                                              ::  response to request
-    $:  p/{p/care q/case r/@tas}                        ::  clade release book
+    $:  p/{p/care q/case r/desk}                        ::  clade release book
         q/path                                          ::  spur
         r/cage                                          ::  data
     ==                                                  ::
   ++  rave                                              ::  general request
     $%  {$sing p/mood}                                  ::  single request
         {$next p/mood}                                  ::  await next version
+        {$mult p/mool}                                  ::  next version of any
         {$many p/? q/moat}                              ::  track range
     ==                                                  ::
   ++  riff  {p/desk q/(unit rave)}                      ::  request+desist
@@ -936,7 +939,7 @@
     ::  and change subscriptions.
     ::
     ::  change tasks are designed to match high-level
-    ::  operations - for instance, we have %ktsg, %mint,
+    ::  operations - for instance, we have %burn, %mint,
     ::  and %move, not just a single delta operation.
     ::  more of these operations will probably be added,
     ::  and invariants enforced at transaction end.
@@ -1008,7 +1011,7 @@
       action                                            ::  change
     ::
     +=  task                                            ::  in request ->$
-      $%  [%ktsg p=ship q=safe]                         ::  destroy rights
+      $%  [%burn p=ship q=safe]                         ::  destroy rights
           [%hail p=ship q=remote]                       ::  remote update
           [%init p=@pG q=arms]                          ::  initialize urbit
           [%meet p=(unit (unit ship)) q=farm]           ::  integrate pki from
