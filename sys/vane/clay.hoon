@@ -1,3 +1,4 @@
+
 ::  clay (4c), revision control
 ::
 ::  This is split in three top-level sections:  structure definitions, main
@@ -459,6 +460,7 @@
     ?~(nao ~ (read-at-aeon:ze u.nao mun))
   ::
   ++  ford-fail  |=(tan/tang ~|(%ford-fail (mean tan)))
+  ++  now-beak  [her syd %da now]
   ::
   ::  Takes either a result or a stack trace.  If it's a stack trace, we crash;
   ::  else, we produce the result.
@@ -770,13 +772,13 @@
       +>.$
     %-  emit
     :*  hen  %pass  [%ergoing (scot %p her) syd ~]  %f
-        %exec  our  ~  [her syd %da now]  %tabl
+        %exec  our  ~  now-beak  %tabl
         ^-  (list (pair silk:ford silk:ford))
         %+  turn  `(list path)`mus
         |=  a/path
         ^-  (pair silk:ford silk:ford)
         :-  [%$ %path !>(a)]
-        :+  %cast  %mime
+        :+  %cast  [-.bem %mime]
         =+  (need (need (read-x:ze cas a)))
         ?:  ?=($& -<)
           [%$ p.-]
@@ -1034,21 +1036,20 @@
       ==
     =.  +>.$
       %-  emil
+      =/  wir  [(scot %p her) syd (scot %da wen) ~]
       ^-  (list move)
-      :~  :*  hen  %pass
-              [%inserting (scot %p her) syd (scot %da wen) ~]
-              %f  %exec  our  ~  [her syd %da wen]  %tabl
+      :~  :*  hen  %pass  [%inserting wir]
+              %f  %exec  our  ~  now-beak  %tabl
               ^-  (list (pair silk:ford silk:ford))
               %+  turn  ins
               |=  {pax/path mis/miso}
               ?>  ?=($ins -.mis)
               :-  [%$ %path -:!>(*path) pax]
               =+  =>((flop pax) ?~(. %$ i))
-              [%cast - [%$ p.mis]]
+              [%cast [now-beak -] [%$ p.mis]]
           ==
-          :*  hen  %pass
-              [%diffing (scot %p her) syd (scot %da wen) ~]
-              %f  %exec  our  ~  [her syd %da wen]  %tabl
+          :*  hen  %pass  [%diffing wir]
+              %f  %exec  our  ~  now-beak  %tabl
               ^-  (list (pair silk:ford silk:ford))
               %+  turn  dif
               |=  {pax/path mis/miso}
@@ -1056,18 +1057,17 @@
               =+  (need (need (read-x:ze let.dom pax)))
               ?>  ?=($& -<)
               :-  [%$ %path -:!>(*path) pax]
-              [%pact [%$ p.-] [%$ p.mis]]
+              [%pact now-beak [%$ p.-] [%$ p.mis]]
           ==
-          :*  hen  %pass
-              [%castifying (scot %p her) syd (scot %da wen) ~]
-              %f  %exec  our  ~  [her syd %da wen]  %tabl
+          :*  hen  %pass  [%castifying wir]
+              %f  %exec  our  ~  now-beak  %tabl
               ^-  (list (pair silk:ford silk:ford))
               %+  turn  mut
               |=  {pax/path mis/miso}
               ?>  ?=($mut -.mis)
               :-  [%$ %path -:!>(*path) pax]
               =+  (lobe-to-mark:ze (~(got by q:(aeon-to-yaki:ze let.dom)) pax))
-              [%cast - [%$ p.mis]]
+              [%cast [now-beak -] [%$ p.mis]]
           ==
       ==
     %_    +>.$
@@ -1215,13 +1215,13 @@
     %-  emit
     :*  hen  %pass
         [%mutating (scot %p her) syd (scot %da wen) ~]
-        %f  %exec  our  ~  [her syd %da wen]  %tabl
+        %f  %exec  our  ~  now-beak  %tabl
         ^-  (list (pair silk:ford silk:ford))
         %+  turn  cat
         |=  {pax/path cay/cage}
         :-  [%$ %path -:!>(*path) pax]
         =+  (lobe-to-silk:ze pax (~(got by q:(aeon-to-yaki:ze let.dom)) pax))
-        [%diff - [%$ cay]]
+        [%diff now-beak - [%$ cay]]
     ==
   ::
   ::  Handle result of diffing mutations.
@@ -1312,7 +1312,7 @@
     ^+  +>
     %-  emit
     :*  hen  %pass  [%patching (scot %p her) syd ~]  %f
-        %exec  our  :^  ~  [her syd %da now]  %tabl
+        %exec  our  :^  ~  now-beak  %tabl
         ^-  (list (pair silk:ford silk:ford))
         %+  turn  ~(tap by hat)
         |=  {a/path b/lobe}
@@ -1398,7 +1398,7 @@
     ::  =-  ~&  %formed-ergo  -
     %-  emit(dok ~)
     :*  hen  %pass  [%ergoing (scot %p her) syd ~]  %f
-        %exec  our  ~  [her syd %da now]  %tabl
+        %exec  our  ~  now-beak  %tabl
         ^-  (list (pair silk:ford silk:ford))
         %+  turn  ~(tap in sum)
         |=  a/path
@@ -1409,7 +1409,7 @@
           [%$ %null !>(~)]
         =+  (~(get by mim.u.dok) a)
         ?^  -  [%$ %mime !>(u.-)]
-        :+  %cast  %mime
+        :+  %cast  [now-beak %mime]
         =+  (need (need (read-x:ze let.dom a)))
         ?:  ?=($& -<)
           [%$ p.-]
@@ -1575,7 +1575,7 @@
   ++  vale-page
     |=  a/page
     ^-  silk:ford
-    ?.  ?=($hoon p.a)  [%vale a]
+    ?.  ?=($hoon p.a)  [%vale now-beak a]
     ?.  ?=(@t q.a)  [%dude |.(>%weird-hoon<) %ride [%zpzp ~] %$ *cage]
     [%$ p.a [%atom %t ~] q.a]
   ::
@@ -1963,8 +1963,9 @@
     ::  Creates a silk to put a type on a page (which is a {mark noun}).
     ::
     ++  page-to-silk                                    :: %hoon bootstrapping
-      |=  a/page
-      ?.  ?=($hoon p.a)  [%volt a]
+      |=  a=page
+      ^-  silk:ford
+      ?.  ?=($hoon p.a)  [%volt now-beak a]
       [%$ p.a [%atom %t ~] q.a]
     ::
     ::  Creates a silk out of a lobe (content hash).
@@ -1986,7 +1987,7 @@
       ?-  -.bol
         $direct     (page-to-silk q.bol)
         $delta      ~|  delta+q.q.bol
-                    [%pact $(lob q.q.bol) (page-to-silk r.bol)]
+                    [%pact now-beak $(lob q.q.bol) (page-to-silk r.bol)]
       ==
     ::
     ::  Hashes a page to get a lobe.
@@ -2927,7 +2928,7 @@
               ~
             :-  ~
             :-  [%$ %path !>(pax)]
-            [%diff (lobe-to-silk pax lob) (lobe-to-silk pax u.a)]
+            [%diff now-beak (lobe-to-silk pax lob) (lobe-to-silk pax u.a)]
         ==
       ::
       ::  Diff ali's commit against the mergebase.
@@ -3049,7 +3050,7 @@
                   =+  (slag (dec (lent pax)) pax)
                   ?~(- %$ i.-)
               :-  [%$ %path !>(pax)]
-              [%join her [%$ cal] [%$ cob]]
+              [%join [now-beak her] [%$ cal] [%$ cob]]
           ==
         ==
       ::
@@ -3091,7 +3092,7 @@
             ?~  -
               ~|  %mate-strange-diff-no-base
               !!
-            [%pact (lobe-to-silk pax u.-) [%$ u.cay]]
+            [%pact now-beak (lobe-to-silk pax u.-) [%$ u.cay]]
         ==
       ::
       ::  Create new commit.
@@ -3301,7 +3302,7 @@
             =+  b=(~(got by erg.dat) a)
             ?.  b
               [%$ %null !>(~)]
-            :+  %cast  %mime
+            :+  %cast  [now-beak %mime]
             (lobe-to-silk:zez a (~(got by q.new.dat) a))
         ==
       ::
@@ -3386,7 +3387,7 @@
           =+  bol=(~(got by lat.ran) lob)
           ?-  -.bol
             $direct     (page-to-silk q.bol)
-            $delta      [%pact $(lob q.q.bol) (page-to-silk r.bol)]
+            $delta      [%pact now-beak $(lob q.q.bol) (page-to-silk r.bol)]
           ==
         ::
         ::  Find the most recent common ancestor(s).

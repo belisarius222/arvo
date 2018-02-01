@@ -910,7 +910,8 @@
         ?.  ?=($mime p.cay)
           =+  bek=(norm-beak -:(need (de-beam p.tee)))
           =+  tee-ses=?~(ses tee [%ac u.ses tee])
-          (exec-live tee-ses bek [%flag [p.sih `~] %cast %mime [%$ p.q.sih]])
+          %+  exec-live  tee-ses
+          [bek [%flag [p.sih `~] %cast [bek %mime] [%$ p.q.sih]]]
         ~|  q.q.cay
         =+  cug=?~(ses ~ cug:(~(got by wup) u.ses))
         =+  ((hard {mit/mite rez/octs}) q.q.cay)
@@ -958,13 +959,15 @@
   ::
   ++  back                                              ::  %ford bounce
     |=  {tea/whir mar/mark cay/cage}
-    (execute tea (norm-beak -.top) [%cast mar $+cay])
+    =/  bek  (norm-beak -.top)
+    (execute tea bek [%cast [bek mar] $+cay])
   ::
   ++  cast-thou
     |=  {mar/mark cay/cage}
     ?:  ?=($httr mar)  (give-sigh %& cay)
-    %^  execute  si+~  (norm-beak -.top)
-    [%alts [%cast mar $+cay] [%cast %recoverable-error $+cay] ~]
+    =/  bek  (norm-beak -.top)
+    %^  execute  si+~  bek
+    [%alts [%cast [bek mar] $+cay] [%cast [bek %recoverable-error] $+cay] ~]
   ::
   ++  del-deps
     |=  {a/@uvH b/(each duct ixor)}  ^+  +>.$
@@ -985,7 +988,6 @@
     =-  -(hen hen.+)
     (pass-note(hen `~) on+~ %f [%wasp our a &])
   ::
-  ++  ford-req  |=({bek/beak kas/silk:ford} [%f [%exec our `[bek kas]]])
   ++  exec-live
     |=  {tea/whir req/{beak silk:ford}}
     =.  lyv  (~(put by lyv) hen [%exec tea])

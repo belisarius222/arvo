@@ -820,29 +820,30 @@
         {$fszy q/mark}                                  ::  /mark/ static/grow
     ==                                                  ::
   ++  milk  (trel ship desk silk)                       ::  sourced silk
+  ++  bark  (pair beak mark)                            ::  mark at a beak
   ++  silk                                              ::  construction layer
     $^  {p/silk q/silk}                                 ::  cons
     $%  {$$ p/cage}                                     ::  literal
         {$alts p/(list silk)}                           ::  options
         {$bake p/mark q/coin r/beam}                    ::  local synthesis
-        {$bunt p/mark}                                  ::  example of mark
+        {$bunt p/bark}                                  ::  example of mark
         {$call p/silk q/silk}                           ::  slam
-        {$cast p/mark q/silk}                           ::  translate
+        {$cast p/bark q/silk}                           ::  translate
         {$core p/beam}                                  ::  build program
-        {$diff p/silk q/silk}                           ::  diff
+        {$diff p/beak q/silk r/silk}                    ::  diff
         {$dude p/(trap tank) q/silk}                    ::  error wrap
         {$file p/beam}                                  ::  from clay
         {$flag p/(set $@(@uvH beam)) q/silk}            ::  add dependencies
-        {$join p/mark q/silk r/silk}                    ::  merge
-        {$mash p/mark q/milk r/milk}                    ::  annotate
+        {$join p/bark q/silk r/silk}                    ::  merge
+        {$mash p/bark q/milk r/milk}                    ::  annotate
         {$mute p/silk q/(list (pair wing silk))}        ::  mutant
-        {$pact p/silk q/silk}                           ::  patch
+        {$pact p/beak q/silk r/silk}                    ::  patch
         {$plan p/beam q/coin r/hood}                    ::  structured assembly
         {$reef $~}                                      ::  kernel reef
         {$ride p/hoon q/silk}                           ::  silk thru hoon
         {$tabl p/(list (pair silk silk))}               ::  list
-        {$vale p/mark q/*}                              ::  validate
-        {$volt p/(cask *)}                              ::  unsafe add type
+        {$vale p/beak q/mark r/*}                       ::  validate
+        {$volt p/beak q/(cask *)}                       ::  unsafe add type
     ==                                                  ::
   --  ::ford
 ::                                                      ::::

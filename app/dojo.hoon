@@ -1323,8 +1323,8 @@
         $ge  (dy-silk-config (dy-cage p.p.p.bil) q.p.bil)
         $dv  [/hand [%core he-beak (flop p.bil)]]
         $ex  [/hand (dy-mare p.bil)]
-        $sa  [/hand [%bunt p.bil]]
-        $as  [/hand [%cast p.bil [%$ (dy-cage p.q.bil)]]]
+        $sa  [/hand [%bunt he-beak p.bil]]
+        $as  [/hand [%cast [he-beak p.bil] [%$ (dy-cage p.q.bil)]]]
         $do  [/hand [%call (dy-mare p.bil) [%$ (dy-cage p.q.bil)]]]
         $tu  :-  /hand
              :-  %$
@@ -1367,7 +1367,7 @@
       |=  gen/hoon
       ^-  silk:ford
       =+  too=(dy-hoon-mark gen)
-      =-  ?~(too - [%cast u.too -])
+      =-  ?~(too - [%cast [he-beak u.too] -])
       :+  %ride  gen
       :-  [%$ dy-hoon-head]
       [%plan he-beam blob+** [zuse sur lib ~ ~]]

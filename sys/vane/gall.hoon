@@ -485,14 +485,15 @@
   ::
   ++  mo-clip                                           ::  apply club
     |=  {dap/dude pry/prey cub/club}
+    =/  bek  (mo-beak dap)
     ?:  ?=($puff -.cub)
       %+  mo-pass
         [%sys %val (scot %p q.q.pry) dap ~]
-      [%f %exec our ~ (mo-beak dap) %vale +.cub]
+      [%f %exec our ~ bek %vale bek +.cub]
     ?:  ?=($punk -.cub)
       %+  mo-pass
         [%sys %val (scot %p q.q.pry) dap ~]
-      [%f %exec our ~ (mo-beak dap) %cast p.cub %$ q.cub]
+      [%f %exec our ~ bek %cast [bek p.cub] %$ q.cub]
     ?:  ?=($peer-not -.cub)
       (mo-give %unto %reap (some p.cub))
     ap-abet:(ap-club:(ap-abed:ap dap pry) cub)
@@ -527,7 +528,8 @@
         $d
       %+  mo-pass
         [%sys %rep (scot %p him) dap (scot %ud num) ~]
-      [%f %exec our ~ (mo-beak dap) %vale p.ron q.ron]
+      =+  bek=(mo-beak dap)
+      [%f %exec our ~ bek %vale bek p.ron q.ron]
     ::
         $x  =.  +>  (mo-give %mack ~)                  ::  XX should crash
             (mo-give(hen (mo-ball him num)) %unto %quit ~)
@@ -605,7 +607,8 @@
         ?:  =(mar p.cay)  [%give %unto p.q.cov]
         :+  %pass
           [%sys %pel dap ~]
-        [%f %exec our ~ (mo-beak dap) %cast mar %$ cay]
+        =+  bek=(mo-beak dap)
+        [%f %exec our ~ bek %cast [bek mar] %$ cay]
       ::
           $pass
         :+  %pass  `path`[%use dap p.q.cov]
