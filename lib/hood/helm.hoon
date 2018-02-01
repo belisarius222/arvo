@@ -42,8 +42,8 @@
 ::                                                      ::  ::
 ::::                                                    ::  ::
   ::                                                    ::  ::
-|=  {bowl:gall part}                                   ::  main helm work
-=+  sez=(fall (~(get by hoc) ost) *session)
+|:  $:{bowl:gall part}                                  ::  main helm work
+=+  sez=(fall (~(get by hoc) ost) $:session)
 =>  |%                                                  ::  arvo structures
     ++  card                                            ::
       $%  {$cash wire p/@p q/buck:ames}                 ::
@@ -64,7 +64,8 @@
           {$hall-action action:hall}                    ::
       ==                                                ::
     --
-|_  moz/(list move)
+=+  moz=((list move))
+|%
 ++  abet                                              ::  resolve
   [(flop moz) %_(+<+.$ hoc (~(put by hoc) ost sez))]
 ::
@@ -141,7 +142,7 @@
 ::
 ++  poke-reload  |=(all/(list term) (poke-reload-desk %home all))
 ++  poke-reload-desk                                 ::  reload vanes
-  |=  {syd/desk all/(list term)}  =<  abet
+  |:  $:{syd/desk all/(list term)}  =<  abet
   %-  emil
   %-  flop
   %+  turn  all
@@ -212,7 +213,7 @@
   [%flog /reset %veer p way txt]
 ::
 ++  poke-will                                         ::  hear certificate
-  |=  wil/(unit wyll:ames)
+  |:  wil=((unit wyll:ames))
   ?>  ?=(^ bur)
   ?>  ?=(^ wil)
   =<  abet
