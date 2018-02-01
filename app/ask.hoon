@@ -3,6 +3,14 @@
   ::
 /?    310
 /+    sole, hood-womb, prey
+::
+::    should complain no foo until I add dummy dep (add ~ to app/ask/foo.hoon)
+::    once this app successfully builds, echo a newline into foo.hoon
+::    this should change the beam for app/ask/foo but not the boil, so i should see
+::    a 'put-in-unchanged' somewhere. then change the ~ to ~nul and make sure the
+::    whole app reloads.
+/=  foo  /:    /%/foo  /!noun/
+::
 [. sole]
 |%
   ++  card
@@ -20,6 +28,11 @@
         wom/(unit ship)
         admins/(set ship)
     ==
+++  prep
+  |=  old=*
+  ~&  test-ask-prep+foo
+  [~ ..prep]
+::
 ++  prompt
   ^-  sole-prompt
   ?~  wom  [& %ask-ship ":womb-ship? ~"]
