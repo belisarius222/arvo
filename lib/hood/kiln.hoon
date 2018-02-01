@@ -517,9 +517,10 @@
         =+  "mashing conflicts"
         =>  .(+>.$ (spam leaf+- ~))
         =+  tic=(cat 3 syd '-scratch')
+        =/  bek  [our tic %da now]
         %-  blab  :_  ~
         :*  ost  %exec  /kiln/[syd]
-            our  ~  [our tic %da now]  %tabl
+            our  ~  bek  %tabl
             ^-  (list (pair silk:ford silk:ford))
             :: ~&  >  kiln-mashing+[p.are syd=syd +<.abet]
             %+  turn  ~(tap in p.are)
@@ -529,12 +530,12 @@
             =+  base=[%file [our tic %da now] (flop pax)]
             =+  alis=[%file [her sud cas] (flop pax)]
             =+  bobs=[%file [our syd %da now] (flop pax)]
-            =+  dali=[%diff base alis]
-            =+  dbob=[%diff base bobs]
+            =+  dali=[%diff bek base alis]
+            =+  dbob=[%diff bek base bobs]
             =+  ^-  for/mark
                 =+  (slag (dec (lent pax)) pax)
                 ?~(- %$ i.-)
-            [%mash for [her sud dali] [our syd dbob]]
+            [%mash [bek for] [her sud dali] [our syd dbob]]
         ==
       =+  "failed to merge with strategy meld"
       lose:(spam leaf+- >p.p.are< q.p.are)

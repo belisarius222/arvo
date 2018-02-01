@@ -132,7 +132,7 @@
     (made pax ~ &+cay)
   =<  abet
   %^  emit  %exec  write+pax                ::  XX defer %nice
-  [our ~ beak-now %cast u.ext $+cay]
+  [our ~ beak-now %cast [beak-now u.ext] $+cay]
 ::
 ++  made
   |=  {pax/wire @ res/gage:ford}  ^+  abet

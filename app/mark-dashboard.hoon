@@ -46,7 +46,7 @@
   %+  turn  (weld list-marks list-sub-marks)
   |=  {a/mark $~}  ^-  {silk silk}
   :-  [%$ %mark !>(a)]
-  [%bunt a]
+  [%bunt now-beak a]
 ::
 ++  poke-noun
   |=  *
