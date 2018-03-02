@@ -45,6 +45,29 @@
       sup=(jug @uvH duct)                               ::  hash listeners
       out=(set [beam care:clay])                        ::  listening beams
   ==                                                    ::
+::
+::
+:: preparation:
+:: - change mark to (pair beak mark) in API
+:: - update documentation of the beak in ++bilk as the
+::   beak with respect to which this build is live
+:: 
+:: dent-related steps:
+:: - only register live dependencies
+:: - change ++dent from beam to spur to only express live dependencies
+:: - move nozzle to ++beak-state
+:: - restructure ++deps from dent to (pair beak dent)
+:: 
+:: cache-related steps:
+:: - move the cache to ++beak-state
+:: - restructure ++calx to use ++rel-beam
+:: 
+:: then:
+:: - move `out.bay` to ++beak-state
+:: - use the beak in ++zo to resolve ++rel-beams
+:: - use %mult
+:: 
+:: 
 +=  deps                                                ::
   $:  def=(map @uvH (set dent))                         ::  hash obligations
       bak=(jug dent @uvH)                               ::  update to hash
@@ -73,6 +96,7 @@
 +=  calm                                                ::  cache metadata
   $:  dep=(set dent)                                    ::  dependencies
   ==                                                    ::
+::  +=  rel-beam  (pair ?(~ beak) spur)                     ::
 +=  calx                                                ::  concrete cache line
   $%  [%hood p=calm q=(pair beam cage) r=hood]          ::  parse
       [%boil p=calm q=(trel coin beam beam) r=vase]     ::  execute
@@ -195,6 +219,38 @@
     den(s.bem (flop (scag (lent s.bem.folder) (flop s.bem.den))))
   --
 ::
+++  has-ask                                             ::  is  path in /ask ?
+  (has-seg 'ask')
+::
+++  has-seg
+  |=  seg=knot
+  |=  pax=path  ^-  ?
+  %+  lien  pax
+  |=  k=knot
+  =(seg (end 3 3 k))
+::
+++  ren-beamcare                                        ::  print [beam care]
+  |=([bem=beam ren=care:clay] `path`[(crip %c ren ~) (en-beam bem)])
+::
+++  ren-dent                                            ::  print a dent
+  |=  a=dent  ::^-  $^({path mark @p} path)
+  ?-  -.a
+    %beam  [%beam (ren-beamcare +.a)]
+    %boil  [%boil (en-beam bem.a) (en-beam bom.a) `@p`(mug arg.a)]
+    %load  [%load (en-beam bem.a) mar.a]
+  ==
+::
+++  ren-dents                                           ::  print (set dent)
+  |=  dez=(set dent)
+  (turn ~(tap in dez) ren-dent)
+::
+++  ren-jug                                             ::  print jug  of dents
+  |=  a=(jug dent dent)
+  %-  malt  ^-  (list (pair ren-dent (set ren-dent)))
+  %+  turn  ~(tap by a)
+  |=  [b=dent c=(set dent)]
+  [(ren-dent b) (silt (turn ~(tap in c) ren-dent))]
+::
 ++  pin-dephash
   :>    compute the hash of a set of dents and store it in a deps.
   :>
@@ -222,6 +278,17 @@
 ::
 ++  bo                                                  ::  bolt operations
   |%
+  ++  print-foo
+    |=  msg=@t
+    |*  a=(bolt)  ^+  a
+    ~?  (has-seg 'ask' a)  msg^(has-seg 'foo' a)
+    a
+  ::
+  ++  has-seg
+    |*  [seg=knot a=(bolt)]  ^-  ?
+    ?:  ?=(%1 -.q.a)  |
+    (~(any in p.q.a) |=(den=dent ((^has-seg seg) s.bem.den)))
+  :: 
   ++  to-gage                                           ::  wrap vase
     |=  a/(bolt vase)  ^-  (bolt gage)
     (tug a (with |=(a/vase [%& %noun a])))
@@ -256,6 +323,20 @@
   ++  under-dep                                         ::  link deps with
     |*  {a/dent b/(bolt)}                               ::  a as current dep
     ?:  ?=($1 -.q.b)  b                                 ::  and links a to
+    ::
+    =;  ret
+      =/  dos  (~(upstream-dents na s.p.ret) (sy a ~))
+      ~?  (has-ask s.bem.a)
+        :*  %under-dep
+            und=(ren-dent a)
+            des=(ren-dents p.q.b)
+            dos=(ren-dents dos)
+            res=(ren-dents (~(get ju sub.s.p.ret) a))
+            old=~(wyt by sub.s.p.b)
+            new=~(wyt by sub.s.p.ret)
+        ==
+    ret
+    ::
     =:  p.q.b  (sy a ~)                                 ::  s.p.b so a depends
         s.p.b  (~(add-sub na s.p.b) a p.q.b)
       ==
@@ -807,7 +888,8 @@
     ::  send %news moves to listeners and cancel listeners
     =/  hashes=(list @uvH)  ~(tap in changed-hashes)
     ::
-    ::  ~&  [den=den dos=dos hashes=hashes]
+    ~?  dbg  deps-take+[bem+(en-beam bem) new+(ren-dents changed) hashes+hashes]
+    ~?  &(dbg ?=(^ hashes))  (ren-dents (~(get ju def.deh.bay) i.hashes))
     ::
     |-  ^+  this
     ?~  hashes  this
@@ -828,6 +910,7 @@
       %-  ~(rep in des)
       |=  [den=dent hashes=(set @uvH)]
       =/  bak  (~(get ju bak.deh.bay) den)
+      ~?  &(dbg ?=(^ bak))  deps-take+[den+(ren-dent den) bak+bak]
       (~(uni in hashes) (~(get ju bak.deh.bay) den))
     --
   ::
@@ -849,6 +932,9 @@
     =^  results  this  (rebuild bek new todo)
     =+  [changed unchanged]=results
     ~|  unchanged=unchanged
+    ~?  dbg  :+  %on-update
+               changed+(ren-dents changed)
+             unchanged+(ren-dents unchanged)
     [changed (promote-unchanged unchanged bek)]
   ::
   ++  rebuild  ::  !.  ::  TODO reinstate
@@ -868,18 +954,19 @@
     ::
     ::  don't try to rebuild the changed files themselves.
     ?:  (~(has in new) i.todo)
-      ~?  dbg  new+i.todo
+      ~?  dbg  new+(ren-dent i.todo)
       $(todo t.todo)
     ::
     ::  if we've already built a dent at this revision, don't build it again.
     ?:  (~(has in unchanged) i.todo)
-      ~?  dbg  unchanged+i.todo
+      ~?  dbg  unchanged+(ren-dent i.todo)
       $(todo t.todo)
     ::
     ::  if none of our dependencies are in new, then check whether all of them
     ::  are unchanged. if all of them are unchanged, we can avoid rebuilding.
     ::  otherwise, rebuild.
     =/  dez  (~(get ju sub.gaf.bay) i.todo)
+    ~&  dez+[(ren-dent i.todo) (ren-dents dez)]
     ?.  (~(any in dez) ~(has in new))
       ::
       ::  filter out any unchanged sub-dependencies, including
@@ -891,11 +978,11 @@
       ::  if we know all sub-dependencies are unchanged,
       ::  then mark this todo as unchanged and continue.
       ?:  =(~ dez)
-        ~?  dbg  put-in-unchanged+i.todo
+        ~?  dbg  put-in-unchanged+(ren-dent i.todo)
         $(unchanged (~(put in unchanged) i.todo), todo t.todo)
       ::
       ::  otherwise, build all unknown sub-dependencies first and try again.
-      ~?  dbg  adding-dez+~(tap in dez)
+      ~?  dbg  adding-dez+(ren-dents dez)
       $(todo (weld ~(tap in dez) todo))
     ::
     ::  some of our sub-dependencies have been invalidated,
@@ -908,7 +995,7 @@
         $1  ~|([%stub-block p.q.bil] !!)  ::TODO store state in task
         $2
       ::  errors cannot be promoted, so consider this a new build.
-      ~?  dbg  rebuilt+error+i.todo
+      ~?  dbg  rebuilt+error+(ren-dent i.todo)
       $(new (~(put in new) i.todo), todo t.todo)
     ::
         $0
@@ -918,9 +1005,9 @@
       ::  from the previous result, then consider this build new.
       ::  otherwise, consider it unchanged.
       ?:  |(?=(~ pre) !=(r.u.pre q.q.bil))
-        ~?  dbg  rebuilt+new+i.todo
+        ~?  dbg  rebuilt+new+(ren-dent i.todo)
         $(new (~(put in new) i.todo), todo t.todo)
-      ~?  dbg  rebuilt+same+i.todo
+      ~?  dbg  rebuilt+same+(ren-dent i.todo)
       $(unchanged (~(put in unchanged) i.todo), todo t.todo)
     ==
   ::
@@ -1196,7 +1283,7 @@
     ++  compile-to-hood
       ~/  %compile-to-hood
       |=  {cof/cafe bem/beam}
-      :: ~&  compile-to-hood+(en-beam bem)
+      %-  (print-foo:bo %compile-to-hood)
       ^-  (bolt hood)
       %+  admit:bo  |.(leaf+"ford: compile-to-hood {<[(en-beam bem)]>}")
       %+  tug:bo  (load-file cof %*(. bem s [%hoon s.bem]))
@@ -1467,6 +1554,7 @@
     ::
     ++  load-core
       |=  {cof/cafe bem/beam}  ^-  (bolt vase)
+      %-  (print-foo:bo %load-core)
       %+  tug:bo  (to-concrete-revision cof bem)
       |=  {cof/cafe bem/beam}
       (boil cof many+~ bem bem)
@@ -1475,9 +1563,11 @@
       ~/  %boil
       |=  {cof/cafe arg/coin bem/beam bom/beam}
       ^-  (bolt vase)
+      %-  (print-foo:bo %boil)
       %+  tug:bo  (to-concrete-revision cof bem)
       |=  {cof/cafe bem/beam}
       %+  under-dep:bo  `dent`[%boil bem bom arg]
+      ~?  (has-ask s.bem)  boil+(en-beam bem)
       %+  (with-cache:bo %boil)  (new:bo cof arg bem bom)
       |=  {cof/cafe arg/coin bem/beam bom/beam}
       %+  tug:bo  (fame cof bem)
@@ -1499,8 +1589,10 @@
       ~/  %load-file
       |=  {cof/cafe bem/beam}
       ^-  (bolt cage)
+      %-  (print-foo:bo %load-file)
       %+  tug:bo  (add-dep:bo [%beam bem %z] (new:bo cof bem))
       |=  [cof=cafe bem=beam]
+      ~?  (has-ask s.bem)  load-file+(en-beam bem)
       ?:  =([%ud 0] r.bem)
         (err:bo cof [leaf+"ford: no data: {<(en-beam bem(s ~))>}"]~)
       =+  von=(syve [151 %noun] ~ %cx bem)
@@ -1513,6 +1605,7 @@
     ++  load-to-mark
       ~/  %load-to-mark
       |=  {cof/cafe for/mark bem/beam}
+      %-  (print-foo:bo %load-to-mark)
       %+  under-dep:bo  `dent`[%load bem for]
       %+  (with-cache:bo %load)  (new:bo cof for bem)
       |=  {cof/cafe for/mark bem/beam}
@@ -1533,6 +1626,7 @@
     ++  render-or-load
       |=  {cof/cafe for/mark arg/coin bem/beam}
       ^-  (bolt vase)
+      %-  (print-foo:bo %render-or-load)
       %+  catch:bo
         %+  admit:bo  |.(leaf+"load: attempt renderer")
         (boil cof arg [-.bem /[for]/ren] bem)
@@ -1707,6 +1801,7 @@
           |.(leaf+"ford: bake {<p.kas>} {<(en-beam r.kas)>} {~(rend co q.kas)}")
         %+  tug:bo  (to-concrete-revision cof r.kas)
         |=  {cof/cafe bem/beam}
+        ~?  (has-ask s.bem)  bake+(en-beam bem)
         %+  tug:bo  (render-or-load cof p.kas q.kas bem)
         |=  {cof/cafe vax/vase}
         (new:bo cof `gage`[%& p.kas vax])
@@ -1897,6 +1992,7 @@
       ++  abut                                          ::  generate
         |=  {cof/cafe hyd/hood}                         ::  TODO: $ and |^
         ^-  (bolt vase)
+        %-  (print-foo:bo %abut-meow)
         %+  tug:bo  (apex cof hyd)
         |=  {cof/cafe sel/_..abut}
         =.  ..abut  sel
@@ -1956,6 +2052,7 @@
       ++  chap                                          ::  produce resources
         |=  {cof/cafe bax/vase hon/horn}
         ^-  (bolt cage)
+        %-  (print-foo:bo %chap-meow)
         ?-    -.hon
             $fssg
           (tug:bo (wrapped-slap cof bax p.hon) (with:bo |=(a/vase [%noun a])))
@@ -2054,6 +2151,7 @@
         ::
             $fszp
           %+  admit:bo  |.(leaf+"ford: hook {<q.hon>} {<(en-beam how)>}")
+          %-  (print-foo:bo %fszp)
           %.  [cof how]
           ;~  tug:bo
             compile-to-hood
