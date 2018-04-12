@@ -1269,7 +1269,6 @@
     ++  start-live-build
       ^+  this
       =/  build=build  [now schematic]
-      ~&  start-live-build+build
       ::
       =:    listeners.state
         (~(put ju listeners.state) build [duct %.y])
@@ -1287,7 +1286,6 @@
       ^+  this
       =/  pin-date=@da  (date-from-schematic schematic)
       =/  build=build  [pin-date schematic]
-      ~&  start-once-build+build
       ::  associate +listener with :build in :state
       ::
       =:  listeners.state
@@ -1487,7 +1485,6 @@
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
-        ~&  old-build-is-null+build
         $(builds t.builds, can-promote |, gathered [build gathered])
       ::  copy :old-build's live listeners
       ::
@@ -1495,7 +1492,6 @@
         =-  (skim - is-listener-live)
         =-  ~(tap in `(set listener)`(fall - ~))
         (~(get by listeners.state) u.old-build)
-      ~&  gather+[build+build old-live-listeners+old-live-listeners]
       ::
       =.  state
         %+  roll  old-live-listeners
@@ -1630,7 +1626,6 @@
       ::
       =/  next  (~(find-next by-schematic builds-by-schematic.state) build)
       ?~  next
-        ~&  send-future-mades-next-null-for+build
         ::  no future build
         ::
         [~ ..execute]
@@ -1732,12 +1727,11 @@
           ?~  unified-listeners
             listeners.state
           ::
-          (~(put by listeners.state) build.made unified-listeners)
+          (~(put by listeners.state) sub-build unified-listeners)
         ==
       ::
       ?-    -.result.made
           %build-result
-          ~&  made+build.made
         ::
         =.  results.state
           %+  ~(put by results.state)  build.made
@@ -1778,10 +1772,8 @@
           ::
           (access-cache u.previous-build)
         ::
-        ~&  listeners+listeners.state
         =?  state  &(?=(^ previous-build) ?=(^ previous-result))
           (promote-live-listeners u.previous-build build.made)
-        ~&  listeners+listeners.state
         ::
         =.  ..execute  (send-mades build.made (root-once-listeners build.made))
         =.  state  (delete-root-once-listeners build.made)
@@ -1817,7 +1809,6 @@
         $(state-diffs t.state-diffs)
       ::
           %blocks
-        ~&  blocked+build.made
         =?    moves
             ?=(^ scry-blocked.result.made)
           ::
@@ -2508,9 +2499,7 @@
             (~(has by old.rebuilds.state) build)
             (~(has by listeners.state) build)
         ==
-      ~&  cleanup-noop+build
       this
-    ~&  cleanup-delete+build
     ::  remove :build from :state, starting with its cache line
     ::
     =.  results.state  (~(del by results.state) build)
