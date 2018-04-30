@@ -11,7 +11,7 @@
   test-is-schematic-live
   test-date-from-schematic
   test-unify-jugs
-  test-dependency-wire-encoding
+  test-resource-wire-encoding
   test-literal
   test-autocons-same
   test-autocons-different
@@ -101,29 +101,29 @@
   ::
   `(jug @tas @ud)`(my ~[[%a (sy 1 2 ~)] [%b (sy 3 4 5 6 ~)] [%c (sy 7 8 ~)]])
 ::
-++  test-dependency-wire-encoding
-  ~&  %test-dependency-wire-encoding
+++  test-resource-wire-encoding
+  ~&  %test-resource-wire-encoding
   ::
   =/  ford  (ford-turbo now=~1234.5.6 eny=0xdead.beef scry=scry-is-forbidden)
   ::
   ;:  welp
     %-  expect-eq  !>
-    :-  `path`(dependency-to-path:ford [%c care=%x bel=[[~nul %desk] /foo/bar]])
+    :-  `path`(resource-to-path:ford [%c care=%x bel=[[~nul %desk] /foo/bar]])
     /cx/~nul/desk/0/bar/foo
   ::
     %-  expect-eq  !>
-    :-  `dependency:ford`[%c care=%x bel=[[~nul %desk] /foo/bar]]
-    (need (path-to-dependency:ford /cx/~nul/desk/0/bar/foo))
+    :-  `resource:ford`[%c care=%x bel=[[~nul %desk] /foo/bar]]
+    (need (path-to-resource:ford /cx/~nul/desk/0/bar/foo))
   ::
     %-  expect-eq  !>
     :-  ^-  path
-      (dependency-to-path:ford [%g care=%x bel=[[~nul %desk] /foo/bar]])
+      (resource-to-path:ford [%g care=%x bel=[[~nul %desk] /foo/bar]])
     /gx/~nul/desk/0/bar/foo
   ::
     %-  expect-eq  !>
-    :-  ^-  dependency:ford
+    :-  ^-  resource:ford
       [%g care=%x bel=[[~nul %desk] /foo/bar]]
-    (need (path-to-dependency:ford /gx/~nul/desk/0/bar/foo))
+    (need (path-to-resource:ford /gx/~nul/desk/0/bar/foo))
   ==
 ::
 ++  test-literal
@@ -140,7 +140,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %give  %made  ~1234.5.6
-            %complete  %result  %pin  ~1234.5.6  %result  %$  %noun  !>(**)
+            %complete  %success  %pin  ~1234.5.6  %success  %$  %noun  !>(**)
     ==  ==
   ::
   (expect-ford-empty ford ~nul)
@@ -159,9 +159,9 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %give  %made  ~1234.5.6  %complete
-            %result  %pin  ~1234.5.6  %result
-            [%result %$ %noun !>(**)]
-            [%result %$ %noun !>(**)]
+            %success  %pin  ~1234.5.6  %success
+            [%success %$ %noun !>(**)]
+            [%success %$ %noun !>(**)]
     ==  ==
   ::
   (expect-ford-empty ford ~nul)
@@ -180,9 +180,9 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %give  %made  ~1234.5.6  %complete
-            %result  %pin  ~1234.5.6  %result
-            [%result %$ %noun !>(42)]
-            [%result %$ %noun !>(43)]
+            %success  %pin  ~1234.5.6  %success
+            [%success %$ %noun !>(42)]
+            [%success %$ %noun !>(43)]
     ==  ==
   ::
   (expect-ford-empty ford ~nul)
@@ -201,8 +201,8 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %result
-            [%pin ~1234.5.6 %result [%scry %noun !>(42)]]
+    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
+            [%pin ~1234.5.6 %success [%scry %noun !>(42)]]
     ==  ==
   ::
   (expect-ford-empty ford ~nul)
@@ -223,7 +223,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %give  %made  ~1234.5.6  %complete
-        %result  %pin  ~1234.5.6  %error
+        %success  %pin  ~1234.5.6  %error
         :~  leaf+"scry failed for"
             leaf+"%cx /~nul/desk/~1234.5.6/foo/bar"
     ==  ==  ==
@@ -245,7 +245,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %pass
-            wire=/~nul/dependency/cx/~nul/desk/0/foo/bar
+            wire=/~nul/resource/cx/~nul/desk/0/foo/bar
             %c  %warp  [~nul ~nul]  %desk
             ~  %sing  %x  [%da ~1234.5.6]  /bar/foo
     ==  ==
@@ -254,7 +254,7 @@
   ::
   =^  moves2  ford
     %-  take:ford
-    :*  wire=/~nul/dependency/cx/~nul/desk/0/foo/bar  duct=~
+    :*  wire=/~nul/resource/cx/~nul/desk/0/foo/bar  duct=~
         ^=  wrapped-sign  ^-  (hypo sign:ford)  :-  *type  ::  ^-  sign:ford
         [%c %writ ~ [%x [%da ~1234.5.6] %desk] /bar/foo %noun !>(42)]
     ==
@@ -262,8 +262,8 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %result
-            [%pin ~1234.5.6 %result [%scry %noun !>(42)]]
+    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
+            [%pin ~1234.5.6 %success [%scry %noun !>(42)]]
     ==  ==
   ::
   (expect-ford-empty ford ~nul)
@@ -284,7 +284,7 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %result
+    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
             [%scry %noun !>(42)]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
@@ -302,7 +302,7 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %result
+    :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %success
             [%scry %noun !>(43)]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
@@ -338,7 +338,7 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~[/first]  %give  %made  ~1234.5.6  %complete  %result
+    :~  :*  duct=~[/first]  %give  %made  ~1234.5.6  %complete  %success
             [%scry %noun !>(42)]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
@@ -357,7 +357,7 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~[/second]  %give  %made  ~1234.5.7  %complete  %result
+    :~  :*  duct=~[/second]  %give  %made  ~1234.5.7  %complete  %success
             [%scry %noun !>(42)]
     ==  ==
   ::
@@ -394,7 +394,7 @@
     ==
   =/  build=build:ford  [~1234.5.6 schematic]
   =/  result=build-result:ford
-    [%result %same %result %pin ~1234.5.6 %result [%scry %noun !>(42)]]
+    [%success %same %success %pin ~1234.5.6 %success [%scry %noun !>(42)]]
   ::
   =^  moves  ford  (call:ford [duct=~ type=~ %make ~nul schematic])
   %+  welp
@@ -407,18 +407,18 @@
     :-  results:(~(got by state-by-ship.+>+<.ford) ~nul)
     %-  my  :~
       :-  [~1234.5.6 [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]]
-      [%result ~1234.5.6 %result %scry %noun !>(42)]
+      [%value ~1234.5.6 %success %scry %noun !>(42)]
     ::
       :-  :*  ~1234.5.6  %pin  ~1234.5.6
               [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
           ==
-      [%result ~1234.5.6 %result %pin ~1234.5.6 %result %scry %noun !>(42)]
+      [%value ~1234.5.6 %success %pin ~1234.5.6 %success %scry %noun !>(42)]
     ::
       :-  :*  ~1234.5.6  %same  %pin  ~1234.5.6
               [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
           ==
-      :*  %result  ~1234.5.6  %result  %same  %result  %pin  ~1234.5.6
-          %result  %scry  %noun  !>(42)
+      :*  %value  ~1234.5.6  %success  %same  %success  %pin  ~1234.5.6
+          %success  %scry  %noun  !>(42)
       ==
     ==
   ::
@@ -450,7 +450,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %pass
-            wire=/~nul/dependency/cx/~nul/desk/0/foo/bar
+            wire=/~nul/resource/cx/~nul/desk/0/foo/bar
             %c  %warp  [~nul ~nul]  %desk
             ~  %sing  %x  [%da ~1234.5.6]  /bar/foo
         ==
@@ -479,7 +479,7 @@
   =.  ford  (ford now=~1234.5.8 eny=0xbeef.dead scry=scry-42)
   =^  moves3  ford
     %-  take:ford
-    :*  wire=/~nul/dependency/cx/~nul/desk/0/foo/bar  duct=~
+    :*  wire=/~nul/resource/cx/~nul/desk/0/foo/bar  duct=~
         ^=  wrapped-sign  ^-  (hypo sign:ford)  :-  *type  ::  ^-  sign:ford
         [%c %writ ~ [%x [%da ~1234.5.6] %desk] /bar/foo %noun !>(42)]
     ==
@@ -487,10 +487,10 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves3
-    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %result
+    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
             [%scry %noun !>(42)]
         ==
-        :*  duct=~  %give  %made  ~1234.5.7  %complete  %result
+        :*  duct=~  %give  %made  ~1234.5.7  %complete  %success
             [%scry %noun !>(43)]
     ==  ==
   ::
@@ -525,7 +525,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %pass
-            wire=/~nul/dependency/cx/~nul/desk/0/foo/bar
+            wire=/~nul/resource/cx/~nul/desk/0/foo/bar
             %c  %warp  [~nul ~nul]  %desk
             ~  %sing  %x  [%da ~1234.5.6]  /bar/foo
         ==
@@ -549,7 +549,7 @@
   =.  ford  (ford now=~1234.5.8 eny=0xbeef.dead scry=scry-is-forbidden)
   =^  moves2  ford
   %-  take:ford
-  :*  wire=/~nul/dependency/cx/~nul/desk/0/foo/bar  duct=~
+  :*  wire=/~nul/resource/cx/~nul/desk/0/foo/bar  duct=~
       ^=  wrapped-sign  ^-  (hypo sign:ford)  :-  *type  ::  ^-  sign:ford
       [%c %writ ~ [%x [%da ~1234.5.6] %desk] /bar/foo %noun !>(42)]
   ==
@@ -558,10 +558,10 @@
     %-  expect-eq  !>
     :-  moves2
     :~  :*  duct=~[/live]  %give  %made  ~1234.5.6  %complete
-            [%result [%scry %noun !>(42)]]
+            [%success [%scry %noun !>(42)]]
         ==
         :*  duct=~[/once]  %give  %made  ~1234.5.6  %complete
-            [%result [%pin ~1234.5.6 %result [%scry %noun !>(42)]]]
+            [%success [%pin ~1234.5.6 %success [%scry %noun !>(42)]]]
     ==  ==
   ::
   =.  ford  (ford now=~1234.5.9 eny=0xbeef.dead scry=scry-is-forbidden)
@@ -593,8 +593,8 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %result
-            %same  %result  [%scry %noun !>(42)]
+    :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
+            %same  %success  [%scry %noun !>(42)]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -611,8 +611,8 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %result
-            %same  %result  [%scry %noun !>(43)]
+    :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %success
+            %same  %success  [%scry %noun !>(43)]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -661,7 +661,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~[/ride]  %give  %made  ~1234.5.6  %complete
-            [%result [%same [%result [%ride scry-type %constant]]]]
+            [%success [%same [%success [%ride scry-type %constant]]]]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -725,9 +725,9 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~[/ride]  %give  %made  ~1234.5.6  %complete  %result
-            [%result [%ride ride-type %constant]]
-            [%result [%scry %noun !>(%it-does-in-fact-matter)]]
+    :~  :*  duct=~[/ride]  %give  %made  ~1234.5.6  %complete  %success
+            [%success [%ride ride-type %constant]]
+            [%success [%scry %noun !>(%it-does-in-fact-matter)]]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -746,9 +746,9 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~[/ride]  %give  %made  ~1234.5.7  %complete  %result
-            [%result [%ride ride-type %constant]]
-            [%result [%scry %noun !>(%changed)]]
+    :~  :*  duct=~[/ride]  %give  %made  ~1234.5.7  %complete  %success
+            [%success [%ride ride-type %constant]]
+            [%success [%scry %noun !>(%changed)]]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -803,10 +803,10 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves
-    :~  :*  duct=~[/static]  %give  %made  ~1234.5.6  %complete  %result
-            %same  %result  %pin  ~1234.5.6  %result
-            [%result [%ride ride-type %constant]]
-            [%result [%scry %noun scry-type %it-does-in-fact-matter]]
+    :~  :*  duct=~[/static]  %give  %made  ~1234.5.6  %complete  %success
+            %same  %success  %pin  ~1234.5.6  %success
+            [%success [%ride ride-type %constant]]
+            [%success [%scry %noun scry-type %it-does-in-fact-matter]]
     ==  ==
   ::
   =.  ford  (ford now=~1234.5.7 eny=0xbeef.dead scry=scry)
@@ -816,9 +816,9 @@
   %+  welp
     %-  expect-eq  !>
     :-  moves2
-    :~  :*  duct=~[/autocons]  %give  %made  ~1234.5.7  %complete  %result
-            [%result [%ride ride-type %constant]]
-            [%result [%scry %noun scry-type %it-does-in-fact-matter]]
+    :~  :*  duct=~[/autocons]  %give  %made  ~1234.5.7  %complete  %success
+            [%success [%ride ride-type %constant]]
+            [%success [%scry %noun scry-type %it-does-in-fact-matter]]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -865,7 +865,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~[/dead]  %give  %made  ~1234.5.6  %complete
-            [%result [%slim (~(mint ut subject-type) [%noun formula])]]
+            [%success [%slim (~(mint ut subject-type) [%noun formula])]]
     ==  ==
   ::
   =.  ford  (ford now=~1234.5.7 eny=0xbeef.dead scry=scry-is-forbidden)
@@ -895,7 +895,7 @@
   ::
   ?>  =(1 (lent moves))
   ?>  ?=(^ moves)
-  ?>  ?=([* %give %made @da %complete %result %ride *] i.moves)
+  ?>  ?=([* %give %made @da %complete %success %ride *] i.moves)
   ::
   %+  welp
     %-  expect-eq  !>
@@ -906,7 +906,7 @@
     ::
     :-  i.moves(&8 *type)
     :*  duct=~[/dead]  %give  %made  ~1234.5.6  %complete
-        [%result [%ride *type 5]]
+        [%success [%ride *type 5]]
     ==
   ::
   %+  welp
@@ -941,7 +941,7 @@
   ::
   ?>  =(1 (lent moves))
   ?>  ?=(^ moves)
-  ?>  ?=([* %give %made @da %complete %result %ride *] i.moves)
+  ?>  ?=([* %give %made @da %complete %success %ride *] i.moves)
   ::
   %+  welp
     %-  expect-eq  !>
@@ -952,7 +952,7 @@
     ::
     :-  i.moves(&8 *type)
     :*  duct=~[/dead]  %give  %made  ~1234.5.6  %complete
-        [%result [%ride *type 42]]
+        [%success [%ride *type 42]]
     ==
   ::
   %+  welp
@@ -1026,7 +1026,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~  %pass
-            wire=/~nul/dependency/cx/~nul/desk/0/foo/bar
+            wire=/~nul/resource/cx/~nul/desk/0/foo/bar
             %c  %warp  [~nul ~nul]  %desk
             ~  %sing  %x  [%da ~1234.5.6]  /bar/foo
     ==  ==
@@ -1035,14 +1035,14 @@
   ::
   =^  moves2  ford
     %-  take:ford
-    :*  wire=/~nul/dependency/cx/~nul/desk/0/foo/bar  duct=~
+    :*  wire=/~nul/resource/cx/~nul/desk/0/foo/bar  duct=~
         ^=  wrapped-sign  ^-  (hypo sign:ford)  :-  *type  ::  ^-  sign:ford
         [%c %writ ~ [%x [%da ~1234.5.6] %desk] /bar/foo %noun !>(42)]
     ==
   ::
   ?>  =(1 (lent moves2))
   ?>  ?=(^ moves2)
-  ?>  ?=([* %give %made @da %complete %result %ride *] i.moves2)
+  ?>  ?=([* %give %made @da %complete %success %ride *] i.moves2)
   ::
   %+  welp
     %-  expect-eq  !>
@@ -1053,7 +1053,7 @@
     ::
     :-  i.moves2(&8 *type)
     :*  duct=~[/live]  %give  %made  ~1234.5.6  %complete
-        [%result [%ride *type 42]]
+        [%success [%ride *type 42]]
     ==
   ::
   %+  welp
@@ -1099,7 +1099,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~[/ride]  %give  %made  ~1234.5.6  %complete
-            [%result [%ride scry-type %constant]]
+            [%success [%ride scry-type %constant]]
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -1306,7 +1306,7 @@
     %-  expect-eq  !>
     :-  moves2
     :~  :*  duct=~[/alts]  %give  %made  ~1234.5.7  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-two'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-two'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/second
             %c  %warp  [~nul ~nul]  %second
@@ -1326,7 +1326,7 @@
     %-  expect-eq  !>
     :-  moves3
     :~  :*  duct=~[/alts]  %give  %made  ~1234.5.8  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-one'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-one'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/first
             %c  %warp  [~nul ~nul]  %first
@@ -1385,7 +1385,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~[/same]  %give  %made  ~1234.5.6  %complete
-            %result  %same  %result  %scry  %noun  scry-type  'scry-two'
+            %success  %same  %success  %scry  %noun  scry-type  'scry-two'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -1407,7 +1407,7 @@
     %-  expect-eq  !>
     :-  moves2
     :~  :*  duct=~[/alts]  %give  %made  ~1234.5.7  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-two'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-two'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -1428,7 +1428,7 @@
     %-  expect-eq  !>
     :-  moves3
     :~  :*  duct=~[/alts]  %give  %made  ~1234.5.8  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-one'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-one'
         ==
         ::  we subscribe to both paths because /same still exists.
         ::
@@ -1514,7 +1514,7 @@
     %-  expect-eq  !>
     :-  moves
     :~  :*  duct=~[/first]  %give  %made  ~1234.5.6  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-two'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-two'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk
@@ -1530,7 +1530,7 @@
     %-  expect-eq  !>
     :-  moves2
     :~  :*  duct=~[/second]  %give  %made  ~1234.5.7  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-two'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-two'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk  ~  %mult  [%da ~1234.5.7]
@@ -1551,7 +1551,7 @@
     %-  expect-eq  !>
     :-  moves3
     :~  :*  duct=~[/second]  %give  %made  ~1234.5.8  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-three'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-three'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk  ~  %mult  [%da ~1234.5.8]
@@ -1572,7 +1572,7 @@
     %-  expect-eq  !>
     :-  moves4
     :~  :*  duct=~[/first]  %give  %made  ~1234.5.9  %complete
-            %result  %alts  %result  %scry  %noun  scry-type  'scry-one'
+            %success  %alts  %success  %scry  %noun  scry-type  'scry-one'
         ==
         :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
             %c  %warp  [~nul ~nul]  %desk  ~  %mult  [%da ~1234.5.9]
@@ -1617,12 +1617,12 @@
       ==
   ^-  tang
   ::
-  ?>  ?=([* %give %made @da %complete %result ^ *] move)
+  ?>  ?=([* %give %made @da %complete %success ^ *] move)
   =/  result  result.p.card.move
-  ?>  ?=([%result %scry %noun type-a=* @tas *] head.result)
-  ?>  ?=([%result ^ *] tail.result)
-  ?>  ?=([%result %ride type-title-a=* %post-a] head.tail.result)
-  ?>  ?=([%result %ride type-title-b=* %post-b] tail.tail.result)
+  ?>  ?=([%success %scry %noun type-a=* @tas *] head.result)
+  ?>  ?=([%success ^ *] tail.result)
+  ?>  ?=([%success %ride type-title-a=* %post-a] head.tail.result)
+  ?>  ?=([%success %ride type-title-b=* %post-b] tail.tail.result)
   ::
   ;:  welp
     %-  expect-eq  !>
@@ -1633,7 +1633,7 @@
   ::
     %-  expect-eq  !>
     :-  head.result(p.q.cage *^type)
-    [%result %scry %noun *^type [title=title contents=contents]]
+    [%success %scry %noun *^type [title=title contents=contents]]
   ::
     %-  expect-eq  !>
     :-  (~(nest ut p.q.cage.head.result) | type)
@@ -1641,7 +1641,7 @@
   ::
     %-  expect-eq  !>
     :-  head.tail.result(p.vase *^type)
-    [%result %ride *^type 'post-a']
+    [%success %ride *^type 'post-a']
   ::
     %-  expect-eq  !>
     :-  (~(nest ut p.vase.head.tail.result) | -:!>(''))
@@ -1649,7 +1649,7 @@
   ::
     %-  expect-eq  !>
     :-  tail.tail.result(p.vase *^type)
-    [%result %ride *^type 'post-b']
+    [%success %ride *^type 'post-b']
   ::
     %-  expect-eq  !>
     :-  (~(nest ut p.vase.tail.tail.result) | -:!>(''))
