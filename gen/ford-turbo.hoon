@@ -37,6 +37,7 @@
   test-alts
   test-alts-and-live
   test-double-alts
+  test-cache-reclamation-trivial
 ==
 ++  test-is-schematic-live
   ~&  %test-is-schematic-live
@@ -1921,7 +1922,56 @@
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
-  (expect-ford-empty ford ~nul)
+  ;:  weld
+    results1
+    results2
+    results3
+    results4
+    results5
+    results6
+    (expect-ford-empty ford ~nul)
+  ==
+::  +test-cache-reclamation-trivial: reclaim cache on a blank slate ford
+::
+++  test-cache-reclamation-trivial
+  ~&  %test-cache-reclamation-trivial
+  ::
+  =/  ford  *ford-turbo
+  ::
+  =^  results1  ford
+    %-  test-ford-call  :*
+      ford
+      now=~1234.5.6
+      scry=scry-is-forbidden
+      ::  send a pinned literal, expects a %made response with pinned literal
+      ::
+      ^=  call-args
+        [duct=~ type=~ %make ~nul [%pin ~1234.5.6 [%$ %noun !>(**)]]]
+      ::
+      ^=  moves
+        :~  :*  duct=~  %give  %made  ~1234.5.6
+                %complete  %success  %pin  ~1234.5.6  %success  %$  %noun  !>(**)
+        ==  ==
+    ==
+  ::
+  =^  results2  ford
+    %-  test-ford-call  :*
+      ford
+      now=~1234.5.7
+      scry=scry-is-forbidden
+      ::  ask ford to wipe its cache
+      ::
+      call-args=[duct=~ type=~ %wipe ~]
+      ::  cache wiping should never produce any moves
+      ::
+      moves=~
+    ==
+  ::
+  ;:  welp
+    results1
+    results2
+    (expect-ford-empty ford ~nul)
+  ==
 ::
 ::  |utilities: helper arms
 ::
