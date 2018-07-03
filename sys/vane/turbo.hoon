@@ -1169,8 +1169,54 @@
         ::
         =^  current-result  builds.state  (access-build-record build)
         ?:  ?=([~ %value *] current-result)
-          ::  TODO: fill in this case
-          !!
+          ::
+          =/  =build-status  (~(got by builds.state) build)
+          ::
+          |^  ^+  ..execute
+              ::  if we've been run as a once build but are now being run live
+              ::
+              ::    Note that this can only happen when the once build and live
+              ::    build are both requested during the same Arvo event with the
+              ::    same `now`. Otherwise, since a live build always starts at
+              ::    `now`, any once builds will be from an earlier timestamp and
+              ::    will therefore appear as :old-build later in this function.
+              ::
+              =?    ..execute
+                  |(subscribed.build-status !(is-build-live build))
+                (subscribe-to-build-and-subs build)
+              ::
+              =/  old-build=(unit ^build)
+                (~(find-prev by-schematic builds-by-schematic.state) build)
+              ::  if there's no old-build
+              ::
+              ?~  old-build
+                send-live-mades
+              ::
+              =^  old-record  builds.state  (access-build-record u.old-build)
+              ?~  old-record
+                send-live-mades
+              ::
+              =/  old-build-status=build-status
+                (~(got by builds.state) u.old-build)
+              ::  if :old-build has un-notified live listeners, don't send mades
+              ::
+              ?^  %.  notified-live-listeners.old-build-status
+                  %~  dif  in
+                  %-  sy
+                  %+  skim
+                    ~(tap in root-listeners.old-build-status)
+                  is-listener-live
+                ::
+                ..execute
+              ::
+              send-live-mades
+          ::  +send-live-mades: send mades on all live root listeners for :build
+          ::
+          ++  send-live-mades
+            %^  send-mades  build  build-result.u.current-result
+            %-  sy
+            (skim ~(tap in root-listeners.build-status) is-listener-live)
+          --
         ::  place :build in :builds.state if it isn't already there
         ::
         =.  state  (add-build build)
