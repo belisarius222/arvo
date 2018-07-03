@@ -5663,17 +5663,13 @@
     :-  %turbo
     :-  %|
     %+  turn  ~(tap by state-by-ship.ax)     :: XX single-home
-    |=  {our/@ ford-state}  ^-  mass
+    |=  [our=@ ford-state]  ^-  mass
     :+  (scot %p our)  %|
-    ::  TODO: Other vanes don't reveal everything. Which parts should we report?
-    :~  [%results [%& results]]
-        [%builds [%& builds]]
-        :+  %components  %|
-        :~  [%normal [%& components]]
-            [%provisional [%& provisional-components]]
-        ==
-        [%blocks [%& blocks]]
-        [%builds-by-listener [%& builds-by-listener]]
+    ::
+    =/  split-builds  (skid ~(tap by builds) |=([* build-status] subscribed))
+    ::
+    :~  [%live-builds [%& -.split-builds]]
+        [%once-builds [%& +.split-builds]]
     ==
   ==
 ::  +wipe: wipe half a +ford-state's cache, in LRU (least recently used) order
@@ -5817,4 +5813,4 @@
   ::
   =|  new-state=ford-state
   [new-state (~(put by state-by-ship.ax) our new-state)]
---
+  --
