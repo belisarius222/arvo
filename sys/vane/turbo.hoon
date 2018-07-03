@@ -177,14 +177,14 @@
       ::  subs: sub-builds of this build, for whom this build is a client
       ::
       subs=(map build build-relation)
-      ::  promotable: whether this build can be promoted in the future
+      ::  subscribed: whether we're subscribed to all of this build's resources
       ::
-      ::    This build is promotable if all its sub-builds are promotable and
-      ::    its resource is promotable. Leaf literals are always promotable, as
+      ::    This build is subscribed if all its sub-builds are subscribed or
+      ::    its resource is subscribed. Leaf literals are always subscribed, as
       ::    are pins. In the case of leaf scrys, the build is promotable if it
       ::    was run live and we are still subscribed to changes in its resource.
       ::
-      promotable=?
+      subscribed=?
       ::  state: a state machine for tracking the build's progress
       ::
       $=  state
@@ -211,16 +211,32 @@
   ==  ==  ==
 ::  +build-relation: how do two builds relate to each other?
 ::
-::    A build can only block on an actual sub-build, which is why
-::    :blocked only exists under the %actual tag.
+::    A +build-relation can be either :verified or not, and :blocked or not.
+::    It is a symmetric relation between two builds, in the sense that both
+::    the client and the sub will store the same relation, just pointing to
+::    the other build.
 ::
-::    A linkage can also be %expected, in which case we don't know that a
-::    build depends on another build, but we have reason to suspect it might,
-::    so we track that to aid in caching.
+::    If it's not :verified, then the relation is a guess based on previous
+::    builds. These guesses are used to ensure that we hold onto builds we
+::    expect to be used in future builds. Each time we run +make on a build,
+::    it might produce new :verified sub-builds, which may have been unverified
+::    until then. Once a build completes, any unverified sub-builds must be
+::    cleaned up, since it turned out they weren't used by the build after all.
+::
+::    :blocked is used to note that a build can't be completed until that
+::    sub-build has been completed. A relation can be :blocked but not :verified
+::    if we're trying to promote a build, but we haven't run all its sub-builds
+::    yet. In that case, we'll try to promote or run the sub-build in order to
+::    determine whether we can promote the client. Until the sub-build has been
+::    completed, the client is provisionally blocked on the sub-build.
 ::
 +=  build-relation
-  $%  [%expected ~]
-      [%actual blocked=?]
+  $:  ::  verified: do we know this relation is real, or is it only a guess?
+      ::
+      verified=?
+      ::  is this build blocked on this other build?
+      ::
+      blocked=?
   ==
 ::  +build-record: information associated with the result of a completed +build
 ::
@@ -994,45 +1010,34 @@
     =.  state  (remove-listener-from-build [duct live] build)
     ::
     (cleanup build)
-  ::  +add-listener-to-build
+  ::  +add-listener-to-build: mark that :listener is attached to :build
   ::
-  ::    Also adds :listener to newer rebuilds of the build if they share
-  ::    live listeners with :build.
-  ::
+  ::    Also adds :listener to extended sub-builds.
   ::    Does not handle anything with root listeners.
   ::
   ++  add-listener-to-build
     |=  [=listener =build]
     ^+  builds.state
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    ::  if :listener is already attached to :build, we're done
-    ::
-    ?:  (~(has in listeners.build-status) listener)
-      builds.state
-    ::
-    =*  original-build  build
     =/  builds=(list ^build)  ~[build]
     ::
     |-  ^+  builds.state
     ?~  builds  builds.state
     ::
-    =^  build-status  builds.state
-      %+  update-build-status  i.builds
-      |=  =build-status
-      ^+  build-status
-      ::
+    =/  =build-status  (~(got by builds.state) i.builds)
+    ::  if :listener is already attached to :i.builds, move on to :t.builds
+    ::
+    ?:  (~(has in listeners.build-status) listener)
+      $(builds t.builds)
+    ::
+    =.  build-status
       build-status(listeners (~(put in listeners.build-status) listener))
-    ::  recurse on upstream builds: subs, provisional subs, and next build
-    ::  TODO: duplicate code with +remove-listener-from-build
     ::
-    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
+    =.  builds.state  (~(put by builds.state) i.builds build-status)
     ::
-    =/  new-builds=(list ^build)
-      ?:  =(original-build i.builds)  ~
-      (drop (~(find-next by-schematic builds-by-schematic.state) i.builds))
+    =/  subs  (extended-subs i.builds build-status)
     ::
-    $(builds :(welp t.builds subs new-builds))
+    $(builds (welp t.builds subs))
   ::  +remove-listener-from-build: recursively remove listener from (sub)builds
   ::
   ++  remove-listener-from-build
@@ -1058,19 +1063,20 @@
         ==
       ==
     ::
-    =*  original-build  build
     =/  builds=(list ^build)  ~[build]
     ::
     |-  ^+  state
     ?~  builds  state
     ::
     =.  build-status  (~(got by builds.state) i.builds)
+    ::  if any clients still have :listener attached, no-op on :i.builds
+    ::
+    ::    In the case of a provisional diamond dependency graph, we might
+    ::    remove only one side of the diamond, in which case the leaf at
+    ::    the bottom of the sub-build should retain :listener.
     ::
     =/  any-clients-with-listener=?
-      %+  any  in
-        %-  ~(uni in clients.dependencies.build-status)
-        clients.provisional-dependencies.build-status
-      ::
+      %+  lien  (extended-clients i.builds build-status)
       |=  client=^build
       (~(has in listeners:(~(got by builds.state) client)) listener)
     ::
@@ -1082,7 +1088,7 @@
     =.  builds.state
       (~(put by builds.state) build build-status)
     ::
-    $(builds (welp t.builds (extended-subs build build-status))
+    $(builds (welp t.builds (extended-subs i.builds build-status))
   ::  |construction: arms for performing builds
   ::
   ::+|  construction
@@ -1180,16 +1186,10 @@
         =.  builds.state  (copy-old-live-listeners u.old-build build)
         ::
         =/  live=?  (is-build-live build)
-        ::  if :build is a once scry, rerun it instead of promoting
-        ::
-        ::    Note that this will have suboptimal performance when :build is
-        ::    a once build of a previously run live build. In that case we
-        ::    should be able to promote the previous %scry. In a rare moment
-        ::    of erring on the side of simplicity over performance, we ignore
-        ::    that case and just rerun all once %scry's.
+        ::  if :build is a rebuild of a once %scry, we can't promote it
         ::
         ?:  ?&  ?=(%scry -.schematic.build)
-                !live
+                !subscribed:(~(got by builds.state) u.old-build)
             ==
           (add-build-to-next build)
         ::  if we don't have :u.old-build's result cached, we need to run :build
@@ -1206,80 +1206,63 @@
         ::  for each new sub, add all of :build's listeners
         ::
         =.  builds.state  (add-listeners-to-subs build new-subs)
-        ::  if all subs are in old.rebuilds.state, promote ourselves
+        ::  if all :new-subs have same +build-result as :old-subs, promote
         ::
         ?:  |-  ^-  ?
             ?~  new-subs
               &
             ::
-            ?~  status=(~(get by builds.state) i.new-subs)
+            ?~  new-sub-status=(~(get by new-sub-statuses) i.new-subs)
               |
-            ?.  =(`i.old-subs old-rebuild.u.status)
+            ?.  ?=([%complete %value *] u.new-sub-status)
+              |
+            ?~  old-sub-status=(~(get by old-sub-statuses) i.old-subs)
+              |
+            ?.  ?=([%complete %value *] u.old-sub-status)
+              |
+            ?.  .=  build-result.state.u.new-sub-status
+                    build-result.state.u.old-sub-status
               |
             $(new-subs t.new-subs, old-subs t.old-subs)
           ::
           (on-all-subs-are-rebuilds u.old-build build new-subs)
-
-             
-
-            
-
-
-        =^  current-result  results.state  (access-build-record build)
-        ?:  ?=([~ %value *] current-result)
-          ..execute
-        ::  place :build in :builds.state if it isn't already there
+        ::  all new-subs have results, some have different results
         ::
-        =.  builds.state  (~(put by-builds builds.state) build)
-        ::  old-build: most recent previous build with :schematic.build
+        ::    We rerun :build because these non-rebuild results might be
+        ::    different, possibly giving :build a different result.
         ::
-        =/  old-build=(unit ^build)
-          (~(find-previous by-schematic by-schematic.builds.state) build)
-        ::  if no previous builds exist, we need to run :build
+        =/  split-new-subs                    (skid new-subs is-build-stored)
+        =/  stored-new-subs=(list ^build)     -.split-new-subs
+        =/  un-stored-new-subs=(list ^build)  +.split-new-subs
+        ::  depend on completed sub-builds, but don't block on them
         ::
-        ?~  old-build
+        =.  state
+          (record-subs build stored-new-subs [verified=| blocked=|])
+        ::
+        ?~  un-stored-new-subs
           (add-build-to-next build)
-        ::  copy :old-build's live listeners
+        ::  we have incomplete sub-builds, so block on them provisionally
         ::
-        =.  state  (copy-old-live-listeners u.old-build build)
-        ::  if we don't have :u.old-build's result cached, we need to run :build
+        ::    We don't know that :build will end up depending on :new-subs,
+        ::    so they're not :verified.
         ::
-        =^  old-build-record  results.state  (access-build-record u.old-build)
-        ?~  old-build-record
-          (add-build-to-next build)
-        ::  if :u.old-build's result has been wiped, we need to run :build
+        =.  state
+          (record-subs build un-stored-new-subs [verified=| blocked=&])
+        ::  enqueue incomplete sub-builds to be promoted or run
         ::
-        ?:  ?=(%tombstone -.u.old-build-record)
-          (add-build-to-next build)
-        ::  if any ancestors are pinned, we must rerun
+        ::    When all our sub builds don't have results, we can't add :build to
+        ::    :next-builds.state. Instead, put all the remaining uncached new
+        ::    subs into :candidate-builds.state.
         ::
-        ::    We can't cleanly promote a once build to a live build because we
-        ::    didn't register its resources in the live tracking system.
+        ::    If all of our sub-builds finish immediately (i.e. promoted) when
+        ::    they pass through +gather-internal, they will add :build back to
+        ::    :candidate-builds.state and we will run again before +execute runs
+        ::    +make.
         ::
-        ?:  (has-pinned-client u.old-build)
-          (add-build-to-next build)
-        ::  old-subs: sub-builds of :u.old-build
-        ::
-        =/  old-subs  (~(get-subs by-build-dag components.state) u.old-build)
-        ::
-        =/  new-subs  (turn old-subs |=(^build +<(date date.build)))
-        ::  if all subs are in old.rebuilds.state, promote ourselves
-        ::
-        ?:  (levy new-subs ~(has by old.rebuilds.state))
-          (on-all-subs-are-rebuilds u.old-build build new-subs)
-        ::
-        =.  state  (record-sub-builds-as-provisional build new-subs)
-        ::  all new-subs have results, some are not rebuilds
-        ::
-        ::    We rerun :build because these non-rebuild results might be different,
-        ::    possibly giving :build a different result.
-        ::
-        =/  uncached-new-subs  (skip new-subs is-build-stored)
-        ?~  uncached-new-subs
-          (add-build-to-next build)
-        ::  otherwise, not all new subs have results and we shouldn't be run
-        ::
-        (on-not-all-subs-have-results build uncached-new-subs)
+        %_    ..execute
+            candidate-builds.state
+          :(welp uncached-new-subs candidate-builds.state)
+        ==
       ::  +add-build-to-next: run this build during the +make phase
       ::
       ++  add-build-to-next
@@ -1310,18 +1293,9 @@
       ::    When all subs are rebuilds, we promote :old and add builds
       ::    unblocked by this promotion to our :candidate-builds.
       ::
-      ::    TODO state machine; done as soon as +promote-build is done
-      ::
       ++  on-all-subs-are-rebuilds
         |=  [old=build new=build new-subs=(list build)]
         ^+  ..execute
-        ::  link all :new-subs to :build in :components.state
-        ::
-        =.  builds.state
-          |-  ^+  builds.state
-          ?~  new-subs  builds.state
-          ::
-          ((link-client-and-sub %dependencies) client=new sub=i.new-subs)
         ::
         =^  wiped-rebuild  ..execute  (promote-build old date.new new-subs)
         =?    next-builds.state
@@ -1333,31 +1307,6 @@
           (welp unblocked-clients candidate-builds.state)
         ::
         ..execute
-      ::  +on-not-all-subs-have-results: this build can't be run at this time
-      ::
-      ::    When all our sub builds don't have results, we can't add :build to
-      ::    :next-builds.state. Instead, put all the remaining uncached new
-      ::    subs into :candidate-builds.state.
-      ::
-      ::    If all of our sub-builds finish immediately (i.e. promoted) when
-      ::    they pass through +gather-internal, they will add :build back to
-      ::    :candidate-builds.state and we will run again before +execute runs
-      ::    +make.
-      ::
-      ++  on-not-all-subs-have-results
-        |=  [=build uncached-new-subs=(list build)]
-        ^+  ..execute
-        ::
-        =.  blocked-builds.state
-          %+  roll  uncached-new-subs
-          |=  [new-sub=^build blocked-builds=_blocked-builds.state]
-          ::
-          (~(put by-build-dag blocked-builds) build new-sub)
-        ::
-        %_    ..execute
-            candidate-builds.state
-          :(welp uncached-new-subs candidate-builds.state)
-        ==
       ::  +copy-old-live-listeners: copies each live listener from :old to :new
       ::
       ++  copy-old-live-listeners
@@ -1374,29 +1323,45 @@
         %_  build-status
           listeners  (~(gas in listeners.build-status) old-live-listeners)
         ==
-      ::  +record-sub-builds-as-provisional:
+      ::  +record-subs: establish :build-relation between :build and :subs
       ::
       ::    When we can't directly promote ourselves, we're going to rerun
       ::    our build. It's possible that the sub-builds are different, in
       ::    which case we'll need to clean up the current sub-build dependency.
       ::
-      ++  record-sub-builds-as-provisional
-        |=  [=build new-subs=(list build)]
+      ++  record-subs
+        |=  [=build subs=(list build) =build-relation]
         ^+  state
+        ::  mark :new-subs as clients in :build's +build-status
         ::
-        %_    state
-            provisional-components
-          %+  roll  new-subs
-          |=  [new-sub=^build provisional-components=_provisional-components.state]
-          ::
-          (~(put by-build-dag provisional-components) build new-sub)
-        ==
+        =.  builds.state  =<  builds
+          %+  update-build-status  build
+          |=  =build-status
+          %_    build-status
+              subs
+            %-  ~(gas by subs.build-status)
+            (turn subs |=(sub=^build [sub build-relation]))
+          ==
+        ::  mark :build as client in each :new-subs's +build-status
+        ::
+        |-  ^+  state
+        ?~  subs  state
+        ::  add :i.subs to the state if it doesn't already exist
+        ::
+        =.  state  (add-build i.subs)
+        ::
+        =.  builds.state  =<  builds
+          %+  update-build-status  i.subs
+          |=  =build-status
+          %_  build-status
+            clients  (~(put by clients.build-status) build build-relation)
+          ==
+        ::
+        $(subs t.subs)
       --
     ::  +promote-build: promote result of :build to newer :date
     ::
     ::    Also performs relevant accounting, and possibly sends %made moves.
-    ::
-    ::    TODO state machine
     ::
     ++  promote-build
       |=  [old-build=build new-date=@da new-subs=(list build)]
@@ -1433,12 +1398,6 @@
               mades=~
           ==
         ==
-      ::  link :old-build and :new-build persistently
-      ::
-      ::    We store identical rebuilds persistently so that we know we don't
-      ::    have to promote or rerun clients of the new rebuild.
-      ::
-      =.  builds.state  (link-rebuilds old-build new-build)
       ::  if this is the newest %scry on :disc, update :latest-by-disc.state
       ::
       ::    :latest-by-disc.state is used to create Clay subscriptions. This
@@ -1468,7 +1427,7 @@
           ::
           %_    build-status
               clients
-            (~(put by clientts.build-status) new-build [%actual blocked=|])
+            (~(put by clients.build-status) new-build [%actual blocked=|])
           ==
         ::
         $(old-subs t.old-subs)
@@ -1527,6 +1486,7 @@
           %-  ~(gas in notified-listeners.state)
           (skim ~(tap in root-listeners.build-status) is-listener-live)
         ==
+      ::
       =/  root-once-listeners=(set listener)
         %-  sy
         %-  skip  :_  is-listener-live
@@ -1561,7 +1521,7 @@
       |=  =build
       ^-  [(unit ^build) _..execute]
       ::
-      =^  result  builds.state  (access-build-record build)
+      =^  record  builds.state  (access-build-record build)
       ::
       =/  next  (~(find-next by-schematic builds-by-schematic.state) build)
       ?~  next
@@ -1569,14 +1529,14 @@
         ::
         [~ ..execute]
       ::
-      =^  next-result  builds.state  (access-build-record u.next)
-      ?~  next-result
+      =^  next-record  builds.state  (access-build-record u.next)
+      ?~  next-record
         ::  unfinished future build
         ::
         [~ ..execute]
       ::  if :next's result hasn't been wiped
       ::
-      ?:  ?&  ?=(%value -.u.next-result)
+      ?:  ?&  ?=(%value -.u.next-record)
               (is-build-live u.next)
           ==
         ::
@@ -1585,10 +1545,12 @@
         ::  if the result has changed, send %made moves for live listeners
         ::
         =?    ..execute
-            ?&  ?=([~ %value *] result)
-                !=(build-result.u.result build-result.u.next-result)
+            ?&  ?=([~ %value *] record)
+                !=(build-result.u.record build-result.u.next-record)
             ==
-          (send-mades u.next (root-live-listeners u.next))
+          %^  send-mades  u.next
+            build-result.u.next-record
+          (root-live-listeners u.next)
         ::
         $(build u.next)
       ::  if :next has been wiped, produce it
@@ -1732,6 +1694,7 @@
       ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
       ::
       ::    Our build produced an actual result.
+      ::    TODO: state machine
       ::
       ++  apply-build-result
         |=  $:  =build
@@ -1847,6 +1810,8 @@
         ..execute
       ::  +enqueue-client-rebuilds: rerun old clients, updated to current time
       ::
+      ::    TODO: state machine
+      ::
       ++  enqueue-client-rebuilds
         |=  [=build previous-build=build]
         ^+  state
@@ -1876,6 +1841,8 @@
       ::    Walks :old.rebuilds.state recursively to find all previous clients
       ::    of :build that produced the same result.
       ::
+      ::    TODO: state machine
+      ::
       ++  find-old-clients
         |=  =build
         ^-  (list ^build)
@@ -1892,6 +1859,8 @@
       ::    The first step in provisional build cleanup is to remove
       ::    sub-builds which were actually depended on from the provisional
       ::    build set because they're no longer provisional.
+      ::
+      ::    TODO: state machine
       ::
       ++  unlink-used-provisional-builds
         |=  [=build sub-builds=(list build)]
@@ -1911,6 +1880,8 @@
       ::    Any builds left in :provisional-components.state for our build
       ::    are orphaned builds. However, these builds may have other
       ::    listeners and we don't want to delete those.
+      ::
+      ::    TODO: state machine
       ::
       ++  cleanup-orphaned-provisional-builds
         |=  =build
@@ -2040,27 +2011,6 @@
           [block candidate-builds.state]
         ==
       --
-    ::  +link-rebuilds: link old and new same build in :rebuilds.state
-    ::
-    ++  link-rebuilds
-      |=  [old-build=build new-build=build]
-      ^+  builds.state
-      ::
-      =.  builds.state  =<  builds
-        %+  update-build-status  old-build
-        |=  =build-status
-        ^+  build-status
-        ::
-        ?>  ?=(%complete -.state.build-status)
-        build-status(new.rebuilds.state `new-build)
-      ::
-      =<  builds
-      %+  update-build-status  new-build
-      |=  =build-status
-      ^+  build-status
-      ::
-      ?>  ?=(%complete -.state.build-status)
-      build-status(old.rebuilds.state `old-build)
     ::  +remove-listeners-from-build: remove :listeners from :build and subs
     ::
     ++  remove-listeners-from-build
@@ -4888,86 +4838,77 @@
       ::  TODO: when bunts work better, just bunt
       ::
       =|  =build-status
-      build-status(state [%untried ~])
+      build-status(state [%untried ~], subscribed |)
     ==
-  ::  +remove-build: stop storing :build in the state
+  ::  +remove-builds: remove builds and their sub-builds
   ::
-  ::    Removes all linkages to and from sub-builds
-  ::    TODO: should we recurse on children?
-  ::    TODO: should we assert we're not subscribed?
-  ::    TODO: remove rebuilds
-  ::
-  ++  remove-build
-    |=  =build
-    ^+  state
+  ++  remove-builds
+    |=  builds=(list build)
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    ::  never delete a build that something depends on
+    |^  ^+  state
+        ::
+        ?~  builds
+          state
+        ::
+        =/  =build-status  (~(got by builds.state) i.builds)
+        =/  subs  (extended-subs i.builds build-status)
+        ::
+        =^  removed  state  (remove-single-build i.builds build-status)
+        ?.  removed
+          $(builds t.builds)
+        ::
+        $(builds (welp t.builds subs))
+    ::  +remove-build: stop storing :build in the state
     ::
-    ?:  ?|  !=(~ clients.build-status)
-            !=(~ listeners.build-status)
-            !=(~ root-listeners.build-status)
-        ==
-      state
+    ::    Removes all linkages to and from sub-builds
+    ::    TODO: should we assert we're not subscribed?
     ::
-    ?>  ?=(~ old.rebuilds.build-status)
-    ::
-    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
-    ::  for each sub, remove :build from its :clients
-    ::
-    =.  builds.state
-      |-  ^+  builds.state
-      ?~  subs  builds.state
+    ++  remove-single-build
+      |=  [=build =build-status]
+      ^+  [removed=| state]
+      ::  never delete a build that something depends on
+      ::
+      ?:  ?|  !=(~ (extended-clients build build-status)
+              !=(~ listeners.build-status)
+          ==
+        ::  sanity check that :root-listeners is a subset of :listeners
+        ::
+        ?>  ?=(~ root-listeners.build-status)
+        ::
+        [removed=| state]
+      ::  nothing depends on :build, so we'll remove it
+      ::
+      :-  removed=&
+      ^+  state
+      ::
+      =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
+      ::  for each sub, remove :build from its :clients
       ::
       =.  builds.state
+        |-  ^+  builds.state
+        ?~  subs  builds.state
         ::
-        %+  update-build-status  i.subs
-        |=  =build-status
-        ^+  build-status
+        =.  builds.state
+          ::
+          %+  update-build-status  i.subs
+          |=  =build-status
+          ^+  build-status
+          ::
+          build-status(clients (~(del by clients.build-status) i.subs))
         ::
-        build-status(clients (~(del by clients.build-status) i.subs))
+        $(subs t.subs)
       ::
-      $(subs t.subs)
-    ::  delete forward rebuild linkage
-    ::
-    ::    We don't have to delete backwards rebuild linkage because that
-    ::    automatically gets cleaned up when the older build goes away.
-    ::
-    =?    builds.state
-        ?&  ?=(%complete -.state.build-status)
-            ?=(^ new.rebuilds.build-status)
-        ==
+      %_    state
+          builds-by-schematic
+        (~(del by-schematic builds-by-schematic.state) build)
       ::
-      =<  builds
-      %+  update-build-status  u.new.rebuilds.build-status
-      |=  =build-status
-      build-status(old.rebuilds ~)
-    ::
-    %_    state
-        builds-by-schematic
-      (~(del by-schematic builds-by-schematic.state) build)
-    ::
-        builds-by-date
-      (~(del by-date builds-by-date.state) build)
-    ::
-        builds
-      (~(del by builds.state) build)
-    ==
-  ::  +recursive-remove-builds: remove builds and their sub-builds
-  ::
-  ++  recursive-remove-builds
-    |=  builds=(list build)
-    ^+  state
-    ::
-    ?~  builds
-      state
-    ::
-    =/  subs  (extended-subs i.builds (~(got by builds.state) i.builds))
-    ::
-    =.  state  (remove-build i.builds)
-    ::
-    $(builds (welp t.builds subs))
-
+          builds-by-date
+        (~(del by-date builds-by-date.state) build)
+      ::
+          builds
+        (~(del by builds.state) build)
+      ==
+    --
   ::  +update-build-status: replace :build's +build-status by running a function
   ::
   ++  update-build-status
@@ -5030,30 +4971,52 @@
       [~ ~]
     ::
     [~ ~ `(cask)`local-cage]
-  ::  +mark-as-done: store :build as complete and produce any unblocked clients
+  ::  +mark-as-done: unblock and produce clients blocked on :build
   ::
-  ::    We may not know about these unblocked clients, so we register them in
-  ::    the state.
+  ::  TODO +build-relation
   ::
   ++  mark-as-done
     |=  =build
-    ^-  [(list ^build) _state]
+    ^-  [(list ^build) _builds.state]
     ::
     =/  =build-status  (~(got by builds.state) build)
     ::  remove :clients from :blocks in :build's +build-status
     ::
-    =/  clients=(list ^build)  ~(tap in clients.dependencies.build-status)
-    ::
-    =.  state
-      |-  ^+  state
-      ?~  clients  state
+    =/  blocked-clients=(list ^build)
+      %+  murn  ~(tap by clients.build-status)
+      |=  [client=^build =build-relation]
+      ^-  (unit ^build)
       ::
-      =.  state  ((unlink-client-and-sub %blocks) i.clients build)
+      ?.  =([%actual blocked=&] build-relation)
+        ~
+      `client
+    ::  mark clients as unblocked in :build's +build-status
+    ::
+    =.  builds.state
+      =/  unblocked-clients=(list [^build build-relation])
+        %+  turn  blocked-clients
+        |=  client=^build
+        [client [%actual blocked=|]]
+      ::
+      %+  ~(put by builds.state)  build
+      build-status(clients (~(gas by clients.build-status) unblocked-clients))
+    ::  mark clients as unblocked in each of the clients' +build-status's
+    ::
+    =.  builds.state
+      |-  ^+  builds.state
+      ?~  blocked-clients  builds.state
+      ::
+      =.  builds.state  =<  builds
+        %+  update-build-status  i.blocked-clients
+        |=  =build-status
+        %_  build-status
+          subs  (~(put by subs.build-status) build [%actual blocked=|])
+        ==
       ::
       $(clients t.clients)
     ::  produce unblocked clients and mutant state
     ::
-    [(skip clients is-build-blocked) state]
+    [blocked-clients builds.state]
   ::  +send-mades: send %made moves for :listeners on :build
   ::
   ++  send-mades
@@ -5094,28 +5057,6 @@
       ::
       build-status(notified-listeners.state notified-listeners)
     ==
-  ::  +unlink-sub-builds
-  ::
-  ++  unlink-sub-builds
-    |=  =build
-    ^+  ..execute
-    ::
-    =/  kids=(list ^build)
-      %~  tap  in
-      %-  ~(uni in (~(get ju sub-builds.components.state) build))
-      (~(get ju sub-builds.provisional-components.state) build)
-    ::
-    =.  components.state
-      (~(del-build by-build-dag components.state) build)
-    ::
-    =.  provisional-components.state
-      (~(del-build by-build-dag provisional-components.state) build)
-    ::
-    %+  roll  kids
-    |=  [kid=^build accumulator=_..execute]
-    ::
-    =.  ..execute  accumulator
-    (cleanup kid)
   ::  +advance-live-listeners: move live listeners from :old to :new
   ::
   ++  advance-live-listeners
@@ -5219,6 +5160,25 @@
     ^-  ?
     ::
     ?=(%blocked -.state:(~(got by builds.state) build)
+  ::  +is-build-stored: are we storing a +build-result for :build?
+  ::
+  ++  is-build-stored
+    |=  =build
+    ^-  ?
+    ::
+    ?~  maybe-build-status=(~(get by builds.state) build)
+      |
+    ?=([%complete %value *] u.maybe-build-status)
+  ::  +any-shared-live-listeners: do :a and :b share live listeners?
+  ::
+  ::    TODO: move to hoon.hoon as an overlap-checking arm for optimization
+  ::
+  ++  any-shared-live-listeners
+    |=  [a=build-status b=build-status]
+    ^-  ?
+    .=  ~
+    %.  is-listener-live
+    ~(any in (~(int in listeners.a) listeners.b))
   ::  +is-build-live: whether this is a live or a once build
   ::
   ++  is-build-live
@@ -5384,42 +5344,26 @@
       ..execute
     ::
     =.  ..execute  (cleanup-live-tracking build build-status)
-    =.  build-status  (~(got by builds.state) build)
     ::
-    ?^  (extended-clients build build-status)
-      ..execute
+    =.  state  (remove-builds ~[build])
     ::
-    =.  state  (remove-build build)
-    ::
-    
-
-    ::  this also recurses on our children
-    ::
-    =.  ..execute  (unlink-sub-builds build)
-    ::  if we have a :newer-build, clean it up too
-    ::
-    =/  newer-build
-      (~(find-next by-schematic by-schematic.builds.state) build)
-    ::
-    ?~  newer-build
-      this
-    ::
-    (cleanup u.newer-build)
-
-
-
+    ..execute
+  ::  +cleanup-live-tracking: stop tracking build
+  ::
   ++  cleanup-live-tracking
     |=  [=build =build-status]
     ^+  ..execute
-    ::  check if :build depends on a live clay +resource
     ::
-    =/  has-live-resource
-      ?&  ?=([%scry %c *] schematic.build)
-          promotable.build-status
-      ==
+    =/  was-promotable=?  promotable.build-status
+    =.  promotable.build-status  |
     ::  clean up dependency tracking and maybe cancel clay subscription
     ::
-    =?  ..execute  has-live-resource
+    =?    ..execute
+        ::  does :build depend on a live clay +resource?
+        ::
+        ?&  ?=([%scry %c *] schematic.build)
+            was-promotable
+        ==
       ::  type system didn't know, so tell it again
       ::
       ?>  ?=([%scry %c *] schematic.build)
@@ -5471,8 +5415,12 @@
     =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
     ::
     =/  new-subs=(list ^build)
-      %+  murn  subs
-      ~(find-next by-schematic builds-by-schematic.state)
+      %-  zing
+      %+  turn  subs
+      |=  sub=^build
+      ^-  (list ^build)
+      ::
+      (find-next-builds-by-live-listener sub (~(got by builds.state) sub))
     ::
     (weld subs new-subs)
   ::  +extended-clients: a list of clients and old clients
@@ -5484,10 +5432,54 @@
     =/  clients=(list ^build)  ~(tap in ~(key by clients.build-status))
     ::
     =/  old-clients=(list ^build)
-      %+  murn  clients
-      ~(find-prev by-schematic builds-by-schematic.state)
+      %-  zing
+      %+  turn  clients
+      |=  client=^build
+      ^-  (list ^build)
+      ::
+      (find-prev-builds-by-live-listener client (~(got by builds.state) client))
     ::
     (weld clients old-clients)
+  ::  +find-next-builds-by-live-listener: recursively find newer rebuilds
+  ::
+  ::    Produces builds in chronological order from oldest to newest.
+  ::
+  ++  find-next-builds-by-live-listener
+    =|  next-builds=(list build)
+    |=  [=build =build-status]
+    ^-  (list ^build)
+    ::
+    ?~  next=(~(find-next by-schematic builds-by-schematic.state) build)
+      next-builds
+    ::
+    =/  next-build-status=(~(got by builds.state) u.next)
+    ::
+    ?.  (any-shared-live-listeners build-status next-build-status)
+      next-builds
+    ::
+    =.  next-builds  (weld next-builds ~[u.next])
+    ::
+    $(build u.next, build-status next-build-status)
+  ::  +find-prev-builds-by-live-listener: recursively find newer rebuilds
+  ::
+  ::    Produces builds in chronological order from oldest to newest.
+  ::
+  ++  find-prev-builds-by-live-listener
+    =|  prev-builds=(list build)
+    |=  [=build =build-status]
+    ^-  (list ^build)
+    ::
+    ?~  prev=(~(find-prev by-schematic builds-by-schematic.state) build)
+      prev-builds
+    ::
+    =/  prev-build-status=(~(got by builds.state) u.prev)
+    ::
+    ?.  (any-shared-live-listeners build-status prev-build-status)
+      prev-builds
+    ::
+    =.  prev-builds  [u.prev prev-builds]
+    ::
+    $(build u.prev, build-status prev-build-status)
   ::  +clay-sub-wire: the wire to use for a clay subscription
   ::
   ++  clay-sub-wire
@@ -5634,7 +5626,6 @@
         :~  [%normal [%& components]]
             [%provisional [%& provisional-components]]
         ==
-        [%rebuilds [%& rebuilds]]
         [%blocks [%& blocks]]
         [%builds-by-listener [%& builds-by-listener]]
     ==
