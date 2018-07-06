@@ -1348,7 +1348,7 @@
             ?=(^ wiped-rebuild)
           (~(put in next-builds.state) u.wiped-rebuild)
         ::
-        =^  unblocked-clients  state  (mark-as-done new)
+        =^  unblocked-clients  state  (unblock-clients new)
         =.  candidate-builds.state
           (welp unblocked-clients candidate-builds.state)
         ::
@@ -1652,17 +1652,15 @@
       ::
       ++  apply-build-receipt
         |=  made=build-receipt
-        ::  update live resource tracking if the build is a live %scry
         ::
-        =?    ..execute
-            ?&  ?=(%scry -.schematic.build.made)
-                (is-build-live build.made)
-            ==
-          ::
-          (do-live-scry-accounting build.made resource.schematic.build.made)
+        =/  live=?     (is-build-live build.made)
+        =/  blocked=?  ?=(%blocks -.result.made)
         ::  process :sub-builds.made
         ::
         =.  state  (track-sub-builds build.made sub-builds.made)
+        ::  mark :build as subscribed if we ran it live
+        ::
+        =?  ..execute  live  (subscribe-to-build-and-subs build.made blocked)
         ::
         ?-    -.result.made
             %build-result
@@ -1671,34 +1669,6 @@
             %blocks
           (apply-blocks build.made result.made sub-builds.made)
         ==
-      ::  +do-live-scry-accounting: updates tracking for a live %scry build
-      ::
-      ++  do-live-scry-accounting
-        |=  [=build =resource]
-        ^+  ..execute
-        =/  =disc  (extract-disc resource)
-        ::
-        %_    ..execute
-        ::  link :disc to :resource
-        ::
-            resources-by-disc.state
-          (~(put ju resources-by-disc.state) [disc resource])
-        ::  mark :disc as dirty
-        ::
-            dirty-discs
-          (~(put in dirty-discs) disc)
-        ::  update :latest-by-disc.state if :date.build is later
-        ::
-            latest-by-disc.state
-          =/  latest-date  (~(get by latest-by-disc.state) disc)
-          ::
-          ?:  ?&  ?=(^ latest-date)
-                  (lte date.build u.latest-date)
-              ==
-            latest-by-disc.state
-          ::
-          (~(put by latest-by-disc.state) disc date.build)
-        ==
       ::  +track-sub-builds:
       ::
       ::    For every sub-build discovered while running :build, we have to make
@@ -1706,35 +1676,51 @@
       ::    right listeners.
       ::
       ++  track-sub-builds
-        |=  [=build sub-builds=(list build)]
+        |=  [=build sub-builds=(list build) blocked=?]
         ^+  state
-        %+  roll  sub-builds
-        |=  [sub-build=^build accumulator=_state]
-        =.  state  accumulator
-        ::  freshen cache for sub-build
+        ::  mark :sub-builds as :subs in :build's +build-status
         ::
-        =.  results.state  +:(access-build-record sub-build)
+        =^  build-status  builds.state
+          %+  update-build-status  build
+          |=  =build-status
+          %_    build-status
+              subs
+            %-  ~(gas by subs.build-status)
+            (turn sub-builds |=(sub=^build [sub [verified=& blocked]]))
+          ==
+        ::
+        =/  listeners=(set listener)  listeners.build-status
+        ::
+        |-  ^+  state
+        ?~  sub-builds  state
+        ::  add :i.sub-builds to the state if it doesn't already exist
+        ::
+        =.  state  (add-build i.sub-builds)
         ::
         %_    state
             builds
-          (~(put by-builds builds.state) sub-build)
-        ::
-            components
-          (~(put by-build-dag components.state) build sub-build)
-        ::
-            listeners
           ::
-          =/  unified-listeners
-            %-  ~(uni in (fall (~(get by listeners.state) sub-build) ~))
-            (fall (~(get by listeners.state) build) ~)
-          ::  don't put a key with an empty value
+          =<  builds
+          %+  update-build-status  i.sub-builds
+          |=  =build-status
+          %_    build-status
+          ::  mark :build as a client
           ::
-          ?~  unified-listeners
-            listeners.state
+              clients
+            (~(put by clients.build-status) build [verified=& blocked])
+          ::  copy :listeners from :build into :i.sub-builds
           ::
-          (~(put by listeners.state) sub-build unified-listeners)
+              listeners
+            (~(put in listeners.build-status) listeners)
+          ::  freshen :last-accessed date
+          ::
+              state
+            ::
+            ?.  ?=([%complete %value *] state)
+              state
+            state(last-accessed.build-record now)
+          ==
         ==
-      ::
       ::  +|  apply-build-result
       ::
       ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
@@ -1751,25 +1737,22 @@
             ==
         ^+  ..execute
         ::
-        ?>  (~(has ju by-date.builds.state) date.build schematic.build)
-        ::  record the result returned from the build
-        ::
-        =.  results.state
-          %+  ~(put by results.state)  build
-          [%value last-accessed=now build-result]
-        ::  queue clients we can run now that we have this build result
-        ::
-        =^  unblocked-clients  state  (mark-as-done build)
-        =.  next-builds.state  (~(gas in next-builds.state) unblocked-clients)
-        ::  :previous-build: last build of :schematic.build before :build if any
+        =^  build-status  builds.state
+          %+  update-build-status  build
+          |=  =build-status
+          %_    build-status
+              state
+            :+  %complete
+              `build-record`[%value last-accessed=now build-result]
+            notified-listeners=~
+          ==
         ::
         =/  previous-build
-          (~(find-previous by-schematic by-schematic.builds.state) build)
-        ::  :previous-result: result of :previous-build if any
+          (~(find-prev by-schematic builds-by-schematic.state) build)
         ::
-        =^  previous-result  results.state
+        =^  previous-record  builds.state
           ?~  previous-build
-            [~ results.state]
+            [~ builds.state]
           (access-build-record u.previous-build)
         ::  TODO: Maybe we can unify some of this code with +promote-build?
         ::
@@ -1782,10 +1765,7 @@
         =?    state
             ?&  ?=(^ previous-build)
                 ?=(^ previous-result)
-                ::  TODO: double check on the tests for this. it seems wrong,
-                ::  as a build could have an unpinned client and a pinned
-                ::  client
-                !(has-pinned-client u.previous-build)
+                !(build-is-live u.previous-build)
             ==
           (advance-live-listeners u.previous-build build)
         ::  send results to once listeners and delete them
@@ -1793,27 +1773,43 @@
         ::    Once listeners are deleted as soon as their %made has been sent
         ::    because they don't maintain a subscription to the build.
         ::
-        =.  ..execute  (send-mades build (root-once-listeners build))
-        =.  state  (delete-root-once-listeners build)
-        ::  does :build have the same result as :u.previous-build?
+        =.  build-status  (~(got by builds.state) build)
         ::
-        ::    We consider a result the same if we have a :previous-build which
-        ::    has a real %value, the current :build-result is the same, and
-        ::    the :previous-build doesn't have a pinned client. We can't
-        ::    promote pinned builds, so we always consider the result to be
-        ::    different.
+        =/  split-listeners
+          (skid ~(tap in root-listeners.build-status) is-listener-live)
+        ::
+        =/  root-live-listeners=(set listener)  (sy -.split-listeners)
+        =/  root-once-listeners=(set listener)  (sy +.split-listeners)
+        ::  enqueue %made moves to be emitted at the end of the event
+        ::
+        =.  ..execute  (send-mades build build-status root-once-listeners)
+        ::  delete :root-once-listeners from :build
+        ::
+        =.  state
+          ::
+          =/  listeners=(list listener)  ~(tap in root-once-listeners)
+          ::
+          |-  ^+  state
+          ?~  listeners  state
+          ::
+          =.  state  (remove-listener-from-build i.listeners build)
+          ::
+          $(listeners t.listeners)
+        ::
+        =.  build-status  (~(got by builds.state) build)
+        ::  does :build have the same result as :previous-build?
+        ::
+        ::    This should perform a unifying equality check, we hope.
         ::
         =/  same-result=?
-          ?&  ?=(^ previous-build)
-              !(has-pinned-client u.previous-build)
-              ?=([~ %value *] previous-result)
-              =(build-result build-result.u.previous-result)
+          ?&  ?=([~ %value *] previous-record)
+              =(build-result build-result.u.previous-record)
           ==
         ::  if the result has changed, inform all live listeners
         ::
         =?    ..execute
             !same-result
-          (send-mades build (root-live-listeners build))
+          (send-mades build build-status root-live-listeners)
         ::  if the result has changed, rerun all old clients
         ::
         ::    When we have a previous result which isn't the same, we need to
@@ -1821,12 +1817,10 @@
         ::    sub-builds with new results, the results of clients might also be
         ::    different.
         ::
-        =?    state
+        =?    ..execute
             &(!same-result ?=(^ previous-build))
           (enqueue-client-rebuilds build u.previous-build)
-        ::  clean up provisional builds
         ::
-        =.  state      (unlink-used-provisional-builds build sub-builds)
         =.  ..execute  (cleanup-orphaned-provisional-builds build)
         ::  if we had a previous build, clean it up
         ::
@@ -1850,77 +1844,73 @@
         ?~  wiped-rebuild
           ..execute
         ::  if a future-build's result was wiped from the cache, rebuild it.
+        ::  TODO: maybe candidate builds
         ::
         =.  next-builds.state  (~(put in next-builds.state) u.wiped-rebuild)
         ::
         ..execute
       ::  +enqueue-client-rebuilds: rerun old clients, updated to current time
       ::
-      ::    TODO: state machine
-      ::
       ++  enqueue-client-rebuilds
-        |=  [=build previous-build=build]
-        ^+  state
-        ::
-        =/  clients-to-rebuild=(list ^build)
-          %+  turn  (find-old-clients previous-build)
-          ::
-          |=  old-client=^build
-          old-client(date date.build)
-        ::
-        %+  roll  clients-to-rebuild
-        |=  [client=^build state=_state]
-        ::
-        %_    state
-        ::
-            next-builds
-          (~(put in next-builds.state) client)
-        ::
-            provisional-components
-          (~(put by-build-dag provisional-components.state) client build)
-        ::
-            builds
-          (~(put by-builds builds.state) client)
-        ==
-      ::  +find-old-clients: find all previous clients of :build
-      ::
-      ::    Walks :old.rebuilds.state recursively to find all previous clients
-      ::    of :build that produced the same result.
-      ::
-      ::    TODO: state machine
-      ::
-      ++  find-old-clients
         |=  =build
-        ^-  (list ^build)
+        ^+  ..execute
+        ::  updated-clients: all clients of :build, updated to :build's date
         ::
-        %+  weld
-          (~(get-clients by-build-dag components.state) build)
+        =/  updated-clients
+          %+  turn  (extended-clients build)
+          |=  client=^build
+          client(date date.build)
+        ::  add :updated-clients to the state if they're not already there
         ::
-        =/  older-build  (~(get by old.rebuilds.state) build)
-        ?~  older-build
-          ~
-        $(build u.older-build)
-      ::  +unlink-used-provisional-builds:
-      ::
-      ::    The first step in provisional build cleanup is to remove
-      ::    sub-builds which were actually depended on from the provisional
-      ::    build set because they're no longer provisional.
-      ::
-      ::    TODO: state machine
-      ::
-      ++  unlink-used-provisional-builds
-        |=  [=build sub-builds=(list build)]
-        ^+  state
-        ::
-        %_    state
-            provisional-components
-          %+  roll  sub-builds
-          |=  $:  sub-build=^build
-                  provisional-components=_provisional-components.state
-              ==
+        =.  state
+          |-  ^+  state
+          ?~  updated-clients  state
           ::
-          (~(del by-build-dag provisional-components) build sub-build)
-        ==
+          =.  state  (add-build i.updated-clients)
+          ::
+          $(updated-clients t.updated-clients)
+        ::  link :updated-clients to :build in :build's +build-status
+        ::
+        =.  builds.state  =<  builds
+          %+  update-build-status  build
+          |=  =build-status
+          %_    build-status
+              clients
+            ::
+            %-  ~(gas by clients.build-status)
+            %+  turn  updated-clients
+            |=  client=^build
+            ::
+            ?^  existing=(~(get by clients.build-status) client)
+              u.existing
+            [verified=| blocked=&]
+          ==
+        ::  link :updated-clients to :build in client +build-status's
+        ::
+        =.  builds.state
+          |-  ^+  builds.state
+          ?~  updated-clients  builds.state
+          ::
+          =.  builds.state  =<  builds
+            %+  update-build-status  i.builds
+            |=  =build-status
+            %_    build-status
+                subs
+              ::
+              %+  ~(put by subs.build-status)  build
+              ?^  existing=(~(get by subs.build-status) build)
+                u.existing
+              [verified=| blocked=&]
+            ==
+          ::
+          $(updated-clients t.updated-clients)
+        ::  unblock and enqueue any clients that were blocked only on :build
+        ::
+        =^  unblocked-clients  state  (unblock-clients build)
+        =.  candidate-builds.state
+          (weld unblocked-clients candidate-builds.state)
+        ::
+        ..execute
       ::  +cleanup-orphaned-provisional-builds: delete extraneous sub-builds
       ::
       ::    Any builds left in :provisional-components.state for our build
@@ -1933,59 +1923,90 @@
         |=  =build
         ^+  ..execute
         ::
-        %+  roll
-          (~(get-subs by-build-dag provisional-components.state) build)
-        ::
-        |=  [sub-build=^build accumulator=_..execute]
-        =.  ..execute  accumulator
-        ::  calculate the listeners to remove
-        ::
-        ::    Orphaned sub-builds have a set of listeners attached to them.
-        ::    We want to find the listeners which shouldn't be there and
-        ::    remove them.
+        =/  =build-status  (~(got by builds.state) build)
         ::
         =/  provisional-client-listeners=(set listener)
-          (fall (~(get by listeners.state) build) ~)
-        ::  unify listener sets of all provisional client builds of :sub-build
+          listeners.build-status
+        ::
+        =/  orphans=(list ^build)
+          %+  murn  ~(tap by subs.build-status)
+          |=  [sub=^build =build-relation]
+          ^-  (unit ^build)
+          ::
+          ?:  verified.build-relation
+            ~
+          `sub
+        ::  remove links to orphans in :build's +build-status
+        ::
+        =^  build-status  builds.state
+          %+  update-build-status  build
+          |=  =build-status
+          %_    build-status
+              subs
+            ::
+            |-  ^+  subs.build-status
+            ?~  orphans  subs.build-status
+            ::
+            =.  subs.build-status  (~(del by subs.build-status) i.orphans)
+            ::
+            $(orphans t.orphans)
+          ==
+        ::
+        |-  ^+  ..execute
+        ?~  orphans  ..execute
+        ::  remove link to :build in :i.orphan's +build-status
+        ::
+        =^  orphan-status  builds.state
+          %+  update-build-status  i.orphans
+          |=  orphan-status=^build-status
+          %_  orphan-status
+            clients  (~(del by clients.orphan-status) build)
+          ==
+        ::
+        =/  all-other-clients=(set ^build)
+          =-  (~(del in -) build)
+          ::
+          %+  murn  ~(tap by clients.orphan-status)
+          |=  [client=^build =build-relation]
+          ^-  (unit ^build)
+          ::
+          ?:  verified.build-relation
+            ~
+          `client
         ::
         =/  all-other-client-listeners=(set listener)
-          %+  roll
-            %~  tap  in
-            ::  omit :build; it's all *other* client listeners
-            ::
-            =-  (~(del in -) build)
-            =-  (fall - ~)
-            (~(get by client-builds.provisional-components.state) sub-build)
-          |=  [build=^build listeners=(set listener)]
+          %+  roll  all-other-clients
+          |=  [client=^build listeners=(set listener)]
           ::
-          %-  ~(uni in listeners)
-          (fall (~(get by listeners.state) build) ~)
-        ::  remove the orphaned build from provisional builds
-        ::
-        =.  provisional-components.state
-          (~(del by-build-dag provisional-components.state) build sub-build)
+          (~(uni in listeners) listeners:(~(got by builds.state) client))
         ::  orphaned-listeners: the clients we actually have to remove
         ::
         ::    The clients that are actually orphaned are the ones which are
         ::    in :provisional-client-listeners, but not
         ::    :all-other-client-listeners.
         ::
-        =/  orphaned-listeners
+        =/  orphaned-listeners=(list listener)
+          %~  tap  in
           (~(dif in provisional-client-listeners) all-other-client-listeners)
-        ::  remove orphaned listeners from :sub-build
+        ::  remove orphaned listeners from :i.orphans
         ::
-        ::    We need to do this after we've removed :sub-build from
-        ::    :provisional-components.state because otherwise that provisional
-        ::    client link will prevent the listener from being removed.
+        ::    We need to do this after removing the link between :build
+        ::    and :i.orphans, since if it was still there, it would prevent
+        ::    the listener from being removed.
+        ::
+        ::    TODO: check if ^^ is correct
         ::
         =.  state
-          %+  roll  ~(tap in orphaned-listeners)
-          |=  [=listener accumulator=_state]
-          =.  state  accumulator
+          |-  ^+  state
+          ?~  orphaned-listeners  state
           ::
-          (remove-listener-from-build listener sub-build)
+          =.  state  (remove-listener-from-build i.orphaned-listeners i.orphans)
+          ::
+          $(orphaned-listeners t.orphaned-listeners)
         ::
-        (cleanup sub-build)
+        =.  ..execute  (cleanup i.orphans)
+        ::
+        $(orphans t.orphans)
       ::
       ::  +|  apply-blocks
       ::
@@ -2012,9 +2033,14 @@
           ?>  ?=(%c vane.u.scry-blocked)
           ::
           [(clay-request-for-scry-request date.build u.scry-blocked) moves]
-        ::  register blocks on sub-builds in :blocked-builds.state
+        ::  we must run +apply-build-receipt on :build.made before :block
         ::
-        =.  state  (register-sub-build-blocks build blocks)
+        ?<  %+  lien  blocks
+            |=  block=^build
+            ?=(%complete -.state:(~(got by builds.state) block))
+        ::  enqueue :blocks to be run next
+        ::
+        =.  candidate-builds  (weld blocks candidate-builds)
         ::
         ..execute
       ::  +clay-request-for-scry-request: new move to request blocked resource
@@ -2033,29 +2059,6 @@
           ==
         ::
         [duct [%pass wire note]]
-      ::  +register-sub-build-blocks: book-keeping on blocked builds
-      ::
-      ::    When we receive a %blocks +build-receipt, we need to register that
-      ::    :build is blocked on each item in :blocks, along with queuing
-      ::    each block as a candidate build.
-      ::
-      ++  register-sub-build-blocks
-        |=  [=build blocks=(list build)]
-        ^+  state
-        ::
-        %+  roll  blocks
-        |=  [block=^build state=_state]
-        ::  we must run +apply-build-receipt on :build.made before :block
-        ::
-        ?<  (~(has by results.state) block)
-        ::
-        %_    state
-            blocked-builds
-          (~(put by-build-dag blocked-builds.state) build block)
-        ::
-            candidate-builds
-          [block candidate-builds.state]
-        ==
       --
     ::  +remove-listeners-from-build: remove :listeners from :build and subs
     ::
@@ -2095,6 +2098,7 @@
         ::
             %pin   (make-pin date schematic)
             %alts  (make-alts choices)
+            
             %bake  (make-bake renderer query-string path-to-render)
             %bunt  (make-bunt disc mark)
             %call  (make-call gate sample)
@@ -5017,52 +5021,50 @@
       [~ ~]
     ::
     [~ ~ `(cask)`local-cage]
-  ::  +mark-as-done: unblock and produce clients blocked on :build
+  ::  +unblock-clients: unblock and produce clients blocked on :build
   ::
-  ::  TODO +build-relation
-  ::
-  ++  mark-as-done
+  ++  unblock-clients
     |=  =build
     ^-  [(list ^build) _builds.state]
     ::
-    =/  =build-status  (~(got by builds.state) build)
+    =/  blocked-relations=(list [client=^build =build-relation])
+      =/  =build-status  (~(got by builds.state) build)
+      ::
+      (skim ~(tap by clients.build-status) |=([* build-relation] blocked))
     ::  remove :clients from :blocks in :build's +build-status
     ::
-    =/  blocked-clients=(list ^build)
-      %+  murn  ~(tap by clients.build-status)
-      |=  [client=^build =build-relation]
-      ^-  (unit ^build)
-      ::
-      ?.  =([%actual blocked=&] build-relation)
-        ~
-      `client
-    ::  mark clients as unblocked in :build's +build-status
-    ::
-    =.  builds.state
-      =/  unblocked-clients=(list [^build build-relation])
-        %+  turn  blocked-clients
-        |=  client=^build
-        [client [%actual blocked=|]]
-      ::
-      %+  ~(put by builds.state)  build
-      build-status(clients (~(gas by clients.build-status) unblocked-clients))
-    ::  mark clients as unblocked in each of the clients' +build-status's
+    =^  build-status  builds.state
+      %+  update-build-status  build
+      |=  =build-status
+      %_    build-status
+          clients
+        ::
+        %-  ~(gas by clients.build-status)
+        %+  turn  blocked-relations
+        |=  [client=^build =build-relation]
+        [client build-relation(blocked |)]
+      ==
+    ::  mark clients as unblocked in clients' +build-status's
     ::
     =.  builds.state
       |-  ^+  builds.state
-      ?~  blocked-clients  builds.state
+      ?~  blocked-relations  builds.state
       ::
       =.  builds.state  =<  builds
-        %+  update-build-status  i.blocked-clients
+        %+  update-build-status  i.builds
         |=  =build-status
-        %_  build-status
-          subs  (~(put by subs.build-status) build [%actual blocked=|])
+        %_    build-status
+            subs
+          %+  (~(put by subs.build-status)  build
+          =/  original  (~(got by subs.build-status) build)
+          original(blocked |)
         ==
       ::
-      $(clients t.clients)
-    ::  produce unblocked clients and mutant state
+      $(builds t.builds)
     ::
-    [blocked-clients builds.state]
+    =/  unblocked-clients=(list ^build)  (turn blocked-relations head)
+    ::
+    [unblocked-clients builds.state]
   ::  +send-mades: send %made moves for :listeners on :build
   ::
   ++  send-mades
@@ -5452,6 +5454,64 @@
       ^$(build i.sub-builds, build-status (~(got by builds.state) i.sub-builds))
     ::
     $(sub-builds t.sub-builds)
+  ::  +subscribe-to-build-and-subs: subscribe to all +resource's under :build
+  ::
+  ++  subscribe-to-build-and-subs
+    |=  =build
+    ^+  ..execute
+    ::  don't recurse on sub-builds if :build is already subscribed
+    ::
+    ::    TODO: this performs an extra lookup in :builds.state
+    ::
+    ?:  subscribed:(~(got by builds.state) build)
+      ..execute
+    ::
+    =^  build-status  builds.state
+      %+  update-build-status  build
+      |=  =build-status
+      build-status(subscribed &)
+    ::  perform the actual subscription logic
+    ::
+    =?    ..execute
+        ?=(%scry -.schematic.build)
+      (do-live-scry-accounting build)
+    ::
+    =/  subs  (extended-subs build build-status)
+    ::
+    |-  ^+  ..execute
+    ?~  subs  ..execute
+    ::
+    =.  ..execute  ^$(build i.subs)
+    ::
+    $(subs t.subs)
+    ::  +do-live-scry-accounting: updates tracking for a live %scry build
+    ::
+    ++  do-live-scry-accounting
+      |=  build=[%scry =resource]
+      ^+  ..execute
+      =/  =disc  (extract-disc resource)
+      ::
+      %_    ..execute
+      ::  link :disc to :resource
+      ::
+          resources-by-disc.state
+        (~(put ju resources-by-disc.state) [disc resource])
+      ::  mark :disc as dirty
+      ::
+          dirty-discs
+        (~(put in dirty-discs) disc)
+      ::  update :latest-by-disc.state if :date.build is later
+      ::
+          latest-by-disc.state
+        =/  latest-date  (~(get by latest-by-disc.state) disc)
+        ::
+        ?:  ?&  ?=(^ latest-date)
+                (lte date.build u.latest-date)
+            ==
+          latest-by-disc.state
+        ::
+        (~(put by latest-by-disc.state) disc date.build)
+      ==
   ::  +extended-subs: a list of subs, provisional subs, and rebuilds of such
   ::
   ++  extended-subs
@@ -5523,7 +5583,7 @@
     ?.  (any-shared-live-listeners build-status prev-build-status)
       prev-builds
     ::
-    =.  prev-builds  [u.prev prev-builds]
+    :=.  prev-builds  [u.prev prev-builds]
     ::
     $(build u.prev, build-status prev-build-status)
   ::  +clay-sub-wire: the wire to use for a clay subscription
