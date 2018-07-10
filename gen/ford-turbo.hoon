@@ -39,12 +39,12 @@
   ::  test-parse-scaffold-crane-fskt
   ::  test-parse-scaffold-crane-fszp
   ::  test-parse-scaffold-crane-fszy
-  ::  test-literal
-  ::  test-autocons-same
-  ::  test-autocons-different
-  ::  test-scry-clay-succeed
-  ::  test-scry-clay-fail
-  ::  test-scry-clay-block
+  test-literal
+  test-autocons-same
+  test-autocons-different
+  test-scry-clay-succeed
+  test-scry-clay-fail
+  test-scry-clay-block
 test-scry-clay-live
   ::  test-scry-clay-live-again
   ::  test-scry-clay-same-path
