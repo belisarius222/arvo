@@ -45,8 +45,8 @@
   test-scry-clay-succeed
   test-scry-clay-fail
   test-scry-clay-block
-test-scry-clay-live
-  ::  test-scry-clay-live-again
+  test-scry-clay-live
+  test-scry-clay-live-again
   ::  test-scry-clay-same-path
 ::    test-pinned-in-past
 ::    test-pinned-in-future

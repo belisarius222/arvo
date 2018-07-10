@@ -1167,7 +1167,7 @@
     ++  gather-build
       |=  =build
       ^+  ..execute
-      ::  ~&  [%gather-build (build-to-tape build)]
+      ~&  [%gather-build (build-to-tape build)]
       ::  if we already have a result for this build, don't rerun the build
       ::
       =^  current-result  builds.state  (access-build-record build)
@@ -1203,6 +1203,7 @@
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
+        ::  ~&  [%no-old-build (build-to-tape build)]
         (add-build-to-next build)
       ::
       =.  builds.state  (copy-old-live-listeners u.old-build build)
@@ -1217,8 +1218,9 @@
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
       ::
-      =^  old-build-record  builds.state  (access-build-record build)
+      =^  old-build-record  builds.state  (access-build-record u.old-build)
       ?.  ?=([~ %value *] old-build-record)
+        ::  ~&  [%no-old-build (build-to-tape u.old-build)]
         (add-build-to-next build)
       ::
       =/  old-build-status=build-status  (~(got by builds.state) u.old-build)
@@ -1228,7 +1230,11 @@
         (turn old-subs |=(^build +<(date date.build)))
       ::  for each new sub, add all of :build's listeners
       ::
-      =.  builds.state  (add-listeners-to-subs build new-subs)
+      =.  state  (add-listeners-to-subs build new-subs)
+      ::
+      ::
+      =?  ..execute  ?|(live subscribed.old-build-status)
+        (subscribe-to-build-and-subs [build ~])
       ::  if all :new-subs have same +build-result as :old-subs, promote
       ::
       ?:  ::  TODO: Should we be updating the last accessed times here?
@@ -1251,6 +1257,7 @@
             |
           $(new-subs t.new-subs, old-subs t.old-subs)
         ::
+        ::  ~&  [%on-all-subs-are-rebuilds (build-to-tape u.old-build)]
         (on-all-subs-are-rebuilds u.old-build build new-subs)
       ::  all new-subs have results, some have different results
       ::
@@ -1297,9 +1304,11 @@
     ::
     ++  add-listeners-to-subs
       |=  [=build subs=(list build)]
-      ^+  builds.state
+      ^+  state
       ::
-      ?~  subs  builds.state
+      ?~  subs  state
+      ::
+      =.  state  (add-build i.subs)
       ::
       =/  =build-status  (~(got by builds.state) build)
       =/  new-listeners  ~(tap in listeners.build-status)
@@ -1341,9 +1350,10 @@
       |=  [old=build new=build]
       ^+  builds.state
       ::
+      =/  old-build-status=build-status  (~(got by builds.state) old)
+      ::
       =/  old-live-listeners=(list listener)
-        %-  skim  :_  is-listener-live
-        ~(tap in listeners:(~(got by builds.state) old))
+        (skim ~(tap in listeners.old-build-status) is-listener-live)
       ::
       =<  builds
       %+  update-build-status  new
@@ -4915,14 +4925,14 @@
       ^+  [removed=| state]
       ::  never delete a build that something depends on
       ::
-      ?:  ?|  !=(~ (extended-clients build build-status))
+      ?:  ?|  !=(~ clients.build-status)
               !=(~ listeners.build-status)
           ==
-        ::  sanity check that :root-listeners is a subset of :listeners
-        ::
-        ?>  ?=(~ root-listeners.build-status)
         ::
         [removed=| state]
+      ::  sanity check that :root-listeners is a subset of :listeners
+      ::
+      ?>  ?=(~ root-listeners.build-status)
       ::  nothing depends on :build, so we'll remove it
       ::
       :-  removed=&
@@ -5280,7 +5290,7 @@
   ::
   ::    Usage:
   ::    ```
-  ::    =^  maybe-build-record  results.state  (access-build-record build)
+  ::    =^  maybe-build-record  builds.state  (access-build-record build)
   ::    ```
   ::
   ++  access-build-record
@@ -5383,22 +5393,21 @@
   ++  cleanup
     |=  =build
     ^+  ..execute
-    ~&  [%cleanup (build-to-tape build)]
     ::   does this build even exist?!
     ::
     ?~  maybe-build-status=(~(get by builds.state) build)
+      ~&  [%cleanup-no-build (build-to-tape build)]
       ..execute
+    ::
     =/  =build-status  u.maybe-build-status
+    ::  never delete a build that something depends on
     ::
-    ::  if something depends on this build, no-op and return
-    ::
-    ::    We don't need to check +extended-clients because that would only
-    ::    include old clients if we had a listener.
-    ::
-    ?.  ?&  =(~ clients.build-status)
-            =(~ listeners.build-status)
+    ?:  ?|  !=(~ clients.build-status)
+            !=(~ listeners.build-status)
         ==
+      ~&  [%cleanup-no-op (build-to-tape build)]
       ..execute
+    ~&  [%cleanup (build-to-tape build)]
     ::
     =.  ..execute  (cleanup-live-tracking build build-status)
     ::
@@ -5414,17 +5423,15 @@
     =/  was-subscribed=?  subscribed.build-status
     =.  subscribed.build-status  |
     =.  builds.state  (~(put by builds.state) build build-status)
+    ~&  [%cleanup-lt (build-to-tape build) was-subscribed=was-subscribed]
     ::  clean up dependency tracking and maybe cancel clay subscription
     ::
     =?    ..execute
         ::  does :build depend on a live clay +resource?
         ::
-        ?&  ?=([%scry %c *] schematic.build)
-            was-subscribed
+        ?&  was-subscribed
+            ?=([%scry %c *] schematic.build)
         ==
-      ::  type system didn't know, so tell it again
-      ::
-      ?>  ?=([%scry %c *] schematic.build)
       ::
       =/  =resource  resource.schematic.build
       =/  =disc  (extract-disc resource)
@@ -5445,6 +5452,7 @@
           listeners:(~(got by builds.state) other-build)
         ::
         (~(any in listeners) is-listener-live)
+      ~&  [%clean-up-dependency-for (build-to-tape build) should-delete=should-delete-resource]
       ::
       =?  resources-by-disc.state  should-delete-resource
         (~(del ju resources-by-disc.state) disc resource)
@@ -5472,24 +5480,24 @@
     ::
     ?~  builds
       ..execute
-    ::  ~&  [%considering-subscribing-to (build-to-tape i.builds)]
+    ~&  [%considering-subscribing-to (build-to-tape i.builds)]
     ::  don't recurse on sub-builds if :build is already subscribed
     ::
     ::    TODO: this performs an extra lookup in :builds.state
     ::
     ?:  subscribed:(~(got by builds.state) i.builds)
-      ::  ~&  [%already-subscribed (build-to-tape i.builds)]
+      ~&  [%already-subscribed (build-to-tape i.builds)]
       $(builds t.builds)
-    ::
-    =^  build-status  builds.state
-      %+  update-build-status  i.builds
-      |=  =build-status
-      build-status(subscribed &)
     ::  perform the actual subscription logic
     ::
     =?    ..execute
         ?=(%scry -.schematic.i.builds)
       (do-live-scry-accounting i.builds)
+    ::
+    =^  build-status  builds.state
+      %+  update-build-status  i.builds
+      |=  =build-status
+      build-status(subscribed &)
     ::
     =/  subs  (extended-subs i.builds build-status)
     ::
