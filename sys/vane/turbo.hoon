@@ -948,6 +948,7 @@
       ::
       :-  date
       [%scry [%c care rail=[disc spur=(flop path)]]]
+    ~&  [%rebuild (turn builds build-to-tape)]
     ::  rebuild resource builds at the new date
     ::
     (execute-loop (sy builds) force=%.y)
@@ -1089,7 +1090,7 @@
     =.  build-status
       build-status(listeners (~(del in listeners.build-status) listener))
     =.  builds.state
-      (~(put by builds.state) build build-status)
+      (~(put by builds.state) i.builds build-status)
     ::
     $(builds (welp t.builds (extended-subs i.builds build-status)))
   ::  |construction: arms for performing builds
@@ -1129,7 +1130,22 @@
     ::
     |^  ^+  ..execute
         ::
-        =?  ..execute  !force
+        =.  ..execute
+          ?:  force
+            =.  next-builds.state  (~(uni in next-builds.state) builds)
+            =.  state
+              =/  build-list  ~(tap in builds)
+              |-
+              ^+  state
+              ?~  build-list
+                state
+              ::
+              =.  state  (add-build i.build-list)
+              ::
+              $(build-list t.build-list)
+            ::
+            ..execute
+          ::
           (gather builds)
         ::
         =^  build-receipts  ..execute  run-builds
@@ -1168,6 +1184,7 @@
       ++  gather-build
         |=  =build
         ^+  ..execute
+        ~&  [%gather-build (build-to-tape build)]
         ::  if we already have a result for this build, don't rerun the build
         ::
         =^  current-result  builds.state  (access-build-record build)
@@ -1186,7 +1203,7 @@
               ::
               =?    ..execute
                   |(subscribed.build-status !(is-build-live build))
-                (subscribe-to-build-and-subs build)
+                (subscribe-to-build-and-subs [build ~])
               ::
               =/  old-build=(unit ^build)
                 (~(find-previous by-schematic builds-by-schematic.state) build)
@@ -1370,6 +1387,9 @@
         ..execute
       ::  +copy-old-live-listeners: copies each live listener from :old to :new
       ::
+      ::    TODO: Maybe we should also delete the live listeners off the old
+      ::    build.
+      ::
       ++  copy-old-live-listeners
         |=  [old=build new=build]
         ^+  builds.state
@@ -1427,6 +1447,7 @@
     ++  promote-build
       |=  [old-build=build new-date=@da new-subs=(list build)]
       ^-  [(unit build) _..execute]
+      ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
       =^  old-build-record  builds.state  (access-build-record old-build)
@@ -1679,9 +1700,10 @@
         ::  process :sub-builds.made
         ::
         =.  state  (track-sub-builds build.made sub-builds.made blocked)
+        ::  ~&  [%post-track (~(got by builds.state) build.made)]
         ::  mark :build as subscribed if we ran it live
         ::
-        =?  ..execute  live  (subscribe-to-build-and-subs build.made)
+        =?  ..execute  live  (subscribe-to-build-and-subs [build.made ~])
         ::
         ?-    -.result.made
             %build-result
@@ -1697,17 +1719,18 @@
       ::    right listeners.
       ::
       ++  track-sub-builds
-        |=  [=build sub-builds=(list build) blocked=?]
+        |=  [client=build sub-builds=(list build) blocked=?]
         ^+  state
+        ::~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
         ::  mark :sub-builds as :subs in :build's +build-status
         ::
         =^  build-status  builds.state
-          %+  update-build-status  build
+          %+  update-build-status  client
           |=  =build-status
           %_    build-status
               subs
             %-  ~(gas by subs.build-status)
-            (turn sub-builds |=(sub=^build [sub [verified=& blocked]]))
+            (turn sub-builds |=(sub=build [sub [verified=& blocked]]))
           ==
         ::
         =/  listeners=(set listener)  listeners.build-status
@@ -1718,18 +1741,17 @@
         ::
         =.  state  (add-build i.sub-builds)
         ::
-        %_    state
-            builds
+        =.  builds.state
           ::
           =<  builds
           %+  update-build-status  i.sub-builds
           |=  build-status=^build-status
           %_    build-status
-          ::  mark :build as a client
+          ::  mark :client as a client
           ::
               clients
-            (~(put by clients.build-status) build [verified=& blocked])
-          ::  copy :listeners from :build into :i.sub-builds
+            (~(put by clients.build-status) client [verified=& blocked])
+          ::  copy :listeners from :client into :i.sub-builds
           ::
               listeners
             (~(uni in listeners.build-status) listeners)
@@ -1741,7 +1763,8 @@
               state.build-status
             state.build-status(last-accessed.build-record now)
           ==
-        ==
+        ::
+        $(sub-builds t.sub-builds)
       ::  +|  apply-build-result
       ::
       ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
@@ -1756,6 +1779,7 @@
                 sub-builds=(list build)
             ==
         ^+  ..execute
+        ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
         ::
         =^  build-status  builds.state
           %+  update-build-status  build
@@ -1776,16 +1800,12 @@
           (access-build-record u.previous-build)
         ::  TODO: Maybe we can unify some of this code with +promote-build?
         ::
-        ::  promote live listeners if we can
-        ::
-        ::    When we have a :previous-build with a :previous-result, and the
-        ::    previous-build isn't a descendant of a %pin schematic, we need to
-        ::    advance live listeners because this is now the most recent build.
+        ::  promote live listeners if previous build was run live
         ::
         =?    state
             ?&  ?=(^ previous-build)
                 ?=(^ previous-record)
-                !(is-build-live u.previous-build)
+                (is-build-live u.previous-build)
             ==
           (advance-live-listeners u.previous-build build)
         ::  send results to once listeners and delete them
@@ -1834,9 +1854,7 @@
         ::    sub-builds with new results, the results of clients might also be
         ::    different.
         ::
-        =?    ..execute
-            &(!same-result ?=(^ previous-build))
-          (enqueue-client-rebuilds build)
+        =.  ..execute  (enqueue-clients build rebuild=!same-result)
         ::
         =.  ..execute  (cleanup-orphaned-provisional-builds build)
         ::  if we had a previous build, clean it up
@@ -1866,27 +1884,30 @@
         =.  next-builds.state  (~(put in next-builds.state) u.wiped-rebuild)
         ::
         ..execute
-      ::  +enqueue-client-rebuilds: rerun old clients, updated to current time
+      ::  +enqueue-clients: rerun old clients, updated to current time
       ::
-      ++  enqueue-client-rebuilds
-        |=  =build
+      ++  enqueue-clients
+        |=  [=build rebuild=?]
         ^+  ..execute
-        ::  updated-clients: all clients of :build, updated to :build's date
+        ::  clients: all clients of :build, updated to :build's date if :rebuild
         ::
-        =/  updated-clients
+        =/  clients
+          ?.  rebuild
+            ~(tap in ~(key by clients:(~(got by builds.state) build)))
+          ::
           %+  turn  (extended-clients build (~(got by builds.state) build))
           |=  client=^build
           client(date date.build)
-        ::  add :updated-clients to the state if they're not already there
+        ::  add :clients to the state if they're not already there
         ::
         =.  state
           |-  ^+  state
-          ?~  updated-clients  state
+          ?~  clients  state
           ::
-          =.  state  (add-build i.updated-clients)
+          =.  state  (add-build i.clients)
           ::
-          $(updated-clients t.updated-clients)
-        ::  link :updated-clients to :build in :build's +build-status
+          $(clients t.clients)
+        ::  link :clients to :build in :build's +build-status
         ::
         =.  builds.state  =<  builds
           %+  update-build-status  build
@@ -1895,7 +1916,7 @@
               clients
             ::
             %-  ~(gas by clients.build-status)
-            %+  turn  updated-clients
+            %+  turn  clients
             |=  client=^build
             ^-  (pair ^build build-relation)
             ::
@@ -1904,14 +1925,14 @@
               u.existing
             [verified=| blocked=&]
           ==
-        ::  link :updated-clients to :build in client +build-status's
+        ::  link :clients to :build in client +build-status's
         ::
         =.  builds.state
           |-  ^+  builds.state
-          ?~  updated-clients  builds.state
+          ?~  clients  builds.state
           ::
           =.  builds.state  =<  builds
-            %+  update-build-status  i.updated-clients
+            %+  update-build-status  i.clients
             |=  =build-status
             %_    build-status
                 subs
@@ -1922,7 +1943,7 @@
               [verified=| blocked=&]
             ==
           ::
-          $(updated-clients t.updated-clients)
+          $(clients t.clients)
         ::  unblock and enqueue any clients that were blocked only on :build
         ::
         =^  unblocked-clients  builds.state  (unblock-clients build)
@@ -2043,6 +2064,7 @@
                 sub-builds=(list build)
             ==
         ^+  ..execute
+        ~&  [%apply-blocks (build-to-tape build)]
         ::  if we scryed, send clay a request for the path we blocked on reading
         ::
         =?    moves
@@ -2056,8 +2078,15 @@
         ::
         ?<  %+  lien  blocks
             |=  block=^build
-            =/  =build-status  (~(got by builds.state) block)
-            ?=(%complete -.state.build-status)
+            ?~  maybe-build-status=(~(get by builds.state) block)
+              %.n
+            ?=(%complete -.state.u.maybe-build-status)
+        ::
+        =.  builds.state
+          =<  builds
+          %+  update-build-status  build
+          |=  =build-status
+          build-status(state [%blocked ~])
         ::  enqueue :blocks to be run next
         ::
         =.  candidate-builds.state  (weld blocks candidate-builds.state)
@@ -4910,6 +4939,7 @@
   ::
   ++  remove-builds
     |=  builds=(list build)
+    ~&  [%remove-builds (turn builds build-to-tape)]
     ::
     |^  ^+  state
         ::
@@ -5045,6 +5075,7 @@
       =/  =build-status  (~(got by builds.state) build)
       ::
       (skim ~(tap by clients.build-status) |=([* build-relation] blocked))
+    ::  ~&  [%unblock-clients (build-to-tape build) relations=blocked-relations]
     ::  remove :clients from :blocks in :build's +build-status
     ::
     =.  builds.state
@@ -5085,6 +5116,7 @@
   ++  send-mades
     |=  [=build =build-status listeners=(set listener)]
     ^+  ..execute
+    ~&  [%send-mades (build-to-tape build) status=build-status listeners=listeners]
     ::  make sure we have something to send
     ::
     ?>  ?=([%complete [%value *] *] state.build-status)
@@ -5126,6 +5158,7 @@
   ++  advance-live-listeners
     |=  [old=build new=build]
     ^+  state
+    ~&  [%advance-live-listeners (build-to-tape old) (build-to-tape new)]
     =/  old-build-status=build-status  (~(got by builds.state) old)
     ::
     =/  old-live-listeners=(list listener)
@@ -5399,6 +5432,7 @@
   ++  cleanup
     |=  =build
     ^+  ..execute
+    ~&  [%cleanup (build-to-tape build)]
     ::   does this build even exist?!
     ::
     ?~  maybe-build-status=(~(get by builds.state) build)
@@ -5482,38 +5516,38 @@
   ::  +subscribe-to-build-and-subs: subscribe to all +resource's under :build
   ::
   ++  subscribe-to-build-and-subs
-    |=  =build
+    |=  builds=(list build)
     ^+  ..execute
+    ::
+    ?~  builds
+      ..execute
     ::  don't recurse on sub-builds if :build is already subscribed
     ::
     ::    TODO: this performs an extra lookup in :builds.state
     ::
-    ?:  subscribed:(~(got by builds.state) build)
-      ..execute
+    ?:  subscribed:(~(got by builds.state) i.builds)
+      ~&  [%already-subscribed (build-to-tape i.builds)]
+      $(builds t.builds)
     ::
     =^  build-status  builds.state
-      %+  update-build-status  build
+      %+  update-build-status  i.builds
       |=  =build-status
       build-status(subscribed &)
     ::  perform the actual subscription logic
     ::
     =?    ..execute
-        ?=(%scry -.schematic.build)
-      (do-live-scry-accounting build)
+        ?=(%scry -.schematic.i.builds)
+      (do-live-scry-accounting i.builds)
     ::
-    =/  subs  (extended-subs build build-status)
+    =/  subs  (extended-subs i.builds build-status)
     ::
-    |-  ^+  ..execute
-    ?~  subs  ..execute
-    ::
-    =.  ..execute  ^$(build i.subs)
-    ::
-    $(subs t.subs)
+    $(builds (weld t.builds subs))
   ::  +do-live-scry-accounting: updates tracking for a live %scry build
   ::
   ++  do-live-scry-accounting
     |=  build=[date=@da [%scry =resource]]
     ^+  ..execute
+    ~&  [%do-live-scry-accounting build]
     =/  =disc  (extract-disc resource.build)
     ::
     %_    ..execute
