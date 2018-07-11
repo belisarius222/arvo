@@ -45,15 +45,19 @@
   test-scry-clay-succeed
   test-scry-clay-fail
   test-scry-clay-block
-  test-scry-clay-live
-  test-scry-clay-live-again
+  ::  test-scry-clay-live
+  ::  test-scry-clay-live-again
+
   ::  test-scry-clay-same-path
-::    test-pinned-in-past
-::    test-pinned-in-future
-::    test-pinned-in-pin
-::    test-pinned-in-live
-::    test-live-build-that-blocks
-::    test-live-and-once
+
+  test-pinned-in-past
+  test-pinned-in-future
+  test-pinned-in-pin
+  ::  test-pinned-in-live
+  ::  test-live-build-that-blocks
+
+  ::  test-live-and-once
+
 ::    test-live-two-deep
 ::    test-live-three-deep
 ::    test-live-triangle
@@ -1173,21 +1177,21 @@
   =^  results1  ford-gate
     %-  test-ford-call  :*
       ford-gate
-      now=~1234.5.6
-      scry=(scry-succeed ~1234.5.8 [%noun !>(42)])
+      now=~1234.5.8
+      scry=(scry-succeed ~1234.5.6 [%noun !>(42)])
       ::
       ^=  call-args
-        :*  duct=~[/pinned-in-future]  type=~  %build  ~nul
+        :*  duct=~[/pinned-in-pin]  type=~  %build  ~nul
             %pin  ~1234.5.7
-            %pin  ~1234.5.8
+            %pin  ~1234.5.6
             [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
         ==
       ::
       ^=  moves
-        :~  :*  duct=~[/pinned-in-future]
-                %give  %made  ~1234.5.8  %complete
+        :~  :*  duct=~[/pinned-in-pin]
+                %give  %made  ~1234.5.7  %complete
                 %success  %pin  ~1234.5.7
-                %success  %pin  ~1234.5.8
+                %success  %pin  ~1234.5.6
                 [%success %scry %noun !>(42)]
     ==  ==  ==
   ::

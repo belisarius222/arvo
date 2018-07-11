@@ -135,25 +135,6 @@
       ::    for a +duct, or to look up whether a duct is live or once.
       ::
       builds-by-listener=(map duct [=build live=?])
-  ::
-  ::  update tracking
-  ::
-      ::  resources-by-disc: live clay resources
-      ::
-      ::    Used for looking up which +resource's rely on a particular
-      ::    +disc, so that we can send a new Clay subscription with all
-      ::    the resources we care about within that disc.
-      ::
-      resources-by-disc=(jug disc resource)
-      ::  latest-by-disc: latest formal date of a completed live build on disc
-      ::
-      ::    Updated each time we complete a build of a +resource,
-      ::    if the build's formal date is later than the stored value.
-      ::
-      latest-by-disc=(map disc @da)
-      ::  clay-subscriptions: ducts we'll use to cancel existing clay requests
-      ::
-      clay-subscriptions=(map disc duct)
   ==
 ::  +build-status: current data for a build, including construction status
 ::
@@ -844,9 +825,6 @@
   ::  moves: the moves to be sent out at the end of this event, reversed
   ::
   =|  moves=(list move)
-  ::  dirty-discs: discs whose resources have changed during this event
-  ::
-  =|  dirty-discs=(set disc)
   ::  scry-results: responses to scry's to handle in this event
   ::
   ::    If a value is `~`, the requested resource is not available.
@@ -857,17 +835,14 @@
   ::
   ::    Not a `|_` because of the `=/`s at the beginning.
   ::    Produces a core containing four public arms:
-  ::    +start-build, +rebuild, +unblock, and +cancel.
+  ::    +start-build, +rebuild, +unblock, and +cancel. 
   ::
   |=  [[our=@p =duct now=@da scry=sley] state=ford-state]
-  ::  original-clay-subscriptions: outstanding clay subscriptions at event start
-  ::
-  =/  original-clay-subscriptions  clay-subscriptions.state
-  ::  original-resources-by-disc: :resources-by-disc.state at event start
-  ::
-  =/  original-resources-by-disc  resources-by-disc.state
   ::
   |%
+  ++  finalize
+    ^-  [(list move) ford-state]
+    [(flop moves) state]
   ::  |entry-points: externally fired arms
   ::
   ::+|  entry-points
@@ -938,9 +913,6 @@
     =/  date=@da  p.case
     ::
     =/  =disc  [ship desk]
-    ::  delete the now-dead clay subscription
-    ::
-    =.  clay-subscriptions.state  (~(del by clay-subscriptions.state) disc)
     ::
     =/  builds=(list build)
       %+  turn  ~(tap in care-paths)
@@ -1331,10 +1303,7 @@
       |=  [old=build new=build new-subs=(list build)]
       ^+  ..execute
       ::
-      =^  wiped-rebuild  ..execute  (promote-build old date.new new-subs)
-      =?    next-builds.state
-          ?=(^ wiped-rebuild)
-        (~(put in next-builds.state) u.wiped-rebuild)
+      =.  ..execute  (promote-build old date.new new-subs)
       ::
       =^  unblocked-clients  builds.state  (unblock-clients new)
       =.  candidate-builds.state
@@ -1402,8 +1371,8 @@
     ::
     ++  promote-build
       |=  [old-build=build new-date=@da new-subs=(list build)]
-      ^-  [(unit build) _..execute]
-      ::  ~&  [%promote-build (build-to-tape old-build) new-date]
+      ^+  ..execute
+      ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
       =^  old-build-record  builds.state  (access-build-record old-build)
@@ -1436,19 +1405,6 @@
               mades=~
           ==
         ==
-      ::  if this is the newest %scry on :disc, update :latest-by-disc.state
-      ::
-      ::    :latest-by-disc.state is used to create Clay subscriptions. This
-      ::    promoted build may now be the latest time for this :disc.
-      ::
-      =?    latest-by-disc.state
-          ?&  ?=(%scry -.schematic.old-build)
-              =/  disc  (extract-disc resource.schematic.old-build)
-              ~|  [disc+disc latest-by-disc+latest-by-disc.state]
-              (gth new-date (~(got by latest-by-disc.state) disc))
-          ==
-        =/  disc  (extract-disc resource.schematic.old-build)
-        (~(put by latest-by-disc.state) disc new-date)
       ::  mirror linkages between :old-build and subs to :new-build and subs
       ::
       =.  builds.state
@@ -1542,64 +1498,10 @@
       =.  ..execute  (send-mades new-build new-build-status root-once-listeners)
       =.  state
         (remove-listeners-from-build ~(tap in root-once-listeners) new-build)
-      ::  send %made moves for future builds
-      ::
-      ::    We may have future results queued, waiting on this build to send a
-      ::    %made. Now that we've sent current %made moves, we can send future
-      ::    ones, as we need to send these in chronological order by formal
-      ::    date.
-      ::
-      =^  wiped-rebuild  ..execute  (send-future-mades new-build)
       ::  :old-build might no longer be tracked by anything
       ::
-      =.  ..execute  (cleanup old-build)
-      ::
-      [wiped-rebuild ..execute]
+      (cleanup old-build)
     --
-  ::  +send-future-mades: send %made moves for future rebuilds
-  ::
-  ::    If a future rebuild has been wiped, then produce it along with
-  ::    a modified `..execute` core.
-  ::
-  ++  send-future-mades
-    |=  =build
-    ^-  [(unit ^build) _..execute]
-    ::
-    =^  record  builds.state  (access-build-record build)
-    ::
-    =/  next  (~(find-next by-schematic builds-by-schematic.state) build)
-    ?~  next
-      ::  no future build
-      ::
-      [~ ..execute]
-    ::
-    =^  next-record  builds.state  (access-build-record u.next)
-    ?~  next-record
-      ::  unfinished future build
-      ::
-      [~ ..execute]
-    ::  if :next's result hasn't been wiped
-    ::
-    ?:  ?&  ?=(%value -.u.next-record)
-            (is-build-live u.next)
-        ==
-      ::
-      =.  state  (advance-live-listeners build u.next)
-      =.  ..execute  (cleanup build)
-      ::  if the result has changed, send %made moves for live listeners
-      ::
-      =?    ..execute
-          ?&  ?=([~ %value *] record)
-              !=(build-result.u.record build-result.u.next-record)
-          ==
-        %^  send-mades  u.next
-          (~(got by builds.state) u.next)
-        (sy (root-live-listeners u.next))
-      ::
-      $(build u.next)
-    ::  if :next has been wiped, produce it
-    ::
-    [`u.next ..execute]
   ::  +run-builds: run the builds and produce +build-receipts
   ::
   ::    Runs the builds and cleans up the build lists afterwards.
@@ -1829,23 +1731,7 @@
       ::    If :build was a once build, now that we've sent its %made moves, we
       ::    can delete it.
       ::
-      =.  ..execute  (cleanup build)
-      ::  now that we've handled :build, check any future builds
-      ::
-      ::    We may have future results queued, waiting on this build to send
-      ::    a %made. Now that we've sent current %made moves, we can send
-      ::    future ones, as we need to send these in chronological order by
-      ::    formal date.
-      ::
-      =^  wiped-rebuild  ..execute  (send-future-mades build)
-      ?~  wiped-rebuild
-        ..execute
-      ::  if a future-build's result was wiped from the cache, rebuild it.
-      ::  TODO: maybe candidate builds
-      ::
-      =.  next-builds.state  (~(put in next-builds.state) u.wiped-rebuild)
-      ::
-      ..execute
+      (cleanup build)
     ::  +enqueue-clients: rerun old clients, updated to current time
     ::
     ++  enqueue-clients
@@ -5077,7 +4963,7 @@
   ++  send-mades
     |=  [=build =build-status listeners=(set listener)]
     ^+  ..execute
-    ::  ~&  [%send-mades (build-to-tape build) status=build-status listeners=listeners]
+    ~&  [%send-mades (build-to-tape build) status=build-status listeners=listeners]
     ::  make sure we have something to send
     ::
     ?>  ?=([%complete [%value *] *] state.build-status)
@@ -5312,82 +5198,6 @@
     ::
     :-  `build-record.state.build-status
     (~(put by builds.state) build build-status)
-  ::  +finalize: convert per-event state to moves and persistent state
-  ::
-  ::    Converts :done-live-roots to %made +move's, performs +duct
-  ::    accounting, and runs +cleanup on completed once builds and
-  ::    stale live builds.
-  ::
-  ++  finalize
-    ^-  [(list move) ford-state]
-    ::  once we're done, +flop :moves to put them in chronological order
-    ::
-    =<  [(flop moves) state]
-    ::
-    =/  discs  ~(tap in dirty-discs)
-    ::
-    |-  ^+  this
-    ?~  discs  this
-    ::
-    =*  disc  i.discs
-    ::  resources: all resources on :disc
-    ::
-    =/  resources=(set resource)
-      (fall (~(get by resources-by-disc.state) disc) ~)
-    ::  subscription-duct: if any, the duct that previously made a subscription
-    ::
-    =/  subscription-duct
-      (~(get by original-clay-subscriptions) disc)
-    ::  if no resources on :disc, don't make a new clay subscription
-    ::
-    ?~  resources
-      ::  no resources, no subscriptions, no action.
-      ::
-      ?~  subscription-duct
-        $(discs t.discs)
-      ::  cancel any clay subscriptions since we don't have any resources left
-      ::
-      =.  moves  :_  moves
-        (clay-cancel-subscription-move u.subscription-duct disc)
-      ::
-      =.  clay-subscriptions.state  (~(del by clay-subscriptions.state) disc)
-      ::
-      =.  latest-by-disc.state  (~(del by latest-by-disc.state) disc)
-      ::
-      $(discs t.discs)
-    ::  prevent thrashing; don't unsubscribe then immediately resubscribe
-    ::
-    ::    When we send a request to a foreign ship, that ship may have
-    ::    started responding before we send a cancellation. In that case,
-    ::    canceling and then resubscribing might cause the foreign ship
-    ::    to send the response twice, which would be extra network traffic.
-    ::
-    ?:  ?&  (~(has by original-clay-subscriptions) disc)
-        ::
-            (~(has by clay-subscriptions.state) disc)
-        ::
-            .=  (~(get by original-resources-by-disc) disc)
-            (~(get by resources-by-disc.state) disc)
-        ==
-      ::
-      $(discs t.discs)
-    ::  if we had a previous subscription on a different duct, send a cancel
-    ::
-    ::    Clay effectively has a (map duct subscription). We need to explicitly
-    ::    cancel the old subscription only if the ducts differ, as otherwise
-    ::    the new subscription will replace the old one.
-    ::
-    =?  moves  &(?=(^ subscription-duct) !=(duct u.subscription-duct))
-      :_  moves
-      (clay-cancel-subscription-move u.subscription-duct disc)
-    ::  send a new clay request using the current duct
-    ::
-    =.  moves  :_  moves
-      (clay-add-subscription-move disc resources)
-    ::
-    =.  clay-subscriptions.state  (~(put by clay-subscriptions.state) disc duct)
-    ::
-    $(discs t.discs)
   ::  +cleanup: try to clean up a build and its sub-builds
   ::
   ++  cleanup
@@ -5409,70 +5219,12 @@
       ..execute
     ~&  [%cleanup (build-to-tape build)]
     ::
-    =.  ..execute  (cleanup-live-tracking build build-status)
-    ::
     =.  state  (remove-builds ~[build])
     ::
     ..execute
-  ::  +cleanup-live-tracking: stop tracking build
-  ::
-  ++  cleanup-live-tracking
-    |=  [=build =build-status]
-    ^+  ..execute
-    ::
-    =/  was-subscribed=?  subscribed.build-status
-    =.  subscribed.build-status  |
-    =.  builds.state  (~(put by builds.state) build build-status)
-    ~&  [%cleanup-lt (build-to-tape build) was-subscribed=was-subscribed]
-    ::  clean up dependency tracking and maybe cancel clay subscription
-    ::
-    =?    ..execute
-        ::  does :build depend on a live clay +resource?
-        ::
-        ?&  was-subscribed
-            ?=([%scry %c *] schematic.build)
-        ==
-      ::
-      =/  =resource  resource.schematic.build
-      =/  =disc  (extract-disc resource)
-      ::
-      =/  should-delete-resource=?
-        ::  checks if there are other live builds of this resource
-        ::
-        =/  dates=(list @da)
-          =-  (skip - |=(d=@da =(d date.build)))
-          =-  (fall - ~)
-          (~(get by builds-by-schematic.state) schematic.build)
-        ?!
-        %+  lien  dates
-        |=  date=@da
-        ^-  ?
-        =/  other-build  [date schematic.build]
-        =/  listeners=(set listener)
-          listeners:(~(got by builds.state) other-build)
-        ::
-        (~(any in listeners) is-listener-live)
-      ~&  [%clean-up-dependency-for (build-to-tape build) should-delete=should-delete-resource]
-      ::
-      =?  resources-by-disc.state  should-delete-resource
-        (~(del ju resources-by-disc.state) disc resource)
-      ::
-      =?  dirty-discs  should-delete-resource
-        (~(put in dirty-discs) disc)
-      ::
-      ..execute
-    ::
-    =/  sub-builds  (extended-subs build build-status)
-    ::
-    |-
-    ^+  ..execute
-    ?~  sub-builds  ..execute
-    ::
-    =.  ..execute
-      ^$(build i.sub-builds, build-status (~(got by builds.state) i.sub-builds))
-    ::
-    $(sub-builds t.sub-builds)
   ::  +subscribe-to-build-and-subs: subscribe to all +resource's under :build
+  ::
+  ::    TODO: PORT This is the part of the subscription stuff that will be very different.
   ::
   ++  subscribe-to-build-and-subs
     |=  builds=(list build)
@@ -5488,11 +5240,11 @@
     ?:  subscribed:(~(got by builds.state) i.builds)
       ~&  [%already-subscribed (build-to-tape i.builds)]
       $(builds t.builds)
-    ::  perform the actual subscription logic
-    ::
-    =?    ..execute
-        ?=(%scry -.schematic.i.builds)
-      (do-live-scry-accounting i.builds)
+    ::  ::  perform the actual subscription logic
+    ::  ::
+    ::  =?    ..execute
+    ::      ?=(%scry -.schematic.i.builds)
+    ::    (do-live-scry-accounting i.builds)
     ::
     =^  build-status  builds.state
       %+  update-build-status  i.builds
@@ -5502,35 +5254,6 @@
     =/  subs  (extended-subs i.builds build-status)
     ::
     $(builds (weld t.builds subs))
-  ::  +do-live-scry-accounting: updates tracking for a live %scry build
-  ::
-  ++  do-live-scry-accounting
-    |=  build=[date=@da [%scry =resource]]
-    ^+  ..execute
-    ::  ~&  [%do-live-scry-accounting build]
-    =/  =disc  (extract-disc resource.build)
-    ::
-    %_    ..execute
-    ::  link :disc to :resource
-    ::
-        resources-by-disc.state
-      (~(put ju resources-by-disc.state) [disc resource.build])
-    ::  mark :disc as dirty
-    ::
-        dirty-discs
-      (~(put in dirty-discs) disc)
-    ::  update :latest-by-disc.state if :date.build is later
-    ::
-        latest-by-disc.state
-      =/  latest-date  (~(get by latest-by-disc.state) disc)
-      ::
-      ?:  ?&  ?=(^ latest-date)
-              (lte date.build u.latest-date)
-          ==
-        latest-by-disc.state
-      ::
-      (~(put by latest-by-disc.state) disc date.build)
-    ==
   ::  +extended-subs: a list of subs, provisional subs, and rebuilds of such
   ::
   ++  extended-subs
@@ -5634,7 +5357,9 @@
     ::  their: requestee +ship
     ::
     =+  [their desk]=disc
-    =/  latest-date  (~(got by latest-by-disc.state) disc)
+    ::  TODO: PORT Make this take the latest date
+    ::
+    =/  latest-date  now
     ::
     =/  =note
       :^  %c  %warp  sock=[our their]
