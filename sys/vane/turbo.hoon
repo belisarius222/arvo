@@ -110,31 +110,27 @@
 ::  +ford-state: all state that ford maintains for a @p ship identity
 ::
 +=  ford-state
-  $:  ::  builds-by-schematic: all attempted builds, sorted by time
-      ::
-      ::    For each schematic we've attempted to build at any time,
-      ::    list the formal dates of all build attempts, sorted newest first.
-      ::
-      builds-by-schematic=(map schematic (list @da))
-      ::  results: all stored build results
+  $:  ::  results: all stored build results
       ::
       ::    Ford generally stores the result for all the most recently
       ::    completed live builds, unless it's been asked to wipe its cache.
       ::
       builds=(map build build-status)
+      ::  ducts: build requests to their state
+      ::
+      ducts=(map duct duct-status)
+      ::  builds-by-schematic: all attempted builds, sorted by time
+      ::
+      ::    For each schematic we've attempted to build at any time,
+      ::    list the formal dates of all build attempts, sorted newest first.
+      ::
+      builds-by-schematic=(map schematic (list @da))
       ::  next-builds: builds to perform in the next iteration
       ::
       next-builds=(set build)
       ::  candidate-builds: builds which might go into next-builds
       ::
       candidate-builds=(list build)
-      ::  builds-by-listener: reverse lookup for :root-listeners
-      ::
-      ::    A duct can only be attached to one root build, and it is either
-      ::    live or once. :builds-by-listener can be used to look up a +build
-      ::    for a +duct, or to look up whether a duct is live or once.
-      ::
-      builds-by-listener=(map duct [=build live=?])
   ==
 ::  +build-status: current data for a build, including construction status
 ::
@@ -144,9 +140,9 @@
 ::    stores links to dependent sub-builds in :subs.
 ::
 +=  build-status
-  $:  ::  listeners: per listener information for this build
+  $:  ::  clients: per duct information for this build
       ::
-      listeners=(map listener listener-status)
+      clients=(jug duct build)
       ::  subs: sub-builds of this build, for whom this build is a client
       ::
       subs=(map build build-relation)
@@ -171,21 +167,20 @@
               ::
               =build-record
   ==  ==  ==
-::  +listener-status: information relating a build to a listener
+::  +duct-status: information relating a build to a duct
 ::
-+=  listener-status
-  $:  ::  notified: whether this build has sent a %made to the listener
++=  duct-status
+  $:  ::  live: whether this duct is being run live
       ::
-      notified=?
-      ::  subscribed: whether this duct has subscribed to these resources
+      $=  live
+      $%  [%once in-progress=@da]
+          $:  %live
+              in-progress=(unit @da)
+              last-sent=(unit [date=@da resources=(jug disc resource)])
+      ==  ==
+      ::  root-schematic: the requested build for this listener
       ::
-      subscribed=?
-      ::  root: whether this is the root build for this listener
-      ::
-      root=?
-      ::  clients: clients of this build on this duct
-      ::
-      clients=(map build build-relation)
+      root-schematic=schematic
   ==
 ::  +build-relation: how do two builds relate to each other?
 ::
@@ -850,59 +845,23 @@
   ::  +start-build: perform a fresh +build, either live or once
   ::
   ++  start-build
-    |=  =schematic
+    |=  [=build live=?]
     ^-  [(list move) ford-state]
     ::
     =<  finalize
     ::
-    |^  =+  live=(is-schematic-live schematic)
-        ?:  live
-          start-live-build
-        start-once-build
+    =.  ducts.state
+      %+  ~(put by ducts.state)  duct
+      :_  schematic.build
+      ?:  live
+        [%live in-progress=`date.build last-sent=~]
+      [%once in-progress=date.build]
     ::
-    ++  start-live-build
-      ^+  this
-      =/  =build  [now schematic]
-      ::
-      =.  state  (associate-build build duct %.y)
-      ::
-      (execute-loop (sy build ~))
+    =.  state  (add-build build)
     ::
-    ++  start-once-build
-      ^+  this
-      =/  pin-date=@da  (date-from-schematic schematic)
-      =/  =build  [pin-date schematic]
-      ::
-      =.  state  (associate-build build duct %.n)
-      ::
-      (execute-loop (sy build ~))
-    ::  +associate-build: associate +listener with :build in :state
+    =.  builds.state  (add-duct-to-subs build)
     ::
-    ++  associate-build
-      |=  [=build duct=^duct live=?]
-      ^+  state
-      ::
-      =.  state  (add-build build)
-      ::
-      =/  =build-status  (~(got by builds.state) build)
-      ::
-      =.  listeners.build-status
-        %+  ~(put by listeners.build-status)  [duct live]
-        :*  notified=%.n
-            subscribed=%.n
-            root=%.y
-            clients=~
-        ==
-      ::
-      %_    state
-          builds
-        (~(put by builds.state) build build-status)
-      ::
-          builds-by-listener
-        (~(put by builds-by-listener.state) duct [build live])
-      ==
-    ::
-    --
+    (execute-loop (sy [build ~]))
   ::  +rebuild: rebuild any live builds based on +resource updates
   ::
   ++  rebuild
@@ -921,6 +880,23 @@
       ::
       :-  date
       [%scry [%c care rail=[disc spur=(flop path)]]]
+    ::
+    =/  duct-status  (~(got by ducts.state) duct)
+    ?>  ?=(%live -.live.duct-status)
+    ::  sanity check; only rebuild once we've completed the previous one
+    ::
+    ?>  ?=(~ in-progress.live.duct-status)
+    ?>  ?=(^ last-sent.live.duct-status)
+    ::  set the in-progress date for this new build
+    ::
+    =.  ducts.state
+      %+  ~(put by ducts.state)  duct
+      duct-status(in-progress.live `date)
+    ::
+    =/  old-root=build
+      [u.last-sent.live.duct-status root-schematic.duct-status]
+    =.  state
+      (copy-build-tree-as-provisional old-root new-date=date)
     ::  gather all the :builds, forcing reruns
     ::
     =.  ..execute  (gather (sy builds) force=%.y)
@@ -972,91 +948,134 @@
     ::
     =<  finalize
     ::
-    =/  build-and-live  (~(get by builds-by-listener.state) duct)
+    ?~  duct-status=(~(get by ducts.state) duct)
+      ~&  [%no-build-for-duct duct]
+      ..execute
     ::
-    ?~  build-and-live
-      ~&(no-build-for-duct+duct this)
+    =.  state  (remove-duct-from-subs root-build.u.duct-status)
+    =.  ducts.state  (~(del by ducts.state) duct)
     ::
-    =+  [build live]=u.build-and-live
-    ::  old-rebuilds and listeners don't interact well.
-    ::
-    ::    Have two ducts listening to the same build, causing a promotion.
-    ::    The new build has an old build. Both ducts by :builds-by-listener
-    ::    point to th new build. The new build has an old build and thus
-    ::    never gets cleaned up.
-    ::
-    =.  state  (remove-listener-from-build [duct live] build)
-    ::
-    (cleanup build)
-  ::  +add-listener-to-build: mark that :listener is attached to :build
+    (cleanup root-build.u.duct-status)
+  ::  +add-duct-to-subs: attach :duct to :build's descendants
   ::
-  ::    Also adds :listener to extended sub-builds.
-  ::    Does not handle anything with root listeners.
-  ::
-  ++  add-listener-to-build
-    |=  [=listener =build]
+  ++  add-duct-to-subs
+    |=  [duct=^duct =build]
     ^+  builds.state
     ::
-    =/  builds=(list ^build)  ~[build]
+    =/  =build-status  (~(got by builds.state) build)
+    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
+    =/  client=^build  build
     ::
     |-  ^+  builds.state
-    ?~  builds  builds.state
+    ?~  subs  builds.state
     ::
-    =/  =build-status  (~(got by builds.state) i.builds)
-    ::  if :listener is already attached to :i.builds, move on to :t.builds
+    =/  sub-status=build-status  (~(got by builds.state) i.subs)
     ::
-    ?:  (~(has by listeners.build-status) listener)
-      $(builds t.builds)
+    =/  already-had-duct=?  (~(has by clients.sub-status) duct)
     ::
-    =.  listeners.build-status
-      %+  ~(put by listeners.build-status)  listener
-      :*  notified=%.n
-          subscribed=%.n
-          ::  TODO: Is this correct? The gate comment says it is...
-          root=%.n
-          clients=~
-      ==
+    =.  clients.sub-status
+      (~(put ju clients.sub-status) duct client)
     ::
-    =.  builds.state  (~(put by builds.state) i.builds build-status)
+    =.  builds.state  (~(put by builds.state) i.subs sub-status)
     ::
-    =/  subs  (extended-subs i.builds build-status)
+    =?  builds.state  !already-had-duct  ^$(build i.subs)
     ::
-    $(builds (welp t.builds subs))
-  ::  +remove-listener-from-build: recursively remove listener from (sub)builds
+    $(subs t.subs)
+  ::  +remove-duct-from-subs: recursively remove duct from sub-builds
   ::
-  ++  remove-listener-from-build
-    |=  [=listener =build]
+  ++  remove-duct-from-subs
+    |=  =build
     ^+  state
     ::
     =/  =build-status  (~(got by builds.state) build)
-    ::  if :build was a root build for :listener, remove the global association
+    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
+    =/  client=^build  build
     ::
-    =?    builds-by-listener.state
-        ?~  maybe-status=(~(get by listeners.build-status) listener)
-          %.n
-        root.u.maybe-status
-      (~(del by builds-by-listener.state) duct.listener)
+    |-  ^+  builds.state
+    ?~  subs  builds.state
     ::
-    =/  builds=(list ^build)  ~[build]
+    =/  sub-status=build-status  (~(got by builds.state) i.subs)
     ::
-    |-  ^+  state
-    ?~  builds  state
+    =.  clients.sub-status
+      (~(del ju clients.sub-status) duct client)
     ::
-    =.  build-status  (~(got by builds.state) i.builds)
-    =/  listener-status   (~(got by build-status) listener)
-    ::  if any clients still have :listener attached, no-op on :i.builds
+    =.  builds.state  (~(put by builds.state) i.subs sub-status)
     ::
-    ::    In the case of a provisional diamond dependency graph, we might
-    ::    remove only one side of the diamond, in which case the leaf at
-    ::    the bottom of the sub-build should retain :listener.
+    =?  builds.state  (~(has by clients.sub-status) duct)
+      ^$(build i.subs)
     ::
-    ?~  clients.listener-status
-      $(builds t.builds)
+    $(subs t.subs)
+  ::  +copy-build-tree-as-provisional: prepopulate new live build
+  ::
+  ::    Make a provisional copy of the completed old root build tree at the
+  ::    :new time.
+  ::
+  ++  copy-build-tree-as-provisional
+    |=  [old-root=build new-date=@da]
+    ^+  state
     ::
-    =.  listeners.build-status  (~(del by listeners.build-status) listener)
-    =.  builds.state  (~(put by builds.state) i.builds build-status)
+    =/  old-client=build  old-root
+    =/  new-client=build  old-client(date new-date)
+    =.  state  (add-build new-client)
     ::
-    $(builds (welp t.builds ~(tap in ~(key by subs.build-status))))
+    =<  copy-node
+    ::
+    |%
+    ++  copy-node
+      ^+  state
+      ::
+      =/  old-build-status=build-status  (~(got by builds.state) old-client)
+      ::
+      =/  old-subs=(list build)  ~(tap in ~(key by subs.old-build-status))
+      =/  new-subs=(list build)  (turn old-subs |=(a=build a(date new-date)))
+      ::
+      =.  builds.state
+        (add-subs-to-client new-client new-subs [verified=%.n blocked=%.n])
+      ::
+      |-
+      ^+  state
+      ?~  old-subs
+        state
+      ::
+      =.  state  (add-client-to-sub i.old-subs)
+      =.  state  copy-node(old-client i.old-subs)
+      ::
+      $(old-subs t.old-subs)
+    ::
+    ++  add-client-to-sub
+      |=  old-sub=build
+      ^+  state
+      ::
+      =/  new-sub  old-sub(date new-date)
+      =.  state  (add-build new-sub)
+      ::
+      =.  builds.state
+        =<  builds
+        %+  update-build-status  new-sub
+        |=  =build-status
+        build-status(clients (~(put ju clients.build-status) duct new-client))
+      ::
+      state
+    --
+  ::  TODO: consolidate all these new sub/duct functions to one area.
+  ::
+  ++  add-subs-to-client
+    |=  [new-client=build new-subs=(list build) =build-relation]
+    ^+  builds.state
+    ::
+    =<  builds
+    %+  update-build-status  new-client
+    |=  =build-status
+    %_    build-status
+        subs
+      %-  ~(gas by subs.build-status)
+      %+  murn  new-subs
+      |=  sub=build
+      ::
+      ?^  (~(get by subs.build-status) sub)
+        ~
+      `[sub build-relation]
+    ==
   ::  |construction: arms for performing builds
   ::
   ::+|  construction
@@ -1130,42 +1149,46 @@
       |=  =build
       ^+  ..execute
       ~&  [%gather-build (build-to-tape build)]
-      =/  is-duct-live=?
-        live:(~(got by builds-by-listener.state) duct)
-      =/  =listener  [duct is-duct-live]
+      =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
       ::
       =^  current-result  builds.state  (access-build-record build)
+      ::  TODO: This might not be a root build. In that case this is wrong.
+      ::
       ?:  ?=([~ %value *] current-result)
-        ::
-        =/  =build-status  (~(got by builds.state) build)
-        ::
-        (on-root-build-complete build listener)
+        (on-root-build-complete build)
       ::  place :build in :builds.state if it isn't already there
       ::
       =.  state  (add-build build)
       ::  old-build: most recent previous build with :schematic.build
       ::
       =/  old-build=(unit ^build)
+        ?:  ?&  ?=(%live -.live.duct-status)
+                ?=(^ last-sent.live.duct-status)
+            ==
+          `[date.u.last-sent.live.duct-status schematic.build]
         (~(find-previous by-schematic builds-by-schematic.state) build)
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
-        ::  ~&  [%no-old-build (build-to-tape build)]
         (add-build-to-next build)
-      ::  TODO: Don't we only want to copy one live listener? Like, the current
-      ::  one? Basically? Amirite?
-      ::
-      =.  builds.state  (copy-old-live-listeners u.old-build build)
       ::
       =/  old-build-status=build-status  (~(got by builds.state) u.old-build)
-      =/  old-listener-status=listener-status
-        (~(got by listeners.old-build-status) listener)
-      ::  if :build is a rebuild of a once %scry, we can't promote it
+      ::  selectively promote scry builds
+      ::
+      ::    We can only promote a scry if its not forced and we ran the same
+      ::    scry schematic as a descendant of the root build schematic at the
+      ::    last sent time for this duct.
       ::
       ?:  ?&  ?=(%scry -.schematic.build)
               ?|  force
-                  !subscribed.old-listener-status
+                  ?!
+                  ?&  ?=(%live -.live.duct-status)
+                      ?=(^ last-sent.live.duct-status)
+                      %+  ~(has ju resources.u.last-sent.live.duct-status)
+                        (extract-disc resource.schematic.build)
+                      resource.schematic.build
+                  ==
           ==  ==
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
@@ -1180,9 +1203,24 @@
       =/  old-subs=(list ^build)  ~(tap in ~(key by subs.old-build-status))
       =/  new-subs=(list ^build)
         (turn old-subs |=(^build +<(date date.build)))
-      ::  for each new sub, add all of :build's listeners
+      ::  link sub-builds provisionally, blocking on incomplete
       ::
-      =.  state  (add-listeners-to-subs build new-subs)
+      ::    We don't know that :build will end up depending on :new-subs,
+      ::    so they're not :verified.
+      ::
+      =/  split-new-subs                    (skid new-subs is-build-stored)
+      =/  stored-new-subs=(list ^build)     -.split-new-subs
+      =/  un-stored-new-subs=(list ^build)  +.split-new-subs
+      ::
+      =.  builds.state
+        (add-subs-to-client build stored-new-subs [verified=%.n blocked=%.n])
+      =.  builds.state
+        (add-subs-to-client build un-stored-new-subs [verified=%.n blocked=%.y])
+      ::
+      =.  state  (add-ducts-to-build-subs build)
+
+      ::  TODO: Continue here tomorrow.
+
       ::  if all :new-subs have same +build-result as :old-subs, promote
       ::
       ?:  ::  TODO: Should we be updating the last accessed times here?
@@ -1207,24 +1245,7 @@
         ::
         ::  ~&  [%on-all-subs-are-rebuilds (build-to-tape u.old-build)]
         (on-all-subs-are-rebuilds u.old-build build new-subs)
-      ::  all new-subs have results, some have different results
-      ::
-      ::    We rerun :build because these non-rebuild results might be
-      ::    different, possibly giving :build a different result.
-      ::
-      =/  split-new-subs                    (skid new-subs is-build-stored)
-      =/  stored-new-subs=(list ^build)     -.split-new-subs
-      =/  un-stored-new-subs=(list ^build)  +.split-new-subs
-      ::  link sub-builds provisionally, blocking on incomplete
-      ::
-      ::    We don't know that :build will end up depending on :new-subs,
-      ::    so they're not :verified.
-      ::
-      =.  state
-        (record-subs build stored-new-subs [verified=| blocked=|])
-      =.  state
-        (record-subs build un-stored-new-subs [verified=| blocked=&])
-      ::  if we have new subs, we need to rerun :build
+      ::  if we have new subs, we need to rerun :build because results differ
       ::
       ?^  stored-new-subs
         (add-build-to-next build)
@@ -1248,28 +1269,34 @@
     ++  add-build-to-next
       |=  =build
       ..execute(next-builds.state (~(put in next-builds.state) build))
-    ::  +add-listeners-to-subs: for each sub, add all of :build's listeners
+    ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
     ::
-    ++  add-listeners-to-subs
-      |=  [=build subs=(list build)]
+    ++  add-ducts-to-build-subs
+      |=  =build
       ^+  state
       ::
-      ?~  subs  state
-      ::
-      =.  state  (add-build i.subs)
-      ::
       =/  =build-status  (~(got by builds.state) build)
-      =/  new-listeners  ~(tap in listeners.build-status)
+      =/  new-ducts  ~(tap in ~(key by clients.build-status))
+      =/  subs  ~(tap in ~(key by subs.build-status))
+      ::
+      =.  state
+        |-
+        ^+  state
+        ?~  subs  state
+        ::
+        =.  state  (add-build i.subs)
+        ::
+        $(subs t.subs)
       ::
       =.  builds.state
         |-  ^+  builds.state
-        ?~  new-listeners  builds.state
+        ?~  new-ducts  builds.state
         ::
-        =.  builds.state  (add-listener-to-build i.new-listeners i.subs)
+        =.  builds.state  (add-duct-to-subs i.new-ducts build)
         ::
-        $(new-listeners t.new-listeners)
+        $(new-ducts t.new-ducts)
       ::
-      $(subs t.subs)
+      state
     ::  +on-all-subs-are-rebuilds: promote when all sub-builds are rebuilds
     ::
     ::    When all subs are rebuilds, we promote :old and add builds
@@ -4877,28 +4904,6 @@
     =/  unblocked-clients=(list ^build)  (turn blocked-relations head)
     ::
     [unblocked-clients builds.state]
-  ::  +on-root-build-complete:
-  ::
-  ++  on-root-build-complete
-    |=  [=build =listener]
-    ^+  ..execute
-    ::
-    =.  ..execute
-      (send-mades build (~(got by builds.state) build) (sy listener ~))
-    ::
-    ?.  live.listener
-      (cleanup build)
-    !!
-    ::  ::
-    ::  =.  ..execute  (subscribe-to-build-and-subs [build ~])
-    ::  ::
-    ::  ?~  previous=(find-previous-live-build build listener)
-    ::    ..execute
-    ::  ::
-    ::  =.  state  (remove-listener-from-build u.previous)
-    ::  ::  cleanup previous build
-    ::  ::
-    ::  (cleanup u.previous)
   ::
   ::
   ++  find-previous-live-build
@@ -4914,49 +4919,57 @@
     ?.  (~(has by listeners.previous-build-status) listener)
       ~
     `u.previous-build
-  ::  +send-mades: send %made moves for :listeners on :build
+  ::  +on-root-build-complete: handle completion or promotion of a root build
   ::
-  ::    TODO: PORT +send-mades should only send the mades if different
+  ::    When a build completes for a duct, we might have to send a %made move
+  ::    on the requesting duct and also do duct and build book-keeping.
   ::
-  ++  send-mades
-    |=  [=build =build-status listeners=(set listener)]
+  ++  on-root-build-complete
+    |=  =build
     ^+  ..execute
-    ~&  [%send-mades (build-to-tape build) status=build-status listeners=listeners]
+    ::
+    =/  =duct-status  (~(got by ducts.state) duct)
+    =/  =build-status  (~(got by build.status) build)
     ::  make sure we have something to send
     ::
     ?>  ?=([%complete [%value *] *] state.build-status)
-    ::  make sure we don't send anything twice
     ::
-    =.  listeners  (~(dif in listeners) notified-listeners.state.build-status)
-    ::
-    %_    ..execute
-        moves
-      ::  prepend a move for each listener in :listeners
-      ::
-      %-  weld  :_  moves
-      ::
-      %+  turn  ~(tap in listeners)
-      |=  =listener
+    =?    moves
+        ::  don't send a move for live builds which didn't change
+        ::
+        ?!
+        ?&  ?=(%live -.live.duct-status)
+            ?=(^ last-sent.live.duct-status)
+            =/  last-build-status
+              %-  ~(got by build.status)
+              [u.last-sent-live.duct-status schematic.build]
+            ?>  ?=(%complete -.state.last-build-status)
+            ?&  ?=(%value -.build-record.state.last-build-status)
+                .=  build-result.build-record.state.last-build-status
+                    build-result.build-record.state.build-status
+        ==  ==
+      :_  moves
       ^-  move
       ::
-      :*  duct.listener  %give  %made  date.build  %complete
+      :*  duct  %give  %made  date.build  %complete
           build-result.build-record.state.build-status
       ==
     ::
-        builds.state
-      ::  mark :listeners as notified
+    ?-    -.live.duct-status
+        %once
+      =.  ducts.state  (~(del by ducts.state) duct)
+      (cleanup build)
+    ::
+        %live
+    ::  TODO: We also should make a clay subscription here.
+
+      ::  clean up previous build
       ::
-      =<  builds
-      %+  update-build-status  build
-      |=  build-status=^build-status
-      ^+  build-status
+      =?  ..execute  ?=(^ last-sent.live.duct-status)
+        (cleanup [u.last-sent.live.duct-status schematic.build])
       ::
-      ?>  ?=([%complete *] state.build-status)
-      ::
-      =/  notified-listeners=(set listener)
-        (~(uni in notified-listeners.state.build-status) listeners)
-      ::
-      build-status(notified-listeners.state notified-listeners)
+      %+  ~(put by ducts.state)  duct
+      duct-status(live [%live in-progress=~ last-sent=`date.build])
     ==
   ::  +advance-live-listeners: move live listeners from :old to :new
   ::
@@ -5421,9 +5434,15 @@
    ::    with the new :ship-state and produce it along with :moves.
    ::
    =^  ship-state  state-by-ship.ax  (find-or-create-ship-state our.task)
+   =/  live=?  (is-schematic-live schematic.task)
+   =/  =build
+     :_  schematic.task
+     ?:  live
+       now
+     (date-from-schematic schematic)
    =*  event-args  [[our.task duct now scry-gate] ship-state]
    =*  start-build  start-build:(per-event event-args)
-   =^  moves  ship-state  (start-build schematic.task)
+   =^  moves  ship-state  (start-build build live)
    =.  state-by-ship.ax  (~(put by state-by-ship.ax) our.task ship-state)
    ::
    [moves ford-gate]
