@@ -845,7 +845,7 @@
     ::
     =.  state  (add-build build)
     ::
-    =.  builds.state  (add-duct-to-subs build)
+    =.  builds.state  (add-duct-to-subs duct build)
     ::
     (execute-loop (sy [build ~]))
   ::  +rebuild: rebuild any live builds based on +resource updates
@@ -880,7 +880,7 @@
       duct-status(in-progress.live `date)
     ::
     =/  old-root=build
-      [u.last-sent.live.duct-status root-schematic.duct-status]
+      [date.u.last-sent.live.duct-status root-schematic.duct-status]
     =.  state
       (copy-build-tree-as-provisional old-root new-date=date)
     ::  gather all the :builds, forcing reruns
@@ -940,7 +940,7 @@
     ::
     =.  ducts.state  (~(del by ducts.state) duct)
     |^  ^+  ..execute
-        ?:  ?=([~ %once @da] duct-status)
+        ?:  ?=(%once -.live.u.duct-status)
           (remove-root-build [in-progress.live root-schematic]:u.duct-status)
         ::
         =?    ..execute
@@ -951,7 +951,8 @@
             ?=(^ last-sent.live.u.duct-status)
           =.  moves
             (cancel-subscriptions resources.u.last-sent.live.u.duct-status)
-          (remove-root-build [u.last-sent.live root-schematic]:u.duct-status)
+          %-  remove-root-build
+          [date.u.last-sent.live root-schematic]:u.duct-status
         ::
         ..execute
     ::
@@ -959,7 +960,7 @@
       |=  =build
       ^+  ..execute
       ::
-      =.  state  (remove-duct-from-subs build)
+      =.  builds.state  (remove-duct-from-subs build)
       =.  state  (cleanup build)
       ::
       ..execute
@@ -971,6 +972,34 @@
       %-  welp  :_  moves
       (turn ~(tap in ~(key by resources)) clay-cancel-subscription-move)
     --
+  ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
+  ::
+  ++  add-ducts-to-build-subs
+    |=  =build
+    ^+  state
+    ::
+    =/  =build-status  (~(got by builds.state) build)
+    =/  new-ducts  ~(tap in ~(key by clients.build-status))
+    =/  subs  ~(tap in ~(key by subs.build-status))
+    ::
+    =.  state
+      |-
+      ^+  state
+      ?~  subs  state
+      ::
+      =.  state  (add-build i.subs)
+      ::
+      $(subs t.subs)
+    ::
+    =.  builds.state
+      |-  ^+  builds.state
+      ?~  new-ducts  builds.state
+      ::
+      =.  builds.state  (add-duct-to-subs i.new-ducts build)
+      ::
+      $(new-ducts t.new-ducts)
+    ::
+    state
   ::  +add-duct-to-subs: attach :duct to :build's descendants
   ::
   ++  add-duct-to-subs
@@ -984,7 +1013,7 @@
     |-  ^+  builds.state
     ?~  subs  builds.state
     ::
-    =/  sub-status=build-status  (~(got by builds.state) i.subs)
+    =/  sub-status=^build-status  (~(got by builds.state) i.subs)
     ::
     =/  already-had-duct=?  (~(has by clients.sub-status) duct)
     ::
@@ -1000,7 +1029,7 @@
   ::
   ++  remove-duct-from-subs
     |=  =build
-    ^+  state
+    ^+  builds.state
     ::
     =/  =build-status  (~(got by builds.state) build)
     =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
@@ -1009,7 +1038,7 @@
     |-  ^+  builds.state
     ?~  subs  builds.state
     ::
-    =/  sub-status=build-status  (~(got by builds.state) i.subs)
+    =/  sub-status=^build-status  (~(got by builds.state) i.subs)
     ::
     =.  clients.sub-status
       (~(del ju clients.sub-status) duct client)
@@ -1086,6 +1115,7 @@
       %-  ~(gas by subs.build-status)
       %+  murn  new-subs
       |=  sub=build
+      ^-  (unit (pair build ^build-relation))
       ::
       ?^  (~(get by subs.build-status) sub)
         ~
@@ -1249,11 +1279,11 @@
           (welp un-stored-new-subs candidate-builds.state)
         ==
       ::
-      =^  promotable  build.state  (are-subs-unchanged old-subs new-subs)
+      =^  promotable  builds.state  (are-subs-unchanged old-subs new-subs)
       ?.  promotable
         (add-build-to-next build)
       ::
-      (promote-build old date.new new-subs)
+      (promote-build u.old-build date.build new-subs)
     ::  +are-subs-unchanged: checks sub-build equivalence, updating access time
     ::
     ++  are-subs-unchanged
@@ -1280,34 +1310,6 @@
     ++  add-build-to-next
       |=  =build
       ..execute(next-builds.state (~(put in next-builds.state) build))
-    ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
-    ::
-    ++  add-ducts-to-build-subs
-      |=  =build
-      ^+  state
-      ::
-      =/  =build-status  (~(got by builds.state) build)
-      =/  new-ducts  ~(tap in ~(key by clients.build-status))
-      =/  subs  ~(tap in ~(key by subs.build-status))
-      ::
-      =.  state
-        |-
-        ^+  state
-        ?~  subs  state
-        ::
-        =.  state  (add-build i.subs)
-        ::
-        $(subs t.subs)
-      ::
-      =.  builds.state
-        |-  ^+  builds.state
-        ?~  new-ducts  builds.state
-        ::
-        =.  builds.state  (add-duct-to-subs i.new-ducts build)
-        ::
-        $(new-ducts t.new-ducts)
-      ::
-      state
     ::  +promote-build: promote result of :build to newer :date
     ::
     ::    Also performs relevant accounting, and possibly sends %made moves.
@@ -1412,7 +1414,7 @@
       ::
       ?-    -.result.made
           %build-result
-        (apply-build-result build.made result.made)
+        (apply-build-result build.made build-result.result.made)
       ::
           %blocks
         (apply-blocks build.made result.made sub-builds.made)
@@ -1441,7 +1443,7 @@
           =/  blocked=?
             ?~  sub-status=(~(get by builds.state) sub)
               %.y
-            !?=([%complete [%value *] *] state.u.sub-status)
+            !?=([%complete %value *] state.u.sub-status)
           ::
           [sub [verified=& blocked]]
         ==
@@ -1461,14 +1463,12 @@
         ::
             state
           ::
-          ?.  ?=([%complete [%value *] *] state.build-status)
+          ?.  ?=([%complete %value *] state.build-status)
             state.build-status
           state.build-status(last-accessed.build-record now)
         ==
       ::
       $(sub-builds t.sub-builds)
-    ::  +|  apply-build-result
-    ::
     ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
     ::
     ::    Our build produced an actual result.
@@ -1484,63 +1484,6 @@
         build-status(state [%complete [%value last-accessed=now build-result]])
       ::
       (on-build-complete build)
-    ::  +cleanup-orphaned-provisional-builds: delete extraneous sub-builds
-    ::
-    ::    Remove unverified linkages to sub builds. If a sub-build has no other
-    ::    clients on this duct, then it is orphaned and we remove the duct from
-    ::    its subs and call +cleanup on it.
-    ::
-    ++  cleanup-orphaned-provisional-builds
-      |=  =build
-      ^+  ..execute
-      ::
-      =/  =build-status  (~(got by builds.state) build)
-      ::
-      =/  orphans=(list ^build)
-        %+  murn  ~(tap by subs.build-status)
-        |=  [sub=^build =build-relation]
-        ^-  (unit ^build)
-        ::
-        ?:  verified.build-relation
-          ~
-        `sub
-      ::  remove links to orphans in :build's +build-status
-      ::
-      =^  build-status  builds.state
-        %+  update-build-status  build
-        |=  build-status=^build-status
-        %_    build-status
-            subs
-          ::
-          |-  ^+  subs.build-status
-          ?~  orphans  subs.build-status
-          ::
-          =.  subs.build-status  (~(del by subs.build-status) i.orphans)
-          ::
-          $(orphans t.orphans)
-        ==
-      ::
-      |-  ^+  ..execute
-      ?~  orphans  ..execute
-      ::  remove link to :build in :i.orphan's +build-status
-      ::
-      =^  orphan-status  builds.state
-        %+  update-build-status  i.orphans
-        |=  orphan-status=_build-status
-        %_  orphan-status
-          clients  (~(del ju clients.orphan-status) duct build)
-        ==
-      ::
-      ?:  (~(has by clients.orphan-status) duct)
-        $(orphans t.orphans)
-      ::  :build was the last client on this duct so remove it
-      ::
-      =.  state  (remove-duct-from-subs i.orphans)
-      =.  ..execute  (cleanup i.orphans)
-      $(orphans t.orphans)
-    ::
-    ::  +|  apply-blocks
-    ::
     ::  +apply-blocks: apply a %blocks +build-receipt to ..execute
     ::
     ::    :build blocked. Record information about what builds it blocked on
@@ -4548,14 +4491,14 @@
       ::
       %+  murn  ~(tap in (~(got by clients.build-status) duct))
       |=  client=^build
-      ^-  (unit [^build build-relation])
+      ^-  (unit (pair ^build build-relation))
       ::
-      =/  client-status=build-status  (~(got by builds.state) client)
+      =/  client-status=^build-status  (~(got by builds.state) client)
       =/  =build-relation  (~(got by subs.client-status) build)
       ::
       ?.  blocked.build-relation
         ~
-      [client build-relation]
+      `[client build-relation]
     ::  ~&  [%unblock-clients (build-to-tape build) relations=blocked-relations]
     ::  mark clients as unblocked in clients' +build-status's
     ::
@@ -4612,10 +4555,10 @@
     ^+  ..execute
     ::
     =/  =duct-status  (~(got by ducts.state) duct)
-    =/  =build-status  (~(got by build.status) build)
+    =/  =build-status  (~(got by builds.state) build)
     ::  make sure we have something to send
     ::
-    ?>  ?=([%complete [%value *] *] state.build-status)
+    ?>  ?=([%complete %value *] state.build-status)
     ::
     =?    moves
         ::  don't send a move for live builds which didn't change
@@ -4624,8 +4567,8 @@
         ?&  ?=(%live -.live.duct-status)
             ?=(^ last-sent.live.duct-status)
             =/  last-build-status
-              %-  ~(got by build.status)
-              [u.last-sent-live.duct-status schematic.build]
+              %-  ~(got by builds.state)
+              [u.last-sent.live.duct-status schematic.build]
             ?>  ?=(%complete -.state.last-build-status)
             ?&  ?=(%value -.build-record.state.last-build-status)
                 .=  build-result.build-record.state.last-build-status
@@ -4641,25 +4584,84 @@
     ?-    -.live.duct-status
         %once
       =.  ducts.state  (~(del by ducts.state) duct)
-      =.  state  (remove-duct-from-subs build)
-      (cleanup build)
+      =.  builds.state  (remove-duct-from-subs build)
+      =.  state  (cleanup build)
+      ..execute
     ::
         %live
       =/  resources=(jug disc resource)  (collect-live-resources build)
       ::
       =.  moves
         =-  (weld - moves)
-        (turn ~(tap by resources) clay-add-subscription-move)
+        (turn ~(tap by resources) (clay-add-subscription-move date.build))
       ::  clean up previous build
       ::
       =?  ..execute  ?=(^ last-sent.live.duct-status)
-        =/  old-build=^build  [u.last-sent.live.duct-status schematic.build]
-        =.  state  (remove-duct-from-subs old-build)
-        (cleanup old-build)
+        =/  old-build=^build  build(date date.u.last-sent.live.duct-status)
+        =.  builds.state  (remove-duct-from-subs old-build)
+        =.   state  (cleanup old-build)
+        ..execute
       ::
-      %+  ~(put by ducts.state)  duct
-      duct-status(live [%live in-progress=~ last-sent=`[date.build resources]])
+      =.  ducts.state
+        %+  ~(put by ducts.state)  duct
+        duct-status(live [%live in-progress=~ last-sent=`[date.build resources]])
+      ::
+      ..execute
     ==
+  ::  +cleanup-orphaned-provisional-builds: delete extraneous sub-builds
+  ::
+  ::    Remove unverified linkages to sub builds. If a sub-build has no other
+  ::    clients on this duct, then it is orphaned and we remove the duct from
+  ::    its subs and call +cleanup on it.
+  ::
+  ++  cleanup-orphaned-provisional-builds
+    |=  =build
+    ^+  ..execute
+    ::
+    =/  =build-status  (~(got by builds.state) build)
+    ::
+    =/  orphans=(list ^build)
+      %+  murn  ~(tap by subs.build-status)
+      |=  [sub=^build =build-relation]
+      ^-  (unit ^build)
+      ::
+      ?:  verified.build-relation
+        ~
+      `sub
+    ::  remove links to orphans in :build's +build-status
+    ::
+    =^  build-status  builds.state
+      %+  update-build-status  build
+      |=  build-status=^build-status
+      %_    build-status
+          subs
+        ::
+        |-  ^+  subs.build-status
+        ?~  orphans  subs.build-status
+        ::
+        =.  subs.build-status  (~(del by subs.build-status) i.orphans)
+        ::
+        $(orphans t.orphans)
+      ==
+    ::
+    |-  ^+  ..execute
+    ?~  orphans  ..execute
+    ::  remove link to :build in :i.orphan's +build-status
+    ::
+    =^  orphan-status  builds.state
+      %+  update-build-status  i.orphans
+      |=  orphan-status=_build-status
+      %_  orphan-status
+        clients  (~(del ju clients.orphan-status) duct build)
+      ==
+    ::
+    ?:  (~(has by clients.orphan-status) duct)
+      $(orphans t.orphans)
+    ::  :build was the last client on this duct so remove it
+    ::
+    =.  builds.state  (remove-duct-from-subs i.orphans)
+    =.  state  (cleanup i.orphans)
+    $(orphans t.orphans)
   ::  +is-build-stored: are we storing a +build-result for :build?
   ::
   ++  is-build-stored
@@ -4729,12 +4731,12 @@
       ~
     ::
     =/  subs  ~(tap in ~(key by subs:(~(got by builds.state) build)))
-    =|  resources=(set ^build)
+    =|  resources=(jug disc resource)
     |-
     ?~  subs
       resources
     ::
-    =/  sub-resources  ^$(build i.subs)
+    =/  sub-resources=(jug disc resource)  ^$(build i.subs)
     =.  resources  (unify-jugs resources sub-resources)
     $(subs t.subs)
   ::  +clay-sub-wire: the wire to use for a clay subscription
@@ -4748,7 +4750,8 @@
   ::  +clay-add-subscription-move: subscribes to :resources
   ::
   ++  clay-add-subscription-move
-    |=  [latest-date=@da =disc resources=(set resource)]
+    |=  date=@da
+    |=  [=disc resources=(set resource)]
     ^-  move
     ::  request-contents: the set of [care path]s to subscribe to in clay
     ::
@@ -4770,7 +4773,8 @@
     =/  =note
       :^  %c  %warp  sock=[our their]
       ^-  riff:clay
-      [desk `[%mult case=[%da latest-date] request-contents]]
+      ~!  date.build
+      [desk `[%mult `case`[%da date] request-contents]]
     ::
     [duct [%pass wire=(clay-sub-wire disc) note]]
   ::  +clay-cancel-subscription-move: builds a cancel move
@@ -4836,7 +4840,7 @@
      :_  schematic.task
      ?:  live
        now
-     (date-from-schematic schematic)
+     (date-from-schematic schematic.task)
    =*  event-args  [[our.task duct now scry-gate] ship-state]
    =*  start-build  start-build:(per-event event-args)
    =^  moves  ship-state  (start-build build live)
@@ -4928,8 +4932,8 @@
       builds
     %-  ~(gas by builds.state)
     %+  turn  stale
-    |=  =build
-    ^-  [^build build-status]
+    |=  [=build =build-record]
+    ^-  (pair ^build build-status)
     ::
     =/  =build-status  (~(got by builds.state) build)
     ?>  ?=(%complete -.state.build-status)
