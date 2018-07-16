@@ -159,6 +159,10 @@
               ::
               %blocked  ~
           ==
+          $:  ::  %unblocked: we were blocked but now we aren't
+              ::
+              %unblocked  ~
+          ==
           $:  ::  %complete: build has finished running and has a result
               ::
               %complete
@@ -912,12 +916,14 @@
     ::
     =.  scry-results  (~(put by scry-results) scry-request scry-result)
     ::
-    %-  execute-loop
-    ^-  (set build)
-    %-  sy
-    ^-  (list build)
-    :_  ~
-    (scry-request-to-build scry-request)
+    =/  unblocked-build=build  (scry-request-to-build scry-request)
+    =.  builds.state
+      =<  builds
+      %+  update-build-status  unblocked-build
+      |=  =build-status
+      build-status(state [%unblocked ~])
+    ::
+    (execute-loop (sy unblocked-build ~))
   ::  +cancel: cancel a build
   ::
   ::    When called on a live build, removes all tracking related to the live
@@ -979,7 +985,10 @@
     ^+  state
     ::
     =/  =build-status  (~(got by builds.state) build)
-    =/  new-ducts  ~(tap in ~(key by clients.build-status))
+    ::  is :new-ducts always going to be the empty set?
+    ::
+    =/  new-ducts  ~(tap in (~(put in ~(key by clients.build-status)) duct))
+    ::
     =/  subs  ~(tap in ~(key by subs.build-status))
     ::
     =.  state
@@ -1009,6 +1018,7 @@
     =/  =build-status  (~(got by builds.state) build)
     =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
     =/  client=^build  build
+    ::  ~&  [%add-duct-to-subs duct (build-to-tape build) (lent subs)]
     ::
     |-  ^+  builds.state
     ?~  subs  builds.state
@@ -1204,6 +1214,13 @@
       ::  place :build in :builds.state if it isn't already there
       ::
       =.  state  (add-build build)
+      ::  ignore blocked builds
+      ::
+      =/  =build-status  (~(got by builds.state) build)
+      ?:  ?=(%blocked -.state.build-status)
+        ~&  [%gather-1 (build-to-tape build) build-status]
+        =.  state  (add-ducts-to-build-subs build)
+        ..execute
       ::  old-build: most recent previous build with :schematic.build
       ::
       =/  old-build=(unit ^build)
@@ -1215,9 +1232,10 @@
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
+        ~&  [%gather-2 (build-to-tape build)]
         (add-build-to-next build)
       ::
-      =/  old-build-status=build-status  (~(got by builds.state) u.old-build)
+      =/  old-build-status=^build-status  (~(got by builds.state) u.old-build)
       ::  selectively promote scry builds
       ::
       ::    We can only promote a scry if its not forced and we ran the same
@@ -1233,12 +1251,14 @@
                         (extract-disc resource.schematic.build)
                       resource.schematic.build
           ==  ==  ==
+        ~&  [%gather-3 (build-to-tape build)]
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
       ::
       =^  old-build-record  builds.state  (access-build-record u.old-build)
       ?.  ?=([~ %value *] old-build-record)
         ::  ~&  [%no-old-build (build-to-tape u.old-build)]
+        ~&  [%gather-4 (build-to-tape build)]
         (add-build-to-next build)
       ::
       =.  old-build-status  (~(got by builds.state) u.old-build)
@@ -1263,6 +1283,7 @@
       =.  state  (add-ducts-to-build-subs build)
       ::
       ?^  un-stored-new-subs
+        ~&  [%gather-5 (build-to-tape build)]
         ::  enqueue incomplete sub-builds to be promoted or run
         ::
         ::    When not all our sub builds have results, we can't add :build to
@@ -1281,8 +1302,10 @@
       ::
       =^  promotable  builds.state  (are-subs-unchanged old-subs new-subs)
       ?.  promotable
+        ~&  [%gather-6 (build-to-tape build)]
         (add-build-to-next build)
       ::
+      ~&  [%gather-7 (build-to-tape build)]
       (promote-build u.old-build date.build new-subs)
     ::  +are-subs-unchanged: checks sub-build equivalence, updating access time
     ::
@@ -1428,7 +1451,7 @@
     ++  track-sub-builds
       |=  [client=build sub-builds=(list build)]
       ^+  state
-      ::~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
+      ::  ~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
       ::  mark :sub-builds as :subs in :build's +build-status
       ::
       =^  build-status  builds.state
@@ -4489,6 +4512,9 @@
     =/  blocked-relations=(list [client=^build =build-relation])
       =/  =build-status  (~(got by builds.state) build)
       ::
+      ::  ~&  [%build (build-to-tape build)]
+      ::  ~&  [%status build-status]
+      ::
       %+  murn  ~(tap in (~(got by clients.build-status) duct))
       |=  client=^build
       ^-  (unit (pair ^build build-relation))
@@ -4509,16 +4535,24 @@
       =.  builds.state  =<  builds
         %+  update-build-status  client.i.blocked-relations
         |=  =build-status
-        %_    build-status
-            subs
+        ::
+        =.  subs.build-status
           %+  ~(put by subs.build-status)  build
           =/  original  (~(got by subs.build-status) build)
           original(blocked |)
-        ==
+        ::
+        =?    state.build-status
+            !(~(any by subs.build-status) |=(build-relation blocked))
+          ::
+          [%unblocked ~]
+        ::
+        build-status
       ::
       $(blocked-relations t.blocked-relations)
     ::
     =/  unblocked-clients=(list ^build)  (turn blocked-relations head)
+    ::
+    ~&  [%unblocked-clients-for (build-to-tape build) (turn unblocked-clients build-to-tape)]
     ::
     [unblocked-clients builds.state]
   ::  +on-build-complete: handles completion of any build
@@ -4527,9 +4561,11 @@
     |=  =build
     ^+  ..execute
     ::
+    ~&  [%on-build-complete (build-to-tape build)]
     =.  ..execute  (cleanup-orphaned-provisional-builds build)
     ::
     =/  duct-status  (~(got by ducts.state) duct)
+    ::
     ?:  =(schematic.build root-schematic.duct-status)
       ::
       ?>  .=  `date.build
@@ -4566,9 +4602,10 @@
         ?!
         ?&  ?=(%live -.live.duct-status)
             ?=(^ last-sent.live.duct-status)
+            ~&  [%last-build [date.u.last-sent.live.duct-status schematic.build]]
             =/  last-build-status
               %-  ~(got by builds.state)
-              [u.last-sent.live.duct-status schematic.build]
+              [date.u.last-sent.live.duct-status schematic.build]
             ?>  ?=(%complete -.state.last-build-status)
             ?&  ?=(%value -.build-record.state.last-build-status)
                 .=  build-result.build-record.state.last-build-status

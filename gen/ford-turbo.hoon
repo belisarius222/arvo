@@ -39,20 +39,20 @@
   ::  test-parse-scaffold-crane-fskt
   ::  test-parse-scaffold-crane-fszp
   ::  test-parse-scaffold-crane-fszy
-  test-literal
-  test-autocons-same
-  test-autocons-different
-  test-scry-clay-succeed
-  test-scry-clay-fail
-  test-scry-clay-block
+  ::  test-literal
+  ::  test-autocons-same
+  ::  test-autocons-different
+  ::  test-scry-clay-succeed
+  ::  test-scry-clay-fail
+  ::  test-scry-clay-block
   ::  test-scry-clay-live
   ::  test-scry-clay-live-again
 
-  ::  test-scry-clay-same-path
+  test-scry-clay-same-path
 
-  test-pinned-in-past
-  test-pinned-in-future
-  test-pinned-in-pin
+  ::  test-pinned-in-past
+  ::  test-pinned-in-future
+  ::  test-pinned-in-pin
   ::  test-pinned-in-live
   ::  test-live-build-that-blocks
 
@@ -987,8 +987,7 @@
     %-  test-ford-call  :*
       ford-gate
       now=~1234.5.7
-      scry=scry-is-forbidden
-      ::  a second scry from a different duct shouldn't resubscribe
+      scry=(scry-succeed ~1234.5.7 [%noun !>(42)])
       ::
       ^=  call-args
         :*  duct=~[/second]  type=~  %build  ~nul
@@ -998,6 +997,10 @@
       ^=  moves
         :~  :*  duct=~[/second]  %give  %made  ~1234.5.7  %complete  %success
                 [%scry %noun !>(42)]
+            ==
+            :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk
+                %c  %warp  [~nul ~nul]  %desk
+                `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
   ::
   =^  results3  ford-gate
@@ -1007,8 +1010,10 @@
       scry=scry-is-forbidden
       ::
       call-args=[duct=~[/first] type=~ %kill ~nul]
-      moves=~
-    ==
+      ^=  moves
+        :~  :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk
+                %c  %warp  [~nul ~nul]  %desk  ~
+    ==  ==  ==
   ::
   =^  results4  ford-gate
     %-  test-ford-call  :*
@@ -1019,9 +1024,7 @@
       call-args=[duct=~[/second] type=~ %kill ~nul]
       ::
       ^=  moves
-        ::  the cancellation should go on the duct that made it: /first
-        ::
-        :~  :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -1100,7 +1103,7 @@
       scry=(scry-blocks blocks)
       ::
       ^=  take-args
-        :*  wire=/~nul/scry-request/cx/~nul/desk/~1234.5.8/foo/bar  duct=~
+        :*  wire=/~nul/scry-request/cx/~nul/desk/~1234.5.8/foo/bar  duct=~[/first]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             :*  %c  %writ  ~  [%x [%da ~1234.5.8] %desk]
                 /bar/foo  %noun  scry-type  %eight
