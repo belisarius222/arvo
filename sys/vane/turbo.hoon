@@ -1258,8 +1258,21 @@
       ::
       =/  =build-status  (~(got by builds.state) build)
       ?:  ?=(%blocked -.state.build-status)
-        ~&  [%gather-1 (build-to-tape build) build-status]
         =.  state  (add-ducts-to-build-subs build)
+        ::
+        =/  sub-scrys=(list scry-request)
+          ~(tap in (collect-blocked-sub-scrys build))
+        ::
+        =.  pending-scrys.state
+          |-
+          ?~  sub-scrys
+            pending-scrys.state
+          ::
+          =.  pending-scrys.state
+            (~(put ju pending-scrys.state) i.sub-scrys duct)
+          ::
+          $(sub-scrys t.sub-scrys)
+        ::
         ..execute
       ::  old-build: most recent previous build with :schematic.build
       ::
@@ -4562,10 +4575,6 @@
       ~|  [%build-state builds.state]
       =/  =build-status  (~(got by builds.state) build)
       ::
-      ~&  [%build (build-to-tape build)]
-      ~&  [%status build-status]
-      ~&  [%duct duct]
-      ::
       %+  murn  ~(tap in (fall (~(get by clients.build-status) duct) ~))
       |=  client=^build
       ^-  (unit (pair ^build build-relation))
@@ -4840,6 +4849,38 @@
     ::
     =/  sub-resources=(jug disc resource)  ^$(build i.subs)
     =.  resources  (unify-jugs resources sub-resources)
+    $(subs t.subs)
+  ::  +collect-blocked-resources: produces all blocked resources from sub-scrys
+  ::
+  ++  collect-blocked-sub-scrys
+    |=  =build
+    ^-  (set scry-request)
+    ::
+    ?:  ?=(%scry -.schematic.build)
+      =,  resource.schematic.build
+      =/  =scry-request
+        :+  vane  care
+        ^-  beam
+        [[ship.disc.rail desk.disc.rail [%da date.build]] spur.rail]
+      (sy [scry-request ~])
+    ::  only recurse on blocked sub-builds
+    ::
+    =/  subs=(list ^build)
+      %+  murn  ~(tap by subs:(~(got by builds.state) build))
+      |=  [sub=^build =build-relation]
+      ^-  (unit ^build)
+      ::
+      ?.  blocked.build-relation
+        ~
+      `sub
+    ::
+    =|  scrys=(set scry-request)
+    |-
+    ^+  scrys
+    ?~  subs
+      scrys
+    ::
+    =.  scrys  (~(uni in scrys) ^$(build i.subs))
     $(subs t.subs)
   ::  +start-clay-subscription: listen for changes in the filesystem
   ::

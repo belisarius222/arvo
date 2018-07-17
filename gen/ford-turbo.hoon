@@ -47,15 +47,15 @@
   test-scry-clay-block
   test-scry-clay-live
   test-scry-clay-live-again
-  ::  test-scry-clay-same-path
-  ::  test-pinned-in-past
-  ::  test-pinned-in-future
-  ::  test-pinned-in-pin
-  ::  test-pinned-in-live
+  test-scry-clay-same-path
+  test-pinned-in-past
+  test-pinned-in-future
+  test-pinned-in-pin
+  test-pinned-in-live
+
   ::  test-live-build-that-blocks
 
   ::  test-live-and-once
-
 
 ::    test-live-two-deep
 ::    test-live-three-deep
@@ -1223,46 +1223,23 @@
       now=~1234.5.6
       scry=scry-42
       ::
-      call-args=[duct=~ type=~ %build ~nul schematic]
-      moves=[duct=~ %give %made ~1234.5.6 %complete result]~
+      call-args=[duct=~[/live] type=~ %build ~nul schematic]
+      moves=[duct=~[/live] %give %made ~1234.5.6 %complete result]~
     ==
-  ::  TODO: uncomment
   ::
-  ::  =/  results2=tang
-  ::    %-  expect-eq  !>
-  ::    =/  ford  *ford-gate
-  ::    :_  results:(~(got by state-by-ship.ax.+>+<.ford) ~nul)
-  ::    %-  my  :~
-  ::      :-  [~1234.5.6 [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]]
-  ::      [%value ~1234.5.6 %success %scry %noun !>(42)]
-  ::    ::
-  ::      :-  :*  ~1234.5.6  %pin  ~1234.5.6
-  ::              [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
-  ::          ==
-  ::      [%value ~1234.5.6 %success %pin ~1234.5.6 %success %scry %noun !>(42)]
-  ::    ::
-  ::      :-  :*  ~1234.5.6  %same  %pin  ~1234.5.6
-  ::              [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
-  ::          ==
-  ::      :*  %value  ~1234.5.6  %success  %same  %success  %pin  ~1234.5.6
-  ::          %success  %scry  %noun  !>(42)
-  ::      ==
-  ::    ==
-  ::
-  =^  results3  ford-gate
+  =^  results2  ford-gate
     %-  test-ford-call  :*
       ford-gate
       now=~1234.5.8
       scry=scry-is-forbidden
       ::
-      call-args=[duct=~ type=~ %kill ~nul]
+      call-args=[duct=~[/live] type=~ %kill ~nul]
       moves=~
     ==
   ::
   ;:  weld
     results1
-    ::  results2
-    results3
+    results2
     (expect-ford-empty ford-gate ~nul)
   ==
 ::
@@ -1307,7 +1284,7 @@
         :~  :*  duct=~[/live]  %give  %made  ~1234.5.6  %complete  %success
                 [%scry %noun !>(42)]
             ==
-            :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -1319,7 +1296,7 @@
       scry=scry-43
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~[/live]
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/live]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
@@ -1328,7 +1305,7 @@
         :~  :*  duct=~[/live]  %give  %made  ~1234.5.7  %complete  %success
                 [%scry %noun !>(43)]
             ==
-            :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -1342,7 +1319,7 @@
       call-args=[duct=~[/live] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/live]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
