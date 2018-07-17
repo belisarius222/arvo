@@ -988,7 +988,11 @@
     ::
     =/  root-build=build  [date.u.last-sent.live root-schematic]:u.duct-status
     ::
+    ~&  [%cancel-duct-status duct-status]
+    ~&  [%root-build (build-to-tape root-build)]
+    ::
     =.  state  (remove-duct-from-root root-build)
+    ::
     ::
     =/  resources  ~(tap by resources.u.last-sent.live.u.duct-status)
     |-  ^+  ..execute
@@ -4471,6 +4475,8 @@
       ::
       ?^  clients.build-status
         [removed=| state]
+      ?^  requesters.build-status
+        [removed=| state]
       ::  nothing depends on :build, so we'll remove it
       ::
       :-  removed=&
@@ -4508,6 +4514,8 @@
     |=  [=build update-func=$-(build-status build-status)]
     ^-  [build-status builds=_builds.state]
     ::
+    ~|  [%update-build build]
+    ~|  [%builds-state builds.state]
     =/  mutant=build-status  (update-func (~(got by builds.state) build))
     ::
     [mutant (~(put by builds.state) build mutant)]
@@ -4627,16 +4635,12 @@
     =/  duct-status  (~(got by ducts.state) duct)
     ::
     =/  =build-status  (~(got by builds.state) build)
-    =?  ..execute  ?=(^ requesters.build-status)
+    ?:  (~(has in requesters.build-status) duct)
       (on-root-build-complete build)
-    ::  on root build complete might have unallocated the root build
     ::
-    =?  ..execute  (~(has by builds.state) build)
-      =^  unblocked-clients  builds.state  (unblock-clients-on-duct build)
-      =.  candidate-builds.state
-        (welp unblocked-clients candidate-builds.state)
-      ::
-      ..execute
+    =^  unblocked-clients  builds.state  (unblock-clients-on-duct build)
+    =.  candidate-builds.state
+      (welp unblocked-clients candidate-builds.state)
     ::
     ..execute
   ::  +on-root-build-complete: handle completion or promotion of a root build
@@ -4648,15 +4652,9 @@
     |=  =build
     ^+  ..execute
     ::
+    ~&  [%on-root-build-complete (build-to-tape build)]
+    ::
     =/  =build-status  (~(got by builds.state) build)
-    =/  ducts  ~(tap in requesters.build-status)
-    |-
-    ^+  ..execute
-    ::
-    ?~  ducts
-      ..execute
-    ::
-    =*  duct  i.ducts
     =/  =duct-status  (~(got by ducts.state) duct)
     ::  make sure we have something to send
     ::
@@ -4687,10 +4685,11 @@
     ::
     ?-    -.live.duct-status
         %once
+      ~&  [%deleting-once-build (build-to-tape build)]
       =.  ducts.state  (~(del by ducts.state) duct)
       =.  state  (remove-duct-from-root build)
       ::
-      $(ducts t.ducts)
+      ..execute
     ::
         %live
       =/  resources  (collect-live-resources build)
@@ -4717,7 +4716,7 @@
         %+  ~(put by ducts.state)  duct
         duct-status(live [%live in-progress=~ last-sent=`[date.build resources]])
       ::
-      $(ducts t.ducts)
+      ..execute
     ==
   ::  +cleanup-orphaned-provisional-builds: delete extraneous sub-builds
   ::
@@ -4823,7 +4822,10 @@
     ::  never delete a build that something depends on
     ::
     ?^  clients.build-status
-      ~&  [%cleanup-no-op (build-to-tape build)]
+      ~&  [%cleanup-clients-no-op (build-to-tape build)]
+      state
+    ?^  requesters.build-status
+      ~&  [%cleanup-requesters-no-op (build-to-tape build)]
       state
     ~&  [%cleanup (build-to-tape build)]
     ::
@@ -4887,6 +4889,7 @@
   ++  start-clay-subscription
     |=  =subscription
     ^+  ..execute
+    ~&  [%start-clay-subscription subscription duct]
     ::
     =/  already-subscribed=?
       (~(has by pending-subscriptions.state) subscription)
@@ -4930,12 +4933,15 @@
   ++  cancel-clay-subscription
     |=  =subscription
     ^+  ..execute
+    ~&  [%cancel-clay-subscription subscription]
+    ~&  [%before-pending-state pending-subscriptions.state]
     ::
     =.  pending-subscriptions.state
       (~(del ju pending-subscriptions.state) subscription duct)
     ::  if there are still other ducts on this subscription, don't sned a move
     ::
     ?^  (~(get by pending-subscriptions.state) subscription)
+      ~&  [%not-canceling-for-pending pending-subscriptions.state]
       ..execute
     ::
     =.  moves  :_  moves
