@@ -946,48 +946,46 @@
       ..execute
     ::
     =.  ducts.state  (~(del by ducts.state) duct)
-    |^  ^+  ..execute
-        ?:  ?=(%once -.live.u.duct-status)
-          (remove-root-build [in-progress.live root-schematic]:u.duct-status)
-        ::
-        =?    ..execute
-            ?=(^ in-progress.live.u.duct-status)
-          (remove-root-build [u.in-progress.live root-schematic]:u.duct-status)
-        ::
-        =?    ..execute
-            ?=(^ last-sent.live.u.duct-status)
-          =/  =build  [date.u.last-sent.live root-schematic]:u.duct-status
-          =.  ..execute
-            %+  cancel-subscriptions  build
-            resources.u.last-sent.live.u.duct-status
-          (remove-root-build build)
-        ::
-        ..execute
     ::
-    ++  remove-root-build
-      |=  =build
-      ^+  ..execute
-      ::
-      =.  builds.state  (remove-duct-from-subs build)
-      =.  state  (cleanup build)
+    ?:  ?=(%once -.live.u.duct-status)
+      =.  state
+        (remove-duct-from-root [in-progress.live root-schematic]:u.duct-status)
       ::
       ..execute
     ::
-    ++  cancel-subscriptions
-      |=  [=build resources=(jug disc resource)]
-      ^+  ..execute
-      ::
-      =/  resource-list  ~(tap by resources)
-      |-
-      ^+  ..execute
-      ?~  resource-list
-        ..execute
-      ::
-      =.  ..execute
-        (clay-cancel-subscription-move date.build i.resource-list)
-      ::
-      $(resource-list t.resource-list)
-    --
+    =?    state
+        ?=(^ in-progress.live.u.duct-status)
+      (remove-duct-from-root [u.in-progress.live root-schematic]:u.duct-status)
+    ::
+    ?~  last-sent.live.u.duct-status
+      ..execute
+    ::
+    =/  root-build=build  [date.u.last-sent.live root-schematic]:u.duct-status
+    ::
+    =.  state  (remove-duct-from-root root-build)
+    ::
+    =/  resources  ~(tap by resources.u.last-sent.live.u.duct-status)
+    |-  ^+  ..execute
+    ?~  resources  ..execute
+    ::
+    =.  ..execute  (cancel-clay-subscription date.root-build i.resources)
+    ::
+    $(resources t.resources)
+  ::  +remove-duct-from-root: remove :duct from a build tree
+  ::
+  ++  remove-duct-from-root
+    |=  =build
+    ^+  state
+    ::
+    =.  builds.state
+      =<  builds
+      %+  update-build-status  build
+      |=  =build-status
+      build-status(requesters (~(del in requesters.build-status) duct))
+    ::
+    =.  builds.state  (remove-duct-from-subs build)
+    ::
+    (cleanup build)
   ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
   ::
   ++  add-ducts-to-build-subs
@@ -995,10 +993,7 @@
     ^+  state
     ::
     =/  =build-status  (~(got by builds.state) build)
-    ::  is :new-ducts always going to be the empty set?
-    ::
     =/  new-ducts  ~(tap in (~(put in ~(key by clients.build-status)) duct))
-    ::
     =/  subs  ~(tap in ~(key by subs.build-status))
     ::
     =.  state
@@ -4615,19 +4610,20 @@
     ::  make sure we have something to send
     ::
     ?>  ?=([%complete %value *] state.build-status)
+    ::  send a %made move unless it's an unchanged live build
     ::
     =?    moves
-        ::  don't send a move for live builds which didn't change
-        ::
         ?!
         ?&  ?=(%live -.live.duct-status)
             ?=(^ last-sent.live.duct-status)
-            ~&  [%last-build [date.u.last-sent.live.duct-status schematic.build]]
+            ::
             =/  last-build-status
               %-  ~(got by builds.state)
               [date.u.last-sent.live.duct-status schematic.build]
+            ::
             ?>  ?=(%complete -.state.last-build-status)
             ?&  ?=(%value -.build-record.state.last-build-status)
+            ::
                 .=  build-result.build-record.state.last-build-status
                     build-result.build-record.state.build-status
         ==  ==
@@ -4641,15 +4637,8 @@
     ?-    -.live.duct-status
         %once
       =.  ducts.state  (~(del by ducts.state) duct)
+      =.  state  (remove-duct-from-root build)
       ::
-      =.  builds.state
-        =<  builds
-        %+  update-build-status  build
-        |=  =build-status
-        build-status(requesters (~(del in requesters.build-status) duct))
-      ::
-      =.  builds.state  (remove-duct-from-subs build)
-      =.  state  (cleanup build)
       $(ducts t.ducts)
     ::
         %live
@@ -4662,23 +4651,15 @@
         ?~  resources
           ..execute
         ::
-        =.  ..execute  (clay-add-subscription-move date.build i.resources)
+        =.  ..execute  (start-clay-subscription date.build i.resources)
         ::
         $(resources t.resources)
       ::  clean up previous build
       ::
-      =?  ..execute  ?=(^ last-sent.live.duct-status)
+      =?  state  ?=(^ last-sent.live.duct-status)
         =/  old-build=^build  build(date date.u.last-sent.live.duct-status)
         ::
-        =.  builds.state
-          =<  builds
-          %+  update-build-status  old-build
-          |=  =build-status
-          build-status(requesters (~(del in requesters.build-status) duct))
-        ::
-        =.  builds.state  (remove-duct-from-subs old-build)
-        =.   state  (cleanup old-build)
-        ..execute
+        (remove-duct-from-root old-build)
       ::
       =.  ducts.state
         %+  ~(put by ducts.state)  duct
@@ -4817,81 +4798,82 @@
     =/  sub-resources=(jug disc resource)  ^$(build i.subs)
     =.  resources  (unify-jugs resources sub-resources)
     $(subs t.subs)
-  ::  +clay-sub-wire: the wire to use for a clay subscription
+  ::  +start-clay-subscription: listen for changes in the filesystem
   ::
-  ++  clay-sub-wire
-    |=  =disc  ^-  wire
-    ::
-    =+  [their desk]=disc
-    ::
-    /(scot %p our)/clay-sub/(scot %p their)/[desk]
-  ::  +clay-add-subscription-move: subscribes to :resources
-  ::
-  ::    TODO: Continue here tomorrow.
-  ::
-  ++  clay-add-subscription-move
+  ++  start-clay-subscription
     |=  subscription=[date=@da =disc resources=(set resource)]
     ^+  ..execute
     ::
-    ?:  (~(has by pending-subscriptions.state) subscription)
-      =.  pending.state  (~(put ju pending.state) subscription duct)
-      ..execute
+    =/  already-subscribed=?
+      (~(has by pending-subscriptions.state) subscription)
     ::
-    =/  =note  (clay-subscription-note subscription)
+    =.  pending-subscriptions.state
+      (~(put ju pending-subscriptions.state) subscription duct)
+    ::  don't send a duplicate move if we're already subscribed
+    ::
+    ?:  already-subscribed
+      ..execute
     ::
     =.  moves  :_  moves
-      [duct [%pass wire=(clay-sub-wire disc) note]]
-    =.  pending.state  (~(put ju pending.state) subscription duct)
+      ^-  move
+      :^  duct  %pass  wire=(clay-subscription-wire disc)
+      ^-  note
+      ::  request-contents: the set of [care path]s to subscribe to in clay
+      ::
+      =/  request-contents=(set [care:clay path])
+        %-  sy  ^-  (list [care:clay path])
+        %+  murn  ~(tap in `(set resource)`resources)
+        |=  =resource  ^-  (unit [care:clay path])
+        ::
+        ?.  ?=(%c -.resource)  ~
+        ::
+        `[care.resource (flop spur.rail.resource)]
+      ::  if :request-contents is `~`, this code is incorrect
+      ::
+      ?<  ?=(~ request-contents)
+      ::  their: requestee +ship
+      ::
+      =+  [their desk]=disc
+      ::
+      :^  %c  %warp  sock=[our their]
+      ^-  riff:clay
+      [desk `[%mult `case`[%da date] request-contents]]
     ::
     ..execute
-  ::  +clay-cancel-subscription-move: builds a cancel move
+  ::  +cancel-clay-subscription: remove a subscription on :duct
   ::
-  ++  clay-cancel-subscription-move
-    |=  [date=@da =disc resources=(set resource)]
+  ++  cancel-clay-subscription
+    |=  subscription=[date=@da =disc resources=(set resource)]
     ^+  ..execute
     ::
-    =/  pending-note=note
-      (clay-subscription-note date disc resources)
+    =.  pending-subscriptions.state
+      (~(del ju pending-subscriptions.state) subscription duct)
+    ::  if there are still other ducts on this subscription, don't sned a move
     ::
-    =.  pending.state
-      (~(del ju pending.state) pending-note duct)
-    ::
-    ?^  (~(get by pending.state) pending-note)
+    ?^  (~(get by pending-subscriptions.state) subscription)
       ..execute
     ::
-    =/  =note
+    =.  moves  :_  moves
+      ^-  move
+      :^  duct  %pass  wire=(clay-subscription-wire disc)
+      ^-  note
+      ::
+      =+  [their desk]=disc
+      ::
       :^  %c  %warp  sock=[our their]
       ^-  riff:clay
       [desk ~]
     ::
-    =.  moves  :_  moves
-      [duct [%pass wire=(clay-sub-wire disc) note]]
-    ::
     ..execute
+  ::  +clay-sub-wire: the wire to use for a clay subscription
   ::
-  ++  clay-subscription-note
-    |=  [date=@da =disc resources=(set resource)]
-    ^-  note
-    ::  request-contents: the set of [care path]s to subscribe to in clay
-    ::
-    =/  request-contents=(set [care:clay path])
-      %-  sy  ^-  (list [care:clay path])
-      %+  murn  ~(tap in `(set resource)`resources)
-      |=  =resource  ^-  (unit [care:clay path])
-      ::
-      ?.  ?=(%c -.resource)  ~
-      ::
-      `[care.resource (flop spur.rail.resource)]
-    ::  if :request-contents is `~`, this code is incorrect
-    ::
-    ?<  ?=(~ request-contents)
-    ::  their: requestee +ship
+  ++  clay-subscription-wire
+    |=  =disc
+    ^-  wire
     ::
     =+  [their desk]=disc
     ::
-    :^  %c  %warp  sock=[our their]
-    ^-  riff:clay
-    [desk `[%mult `case`[%da date] request-contents]]
+    /(scot %p our)/clay-sub/(scot %p their)/[desk]
   --
 --
 ::
