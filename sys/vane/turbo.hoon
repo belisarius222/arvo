@@ -865,12 +865,21 @@
     ::
     =<  finalize
     ::
-    =/  builds=(list build)
+    =/  resources=(list resource)
       %+  turn  ~(tap in care-paths)
-      |=  [care=care:clay =path]  ^-  build
+      |=  [care=care:clay =path]  ^-  resource
       ::
-      :-  date
-      [%scry [%c care rail=[disc spur=(flop path)]]]
+      [%c care rail=[disc spur=(flop path)]]
+    ::
+    =/  subscription  [date disc (sy resources)]
+    =.  pending-subscriptions.state
+      (~(del ju pending-subscriptions.state) subscription duct)
+    ::
+    =/  builds=(list build)
+      %+  turn  resources
+      |=  =resource  ^-  build
+      ::
+      [date [%scry resource]]
     ::
     =/  duct-status  (~(got by ducts.state) duct)
     ?>  ?=(%live -.live.duct-status)
@@ -916,6 +925,8 @@
     ::    to be used during this event before it goes out of scope.
     ::
     =.  scry-results  (~(put by scry-results) scry-request scry-result)
+    ::
+    =.  pending-scrys.state  (~(del ju pending-scrys.state) scry-request duct)
     ::
     =/  unblocked-build=build  (scry-request-to-build scry-request)
     =.  builds.state
@@ -967,6 +978,8 @@
     =/  resources  ~(tap by resources.u.last-sent.live.u.duct-status)
     |-  ^+  ..execute
     ?~  resources  ..execute
+    ::
+    ::  TODO: Also add scry cancels here.
     ::
     =.  ..execute  (cancel-clay-subscription date.root-build i.resources)
     ::
@@ -1533,16 +1546,24 @@
               sub-builds=(list build)
           ==
       ^+  ..execute
-      ~&  [%apply-blocks (build-to-tape build)]
-      ::  if we scryed, send clay a request for the path we blocked on reading
+      ~&  [%apply-blocks duct (build-to-tape build)]
+      ::  if we scryed, set our duct as depending on the scry and maybe send a move
       ::
-      =?    moves
+      =?    ..execute
           ?=(^ scry-blocked)
         ::  TODO: handle other vanes
         ::
         ?>  ?=(%c vane.u.scry-blocked)
+        ::  if we are the first block depending on this scry, send a move
         ::
-        [(clay-request-for-scry-request date.build u.scry-blocked) moves]
+        =?  moves  ?=(~ (~(get ju pending-scrys.state) u.scry-blocked))
+          :_  moves
+          (clay-request-for-scry-request date.build u.scry-blocked)
+        ::
+        =.  pending-scrys.state
+          (~(put ju pending-scrys.state) u.scry-blocked duct)
+        ::
+        ..execute
       ::  we must run +apply-build-receipt on :build.made before :block
       ::
       ?<  %+  lien  blocks
@@ -4522,6 +4543,8 @@
     ^-  [(list ^build) _builds.state]
     ::
     =/  blocked-relations=(list [client=^build =build-relation])
+      ~|  [%unblocking (build-to-tape build)]
+      ~|  [%build-state builds.state]
       =/  =build-status  (~(got by builds.state) build)
       ::
       ~&  [%build (build-to-tape build)]
@@ -4582,10 +4605,14 @@
     =/  =build-status  (~(got by builds.state) build)
     =?  ..execute  ?=(^ requesters.build-status)
       (on-root-build-complete build)
+    ::  on root build complete might have unallocated the root build
     ::
-    =^  unblocked-clients  builds.state  (unblock-clients-on-duct build)
-    =.  candidate-builds.state
-      (welp unblocked-clients candidate-builds.state)
+    =?  ..execute  (~(has by builds.state) build)
+      =^  unblocked-clients  builds.state  (unblock-clients-on-duct build)
+      =.  candidate-builds.state
+        (welp unblocked-clients candidate-builds.state)
+      ::
+      ..execute
     ::
     ..execute
   ::  +on-root-build-complete: handle completion or promotion of a root build
@@ -4642,18 +4669,19 @@
       $(ducts t.ducts)
     ::
         %live
-      =/  resources  ~(tap by (collect-live-resources build))
+      =/  resources  (collect-live-resources build)
       ::
       =.  ..execute
+        =/  resource-list  ~(tap by resources)
         |-
         ^+  ..execute
         ::
-        ?~  resources
+        ?~  resource-list
           ..execute
         ::
-        =.  ..execute  (start-clay-subscription date.build i.resources)
+        =.  ..execute  (start-clay-subscription date.build i.resource-list)
         ::
-        $(resources t.resources)
+        $(resource-list t.resource-list)
       ::  clean up previous build
       ::
       =?  state  ?=(^ last-sent.live.duct-status)
@@ -4816,13 +4844,13 @@
     ::
     =.  moves  :_  moves
       ^-  move
-      :^  duct  %pass  wire=(clay-subscription-wire disc)
+      :^  duct  %pass  wire=(clay-subscription-wire disc.subscription)
       ^-  note
       ::  request-contents: the set of [care path]s to subscribe to in clay
       ::
       =/  request-contents=(set [care:clay path])
         %-  sy  ^-  (list [care:clay path])
-        %+  murn  ~(tap in `(set resource)`resources)
+        %+  murn  ~(tap in `(set resource)`resources.subscription)
         |=  =resource  ^-  (unit [care:clay path])
         ::
         ?.  ?=(%c -.resource)  ~
@@ -4833,11 +4861,11 @@
       ?<  ?=(~ request-contents)
       ::  their: requestee +ship
       ::
-      =+  [their desk]=disc
+      =+  [their desk]=disc.subscription
       ::
       :^  %c  %warp  sock=[our their]
       ^-  riff:clay
-      [desk `[%mult `case`[%da date] request-contents]]
+      [desk `[%mult `case`[%da date.subscription] request-contents]]
     ::
     ..execute
   ::  +cancel-clay-subscription: remove a subscription on :duct
@@ -4855,13 +4883,14 @@
     ::
     =.  moves  :_  moves
       ^-  move
-      :^  duct  %pass  wire=(clay-subscription-wire disc)
+      :^  duct  %pass  wire=(clay-subscription-wire disc.subscription)
       ^-  note
       ::
-      =+  [their desk]=disc
+      =+  [their desk]=disc.subscription
       ::
       :^  %c  %warp  sock=[our their]
       ^-  riff:clay
+      ~!  desk
       [desk ~]
     ::
     ..execute
@@ -5050,8 +5079,9 @@
       =/  =disc  (raid:wired t.t.wire ~[%p %tas])
       ::
       =/  ducts=(list ^duct)
-        %-  ~(get by pending-subscriptions.ship-state)
+        =-  ~(tap in (~(get ju pending-subscriptions.ship-state) -))
         :+  date=p.case.sign  disc
+        ^-  (set resource)
         %-  ~(run in care-paths.sign)
         |=  [care=care:clay =path]
         ^-  resource
@@ -5089,6 +5119,8 @@
       `r.u.riot.sign
     ::
     =/  ducts=(list ^duct)
+      ~|  [%pending-scrys pending-scrys.ship-state]
+      ~|  [%scry-request scry-request]
       ~(tap in (~(got by pending-scrys.ship-state) scry-request))
     ::
     =|  moves=(list move)
@@ -5096,6 +5128,8 @@
     ^+  [moves ship-state]
     ?~  ducts
       [moves ship-state]
+    ::
+    ~&  [%sending-unblock i.ducts scry-request]
     ::
     =*  event-args  [[our i.ducts now scry-gate] ship-state]
     ::  unblock the builds that had blocked on :resource
