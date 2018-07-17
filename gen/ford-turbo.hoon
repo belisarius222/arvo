@@ -39,14 +39,14 @@
   ::  test-parse-scaffold-crane-fskt
   ::  test-parse-scaffold-crane-fszp
   ::  test-parse-scaffold-crane-fszy
-  ::  test-literal
-  ::  test-autocons-same
-  ::  test-autocons-different
-  ::  test-scry-clay-succeed
-  ::  test-scry-clay-fail
-  ::  test-scry-clay-block
-  ::  test-scry-clay-live
-  ::  test-scry-clay-live-again
+  test-literal
+  test-autocons-same
+  test-autocons-different
+  test-scry-clay-succeed
+  test-scry-clay-fail
+  test-scry-clay-block
+  test-scry-clay-live
+  test-scry-clay-live-again
   ::  test-scry-clay-same-path
   ::  test-pinned-in-past
   ::  test-pinned-in-future
@@ -54,7 +54,8 @@
   ::  test-pinned-in-live
   ::  test-live-build-that-blocks
 
-  test-live-and-once
+  ::  test-live-and-once
+
 
 ::    test-live-two-deep
 ::    test-live-three-deep
@@ -903,15 +904,15 @@
       scry=(scry-succeed ~1234.5.6 [%noun !>(42)])
       ::
       ^=  call-args
-        :*  duct=~  type=~  %build  ~nul
+        :*  duct=~[/first]  type=~  %build  ~nul
             [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]
         ==
       ::
       ^=  moves
-        :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
+        :~  :*  duct=~[/first]  %give  %made  ~1234.5.6  %complete  %success
                 [%scry %noun !>(42)]
             ==
-            :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -923,16 +924,16 @@
       scry=(scry-succeed ~1234.5.7 [%noun !>(43)])
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/first]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
       ::
       ^=  moves
-        :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %success
+        :~  :*  duct=~[/first]  %give  %made  ~1234.5.7  %complete  %success
                 [%scry %noun !>(43)]
             ==
-            :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -943,10 +944,10 @@
       now=~1234.5.8
       scry=scry-is-forbidden
       ::
-      call-args=[duct=~ type=~ %kill ~nul]
+      call-args=[duct=~[/first] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -976,7 +977,7 @@
         :~  :*  duct=~[/first]  %give  %made  ~1234.5.6  %complete  %success
                 [%scry %noun !>(42)]
             ==
-            :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -996,7 +997,7 @@
         :~  :*  duct=~[/second]  %give  %made  ~1234.5.7  %complete  %success
                 [%scry %noun !>(42)]
             ==
-            :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -1009,7 +1010,7 @@
       ::
       call-args=[duct=~[/first] type=~ %kill ~nul]
       ^=  moves
-        :~  :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/first]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -1022,7 +1023,7 @@
       call-args=[duct=~[/second] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/second]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::

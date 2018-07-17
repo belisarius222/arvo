@@ -120,7 +120,7 @@
       pending-scrys=(jug scry-request duct)
       ::  pending-subscriptions: pending subscription requests
       ::
-      pending-subscriptions=(jug [date=@da =disc resources=(set resource)] duct)
+      pending-subscriptions=(jug subscription duct)
       ::  next-builds: builds to perform in the next iteration
       ::
       next-builds=(set build)
@@ -245,6 +245,19 @@
       ::  schematic: the schematic that determines how to run this build
       ::
       =schematic
+  ==
+::  +subscription: a single subscription to changes on a set of resources
+::
++=  subscription
+  $:  ::  date: date this was made
+      ::
+      date=@da
+      ::  disc: ship and desk for all :resources
+      ::
+      =disc
+      ::  resources: we will be notified if any of these resources change
+      ::
+      resources=(set resource)
   ==
 ::  +scry-request: parsed arguments to a scry operation
 ::
@@ -860,7 +873,7 @@
   ::  +rebuild: rebuild any live builds based on +resource updates
   ::
   ++  rebuild
-    |=  [=disc date=@da care-paths=(set [care=care:clay =path])]
+    |=  [old-date=@da =disc new-date=@da care-paths=(set [care=care:clay =path])]
     ^-  [(list move) ford-state]
     ::
     =<  finalize
@@ -871,7 +884,7 @@
       ::
       [%c care rail=[disc spur=(flop path)]]
     ::
-    =/  subscription  [date disc (sy resources)]
+    =/  subscription  [old-date disc (sy resources)]
     =.  pending-subscriptions.state
       (~(del ju pending-subscriptions.state) subscription duct)
     ::
@@ -879,7 +892,8 @@
       %+  turn  resources
       |=  =resource  ^-  build
       ::
-      [date [%scry resource]]
+      [new-date [%scry resource]]
+    ~&  [%rebuild builds]
     ::
     =/  duct-status  (~(got by ducts.state) duct)
     ?>  ?=(%live -.live.duct-status)
@@ -891,12 +905,12 @@
     ::
     =.  ducts.state
       %+  ~(put by ducts.state)  duct
-      duct-status(in-progress.live `date)
+      duct-status(in-progress.live `new-date)
     ::
     =/  old-root=build
       [date.u.last-sent.live.duct-status root-schematic.duct-status]
     =.  state
-      (copy-build-tree-as-provisional old-root new-date=date)
+      (copy-build-tree-as-provisional old-root new-date=new-date)
     ::  gather all the :builds, forcing reruns
     ::
     =.  ..execute  (gather (sy builds) force=%.y)
@@ -950,6 +964,7 @@
   ::
   ++  cancel  ^+  [moves state]
     ::
+    
     =<  finalize
     ::
     ?~  duct-status=(~(get by ducts.state) duct)
@@ -4829,7 +4844,7 @@
   ::  +start-clay-subscription: listen for changes in the filesystem
   ::
   ++  start-clay-subscription
-    |=  subscription=[date=@da =disc resources=(set resource)]
+    |=  =subscription
     ^+  ..execute
     ::
     =/  already-subscribed=?
@@ -4844,7 +4859,8 @@
     ::
     =.  moves  :_  moves
       ^-  move
-      :^  duct  %pass  wire=(clay-subscription-wire disc.subscription)
+      :^  duct  %pass
+        wire=(clay-subscription-wire date.subscription disc.subscription)
       ^-  note
       ::  request-contents: the set of [care path]s to subscribe to in clay
       ::
@@ -4871,7 +4887,7 @@
   ::  +cancel-clay-subscription: remove a subscription on :duct
   ::
   ++  cancel-clay-subscription
-    |=  subscription=[date=@da =disc resources=(set resource)]
+    |=  =subscription
     ^+  ..execute
     ::
     =.  pending-subscriptions.state
@@ -4883,7 +4899,8 @@
     ::
     =.  moves  :_  moves
       ^-  move
-      :^  duct  %pass  wire=(clay-subscription-wire disc.subscription)
+      :^  duct  %pass
+        wire=(clay-subscription-wire date.subscription disc.subscription)
       ^-  note
       ::
       =+  [their desk]=disc.subscription
@@ -4897,12 +4914,12 @@
   ::  +clay-sub-wire: the wire to use for a clay subscription
   ::
   ++  clay-subscription-wire
-    |=  =disc
+    |=  [date=@da =disc]
     ^-  wire
     ::
     =+  [their desk]=disc
     ::
-    /(scot %p our)/clay-sub/(scot %p their)/[desk]
+    /(scot %p our)/clay-sub/(scot %p their)/[desk]/(scot %da date)
   --
 --
 ::
@@ -5073,19 +5090,28 @@
   =/  our=@p  (slav %p i.wire)
   =/  ship-state  ~|(our+our (~(got by state-by-ship.ax) our))
   ::
+  ~&  [%take wire]
   =^  moves  ship-state
     ?:  =(%clay-sub i.t.wire)
       ?>  ?=([%c %wris *] sign)
-      =/  =disc  (raid:wired t.t.wire ~[%p %tas])
+      =+  [ship desk date]=(raid:wired t.t.wire ~[%p %tas %da])
+      =/  disc  [ship desk]
+      ::
+      ~&  [%pending-subscriptions pending-subscriptions.ship-state]
+      ~&  [%new-case p.case.sign]
+      ~&  [%old-date date]
       ::
       =/  ducts=(list ^duct)
         =-  ~(tap in (~(get ju pending-subscriptions.ship-state) -))
-        :+  date=p.case.sign  disc
+        ^-  subscription
+        :+  date  disc
         ^-  (set resource)
         %-  ~(run in care-paths.sign)
         |=  [care=care:clay =path]
         ^-  resource
         [%c care rail=[disc spur=(flop path)]]
+      ::
+      ~&  [%ducts-to-rebuild ducts]
       ::
       =|  moves=(list move)
       |-
@@ -5095,7 +5121,7 @@
       ::
       =*  event-args  [[our i.ducts now scry-gate] ship-state]
       =*  rebuild  rebuild:(per-event event-args)
-      =^  duct-moves  ship-state  (rebuild disc p.case.sign care-paths.sign)
+      =^  duct-moves  ship-state  (rebuild date disc p.case.sign care-paths.sign)
       ::
       $(ducts t.ducts, moves (weld moves duct-moves))
     ::
@@ -5122,6 +5148,8 @@
       ~|  [%pending-scrys pending-scrys.ship-state]
       ~|  [%scry-request scry-request]
       ~(tap in (~(got by pending-scrys.ship-state) scry-request))
+    ::
+    ~&  [%ducts-to-unblock ducts]
     ::
     =|  moves=(list move)
     |-
