@@ -964,7 +964,6 @@
   ::
   ++  cancel  ^+  [moves state]
     ::
-    
     =<  finalize
     ::
     ?~  duct-status=(~(get by ducts.state) duct)
@@ -1243,7 +1242,7 @@
     ++  gather-build
       |=  =build
       ^+  ..execute
-      ::  ~&  [%gather-build (build-to-tape build)]
+      ~&  [%gather-build (build-to-tape build)]
       ~|  [%duct duct]
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
@@ -1281,17 +1280,28 @@
         ?:  ?&  ?=(%live -.live.duct-status)
                 ?=(^ last-sent.live.duct-status)
             ==
-          `[date.u.last-sent.live.duct-status schematic.build]
+          ::  check whether :build was run as part of the last live build tree
+          ::
+          ::    TODO: cleanup docs
+          ::
+          =/  possible-build=^build
+            [date.u.last-sent.live.duct-status schematic.build]
+          ?:  (~(has by builds.state) possible-build)
+            `possible-build
+          (~(find-previous by-schematic builds-by-schematic.state) build)
         (~(find-previous by-schematic builds-by-schematic.state) build)
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
         (add-build-to-next build)
       ::
-      =/  old-build-status=^build-status  (~(got by builds.state) u.old-build)
+      =/  old-build-status=^build-status
+        ~|  [%missing-old-build (build-to-tape u.old-build)]
+        ~|  [%build-state (turn ~(tap in ~(key by builds.state)) build-to-tape)]
+        (~(got by builds.state) u.old-build)
       ::  selectively promote scry builds
       ::
-      ::    We can only promote a scry if its not forced and we ran the same
+      ::    We can only promote a scry if it's not forced and we ran the same
       ::    scry schematic as a descendant of the root build schematic at the
       ::    last sent time for this duct.
       ::
@@ -1509,7 +1519,7 @@
     ++  track-sub-builds
       |=  [client=build sub-builds=(list build)]
       ^+  state
-      ::  ~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
+      ~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
       ::  mark :sub-builds as :subs in :build's +build-status
       ::
       =^  build-status  builds.state
@@ -4457,10 +4467,11 @@
         ?~  builds
           state
         ::
-        =/  =build-status  (~(got by builds.state) i.builds)
-        =/  subs  ~(tap in ~(key by subs.build-status))
+        ?~  maybe-build-status=(~(get by builds.state) i.builds)
+          $(builds t.builds)
+        =/  subs  ~(tap in ~(key by subs.u.maybe-build-status))
         ::
-        =^  removed  state  (remove-single-build i.builds build-status)
+        =^  removed  state  (remove-single-build i.builds u.maybe-build-status)
         ?.  removed
           $(builds t.builds)
         ::
@@ -4822,7 +4833,7 @@
     ?^  requesters.build-status
       ::  ~&  [%cleanup-requesters-no-op (build-to-tape build)]
       state
-    ::  ~&  [%cleanup (build-to-tape build)]
+    ~&  [%cleanup (build-to-tape build)]
     ::
     (remove-builds ~[build])
   ::  +collect-live-resources: produces all live resources from sub-scrys

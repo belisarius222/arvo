@@ -56,8 +56,8 @@
   test-live-and-once
   test-live-two-deep
   test-live-three-deep
-::    test-live-triangle
-::    test-live-and-pinned-triangle
+  test-live-triangle
+  test-live-and-pinned-triangle
 ::    test-call
 ::    test-call-scry-succeed
 ::    test-call-scry-fail
@@ -1594,7 +1594,7 @@
                 [%success [%ride ride-type %constant]]
                 [%success [%scry %noun !>(%it-does-in-fact-matter)]]
             ==
-            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar] ~)]
     ==  ==  ==
@@ -1606,7 +1606,7 @@
       scry=scry
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~[/ride]
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/ride]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
@@ -1616,7 +1616,7 @@
                 [%success [%ride ride-type %constant]]
                 [%success [%scry %noun !>(%changed)]]
             ==
-            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar] ~)]
     ==  ==  ==
@@ -1630,7 +1630,7 @@
       call-args=[duct=~[/ride] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -1698,7 +1698,7 @@
                 [%success [%ride ride-type %constant]]
                 [%success [%scry %noun scry-type %it-does-in-fact-matter]]
             ==
-            :*  duct=~[/autocons]  %pass  wire=/~nul/clay-sub/~nul/home
+            :*  duct=~[/autocons]  %pass  wire=/~nul/clay-sub/~nul/home/~1234.5.7
                 %c  %warp  [~nul ~nul]  %home
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar] ~)]
     ==  ==  ==
@@ -1717,13 +1717,13 @@
   =^  results4  ford-gate
     %-  test-ford-call  :*
       ford-gate
-      now=~1234.5.8
+      now=~1234.5.9
       scry=scry-is-forbidden
       ::
       call-args=[duct=~[/autocons] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/autocons]  %pass  wire=/~nul/clay-sub/~nul/home
+        :~  :*  duct=~[/autocons]  %pass  wire=/~nul/clay-sub/~nul/home/~1234.5.7
                 %c  %warp  [~nul ~nul]  %home  ~
     ==  ==  ==
   ::
