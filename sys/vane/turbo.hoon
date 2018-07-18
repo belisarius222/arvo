@@ -988,9 +988,6 @@
     ::
     =/  root-build=build  [date.u.last-sent.live root-schematic]:u.duct-status
     ::
-    ~&  [%cancel-duct-status duct-status]
-    ~&  [%root-build (build-to-tape root-build)]
-    ::
     =.  state  (remove-duct-from-root root-build)
     ::
     ::
@@ -1055,7 +1052,6 @@
     =/  =build-status  (~(got by builds.state) build)
     =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
     =/  client=^build  build
-    ::  ~&  [%add-duct-to-subs duct (build-to-tape build) (lent subs)]
     ::
     |-  ^+  builds.state
     ?~  subs  builds.state
@@ -1135,7 +1131,8 @@
         state
       ::
       =.  state  (add-client-to-sub i.old-subs)
-      =.  state  copy-node(old-client i.old-subs)
+      =.  state
+        copy-node(old-client i.old-subs, new-client i.old-subs(date new-date))
       ::
       $(old-subs t.old-subs)
     ::
@@ -1246,7 +1243,7 @@
     ++  gather-build
       |=  =build
       ^+  ..execute
-      ~&  [%gather-build (build-to-tape build)]
+      ::  ~&  [%gather-build (build-to-tape build)]
       ~|  [%duct duct]
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
@@ -1289,7 +1286,6 @@
       ::  if no previous builds exist, we need to run :build
       ::
       ?~  old-build
-        ~&  [%gather-2 (build-to-tape build)]
         (add-build-to-next build)
       ::
       =/  old-build-status=^build-status  (~(got by builds.state) u.old-build)
@@ -1308,14 +1304,11 @@
                         (extract-disc resource.schematic.build)
                       resource.schematic.build
           ==  ==  ==
-        ~&  [%gather-3 (build-to-tape build)]
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
       ::
       =^  old-build-record  builds.state  (access-build-record u.old-build)
       ?.  ?=([~ %value *] old-build-record)
-        ::  ~&  [%no-old-build (build-to-tape u.old-build)]
-        ~&  [%gather-4 (build-to-tape build)]
         (add-build-to-next build)
       ::
       =.  old-build-status  (~(got by builds.state) u.old-build)
@@ -1351,7 +1344,6 @@
       =.  state  (add-ducts-to-build-subs build)
       ::
       ?^  un-stored-new-subs
-        ~&  [%gather-5 (build-to-tape build)]
         ::  enqueue incomplete sub-builds to be promoted or run
         ::
         ::    When not all our sub builds have results, we can't add :build to
@@ -1370,10 +1362,10 @@
       ::
       =^  promotable  builds.state  (are-subs-unchanged old-subs new-subs)
       ?.  promotable
-        ~&  [%gather-6 (build-to-tape build)]
         (add-build-to-next build)
       ::
-      ~&  [%gather-7 (build-to-tape build)]
+      ?>  =(schematic.build schematic.u.old-build)
+      ?>  (~(has by builds.state) build)
       (promote-build u.old-build date.build new-subs)
     ::  +are-subs-unchanged: checks sub-build equivalence, updating access time
     ::
@@ -1408,7 +1400,7 @@
     ++  promote-build
       |=  [old-build=build new-date=@da new-subs=(list build)]
       ^+  ..execute
-      ~&  [%promote-build (build-to-tape old-build) new-date]
+      ::  ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
       =^  old-build-record  builds.state  (access-build-record old-build)
@@ -1435,8 +1427,6 @@
           ^-  (list (pair build build-relation))
           %+  turn  new-subs
           |=  sub=build
-          ::
-          ?>  =([verified=| blocked=&] (~(got by subs.build-status) sub))
           ::
           [sub [verified=& blocked=|]]
         ::  copy the old result to :new-build
@@ -1567,7 +1557,7 @@
     ++  apply-build-result
       |=  [=build =build-result]
       ^+  ..execute
-      ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
+      ::  ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
       ::
       =^  build-status  builds.state
         %+  update-build-status  build
@@ -1589,7 +1579,7 @@
               sub-builds=(list build)
           ==
       ^+  ..execute
-      ~&  [%apply-blocks duct (build-to-tape build)]
+      ::  ~&  [%apply-blocks duct (build-to-tape build)]
       ::  if we scryed, set our duct as depending on the scry and maybe send a move
       ::
       =?    ..execute
@@ -4439,6 +4429,7 @@
   ++  add-build
     |=  =build
     ^+  state
+    ::  ~&  [%add-build (build-to-tape build)]
     ::  don't overwrite an existing entry
     ::
     ?:  (~(has by builds.state) build)
@@ -4525,9 +4516,10 @@
     |=  [=build update-func=$-(build-status build-status)]
     ^-  [build-status builds=_builds.state]
     ::
-    ~|  [%update-build build]
-    ~|  [%builds-state builds.state]
-    =/  mutant=build-status  (update-func (~(got by builds.state) build))
+    =/  original=build-status
+      ~|  [%update-build (build-to-tape build)]
+      (~(got by builds.state) build)
+    =/  mutant=build-status  (update-func original)
     ::
     [mutant (~(put by builds.state) build mutant)]
   ::  +intercepted-scry: use local results as a scry facade
@@ -4602,10 +4594,8 @@
       =/  =build-relation  (~(got by subs.client-status) build)
       ::
       ?.  blocked.build-relation
-        ~&  [%not-blocked (build-to-tape client) client-status]
         ~
       `[client build-relation]
-
     ::  ~&  [%unblock-clients (build-to-tape build) relations=blocked-relations]
     ::  mark clients as unblocked in clients' +build-status's
     ::
@@ -4635,7 +4625,7 @@
     ::
     =/  unblocked-clients=(list ^build)  (turn blocked-relations head)
     ::
-    ~&  [%unblocked-clients-for (build-to-tape build) (turn unblocked-clients build-to-tape)]
+    ::  ~&  [%unblocked-clients-for (build-to-tape build) (turn unblocked-clients build-to-tape)]
     ::
     [unblocked-clients builds.state]
   ::  +on-build-complete: handles completion of any build
@@ -4644,7 +4634,7 @@
     |=  =build
     ^+  ..execute
     ::
-    ~&  [%on-build-complete (build-to-tape build)]
+    ::  ~&  [%on-build-complete (build-to-tape build)]
     =.  ..execute  (cleanup-orphaned-provisional-builds build)
     ::
     =/  duct-status  (~(got by ducts.state) duct)
@@ -4667,7 +4657,7 @@
     |=  =build
     ^+  ..execute
     ::
-    ~&  [%on-root-build-complete (build-to-tape build)]
+    ::  ~&  [%on-root-build-complete (build-to-tape build)]
     ::
     =/  =build-status  (~(got by builds.state) build)
     =/  =duct-status  (~(got by ducts.state) duct)
@@ -4700,7 +4690,6 @@
     ::
     ?-    -.live.duct-status
         %once
-      ~&  [%deleting-once-build (build-to-tape build)]
       =.  ducts.state  (~(del by ducts.state) duct)
       =.  state  (remove-duct-from-root build)
       ::
@@ -4821,19 +4810,19 @@
     ::   does this build even exist?!
     ::
     ?~  maybe-build-status=(~(get by builds.state) build)
-      ~&  [%cleanup-no-build (build-to-tape build)]
+      ::  ~&  [%cleanup-no-build (build-to-tape build)]
       state
     ::
     =/  =build-status  u.maybe-build-status
     ::  never delete a build that something depends on
     ::
     ?^  clients.build-status
-      ~&  [%cleanup-clients-no-op (build-to-tape build)]
+      ::  ~&  [%cleanup-clients-no-op (build-to-tape build)]
       state
     ?^  requesters.build-status
-      ~&  [%cleanup-requesters-no-op (build-to-tape build)]
+      ::  ~&  [%cleanup-requesters-no-op (build-to-tape build)]
       state
-    ~&  [%cleanup (build-to-tape build)]
+    ::  ~&  [%cleanup (build-to-tape build)]
     ::
     (remove-builds ~[build])
   ::  +collect-live-resources: produces all live resources from sub-scrys
@@ -4895,7 +4884,6 @@
   ++  start-clay-subscription
     |=  =subscription
     ^+  ..execute
-    ~&  [%start-clay-subscription subscription duct]
     ::
     =/  already-subscribed=?
       (~(has by pending-subscriptions.state) subscription)
@@ -4939,15 +4927,12 @@
   ++  cancel-clay-subscription
     |=  =subscription
     ^+  ..execute
-    ~&  [%cancel-clay-subscription subscription]
-    ~&  [%before-pending-state pending-subscriptions.state]
     ::
     =.  pending-subscriptions.state
       (~(del ju pending-subscriptions.state) subscription duct)
     ::  if there are still other ducts on this subscription, don't sned a move
     ::
     ?^  (~(get by pending-subscriptions.state) subscription)
-      ~&  [%not-canceling-for-pending pending-subscriptions.state]
       ..execute
     ::
     =.  moves  :_  moves
@@ -4965,6 +4950,10 @@
     ::
     ..execute
   ::  +clay-sub-wire: the wire to use for a clay subscription
+  ::
+  ::    While it is possible for two different root builds to make
+  ::    subscriptions with the same wire, those wires will always be associated
+  ::    with different ducts, so there's no risk of duplicates.
   ::
   ++  clay-subscription-wire
     |=  [date=@da =disc]
@@ -5143,16 +5132,11 @@
   =/  our=@p  (slav %p i.wire)
   =/  ship-state  ~|(our+our (~(got by state-by-ship.ax) our))
   ::
-  ~&  [%take wire]
   =^  moves  ship-state
     ?:  =(%clay-sub i.t.wire)
       ?>  ?=([%c %wris *] sign)
       =+  [ship desk date]=(raid:wired t.t.wire ~[%p %tas %da])
       =/  disc  [ship desk]
-      ::
-      ~&  [%pending-subscriptions pending-subscriptions.ship-state]
-      ~&  [%new-case p.case.sign]
-      ~&  [%old-date date]
       ::
       =/  ducts=(list ^duct)
         =-  ~(tap in (~(get ju pending-subscriptions.ship-state) -))
@@ -5163,8 +5147,6 @@
         |=  [care=care:clay =path]
         ^-  resource
         [%c care rail=[disc spur=(flop path)]]
-      ::
-      ~&  [%ducts-to-rebuild ducts]
       ::
       =|  moves=(list move)
       |-
@@ -5202,15 +5184,11 @@
       ~|  [%scry-request scry-request]
       ~(tap in (~(got by pending-scrys.ship-state) scry-request))
     ::
-    ~&  [%ducts-to-unblock ducts]
-    ::
     =|  moves=(list move)
     |-
     ^+  [moves ship-state]
     ?~  ducts
       [moves ship-state]
-    ::
-    ~&  [%sending-unblock i.ducts scry-request]
     ::
     =*  event-args  [[our i.ducts now scry-gate] ship-state]
     ::  unblock the builds that had blocked on :resource
