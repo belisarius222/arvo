@@ -1127,7 +1127,7 @@
       =/  new-subs=(list build)  (turn old-subs |=(a=build a(date new-date)))
       ::
       =.  builds.state
-        (add-subs-to-client new-client new-subs [verified=%.n blocked=%.n])
+        (add-subs-to-client new-client new-subs [verified=%.n blocked=%.y])
       ::
       |-
       ^+  state
@@ -1328,7 +1328,18 @@
       ::    We don't know that :build will end up depending on :new-subs,
       ::    so they're not :verified.
       ::
-      =/  split-new-subs                    (skid new-subs is-build-stored)
+      =/  split-new-subs
+        %+  skid  new-subs
+        |=  sub=^build
+        ^-  ?
+        ::
+        ?~  maybe-build-status=(~(get by builds.state) sub)
+          %.n
+        ::
+        ?&  ?=(%complete -.state.u.maybe-build-status)
+            ?=(%value -.build-record.state.u.maybe-build-status)
+        ==
+      ::
       =/  stored-new-subs=(list ^build)     -.split-new-subs
       =/  un-stored-new-subs=(list ^build)  +.split-new-subs
       ::
@@ -4591,8 +4602,10 @@
       =/  =build-relation  (~(got by subs.client-status) build)
       ::
       ?.  blocked.build-relation
+        ~&  [%not-blocked (build-to-tape client) client-status]
         ~
       `[client build-relation]
+
     ::  ~&  [%unblock-clients (build-to-tape build) relations=blocked-relations]
     ::  mark clients as unblocked in clients' +build-status's
     ::
@@ -4610,7 +4623,9 @@
           original(blocked |)
         ::
         =?    state.build-status
-            !(~(any by subs.build-status) |=(build-relation blocked))
+            ?!
+            %-  ~(any by subs.build-status)
+            |=(build-relation &(blocked verified))
           ::
           [%unblocked ~]
         ::
@@ -4772,15 +4787,6 @@
     =.  builds.state  (remove-duct-from-subs i.orphans)
     =.  state  (cleanup i.orphans)
     $(orphans t.orphans)
-  ::  +is-build-stored: are we storing a +build-result for :build?
-  ::
-  ++  is-build-stored
-    |=  =build
-    ^-  ?
-    ::
-    ?~  maybe-build-status=(~(get by builds.state) build)
-      |
-    ?=([%complete [%value *] *] u.maybe-build-status)
   ::  +access-build-record: access a +build-record, updating :last-accessed
   ::
   ::    Usage:

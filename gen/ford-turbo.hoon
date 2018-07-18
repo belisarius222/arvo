@@ -55,7 +55,7 @@
   test-live-build-that-blocks
   test-live-and-once
 
-::    test-live-two-deep
+  test-live-two-deep
 ::    test-live-three-deep
 ::    test-live-triangle
 ::    test-live-and-pinned-triangle
@@ -1428,15 +1428,16 @@
       scry=scry-42
       ::
       ^=  call-args
-        :*  duct=~  type=~  %build  ~nul
+        :*  duct=~[/two-deep-4u]  type=~  %build  ~nul
             [%same [%scry %c care=%x rail=[[~nul %desk] /bar/foo]]]
         ==
       ::
       ^=  moves
-        :~  :*  duct=~  %give  %made  ~1234.5.6  %complete  %success
-                %same  %success  [%scry %noun !>(42)]
+        :~  :*  duct=~[/two-deep-4u]  %give  %made  ~1234.5.6  %complete
+                %success  %same  %success  [%scry %noun !>(42)]
             ==
-            :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/two-deep-4u]  %pass
+                wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -1448,16 +1449,17 @@
       scry=scry-43
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/two-deep-4u]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
       ::
       ^=  moves
-        :~  :*  duct=~  %give  %made  ~1234.5.7  %complete  %success
-                %same  %success  [%scry %noun !>(43)]
+        :~  :*  duct=~[/two-deep-4u]  %give  %made  ~1234.5.7  %complete
+                %success  %same  %success  [%scry %noun !>(43)]
             ==
-            :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/two-deep-4u]  %pass
+                wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -1468,10 +1470,11 @@
       now=~1234.5.8
       scry=scry-is-forbidden
       ::
-      call-args=[duct=~ type=~ %kill ~nul]
+      call-args=[duct=~[/two-deep-4u] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/two-deep-4u]  %pass
+                wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
