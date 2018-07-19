@@ -120,7 +120,7 @@
       pending-scrys=(jug scry-request duct)
       ::  pending-subscriptions: pending subscription requests
       ::
-      pending-subscriptions=(jug subscription duct)
+      pending-subscriptions=subscription-tracker
       ::  next-builds: builds to perform in the next iteration
       ::
       next-builds=(set build)
@@ -245,6 +245,17 @@
       ::  schematic: the schematic that determines how to run this build
       ::
       =schematic
+  ==
+::  +subscription-tracker: information about ducts subscribed to resources
+::
++=  subscription-tracker
+  %+  map  subscription
+  $:  ::  subscribed: set of all ducts subscribed to this subscription
+      ::
+      subscribed=(set duct)
+      ::  originator: the duct which the subscription was made on
+      ::
+      originator=duct
   ==
 ::  +subscription: a single subscription to changes on a set of resources
 ::
@@ -627,6 +638,39 @@
       `[i.dates schematic.build]
     $(dates t.dates)
   --
+::  +get-subscription-ducts: returns all ducts subscribed to :subscription
+::
+++  get-subscription-ducts
+  |=  [=subscription-tracker =subscription]
+  ^-  (list duct)
+  ::
+  ~(tap in subscribed:(~(got by subscription-tracker) subscription))
+::  +put-subscription: associates a :duct with a :subscription
+::
+++  put-subscription
+  |=  [=subscription-tracker =subscription =duct]
+  ^+  subscription-tracker
+  ::
+  %+  ~(put by subscription-tracker)  subscription
+  ?~  original=(~(get by subscription-tracker) subscription)
+    [(sy duct ~) duct]
+  u.original(subscribed (~(put in subscribed.u.original) duct))
+::  +del-subscription: remove a duct and return the originating duct if empty
+::
+++  del-subscription
+  |=  [=subscription-tracker =subscription =duct]
+  ^-  [(unit ^duct) _subscription-tracker]
+  ::
+  =/  record  (~(got by subscription-tracker) subscription)
+  =.  subscribed.record  (~(del in subscribed.record) duct)
+  ::
+  =.  subscription-tracker
+    (~(put by subscription-tracker) subscription record)
+  ::
+  :_  subscription-tracker
+  ?^  subscribed.record
+    ~
+  `originator.record
 ::  +parse-scaffold: produces a parser for a hoon file with +crane instances
 ::
 ::    Ford parses a superset of hoon which contains additional runes to
@@ -816,6 +860,8 @@
       ==
     ==
   --
+
+
 ::  +per-event: per-event core
 ::
 ++  per-event
@@ -873,26 +919,21 @@
   ::  +rebuild: rebuild any live builds based on +resource updates
   ::
   ++  rebuild
-    |=  [old-date=@da =disc new-date=@da care-paths=(set [care=care:clay =path])]
+    |=  [=subscription new-date=@da =disc care-paths=(set [care=care:clay =path])]
     ^-  [(list move) ford-state]
     ::
     =<  finalize
     ::
-    =/  resources=(list resource)
-      %+  turn  ~(tap in care-paths)
-      |=  [care=care:clay =path]  ^-  resource
-      ::
-      [%c care rail=[disc spur=(flop path)]]
-    ::
-    =/  subscription  [old-date disc (sy resources)]
+    ~&  [%rebuild subscription=subscription pending-subscriptions.state]
     =.  pending-subscriptions.state
-      (~(del ju pending-subscriptions.state) subscription duct)
+      +:(del-subscription pending-subscriptions.state subscription duct)
     ::
     =/  builds=(list build)
-      %+  turn  resources
-      |=  =resource  ^-  build
+      %+  turn  ~(tap in care-paths)
+      |=  [care=care:clay =path]
+      ^-  build
       ::
-      [new-date [%scry resource]]
+      [new-date [%scry [%c care rail=[disc spur=(flop path)]]]]
     ~&  [%rebuild builds]
     ::
     =/  duct-status  (~(got by ducts.state) duct)
@@ -4589,63 +4630,53 @@
   ::  +unblock-clients-on-duct: unblock and produce clients blocked on :build
   ::
   ++  unblock-clients-on-duct
+    =|  unblocked=(list build)
     |=  =build
-    ^-  [(list ^build) _builds.state]
+    ^+  [unblocked builds.state]
     ::
-    =/  blocked-relations=(list [client=^build =build-relation])
+    =/  =build-status
       ~|  [%unblocking (build-to-tape build)]
-      ~|  [%build-state builds.state]
-      =/  =build-status  (~(got by builds.state) build)
-      ::
-      %+  murn  ~(tap in (fall (~(get by clients.build-status) duct) ~))
-      |=  client=^build
-      ^-  (unit (pair ^build build-relation))
-      ::
-      =/  client-status=^build-status  (~(got by builds.state) client)
-      =/  =build-relation  (~(got by subs.client-status) build)
-      ::
-      ?.  blocked.build-relation
-        ~
-      `[client build-relation]
-    ::  ~&  [%unblock-clients (build-to-tape build) relations=blocked-relations]
-    ::  mark clients as unblocked in clients' +build-status's
+      (~(got by builds.state) build)
     ::
-    =.  builds.state
-      |-  ^+  builds.state
-      ?~  blocked-relations  builds.state
+    =/  clients=(list ^build)  ~(tap in (~(get ju clients.build-status) duct))
+    ::
+    |-
+    ^+  [unblocked builds.state]
+    ?~  clients
+      ~&  [%unblocked-for (build-to-tape build) (turn unblocked build-to-tape)]
+      [unblocked builds.state]
+    ::
+    =^  client-status  builds.state
+      %+  update-build-status  i.clients
+      |=  client-status=^build-status
       ::
-      =.  builds.state  =<  builds
-        %+  update-build-status  client.i.blocked-relations
-        |=  =build-status
-        ::
-        =.  subs.build-status
-          %+  ~(put by subs.build-status)  build
-          =/  original  (~(got by subs.build-status) build)
-          original(blocked |)
-        ::
-        =?    state.build-status
-            ?!
-            %-  ~(any by subs.build-status)
-            |=(build-relation &(blocked verified))
+      =.  subs.client-status
+        %+  ~(put by subs.client-status)  build
+        =/  original  (~(got by subs.client-status) build)
+        original(blocked |)
+      ::
+      =?    state.client-status
+          ?&  ?=(%blocked -.state.client-status)
           ::
-          [%unblocked ~]
+              ?!
+              %-  ~(any by subs.client-status)
+              |=(build-relation &(blocked verified))
+          ==
         ::
-        build-status
-      ::
-      $(blocked-relations t.blocked-relations)
+        [%unblocked ~]
+      client-status
     ::
-    =/  unblocked-clients=(list ^build)  (turn blocked-relations head)
+    =?  unblocked  !?=(%blocked -.state.client-status)
+      [i.clients unblocked]
     ::
-    ::  ~&  [%unblocked-clients-for (build-to-tape build) (turn unblocked-clients build-to-tape)]
-    ::
-    [unblocked-clients builds.state]
+    $(clients t.clients)
   ::  +on-build-complete: handles completion of any build
   ::
   ++  on-build-complete
     |=  =build
     ^+  ..execute
     ::
-    ::  ~&  [%on-build-complete (build-to-tape build)]
+    ~&  [%on-build-complete (build-to-tape build)]
     =.  ..execute  (cleanup-orphaned-provisional-builds build)
     ::
     =/  duct-status  (~(got by ducts.state) duct)
@@ -4668,7 +4699,7 @@
     |=  =build
     ^+  ..execute
     ::
-    ::  ~&  [%on-root-build-complete (build-to-tape build)]
+    ~&  [%on-root-build-complete (build-to-tape build)]
     ::
     =/  =build-status  (~(got by builds.state) build)
     =/  =duct-status  (~(got by ducts.state) duct)
@@ -4898,9 +4929,10 @@
     ::
     =/  already-subscribed=?
       (~(has by pending-subscriptions.state) subscription)
+    ~&  [%start-clay-subscription subscription already-subscribed=already-subscribed pending-subscriptions.state]
     ::
     =.  pending-subscriptions.state
-      (~(put ju pending-subscriptions.state) subscription duct)
+      (put-subscription pending-subscriptions.state subscription duct)
     ::  don't send a duplicate move if we're already subscribed
     ::
     ?:  already-subscribed
@@ -4939,16 +4971,17 @@
     |=  =subscription
     ^+  ..execute
     ::
-    =.  pending-subscriptions.state
-      (~(del ju pending-subscriptions.state) subscription duct)
-    ::  if there are still other ducts on this subscription, don't sned a move
+    ~&  [%cancel-clay-subscription subscription pending-subscriptions.state]
+    =^  originator  pending-subscriptions.state
+      (del-subscription pending-subscriptions.state subscription duct)
+    ::  if there are still other ducts on this subscription, don't send a move
     ::
-    ?^  (~(get by pending-subscriptions.state) subscription)
+    ?~  originator
       ..execute
     ::
     =.  moves  :_  moves
       ^-  move
-      :^  duct  %pass
+      :^  u.originator  %pass
         wire=(clay-subscription-wire date.subscription disc.subscription)
       ^-  note
       ::
@@ -5149,15 +5182,21 @@
       =+  [ship desk date]=(raid:wired t.t.wire ~[%p %tas %da])
       =/  disc  [ship desk]
       ::
-      =/  ducts=(list ^duct)
-        =-  ~(tap in (~(get ju pending-subscriptions.ship-state) -))
-        ^-  subscription
+      ~&  [%pending-subscriptions pending-subscriptions.ship-state]
+      =/  =subscription
         :+  date  disc
         ^-  (set resource)
-        %-  ~(run in care-paths.sign)
-        |=  [care=care:clay =path]
-        ^-  resource
-        [%c care rail=[disc spur=(flop path)]]
+        ::
+        =/  =duct-status  (~(got by ducts.ship-state) duct)
+        ?>  ?=(%live -.live.duct-status)
+        ?>  ?=(^ last-sent.live.duct-status)
+        (~(got by resources.u.last-sent.live.duct-status) disc)
+      ~&  [%subscription subscription]
+      ::
+      =/  ducts=(list ^duct)
+        (get-subscription-ducts pending-subscriptions.ship-state subscription)
+      ::
+      ~&  [%ducts-for-clay-sub ducts]
       ::
       =|  moves=(list move)
       |-
@@ -5167,7 +5206,8 @@
       ::
       =*  event-args  [[our i.ducts now scry-gate] ship-state]
       =*  rebuild  rebuild:(per-event event-args)
-      =^  duct-moves  ship-state  (rebuild date disc p.case.sign care-paths.sign)
+      =^  duct-moves  ship-state
+        (rebuild subscription p.case.sign disc care-paths.sign)
       ::
       $(ducts t.ducts, moves (weld moves duct-moves))
     ::
@@ -5194,6 +5234,8 @@
       ~|  [%pending-scrys pending-scrys.ship-state]
       ~|  [%scry-request scry-request]
       ~(tap in (~(got by pending-scrys.ship-state) scry-request))
+    ::
+    ~&  [%ducts-for-scrys ducts]
     ::
     =|  moves=(list move)
     |-
