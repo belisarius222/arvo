@@ -129,6 +129,9 @@
       ::    list the formal dates of all build attempts, sorted newest first.
       ::
       builds-by-schematic=(map schematic (list @da))
+      ::  cache: an l.r.u. cache of root builds
+      ::
+      cache=build-cache
       ::  pending-scrys: outgoing requests for static resources
       ::
       pending-scrys=(request-tracker scry-request)
@@ -266,6 +269,39 @@
       ::
       =schematic
   ==
+::  +build-cache: a treap for caching most recent root builds
+::
+::    Each element of the +build-cache is a +cache-key, which contains a +build
+::    and its :last-accessed time, which will generally be retrieved from
+::    :results.state.
+::
+::    The cache is designed to contain a fixed number of elements. If inserting
+::    a new build into the cache brings the size above that maximum, the oldest
+::    build will be deleted. This cache is intended to function as a secondary
+::    index into :results.state. When running +cleanup, if a build is present
+::    in the cache, it should not be deleted. Conversely, when the build is
+::    deleted from the cache, +cleanup should be run on it to free resources.
+::
+::    This treap uses the mug of the +cache-key for vertical ordering
+::    and :last-accessed for horizontal ordering. This allows the +cache
+::    to be used as a binary search tree based on :last-accessed and also
+::    to support efficient random access of a +cache-key, both for lookup
+::    and mutation.
+::
++=  build-cache
+  $:  ::  max-size: maximum allowed number of builds in the cache
+      ::
+      max-size=_64
+      ::  size: current number of builds in the cache
+      ::
+      size=@ud
+      ::  treap: binary search tree for cached builds
+      ::
+      treap=(tree cache-key)
+  ==
+::  +cache-key: lookup key to find a build's cache entry
+::
++=  cache-key  [last-accessed=@da =build]
 ::  +request-tracker: generic tracker and multiplexer for pending requests
 ::
 ++  request-tracker
@@ -436,6 +472,13 @@
     ::    %slim
     ::  "slim {<subject-type.schematic>} {<formula.schematic>}"
   ==
+::  +cache-key-to-tape: convert a cache-key to a printable format
+::
+++  cache-key-to-tape
+  |=  e=cache-key
+  ^-  tape
+  ::
+  "{<last-accessed.e>} {(build-to-tape build.e)}"
 ::  +rail-to-beam
 ::
 ++  rail-to-beam
@@ -574,6 +617,238 @@
       %volt  ~
       %walk  ~
   ==
+::  +in-cache: interface core for +cache
+::
+++  in-cache
+  |_  =build-cache
+  ::  +put: insert an element into the cache and maybe pop off oldest build
+  ::
+  ::    If the number of elements in the cache exceeds :max-size after
+  ::    inserting the new element, pop off the oldest element and produce it.
+  ::
+  ++  put
+    |=  e=cache-key
+    ^-  [(unit build) _build-cache]
+    ::
+    =.  build-cache  (put-unsafe e)
+    ::
+    ?:  (lte size.build-cache max-size.build-cache)
+      [~ build-cache]
+    ::
+    =^  oldest  build-cache  pop-oldest
+    ::
+    [`oldest build-cache]
+  ::  +put-unsafe: insert an element into the cache without checking size
+  ::
+  ++  put-unsafe
+    |=  e=cache-key
+    ^+  build-cache
+    ::
+    =^  added  treap.build-cache  (put-recursive e)
+    ::
+    =?    size.build-cache
+        added
+      +(size.build-cache)
+    ::
+    build-cache
+  ::  +put-recursive: internal helper for +put that reports whether it added
+  ::
+  ++  put-recursive
+    |=  e=cache-key
+    ^-  [added=? _treap.build-cache]
+    ::
+    =/  a  treap.build-cache
+    |-  ^-  [added=? _a]
+    ?~  a  [added=& [n=e l=~ r=~]]
+    ::  don't duplicate elements
+    ::
+    ?:  =(e n.a)
+      [added=| a]
+    ::  check horizontal ordering
+    ::
+    ?:  (h-order e n.a)
+      ::  new element goes on the left
+      ::
+      =+  [added-left new-l]=$(a l.a)
+      ?.  added-left
+        [added=| a]
+      ::
+      :-  added=&
+      ^+  treap.build-cache
+      ::  check vertical ordering
+      ::
+      ?>  ?=(^ new-l)
+      ?:  (v-order n.a n.new-l)
+        ::  :new-l goes on bottom
+        ::
+        a(l new-l)
+      ::  :new-l goes on top
+      ::
+      new-l(r a(l r.new-l))
+    ::  new element goes on the right
+    ::
+    =+  [added-right new-r]=$(a r.a)
+    ?.  added-right
+      [added=| a]
+    ::
+    :-  added=&
+    ^+  treap.build-cache
+    ::  check vertical ordering
+    ::
+    ?>  ?=(^ new-r)
+    ?:  (v-order n.a n.new-r)
+      ::  :new-r goes on bottom
+      ::
+      a(r new-r)
+    ::  :new-r goes on top
+    ::
+    new-r(l a(r l.new-r))
+  ::  +del: delete a build from the cache
+  ::
+  ++  del
+    |=  e=cache-key
+    ^+  build-cache
+    ::
+    =^  removed  treap.build-cache  (del-recursive e)
+    ::
+    =?    size.build-cache
+        removed
+      (dec size.build-cache)
+    ::
+    build-cache
+  ::  +del-recursive: internal helper for +del that reports whether it deleted
+  ::
+  ++  del-recursive
+    |=  e=cache-key
+    ^-  [removed=? _treap.build-cache]
+    ::
+    =/  a  treap.build-cache
+    |-  ^-  [removed=? _a]
+    ?~  a  [removed=| a]
+    ::
+    ?.  =(e n.a)
+      =/  old-a  a
+      ::  check horizontal ordering
+      ::
+      ?:  (h-order e n.a)
+        =+  [removed-left new-l]=$(a l.a)
+        ?.  removed-left
+          [removed=| a]
+        ::  :e is to the left
+        ::
+        [removed=& old-a(l new-l)]
+      ::
+      =+  [removed-right new-r]=$(a r.a)
+      ?.  removed-right
+        [removed=| a]
+      ::  :e is to the right
+      ::
+      [removed=& old-a(r new-r)] 
+    ::  we found :e at :n.a; delete it and produce the mutant :a
+    ::
+    :-  removed=&
+    |-  ^+  treap.build-cache
+    ::  no tree rotation necessary if :l.a or :r.a is empty
+    ::
+    ?~  l.a  r.a
+    ?~  r.a  l.a
+    ::  check vertical ordering to rotate the remaining tree (without :n.a)
+    ::
+    ?:  (v-order n.l.a n.r.a)
+      ::  :n.l.a goes above :n.r.a
+      ::
+      l.a(r $(l.a r.l.a))
+    ::  :n.l.a goes below :n.r.a
+    ::
+    r.a(l $(r.a l.r.a))
+  ::  +resize: pop all oldest builds until the cache reaches :max-size
+  ::
+  ++  resize
+    =|  popped=(list build)
+    |=  max-size=@ud
+    ^+  [popped build-cache]
+    ::  if we're at a valid size, deduplicate the builds in :popped and return
+    ::
+    ?:  (lte size.build-cache max-size)
+      [~(tap in (sy popped)) build-cache(max-size max-size)]
+    ::
+    =^  oldest  build-cache  pop-oldest
+    ::
+    $(popped [oldest popped])
+  ::  +pop-oldest: remove and produce oldest build and cache with it removed
+  ::
+  ::    Will error if run on an empty +cache.
+  ::
+  ++  pop-oldest
+    ^-  [build _build-cache]
+    ::
+    ?<  ?=(~ treap.build-cache)
+    ::
+    =-  [build.- (del -)]
+    ::
+    |-  ^-  cache-key
+    ?~  l.treap.build-cache
+      n.treap.build-cache
+    $(treap.build-cache l.treap.build-cache)
+  ::  +has: is the build cached?
+  ::
+  ++  has
+    |=  e=cache-key
+    ^-  ?
+    ::  nothing there, so no :e
+    ::
+    ?~  treap.build-cache
+      |
+    ::  found :e
+    ::
+    ?:  =(e n.treap.build-cache)
+      &
+    ::  check horizontal ordering and recurse on left or right
+    ::
+    ?:  (h-order e n.treap.build-cache)
+      $(treap.build-cache l.treap.build-cache)
+    $(treap.build-cache r.treap.build-cache)
+  ::  +check-correctness: make sure treap order is valid
+  ::
+  ::    +build-cache uses the mug of the element (+gor) for vertical ordering
+  ::    and :last-accessed for horizontal ordering. Oldest builds go on
+  ::    the left, and builds with lower mugs go toward the root.
+  ::
+  ++  check-correctness
+    =|  [l=(unit cache-key) r=(unit cache-key)]
+    ^-  ?
+    ::
+    =/  a  treap.build-cache
+    ::
+    |-  ^-  ?
+    ?~  a   &
+    ::
+    ?&  =-  ~?  !-  l+l  -
+        ?~(l & (h-order u.l n.a))
+        =-  ~?  !-  r+r  -
+        ?~(r & (h-order n.a u.r))
+        =-  ~?  !-  l-a+l.a  -
+        ?~(l.a & ?&((v-order n.a n.l.a) $(a l.a, r `n.a)))
+        =-  ~?  !-  r-a+r.a  -
+        ?~(r.a & ?&((v-order n.a n.r.a) $(a r.a, l `n.a)))
+    ==
+  ::  +h-order: horizontal ordering: :last-accessed or fall back to +vor
+  ::
+  ::    We use +gor as the fallback because it single-mugs, so it should
+  ::    be uncorrelated to the +vor vertical ordering, which double-mugs.
+  ::
+  ++  h-order
+    |=  [x=cache-key y=cache-key]
+    ^-  ?
+    ?:  (lth last-accessed.x last-accessed.y)
+      &
+    ?:  (gth last-accessed.x last-accessed.y)
+      |
+    (gor x y)
+  ::  +v-order: vertical ordering: compare double-mugged elements
+  ::
+  ++  v-order  vor
+  --
 ::  +by-schematic: door for manipulating :by-schematic.builds.ford-state
 ::
 ::    The :dates list for each key in :builds is sorted in reverse
