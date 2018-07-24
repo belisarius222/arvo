@@ -7334,6 +7334,22 @@
   =/  output=tang  (move-comparator moves)
   ::
   [output ford-gate]
+::  +clear-ford-cache: resize ford's cache to zero entries
+::
+++  clear-ford-cache
+  |=  [ford-gate=_ford-gate]
+  ^+  ford-gate
+  ::
+  =/  ford  *ford-gate
+  =^  moves  ford-gate
+    %-  call:ford
+      duct=~[/clear-ford-cache]
+      type=~
+      [%keep max-cache-size=0]
+    ==
+  ::
+  ?>  ?=(~ moves)
+  ford-gate
 ::  +expect-ford-empty: assert that ford's state is one empty ship
 ::
 ::    At the end of every test, we want to assert that we have cleaned up all
@@ -7342,6 +7358,9 @@
 ++  expect-ford-empty
   |=  [ford-gate=_ford-gate ship=@p]
   ^-  tang
+  ::
+  =.  ford-gate  (clear-ford-cache ford-gate)
+  ::
   =/  ford  *ford-gate
   %-  expect-eq  !>
   :-  (my [ship *ford-state:ford]~)

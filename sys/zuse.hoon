@@ -900,6 +900,13 @@
               ::
               =schematic
           ==
+          ::  %keep: resize the cache to :max-cache-size entries
+          ::
+          $:  %keep
+              ::  max-cache-size: the maximum number of builds to cache
+              ::
+              max-cache-size=@ud
+          ==
           ::  %kill: stop a build; send on same duct as original %build request
           ::
           $:  %kill

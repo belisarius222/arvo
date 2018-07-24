@@ -1281,6 +1281,24 @@
       build-status(state [%unblocked ~])
     ::
     (execute-loop (sy unblocked-build ~))
+  ::  +keep: resize the cache to :max-cache-size elements
+  ::
+  ++  keep
+    |=  max-cache-size=@ud
+    ^+  state
+    ::
+    =^  stale-builds  cache.state
+      (~(resize in-cache cache.state) max-cache-size)
+    ::
+    =.  builds.state
+      |-  ^+  builds.state
+      ?~  stale-builds  builds.state
+      ::
+      =.  builds.state  (remove-duct-from-root ~ i.stale-builds)
+      ::
+      $(stale-builds t.stale-builds)
+    ::
+    (remove-builds stale-builds)
   ::  +cancel: cancel a build
   ::
   ::    When called on a live build, removes all tracking related to the live
@@ -1310,7 +1328,7 @@
       =/  root-build=build  [in-progress.live root-schematic]:u.duct-status
       ::
       =.  ..execute  (cancel-scrys root-build)
-      =.  state  (remove-duct-from-root root-build)
+      =.  state  (remove-duct-from-root duct root-build)
       ..execute
     ::  if the duct was live and has an unfinished build, cancel it
     ::
@@ -1319,7 +1337,7 @@
       =/  root-build=build  [u.in-progress.live root-schematic]:u.duct-status
       ::
       =.  ..execute  (cancel-scrys root-build)
-      =.  state  (remove-duct-from-root root-build)
+      =.  state  (remove-duct-from-root duct root-build)
       ..execute
     ::  if there is no completed build for the live duct, we're done
     ::
@@ -1329,7 +1347,7 @@
     ::
     =/  root-build=build  [date.u.last-sent root-schematic.u.duct-status]
     ::
-    =.  state  (remove-duct-from-root root-build)
+    =.  state  (remove-duct-from-root duct root-build)
     ::
     ?~  subscription.u.last-sent
       ..execute
@@ -1351,19 +1369,50 @@
   ::  +remove-duct-from-root: remove :duct from a build tree
   ::
   ++  remove-duct-from-root
-    |=  =build
+    |=  [duct=^duct =build]
     ^+  state
     ::  ~&  [%remove-duct-from-root (build-to-tape build) duct]
+    ::
+    =^  build-status  builds.state
+      %+  update-build-status  build
+      |=  =build-status
+      build-status(requesters (~(del in requesters.build-status) duct))
+    ::  maybe place the bulid in the cache
+    ::
+    =?    state
+        ?&  ::  don't cache :build if we're deleting the cache duct (`~`)
+            ::
+            !=(~ duct)
+            ::  don't duplicate the cache entry for :build
+            ::
+            !(~(has in requesters.build-status) ~))
+        ==
+    ::
+    =.  builds.state  (remove-duct-from-subs build)
+    =.  state  (remove-builds ~[build])
+    ::
+    state
+  ::  +add-build-to-cache: store a root build in :cache.state
+  ::
+  ++  add-build-to-cache
+    |=  =build
+    ^+  state
+    ::
     ::
     =.  builds.state
       =<  builds
       %+  update-build-status  build
-      |=  =build-status
-      build-status(requesters (~(del in requesters.build-status) duct))
+      |=  build-status=^build-status
+      build-status(requesters (~(put in requesters.build-status) ~))
     ::
-    =.  builds.state  (remove-duct-from-subs build)
+    =.  builds.state  (add-duct-to-subs ~ build)
     ::
-    (cleanup build)
+    =^  stale-build  cache.state  (~(put in-cache cache.state) build)
+    ?~  stale-build
+      state
+    ::
+    =.  builds.state  (remove-duct-from-root ~ u.stale-build)
+    (remove-builds ~[u.stale-build])
   ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
   ::
   ++  add-ducts-to-build-subs
@@ -5015,7 +5064,7 @@
     ?-    -.live.duct-status
         %once
       =.  ducts.state  (~(del by ducts.state) duct)
-      =.  state  (remove-duct-from-root build)
+      =.  state  (remove-duct-from-root duct build)
       ::
       ..execute
     ::
@@ -5027,7 +5076,7 @@
         =/  old-build=^build  build(date date.u.last-sent.live.duct-status)
         ::
         ::  ~&  [%remove-previous-duct-from-root duct duct-status (build-to-tape old-build)]
-        (remove-duct-from-root old-build)
+        (remove-duct-from-root duct old-build)
       ::
       =/  resource-list=(list [=disc resources=(set resource)])
         ~(tap by resources)
@@ -5039,7 +5088,7 @@
       ?:  (lth 1 (lent resource-list))
         =.  ..execute  (send-incomplete build)
         =.  ducts.state  (~(del by ducts.state) duct)
-        =.  state  (remove-duct-from-root build)
+        =.  state  (remove-duct-from-root duct build)
         ..execute
       ::
       =/  subscription=(unit subscription)
@@ -5152,6 +5201,7 @@
     ?:  ?=(%tombstone -.build-record.state.build-status)
       [`build-record.state.build-status builds.state]
     ::
+    ::  TODO: update cache entry 
     =.  last-accessed.build-record.state.build-status  now
     ::
     :-  `build-record.state.build-status
@@ -5411,23 +5461,45 @@
       ::  %build: request to perform a build
       ::
       %build
-   ::  perform the build indicated by :task
-   ::
-   ::    First, we find or create the :ship-state for :our.task,
-   ::    modifying :state-by-ship as necessary. Then we dispatch to the |ev
-   ::    by constructing :event-args and using them to create :start-build,
-   ::    which performs the build. The result of :start-build is a pair of
-   ::    :moves and a mutant :ship-state. We update our :state-by-ship map
-   ::    with the new :ship-state and produce it along with :moves.
-   ::
-   =^  ship-state  state-by-ship.ax  (find-or-create-ship-state our.task)
-   =/  =build  [now schematic.task]
-   =*  event-args  [[our.task duct now scry-gate] ship-state]
-   =*  start-build  start-build:(per-event event-args)
-   =^  moves  ship-state  (start-build build live.task)
-   =.  state-by-ship.ax  (~(put by state-by-ship.ax) our.task ship-state)
-   ::
-   [moves ford-gate]
+    ::  perform the build indicated by :task
+    ::
+    ::    First, we find or create the :ship-state for :our.task,
+    ::    modifying :state-by-ship as necessary. Then we dispatch to the |ev
+    ::    by constructing :event-args and using them to create :start-build,
+    ::    which performs the build. The result of :start-build is a pair of
+    ::    :moves and a mutant :ship-state. We update our :state-by-ship map
+    ::    with the new :ship-state and produce it along with :moves.
+    ::
+    =^  ship-state  state-by-ship.ax  (find-or-create-ship-state our.task)
+    =/  =build  [now schematic.task]
+    =*  event-args  [[our.task duct now scry-gate] ship-state]
+    =*  start-build  start-build:(per-event event-args)
+    =^  moves  ship-state  (start-build build live.task)
+    =.  state-by-ship.ax  (~(put by state-by-ship.ax) our.task ship-state)
+    ::
+    [moves ford-gate]
+  ::
+      ::  %keep: resize cache to :max-cache-size
+      ::
+      %keep
+    ::
+    =/  ship-states=(list [ship=@p state=ford-state])
+      ~(tap by state-by-ship.ax)
+    ::
+    =.  state-by-ship.ax
+      |-  ^+  state-by-ship.ax
+      ?~  ship-states  state-by-ship.ax
+      ::
+      =,  i.ship-states
+      =*  event-args   [[ship duct now scry-gate] state]
+      ::
+      =.  state-by-ship.ax
+        %+  ~(put by state-by-ship.ax)  ship
+        (keep:(per-event event-args) max-cache-size.task)
+      ::
+      $(ship-states t.ship-states)
+    ::
+    [~ ford-gate]
   ::
       ::  %kill: cancel a %build
       ::
