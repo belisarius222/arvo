@@ -1153,6 +1153,8 @@
   ::  candidate-builds: builds which might go into next-builds
   ::
   =|  candidate-builds=(set build)
+  ::
+  =|  perf=[makes=@ hits=@ promotions=@]
   ::  the +per-event gate; each event will have a different sample
   ::
   ::    Not a `|_` because of the `=/`s at the beginning.
@@ -1164,6 +1166,7 @@
   |%
   ++  finalize
     ^-  [(list move) ford-state]
+    ~&  perf
     [(flop moves) state]
   ::  |entry-points: externally fired arms
   ::
@@ -1734,7 +1737,7 @@
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
       ::
-      =^  current-result  state  (access-build-record build)
+      =^  current-result  ..execute  (access-build-record build)
       ::
       ?:  ?=([~ %value *] current-result)
         (on-build-complete build)
@@ -1808,7 +1811,7 @@
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
       ::
-      =^  old-build-record  state  (access-build-record u.old-build)
+      =^  old-build-record  ..execute  (access-build-record u.old-build)
       ?.  ?=([~ %value *] old-build-record)
         (add-build-to-next build)
       ::
@@ -1861,7 +1864,7 @@
           (~(gas in candidate-builds) un-stored-new-subs)
         ==
       ::
-      =^  promotable  state  (are-subs-unchanged old-subs new-subs)
+      =^  promotable  ..execute  (are-subs-unchanged old-subs new-subs)
       ?.  promotable
         (add-build-to-next build)
       ::
@@ -1872,22 +1875,22 @@
     ::
     ++  are-subs-unchanged
       |=  [old-subs=(list build) new-subs=(list build)]
-      ^-  [? _state]
+      ^-  [? _..execute]
       ::
       ?~  old-subs
-        [%.y state]
+        [%.y ..execute]
       ?>  ?=(^ new-subs)
       ::
-      =^  old-build-record  state  (access-build-record i.old-subs)
+      =^  old-build-record  ..execute  (access-build-record i.old-subs)
       ?.  ?=([~ %value *] old-build-record)
-        [%.n state]
+        [%.n ..execute]
       ::
-      =^  new-build-record  state  (access-build-record i.new-subs)
+      =^  new-build-record  ..execute  (access-build-record i.new-subs)
       ?.  ?=([~ %value *] new-build-record)
-        [%.n state]
+        [%.n ..execute]
       ::
       ?.  =(build-result.u.old-build-record build-result.u.new-build-record)
-        [%.n state]
+        [%.n ..execute]
       $(new-subs t.new-subs, old-subs t.old-subs)
     ::  +add-build-to-next: run this build during the +make phase
     ::
@@ -1901,10 +1904,13 @@
     ++  promote-build
       |=  [old-build=build new-date=@da new-subs=(list build)]
       ^+  ..execute
+      ::  track the fact that this promotion has occurred
+      ::
+      =.  promotions.perf  +(promotions.perf)
       ::  ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
-      =^  old-build-record  state  (access-build-record old-build)
+      =^  old-build-record  ..execute  (access-build-record old-build)
       ::  we can only promote a cached result, not missing or a %tombstone
       ::
       ?>  ?=([~ %value *] old-build-record)
@@ -1989,9 +1995,11 @@
     ++  apply-build-receipt
       |=  made=build-receipt
       ^+  ..execute
+      ::
+      =.  makes.perf  +(makes.perf)
       ::  process :sub-builds.made
       ::
-      =.  state  (track-sub-builds build.made sub-builds.made)
+      =.  ..execute  (track-sub-builds build.made sub-builds.made)
       ::
       ?-    -.result.made
           %build-result
@@ -2008,7 +2016,7 @@
     ::
     ++  track-sub-builds
       |=  [client=build sub-builds=(list build)]
-      ^+  state
+      ^+  ..execute
       ::  ~&  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
       ::  mark :sub-builds as :subs in :build's +build-status
       ::
@@ -2031,10 +2039,10 @@
       ::
       =.  state  (add-ducts-to-build-subs client)
       ::
-      |-  ^+  state
-      ?~  sub-builds  state
+      |-  ^+  ..execute
+      ?~  sub-builds  ..execute
       ::
-      =.  state  +:(access-build-record i.sub-builds)
+      =.  ..execute  +:(access-build-record i.sub-builds)
       ::
       $(sub-builds t.sub-builds)
     ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
@@ -5264,24 +5272,27 @@
   ::
   ++  access-build-record
     |=  =build
-    ^-  [(unit build-record) _state]
+    ^-  [(unit build-record) _..execute]
     ::
     ?~  maybe-build-status=(~(get by builds.state) build)
-      [~ state]
+      [~ ..execute]
     ::
     =/  =build-status  u.maybe-build-status
     ::
     ?.  ?=(%complete -.state.build-status)
-      [~ state]
+      [~ ..execute]
     ::
     ?:  ?=(%tombstone -.build-record.state.build-status)
-      [`build-record.state.build-status state]
+      [`build-record.state.build-status ..execute]
     ::
     =/  previous-access=@da  last-accessed.build-record.state.build-status
+    ::  we found a result, so note that in our performance tracking
+    ::
+    =.  hits.perf  +(hits.perf)
     ::  if the :last-access is already up-to-date, no-op
     ::
     ?:  =(now previous-access)
-      [`build-record.state.build-status state]
+      [`build-record.state.build-status ..execute]
     ::  freshen :last-accessed in :build's +build-status
     ::
     =.  last-accessed.build-record.state.build-status  now
@@ -5295,7 +5306,7 @@
       =-  (~(put-unsafe in-cache -) [now build])
       (~(del in-cache cache.state) [previous-access build])
     ::
-    [`build-record.state.build-status state]
+    [`build-record.state.build-status ..execute]
   ::  +cleanup: try to clean up a build and its sub-builds
   ::
   ++  cleanup
