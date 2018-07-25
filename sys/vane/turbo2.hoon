@@ -1174,7 +1174,7 @@
   ++  start-build
     |=  [=build live=?]
     ^-  [(list move) ford-state]
-    ~&  [%start-build (build-to-tape build)]
+    ::  ~&  [%start-build (build-to-tape build)]
     ::
     =<  finalize
     ::
@@ -1277,7 +1277,7 @@
     |=  max-cache-size=@ud
     ^+  state
     ::
-    ~&  [%keep max-cache-size]
+    ::  ~&  [%keep max-cache-size]
     ::
     =^  stale-builds  cache.state
       (~(resize in-cache cache.state) max-cache-size)
@@ -1303,8 +1303,7 @@
   ++  cancel  ^+  [moves state]
     ::
     =<  finalize
-    ::
-    ~&  %cancel
+    ::  ~&  %cancel
     ::
     ?~  duct-status=(~(get by ducts.state) duct)
       ~&  [%no-build-for-duct duct]
@@ -1620,7 +1619,6 @@
     =.  candidate-builds  (~(uni in candidate-builds) builds)
     ::
     |^  ^+  ..execute
-        ::  ~&  [%candidate-builds (turn ~(tap in candidate-builds) build-to-tape)]
         ::
         ?:  =(~ candidate-builds)
           ..execute
@@ -1640,7 +1638,7 @@
     ++  gather-build
       |=  =build
       ^+  ..execute
-      ~&  [%gather-build duct (build-to-tape build)]
+      ::  ~&  [%gather-build duct (build-to-tape build)]
       ~|  [%duct duct]
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
@@ -1903,7 +1901,6 @@
       ::  process :sub-builds.made
       ::
       =.  state  (track-sub-builds build.made sub-builds.made)
-      ::  ~&  [%post-track receipt=made build-state=(~(got by builds.state) build.made)]
       ::
       ?-    -.result.made
           %build-result
@@ -1946,20 +1943,7 @@
       |-  ^+  state
       ?~  sub-builds  state
       ::
-      =.  builds.state
-        ::
-        =<  builds
-        %+  update-build-status  i.sub-builds
-        |=  build-status=^build-status
-        %_    build-status
-        ::  freshen :last-accessed date
-        ::
-            state
-          ::
-          ?.  ?=([%complete %value *] state.build-status)
-            state.build-status
-          state.build-status(last-accessed.build-record now)
-        ==
+      =.  state  +:(access-build-record i.sub-builds)
       ::
       $(sub-builds t.sub-builds)
     ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
@@ -1969,7 +1953,7 @@
     ++  apply-build-result
       |=  [=build =build-result]
       ^+  ..execute
-      ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
+      ::  ~&  [%apply-build-result duct (build-to-tape build)]
       ::
       =^  build-status  builds.state
         %+  update-build-status  build
@@ -2025,7 +2009,7 @@
     ::  accessed-builds: builds accessed/depended on during this run.
     ::
     =|  accessed-builds=(list ^build)
-    ~&  [%turbo-make (build-to-tape build)]
+    ::  ~&  [%turbo-make (build-to-tape build)]
     ::  dispatch based on the kind of +schematic in :build
     ::
     ::
@@ -4851,8 +4835,7 @@
         $(builds (welp t.builds subs))
     ::  +remove-build: stop storing :build in the state
     ::
-    ::    Removes all linkages to and from sub-builds
-    ::    TODO: should we assert we're not subscribed?
+    ::    Removes all linkages to and from sub-builds.
     ::
     ++  remove-single-build
       |=  [=build =build-status]
@@ -4860,12 +4843,12 @@
       ::  never delete a build that something depends on
       ::
       ?^  clients.build-status
-        ~&  [%skip-remove-because-clients (build-to-tape build) clients.build-status]
+        ::  ~&  [%skip-has-clients (build-to-tape build)]
         [removed=| state]
       ?^  requesters.build-status
-        ~&  [%skip-remove-because-requesters (build-to-tape build) requesters.build-status]
+        ::  ~&  [%skip-has-requesters (build-to-tape build)]
         [removed=| state]
-      ~&  [%removing (build-to-tape build) (~(got by builds.state) build)]
+      ::  ~&  [%removing (build-to-tape build)]
       ::  nothing depends on :build, so we'll remove it
       ::
       :-  removed=&
@@ -5245,7 +5228,7 @@
     ?:  ?=([%complete %value * cached=%.y *] state.build-status)
       ::  ~&  [%cleanup-cache-no-op (build-to-tape build)]
       state
-    ~&  [%cleanup (build-to-tape build)]
+    ::  ~&  [%cleanup (build-to-tape build)]
     ::  nothing is holding onto this build; cache or delete it
     ::
     =.  state
@@ -5329,7 +5312,7 @@
     ::
     =/  already-subscribed=?
       (~(has by pending-subscriptions.state) subscription)
-    ::  ~&  [%start-clay-subscription subscription already-subscribed=already-subscribed pending-subscriptions.state]
+    ::  ~&  [%start-clay-subscription subscription already-subscribed]
     ::
     =.  pending-subscriptions.state
       (put-request pending-subscriptions.state subscription duct)
@@ -5371,7 +5354,7 @@
     |=  =subscription
     ^+  ..execute
     ::
-    ::  ~&  [%cancel-clay-subscription subscription pending-subscriptions.state]
+    ::  ~&  [%cancel-clay-subscription subscription]
     =^  originator  pending-subscriptions.state
       (del-request pending-subscriptions.state subscription duct)
     ::  if there are still other ducts on this subscription, don't send a move

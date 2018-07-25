@@ -58,18 +58,17 @@
 ::  test-live-three-deep
 ::  test-live-triangle
 ::  test-live-and-pinned-triangle
-
-  test-call
-  test-call-scry-succeed
-  test-call-scry-fail
-  test-call-scry-block
-  test-call-scry-varies
-  test-dude
-  test-dude-error
-  test-hood
-  test-slim
-  test-slit
-
+::  test-call
+::  test-call-scry-succeed
+::  test-call-scry-fail
+::  test-call-scry-block
+::  test-call-scry-varies
+::  test-dude
+::  test-dude-error
+::  test-hood
+::  test-slim
+::  test-slit
+::
 ::  test-slit-error
 ::  test-ride
 ::  test-ride-scry-succeed
@@ -80,11 +79,11 @@
 ::  test-alts
 ::  test-alts-and-live
 ::  test-double-alts
-::::    test-cache-reclamation-trivial
-::::    test-cache-reclamation-live-rebuild
-::::    test-cache-reclamation-live-promote
-::::    test-five-oh-cache-reclamation
-::::  ::  test-reef  ::  very slow
+::::::    test-cache-reclamation-trivial
+::::::    test-cache-reclamation-live-rebuild
+::::::    test-cache-reclamation-live-promote
+::::::    test-five-oh-cache-reclamation
+::::::  ::  test-reef  ::  very slow
 ::  test-reef-short-circuit
 ::  test-path
 ::  test-plan-hoon
@@ -121,7 +120,8 @@
 ::  test-join
 ::  test-list
 ::  test-mash
-::  test-multi-core-same-dependency
+  test-multi-core-same-dependency
+
 ::  test-walk-prefer-grab
 ::  test-walk-large-graph
 ::  test-cast-large-graph
