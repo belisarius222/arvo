@@ -37,6 +37,7 @@
   test-parse-scaffold-crane-fskt
   test-parse-scaffold-crane-fszp
   test-parse-scaffold-crane-fszy
+  test-cache-put
   test-literal
   test-autocons-same
   test-autocons-different
@@ -78,11 +79,11 @@
   test-alts
   test-alts-and-live
   test-double-alts
-::    test-cache-reclamation-trivial
-::    test-cache-reclamation-live-rebuild
-::    test-cache-reclamation-live-promote
-::    test-five-oh-cache-reclamation
-::  ::  test-reef  ::  very slow
+::::    test-cache-reclamation-trivial
+::::    test-cache-reclamation-live-rebuild
+::::    test-cache-reclamation-live-promote
+::::    test-five-oh-cache-reclamation
+::::  ::  test-reef  ::  very slow
   test-reef-short-circuit
   test-path
   test-plan-hoon
@@ -119,7 +120,7 @@
   test-join
   test-list
   test-mash
-  test-multi-core-same-dependency
+  test-multi-core-same-dependency  ::  TODO heisenbug
   test-walk-prefer-grab
   test-walk-large-graph
   test-cast-large-graph
@@ -667,6 +668,86 @@
       ^=  sources
         :~  [%dbug [/~nul/desk/~1234.5.6/foo/bar [2 1] [2 2]] [%sand %ud 9]]
   ==    ==
+::
+++  test-cache-put
+  :-  `tank`leaf+"test-cache-put"
+  ::
+  =/  ford  (ford-gate now=~1234.5.6 eny=0xdead.beef scry=scry-is-forbidden)
+  ::
+  =/  schematic=schematic:ford  [%scry %c %x [~nul %home] /]
+  ::
+  =|  c=build-cache:ford
+  =.  max-size.c  2
+  ::
+  =^  x  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.6 build=[~1234.5.6 schematic]]
+  =^  y  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.7 build=[~1234.5.6 schematic]]
+  ::
+  =^  r1  c  (~(resize in-cache:ford c) 1)
+  ::
+  =^  z  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.8 build=[~1234.5.6 schematic]]
+  ::
+  =^  r2  c  (~(resize in-cache:ford c) 2)
+  ::
+  =^  w  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.7 build=[~1234.5.6 schematic]]
+  ::
+  =+  [r3 c-empty]=(~(resize in-cache:ford c) 0)
+  ::
+  ;:  weld
+  ::
+    %-  expect-eq  !>
+    :-  [~ ~]
+    [x y]
+  ::
+    %-  expect-eq  !>
+    :-  [~1234.5.6 schematic]~
+    r1
+  ::
+    %-  expect-eq  !>
+    :-  `[~1234.5.6 schematic]
+    z
+  ::
+    %-  expect-eq  !>
+    :-  ~
+    r2
+  ::
+    %-  expect-eq  !>
+    :-  ~
+    w
+  ::
+    %-  expect-eq  !>
+    :_  c
+    ::
+    :+  max-size=2  size=2
+    :+  ^=  n
+        :-  last-accessed=~1234.5.7
+        build=[date=~1234.5.6 schematic=schematic]
+      ::
+      l=~
+    ::
+    ^=  r
+    :+  ^=  n
+        :-  last-accessed=~1234.5.8
+        build=[date=~1234.5.6 schematic=schematic]
+      l=~
+    r=~
+  ::  stale builds should get deduplicated
+  ::
+    %-  expect-eq  !>
+    :-  [~1234.5.6 schematic]~
+    r3
+  ::
+    %-  expect-eq  !>
+    :-  [max-size=0 size=0 treap=~]
+    c-empty
+  ==
 ::
 ++  test-literal
   :-  `tank`leaf+"test-literal"
@@ -3360,7 +3441,7 @@
       scry=scry-is-forbidden
       ::  ask ford to wipe its cache
       ::
-      call-args=[duct=~[/trivial] type=~ %wipe ~]
+      call-args=[duct=~[/trivial] type=~ %wipe 100]
       ::  cache wiping should never produce any moves
       ::
       moves=~
@@ -3402,7 +3483,7 @@
       scry=scry-is-forbidden
       ::  ask ford to wipe its cache
       ::
-      call-args=[duct=~[/build] type=~ %wipe ~]
+      call-args=[duct=~[/build] type=~ %wipe 100]
       ::  cache wiping should never produce any moves
       ::
       moves=~
@@ -3497,7 +3578,7 @@
       scry=scry-is-forbidden
       ::  ask ford to wipe its cache
       ::
-      call-args=[duct=~[/ride] type=~ %wipe ~]
+      call-args=[duct=~[/ride] type=~ %wipe 100]
       ::  cache wiping should never produce any moves
       ::
       moves=~
@@ -3637,7 +3718,7 @@
       now=~1234.5.8
       scry=scry-is-forbidden
       ::
-      call-args=[duct=~[/wipe] type=~ %wipe ~]
+      call-args=[duct=~[/wipe] type=~ %wipe 100]
       moves=~
     ==
   ::
@@ -7334,6 +7415,22 @@
   =/  output=tang  (move-comparator moves)
   ::
   [output ford-gate]
+::  +clear-ford-cache: resize ford's cache to zero entries
+::
+++  clear-ford-cache
+  |=  [ford-gate=_ford-gate]
+  ^+  ford-gate
+  ::
+  =/  ford  *ford-gate
+  =^  moves  ford-gate
+    %-  call:ford  :*
+      duct=~[/clear-ford-cache]
+      type=~
+      [%keep max-cache-size=0]
+    ==
+  ::
+  ?>  ?=(~ moves)
+  ford-gate
 ::  +expect-ford-empty: assert that ford's state is one empty ship
 ::
 ::    At the end of every test, we want to assert that we have cleaned up all
@@ -7342,8 +7439,13 @@
 ++  expect-ford-empty
   |=  [ford-gate=_ford-gate ship=@p]
   ^-  tang
+  ::
+  =.  ford-gate  (clear-ford-cache ford-gate)
+  ::
   =/  ford  *ford-gate
   %-  expect-eq  !>
-  :-  (my [ship *ford-state:ford]~)
+  =/  bunted-state  *ford-state:ford
+  =/  expected-state  bunted-state(max-size.cache 0)
+  :-  (my [ship expected-state]~)
   state-by-ship.ax.+>+<.ford
 --
