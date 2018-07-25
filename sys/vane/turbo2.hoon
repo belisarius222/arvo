@@ -251,6 +251,9 @@
           ::    This is used for LRU cache reclamation.
           ::
           last-accessed=@da
+          ::  cached: is this build stored in the cache?
+          ::
+          cached=?
           ::  build-result: the stored value of the build's product
           ::
           =build-result
@@ -629,6 +632,7 @@
   ++  put
     |=  e=cache-key
     ^-  [(unit build) _build-cache]
+    ::  ~&  [%put-in-cache (build-to-tape build.e)]
     ::
     =.  build-cache  (put-unsafe e)
     ::
@@ -643,6 +647,7 @@
   ++  put-unsafe
     |=  e=cache-key
     ^+  build-cache
+    ::  ~&  [%put-unsafe-in-cache (build-to-tape build.e)]
     ::
     =^  added  treap.build-cache  (put-recursive e)
     ::
@@ -708,6 +713,7 @@
   ++  del
     |=  e=cache-key
     ^+  build-cache
+    ::  ~&  [%del-in-cache (build-to-tape build.e)]
     ::
     =^  removed  treap.build-cache  (del-recursive e)
     ::
@@ -767,9 +773,11 @@
     =|  popped=(list build)
     |=  max-size=@ud
     ^+  [popped build-cache]
+    ::  ~&  [%resize-in-cache max-size]
     ::  if we're at a valid size, deduplicate the builds in :popped and return
     ::
     ?:  (lte size.build-cache max-size)
+      ::  ~&  %resize-complete
       [~(tap in (sy popped)) build-cache(max-size max-size)]
     ::
     =^  oldest  build-cache  pop-oldest
@@ -785,29 +793,12 @@
     ?<  ?=(~ treap.build-cache)
     ::
     =-  [build.- (del -)]
+    ::  =-  ~&  [%pop-oldest-in-cache (build-to-tape build.-)]  -
     ::
     |-  ^-  cache-key
     ?~  l.treap.build-cache
       n.treap.build-cache
     $(treap.build-cache l.treap.build-cache)
-  ::  +has: is the build cached?
-  ::
-  ++  has
-    |=  e=cache-key
-    ^-  ?
-    ::  nothing there, so no :e
-    ::
-    ?~  treap.build-cache
-      |
-    ::  found :e
-    ::
-    ?:  =(e n.treap.build-cache)
-      &
-    ::  check horizontal ordering and recurse on left or right
-    ::
-    ?:  (h-order e n.treap.build-cache)
-      $(treap.build-cache l.treap.build-cache)
-    $(treap.build-cache r.treap.build-cache)
   ::  +check-correctness: make sure treap order is valid
   ::
   ::    +build-cache uses the mug of the element (+gor) for vertical ordering
@@ -1144,8 +1135,6 @@
       ==
     ==
   --
-
-
 ::  +per-event: per-event core
 ::
 ++  per-event
@@ -1185,6 +1174,7 @@
   ++  start-build
     |=  [=build live=?]
     ^-  [(list move) ford-state]
+    ~&  [%start-build (build-to-tape build)]
     ::
     =<  finalize
     ::
@@ -1287,18 +1277,17 @@
     |=  max-cache-size=@ud
     ^+  state
     ::
+    ~&  [%keep max-cache-size]
+    ::
     =^  stale-builds  cache.state
       (~(resize in-cache cache.state) max-cache-size)
     ::
-    =.  builds.state
-      |-  ^+  builds.state
-      ?~  stale-builds  builds.state
-      ::
-      =.  builds.state  (remove-duct-from-root ~ i.stale-builds)
-      ::
-      $(stale-builds t.stale-builds)
+    |-  ^+  state
+    ?~  stale-builds  state
     ::
-    (remove-builds stale-builds)
+    =.  state  (remove-stale-build i.stale-builds)
+    ::
+    $(stale-builds t.stale-builds)
   ::  +cancel: cancel a build
   ::
   ::    When called on a live build, removes all tracking related to the live
@@ -1314,6 +1303,8 @@
   ++  cancel  ^+  [moves state]
     ::
     =<  finalize
+    ::
+    ~&  %cancel
     ::
     ?~  duct-status=(~(get by ducts.state) duct)
       ~&  [%no-build-for-duct duct]
@@ -1377,42 +1368,46 @@
       %+  update-build-status  build
       |=  =build-status
       build-status(requesters (~(del in requesters.build-status) duct))
-    ::  maybe place the bulid in the cache
-    ::
-    =?    state
-        ?&  ::  don't cache :build if we're deleting the cache duct (`~`)
-            ::
-            !=(~ duct)
-            ::  don't duplicate the cache entry for :build
-            ::
-            !(~(has in requesters.build-status) ~))
-        ==
     ::
     =.  builds.state  (remove-duct-from-subs build)
-    =.  state  (remove-builds ~[build])
     ::
-    state
+    (cleanup build)
   ::  +add-build-to-cache: store a root build in :cache.state
   ::
   ++  add-build-to-cache
     |=  =build
     ^+  state
     ::
+    =.  builds.state
+      =<  builds
+      %+  update-build-status  build
+      |=  =build-status
+      ~|  [%add-build-to-cache (build-to-tape build) build-status]
+      ?>  ?=([%complete %value * cached=%.n *] state.build-status)
+      build-status(cached.build-record.state &)
+    ::
+    =^  stale-build  cache.state  (~(put in-cache cache.state) [now build])
+    ?~  stale-build
+      state
+    (remove-stale-build u.stale-build)
+  ::  +remove-stale-build: remove a build that has been evicted from the cache
+  ::
+  ++  remove-stale-build
+    |=  =build
+    ^+  state
+    ::
+    ?.  (~(has by builds.state) build)
+      state
     ::
     =.  builds.state
       =<  builds
       %+  update-build-status  build
-      |=  build-status=^build-status
-      build-status(requesters (~(put in requesters.build-status) ~))
+      |=  =build-status
+      ~|  [%remove-stale-build (build-to-tape build) build-status]
+      ?>  ?=([%complete %value * cached=%.y *] state.build-status)
+      build-status(cached.build-record.state |)
     ::
-    =.  builds.state  (add-duct-to-subs ~ build)
-    ::
-    =^  stale-build  cache.state  (~(put in-cache cache.state) build)
-    ?~  stale-build
-      state
-    ::
-    =.  builds.state  (remove-duct-from-root ~ u.stale-build)
-    (remove-builds ~[u.stale-build])
+    (remove-builds ~[build])
   ::  +add-ducts-to-build-subs: for each sub, add all of :build's ducts
   ::
   ++  add-ducts-to-build-subs
@@ -1645,12 +1640,12 @@
     ++  gather-build
       |=  =build
       ^+  ..execute
-      ::  ~&  [%gather-build duct (build-to-tape build)]
+      ~&  [%gather-build duct (build-to-tape build)]
       ~|  [%duct duct]
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
       ::
-      =^  current-result  builds.state  (access-build-record build)
+      =^  current-result  state  (access-build-record build)
       ::
       ?:  ?=([~ %value *] current-result)
         (on-build-complete build)
@@ -1724,7 +1719,7 @@
         (add-build-to-next build)
       ::  if we don't have :u.old-build's result cached, we need to run :build
       ::
-      =^  old-build-record  builds.state  (access-build-record u.old-build)
+      =^  old-build-record  state  (access-build-record u.old-build)
       ?.  ?=([~ %value *] old-build-record)
         (add-build-to-next build)
       ::
@@ -1777,7 +1772,7 @@
           (~(gas in candidate-builds) un-stored-new-subs)
         ==
       ::
-      =^  promotable  builds.state  (are-subs-unchanged old-subs new-subs)
+      =^  promotable  state  (are-subs-unchanged old-subs new-subs)
       ?.  promotable
         (add-build-to-next build)
       ::
@@ -1788,22 +1783,22 @@
     ::
     ++  are-subs-unchanged
       |=  [old-subs=(list build) new-subs=(list build)]
-      ^-  [? _builds.state]
+      ^-  [? _state]
       ::
       ?~  old-subs
-        [%.y builds.state]
+        [%.y state]
       ?>  ?=(^ new-subs)
       ::
-      =^  old-build-record  builds.state  (access-build-record i.old-subs)
+      =^  old-build-record  state  (access-build-record i.old-subs)
       ?.  ?=([~ %value *] old-build-record)
-        [%.n builds.state]
+        [%.n state]
       ::
-      =^  new-build-record  builds.state  (access-build-record i.new-subs)
+      =^  new-build-record  state  (access-build-record i.new-subs)
       ?.  ?=([~ %value *] new-build-record)
-        [%.n builds.state]
+        [%.n state]
       ::
       ?.  =(build-result.u.old-build-record build-result.u.new-build-record)
-        [%.n builds.state]
+        [%.n state]
       $(new-subs t.new-subs, old-subs t.old-subs)
     ::  +add-build-to-next: run this build during the +make phase
     ::
@@ -1820,7 +1815,7 @@
       ::  ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
-      =^  old-build-record  builds.state  (access-build-record old-build)
+      =^  old-build-record  state  (access-build-record old-build)
       ::  we can only promote a cached result, not missing or a %tombstone
       ::
       ?>  ?=([~ %value *] old-build-record)
@@ -1849,7 +1844,7 @@
         ::  copy the old result to :new-build
         ::
             state
-          [%complete [%value last-accessed=now build-result=build-result]]
+          [%complete [%value last-accessed=now cached=| build-result]]
         ==
       ::
       (on-build-complete new-build)
@@ -1974,12 +1969,14 @@
     ++  apply-build-result
       |=  [=build =build-result]
       ^+  ..execute
-      ::  ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
+      ~&  [%apply-build-result (build-to-tape build) (~(got by builds.state) build)]
       ::
       =^  build-status  builds.state
         %+  update-build-status  build
         |=  =build-status
-        build-status(state [%complete [%value last-accessed=now build-result]])
+        %_  build-status
+          state  [%complete [%value last-accessed=now cached=| build-result]]
+        ==
       ::
       (on-build-complete build)
     ::  +apply-blocks: apply a %blocks +build-receipt to ..execute
@@ -2028,7 +2025,7 @@
     ::  accessed-builds: builds accessed/depended on during this run.
     ::
     =|  accessed-builds=(list ^build)
-    ::  ~&  [%turbo-make (build-to-tape build)]
+    ~&  [%turbo-make (build-to-tape build)]
     ::  dispatch based on the kind of +schematic in :build
     ::
     ::
@@ -4235,6 +4232,11 @@
         ::    We killed a bunch of code which "worked" but which might have
         ::    been a no-op.
         ::
+        ?.  ?=(%c vane.scry-request)
+          ::  TODO make this send an %incomplete %made move
+          ::
+          ~|  [%bad-scry-vane vane.scry-request]
+          !!
         [build [%blocks ~ `scry-request] accessed-builds]
       ::  scry failed
       ::
@@ -4858,12 +4860,12 @@
       ::  never delete a build that something depends on
       ::
       ?^  clients.build-status
-        ::  ~&  [%skip-remove-because-clients (build-to-tape build) clients.build-status]
+        ~&  [%skip-remove-because-clients (build-to-tape build) clients.build-status]
         [removed=| state]
       ?^  requesters.build-status
-        ::  ~&  [%skip-remove-because-requesters (build-to-tape build) requesters.build-status]
+        ~&  [%skip-remove-because-requesters (build-to-tape build) requesters.build-status]
         [removed=| state]
-      ::  ~&  [%removing (build-to-tape build) (~(got by builds.state) build)]
+      ~&  [%removing (build-to-tape build) (~(got by builds.state) build)]
       ::  nothing depends on :build, so we'll remove it
       ::
       :-  removed=&
@@ -5183,29 +5185,43 @@
   ::
   ::    Usage:
   ::    ```
-  ::    =^  maybe-build-record  builds.state  (access-build-record build)
+  ::    =^  maybe-build-record  state  (access-build-record build)
   ::    ```
   ::
   ++  access-build-record
     |=  =build
-    ^-  [(unit build-record) _builds.state]
+    ^-  [(unit build-record) _state]
     ::
     ?~  maybe-build-status=(~(get by builds.state) build)
-      [~ builds.state]
+      [~ state]
     ::
     =/  =build-status  u.maybe-build-status
     ::
     ?.  ?=(%complete -.state.build-status)
-      [~ builds.state]
+      [~ state]
     ::
     ?:  ?=(%tombstone -.build-record.state.build-status)
-      [`build-record.state.build-status builds.state]
+      [`build-record.state.build-status state]
     ::
-    ::  TODO: update cache entry 
+    =/  previous-access=@da  last-accessed.build-record.state.build-status
+    ::  if the :last-access is already up-to-date, no-op
+    ::
+    ?:  =(now previous-access)
+      [`build-record.state.build-status state]
+    ::  freshen :last-accessed in :build's +build-status
+    ::
     =.  last-accessed.build-record.state.build-status  now
+    =.  builds.state  (~(put by builds.state) build build-status)
+    ::  if :build is cached, freshen its cache entry
     ::
-    :-  `build-record.state.build-status
-    (~(put by builds.state) build build-status)
+    =?    cache.state
+        cached.build-record.state.build-status
+      ::  we can +put-unsafe safely after deleting an element
+      ::
+      =-  (~(put-unsafe in-cache -) [now build])
+      (~(del in-cache cache.state) [previous-access build])
+    ::
+    [`build-record.state.build-status state]
   ::  +cleanup: try to clean up a build and its sub-builds
   ::
   ++  cleanup
@@ -5226,9 +5242,30 @@
     ?^  requesters.build-status
       ::  ~&  [%cleanup-requesters-no-op (build-to-tape build)]
       state
-    ::  ~&  [%cleanup (build-to-tape build)]
+    ?:  ?=([%complete %value * cached=%.y *] state.build-status)
+      ::  ~&  [%cleanup-cache-no-op (build-to-tape build)]
+      state
+    ~&  [%cleanup (build-to-tape build)]
+    ::  nothing is holding onto this build; cache or delete it
     ::
-    (remove-builds ~[build])
+    =.  state
+      ?:  ?=([%complete %value * cached=%.n *] state.build-status)
+        ::  :build is complete, so we can cache its result
+        ::
+        (add-build-to-cache build)
+      ::  no result to cache, so just delete :build
+      ::
+      (remove-builds ~[build])
+    ::  recurse on sub-builds
+    ::
+    =/  subs  ~(tap in ~(key by subs.build-status))
+    ::
+    |-  ^+  state
+    ?~  subs  state
+    ::
+    =.  state  ^$(build i.subs)
+    ::
+    $(subs t.subs)
   ::  +collect-live-resources: produces all live resources from sub-scrys
   ::
   ++  collect-live-resources
