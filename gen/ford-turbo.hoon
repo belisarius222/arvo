@@ -37,6 +37,7 @@
 ::  test-parse-scaffold-crane-fskt
 ::  test-parse-scaffold-crane-fszp
 ::  test-parse-scaffold-crane-fszy
+  test-cache-put
 ::  test-literal
 ::  test-autocons-same
 ::  test-autocons-different
@@ -120,7 +121,8 @@
 ::  test-join
 ::  test-list
 ::  test-mash
-  test-multi-core-same-dependency
+
+::  test-multi-core-same-dependency
 
 ::  test-walk-prefer-grab
 ::  test-walk-large-graph
@@ -669,6 +671,86 @@
       ^=  sources
         :~  [%dbug [/~nul/desk/~1234.5.6/foo/bar [2 1] [2 2]] [%sand %ud 9]]
   ==    ==
+::
+++  test-cache-put
+  :-  `tank`leaf+"test-cache-put"
+  ::
+  =/  ford  (ford-gate now=~1234.5.6 eny=0xdead.beef scry=scry-is-forbidden)
+  ::
+  =/  schematic=schematic:ford  [%scry %c %x [~nul %home] /]
+  ::
+  =|  c=build-cache:ford
+  =.  max-size.c  2
+  ::
+  =^  x  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.6 build=[~1234.5.6 schematic]]
+  =^  y  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.7 build=[~1234.5.6 schematic]]
+  ::
+  =^  r1  c  (~(resize in-cache:ford c) 1)
+  ::
+  =^  z  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.8 build=[~1234.5.6 schematic]]
+  ::
+  =^  r2  c  (~(resize in-cache:ford c) 2)
+  ::
+  =^  w  c
+    %-  ~(put in-cache:ford c)
+    [last-accessed=~1234.5.7 build=[~1234.5.6 schematic]]
+  ::
+  =+  [r3 c-empty]=(~(resize in-cache:ford c) 0)
+  ::
+  ;:  weld
+  ::
+    %-  expect-eq  !>
+    :-  [~ ~]
+    [x y]
+  ::
+    %-  expect-eq  !>
+    :-  [~1234.5.6 schematic]~
+    r1
+  ::
+    %-  expect-eq  !>
+    :-  `[~1234.5.6 schematic]
+    z
+  ::
+    %-  expect-eq  !>
+    :-  ~
+    r2
+  ::
+    %-  expect-eq  !>
+    :-  ~
+    w
+  ::
+    %-  expect-eq  !>
+    :_  c
+    ::
+    :+  max-size=2  size=2
+    :+  ^=  n
+        :-  last-accessed=~1234.5.7
+        build=[date=~1234.5.6 schematic=schematic]
+      ::
+      l=~
+    ::
+    ^=  r
+    :+  ^=  n
+        :-  last-accessed=~1234.5.8
+        build=[date=~1234.5.6 schematic=schematic]
+      l=~
+    r=~
+  ::  stale builds should get deduplicated
+  ::
+    %-  expect-eq  !>
+    :-  [~1234.5.6 schematic]~
+    r3
+  ::
+    %-  expect-eq  !>
+    :-  [max-size=0 size=0 treap=~]
+    c-empty
+  ==
 ::
 ++  test-literal
   :-  `tank`leaf+"test-literal"
