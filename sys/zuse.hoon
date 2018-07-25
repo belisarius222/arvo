@@ -872,7 +872,6 @@
         {$volt p/(cask *)}                              ::  unsafe add type
     ==                                                  ::
   --  ::ford
-
 ::  |ford: build system vane interface
 ::
 ++  ford-api  ^?
@@ -886,6 +885,40 @@
     +=  task
       $%  ::  %build: perform a build, either live or once
           ::
+          ::    If :live is %.n, Ford will send exactly one %made response
+          ::    when Ford has either completed the build or is incapable of
+          ::    completing it.
+          ::
+          ::    If :live is %.y, Ford will send at least one %made response
+          ::    each time any of the build's live resources update. Each of
+          ::    these %made responses includes the formal date at which
+          ::    that version of the build was performed. This maintains
+          ::    referential transparency, since the requester could ask Ford
+          ::    for a once build of the live schematic pinned to this formal
+          ::    date, and Ford would produce the same build result.
+          ::
+          ::    There is no guarantee that Ford will not produce a duplicate
+          ::    %made at a given formal date. This does not happen under
+          ::    normal operating conditions, but if a %wipe command removes
+          ::    the previous version's result, Ford might produce a duplicate.
+          ::
+          ::    Ford does guarantee that it will send %made moves in
+          ::    chronological order of the formal dates of the builds. It also
+          ::    guarantees that every change to a live resource that affects
+          ::    the final result will cause a new %made move to be sent; Ford
+          ::    won't miss any changes. Note that the current implementation
+          ::    is not capable of maintaining these guarantees if the build
+          ::    is live with respect to multiple +desks (+ship/+desk pairs),
+          ::    so it will instead produce an %incomplete made.
+          ::
+          ::    An error is considered a completed build, since
+          ::    errors are referentially transparent: given the same inputs,
+          ::    the final result of a build will always be the same, including
+          ::    any errors. Ford produces an incomplete result if it was unable
+          ::    to retrieve a resource that the build depended on. A build is
+          ::    not referentially transparent with respect to whether it was
+          ::    able to be completed at a given time.
+          ::
           $:  %build
               ::  our: who our ship is (remove after cc-release)
               ::
@@ -893,14 +926,30 @@
               ::  live: whether we run this build live
               ::
               ::    A live build will subscribe to further updates and keep the
-              ::    build around.
+              ::    build around. Non-live builds are said to be %once builds.
               ::
               live=?
-              ::  plan: the schematic to build
+              ::  schematic: the build request itself; the plan of what to build
               ::
               =schematic
           ==
           ::  %keep: resize the cache to :max-cache-size entries
+          ::
+          ::    This is intended to be used for online cache tuning.
+          ::
+          ::    Increasing the cache size should cause faster performance,
+          ::    since the hit ratio will improve. It will also use more memory.
+          ::
+          ::    Decreasing the cache size will decrease the hit ratio, slowing
+          ::    Ford down, but it will also decrease the maximum memory usage,
+          ::    which should increase the stability of the system if we find
+          ::    that %wipe needs to be called frequently.
+          ::
+          ::    If the cache currently stores more than :max-cache-size
+          ::    builds, the oldest builds will be evicted until the cache
+          ::    reaches a valid size.
+          ::
+          ::    Ford never sends an ack for a %keep.
           ::
           $:  %keep
               ::  max-cache-size: the maximum number of builds to cache
@@ -909,17 +958,52 @@
           ==
           ::  %kill: stop a build; send on same duct as original %build request
           ::
+          ::   For live builds, %kill will cancel the subscription and any
+          ::   pending requests for external resources (from %scry schematics).
+          ::   Ford will also remove the stored build trees relating to this
+          ::   live build from its state.
+          ::
+          ::   For incomplete once builds, %kill will cancel any pending
+          ::   requests for external resources (from %scry schematics), and
+          ::   Ford will also remove the partially completed build tree from
+          ::   its state.
+          ::
+          ::   For completed once builds or builds that have already been
+          ::   canceled, %kill will no-op without error. Ford never sends an
+          ::   ack for a %kill.
+          ::
           $:  %kill
-              ::  our: who our ship is (remove after cc-release)s
+              ::  our: who our ship is (remove after cc-release)
               ::
               our=@p
           ==
-          ::  %wegh: produce memory usage information
+          ::  %wegh: produce a %mass +gift containing a memory usage report
           ::
           [%wegh ~]
-          ::  %wipe: clear cache
+          ::  %wipe: decimate ford build storage to free memory
           ::
-          [%wipe ~]
+          ::   The %wipe command operates on all stored builds, not just
+          ::   the cache. If a cached build is marked for decimation, it will
+          ::   be removed from the cache and removed from the Ford state
+          ::   entirely.
+          ::
+          ::   Builds that are complete but not cached will remain active,
+          ::   i.e. they will still be used internally for subscription
+          ::   tracking and to block and unblock other builds, but their
+          ::   results will be removed and replaced with %tombstone's.
+          ::
+          ::   Ford never sends an ack for a %wipe.
+          ::
+          $:  %wipe
+              ::  percent-to-remove: what ratio of stored builds to remove
+              ::
+              ::   Ford rounds down to determine how many builds to keep,
+              ::   so that repeated application of any decimation percentage
+              ::   that is not 0 will eventually remove all of Ford's build
+              ::   storage.
+              ::
+              percent-to-remove=@ud
+          ==
       ==
     ::  +gift:able:ford: responses from ford
     ::
@@ -931,6 +1015,13 @@
           ::
           $:  %made
               ::  date: formal date of the build
+              ::
+              ::   To rerun this build as a once build, use the same schematic
+              ::   as in the original request and pin the date of the build
+              ::   to this date. Ford's referential transparency guarantees
+              ::   that as long as neither build is stymied by an unavailable
+              ::   resource, causing an %incomplete +made-result, the two
+              ::   %complete results will be identical.
               ::
               date=@da
               ::  result: result of the build; either complete build, or error

@@ -749,7 +749,7 @@
         [removed=| a]
       ::  :e is to the right
       ::
-      [removed=& old-a(r new-r)] 
+      [removed=& old-a(r new-r)]
     ::  we found :e at :n.a; delete it and produce the mutant :a
     ::
     :-  removed=&
@@ -1178,6 +1178,8 @@
     ::
     =<  finalize
     ::
+    ~|  [%start-build duct=duct live=live build=(build-to-tape build)]
+    ::
     =.  ducts.state
       %+  ~(put by ducts.state)  duct
       :_  schematic.build
@@ -1199,10 +1201,16 @@
   ::  +rebuild: rebuild any live builds based on +resource updates
   ::
   ++  rebuild
-    |=  [=subscription new-date=@da =disc care-paths=(set [care=care:clay =path])]
+    |=  $:  =subscription
+            new-date=@da
+            =disc
+            care-paths=(set [care=care:clay =path])
+        ==
     ^-  [(list move) ford-state]
     ::
     =<  finalize
+    ::
+    ~|  [%rebuild subscription=subscription new-date=new-date]
     ::
     ::  ~&  [%rebuild subscription=subscription pending-subscriptions.state]
     =.  pending-subscriptions.state
@@ -1244,6 +1252,8 @@
     ^-  [(list move) ford-state]
     ::
     =<  finalize
+    ::
+    ~|  [%unblock duct=duct scry-request=scry-request]
     ::  place :scry-result in :scry-results.per-event
     ::
     ::    We don't want to call the actual +scry function again,
@@ -1277,7 +1287,7 @@
     |=  max-cache-size=@ud
     ^+  state
     ::
-    ::  ~&  [%keep max-cache-size]
+    ~|  [%keep duct=duct max-cache-size=max-cache-size]
     ::
     =^  stale-builds  cache.state
       (~(resize in-cache cache.state) max-cache-size)
@@ -1286,6 +1296,84 @@
     ?~  stale-builds  state
     ::
     =.  state  (remove-stale-build i.stale-builds)
+    ::
+    $(stale-builds t.stale-builds)
+  ::  +wipe: forcibly decimate build results from the state
+  ::
+  ++  wipe
+    |=  percent-to-remove=@ud
+    ^+  state
+    ::  removing 0% is the same as doing nothing, so do nothing
+    ::
+    ?:  =(0 percent-to-remove)
+      ~&  %wipe-no-op
+      state
+    ::
+    ~|  [%wipe percent-to-remove=percent-to-remove]
+    ?>  (lte percent-to-remove 100)
+    ::  find all completed builds, sorted by :last-accessed date
+    ::
+    =/  completed-builds=(list [=build =build-status])
+      %+  sort
+        ::  filter for builds with a stored +build-result
+        ::
+        %+  skim  ~(tap by builds.state)
+        |=  [=build =build-status]
+        ^-  ?
+        ::
+        ?=([%complete %value *] state.build-status)
+      ::  sort by :last-accessed date
+      ::
+      |=  [[* a=build-status] [* b=build-status]]
+      ^-  ?
+      ::
+      ?>  ?=([%complete %value *] state.a)
+      ?>  ?=([%complete %value *] state.b)
+      ::
+      %+  lte
+        last-accessed.build-record.state.a
+      last-accessed.build-record.state.b
+    ::  determine how many builds should remain after decimation
+    ::
+    ::    This formula has the property that repeated applications
+    ::    of +wipe with anything other than 100% retention rate will
+    ::    always eventually remove every build.
+    ::
+    =/  num-completed-builds=@ud  (lent completed-builds)
+    =/  percent-to-keep=@ud  (sub 100 percent-to-remove)
+    =/  num-to-keep=@ud  (div (mul percent-to-keep num-completed-builds) 100)
+    =/  num-to-remove=@ud  (sub num-completed-builds num-to-keep)
+    ::
+    ~|  [%wipe num-to-keep=num-to-keep num-to-remove=num-to-remove]
+    ::  the oldest :num-to-remove builds are considered stale
+    ::
+    =/  stale-builds  (scag num-to-remove completed-builds)
+    ::  iterate over :stale-builds, replacing with %tombstone's
+    ::
+    |-  ^+  state
+    ?~  stale-builds  state
+    ::
+    =/  =build                build.i.stale-builds
+    =/  =build-status  build-status.i.stale-builds
+    ::
+    ?>  ?=(%complete -.state.build-status)
+    =/  =build-record  build-record.state.build-status
+    ?>  ?=(%value -.build-record)
+    ::  replace the build's entry in :builds.state with a %tombstone
+    ::
+    =.  builds.state
+      %+  ~(put by builds.state)  build
+      build-status(build-record.state [%tombstone ~])
+    ::  if the build was cached, remove it entirely
+    ::
+    =?    state
+        cached.build-record
+      ::
+      =.  cache.state
+        %-  ~(del in-cache cache.state)
+        [last-accessed.build-record build]
+      ::
+      (remove-builds ~[build])
     ::
     $(stale-builds t.stale-builds)
   ::  +cancel: cancel a build
@@ -1303,7 +1391,8 @@
   ++  cancel  ^+  [moves state]
     ::
     =<  finalize
-    ::  ~&  %cancel
+    ::
+    ~|  [%cancel duct=duct]
     ::
     ?~  duct-status=(~(get by ducts.state) duct)
       ~&  [%no-build-for-duct duct]
@@ -1571,7 +1660,7 @@
   ::
   ::  +execute-loop: +execute repeatedly until there's no more work to do
   ::
-  ::    TODO: This implementation is for simplicity. In the longer term, we'd
+  ::    This implementation is for simplicity. In the longer term, we'd
   ::    like to just perform a single run through +execute and set a Behn timer
   ::    to wake us up immediately. This has the advantage that Ford stops hard
   ::    blocking the main Urbit event loop, letting other work be done.
@@ -1618,6 +1707,8 @@
     ::
     =.  candidate-builds  (~(uni in candidate-builds) builds)
     ::
+    ~|  [%gather candidates=(turn ~(tap in candidate-builds) build-to-tape)]
+    ::
     |^  ^+  ..execute
         ::
         ?:  =(~ candidate-builds)
@@ -1639,7 +1730,7 @@
       |=  =build
       ^+  ..execute
       ::  ~&  [%gather-build duct (build-to-tape build)]
-      ~|  [%duct duct]
+      ~|  [%gather-build duct=duct build=(build-to-tape build)]
       =/  duct-status  (~(got by ducts.state) duct)
       ::  if we already have a result for this build, don't rerun the build
       ::
@@ -5536,14 +5627,21 @@
       ::
       %wipe
     ::
-    =/  ship-states=(list [@p ford-state])  ~(tap by state-by-ship.ax)
-    ::  wipe each ship in the state separately
+    =/  ship-states=(list [ship=@p state=ford-state])
+      ~(tap by state-by-ship.ax)
     ::
     =.  state-by-ship.ax
-      %+  roll  ship-states
-      |=  [[ship=@p state=ford-state] accumulator=(map @p ford-state)]
+      |-  ^+  state-by-ship.ax
+      ?~  ship-states  state-by-ship.ax
       ::
-      (~(put by accumulator) ship (wipe state))
+      =,  i.ship-states
+      =*  event-args   [[ship duct now scry-gate] state]
+      ::
+      =.  state-by-ship.ax
+        %+  ~(put by state-by-ship.ax)  ship
+        (wipe:(per-event event-args) percent-to-remove.task)
+      ::
+      $(ship-states t.ship-states)
     ::
     [~ ford-gate]
   ::
@@ -5554,64 +5652,11 @@
     ^-  mass
     :-  %turbo
     :-  %|
-    %+  turn  ~(tap by state-by-ship.ax)     :: XX single-home
+    %+  turn  ~(tap by state-by-ship.ax)     ::  remove after cc-release
     |=  [our=@ ford-state]  ^-  mass
     :+  (scot %p our)  %|
     ::
     [[%builds [%& builds]] ~]
-  ==
-::  +wipe: wipe half a +ford-state's cache, in LRU (least recently used) order
-::
-++  wipe
-  |=  state=ford-state
-  ^+  state
-  ::
-  =/  cache-list=(list [build build-record])
-    %+  murn  ~(tap by builds.state)
-    |=  [=build =build-status]
-    ^-  (unit [^build build-record])
-    ::
-    ?.  ?=(%complete -.state.build-status)
-      ~
-    `[build build-record.state.build-status]
-  ::
-  =/  split-cache=[(list [build build-record]) (list [build build-record])]
-    %+  skid  cache-list
-    |=([=build =build-record] ?=(%tombstone -.build-record))
-  ::
-  =/  tombstones=(list [build build-record])  -.split-cache
-  =/  values=(list [build build-record])      +.split-cache
-  ::  sort the cache lines in chronological order by :last-accessed
-  ::
-  =/  sorted=(list [build build-record])
-    %+  sort  values
-    |=  [a=[=build =build-record] b=[=build =build-record]]
-    ^-  ?
-    ::
-    ?>  ?=(%value -.build-record.a)
-    ?>  ?=(%value -.build-record.b)
-    ::
-    (lte last-accessed.build-record.a last-accessed.build-record.b)
-  ::
-  =/  num-entries=@  (lent cache-list)
-  ::  num-stale: half of :num-entries, rounded up in case :num-entries is 1
-  ::
-  =/  num-stale  (sub num-entries (div num-entries 2))
-  ~&  "ford: wipe: {<num-stale>} cache entries"
-  ::
-  =/  stale=(list [build build-record])  (scag num-stale sorted)
-  ::
-  %_    state
-      builds
-    %-  ~(gas by builds.state)
-    %+  turn  stale
-    |=  [=build =build-record]
-    ^-  (pair ^build build-status)
-    ::
-    =/  =build-status  (~(got by builds.state) build)
-    ?>  ?=(%complete -.state.build-status)
-    ::
-    [build build-status(build-record.state [%tombstone ~])]
   ==
 ::  +take: receive a response from another vane
 ::
