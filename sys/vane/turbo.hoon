@@ -1703,7 +1703,7 @@
     ::  accessed-builds: builds accessed/depended on during this run.
     ::
     =|  accessed-builds=(list ^build)
-    ::  ~&  [%turbo-make (build-to-tape build)]
+    ~&  [%turbo-make (build-to-tape build)]
     ::  dispatch based on the kind of +schematic in :build
     ::
     ::
@@ -3751,24 +3751,6 @@
     ++  make-reef
       |=  =disc
       ^-  build-receipt
-      ::  short-circuit to :pit if asked for current %home desk
-      ::
-      ::    This avoids needing to recompile the kernel if we're asked
-      ::    for the kernel we're already running. Note that this fails
-      ::    referential transparency if |autoload is turned off.
-      ::
-      ?:  ?&  =(disc [our %home])
-              ::  is :date.build the latest commit on the %home desk?
-              ::
-              ?|  =(now date.build)
-                  ::
-                  =/  =beam  [[our %home [%da date.build]] /hoon/hoon/sys]
-                  ::
-                  .=  (scry [%143 %noun] ~ %cw beam)
-                  (scry [%143 %noun] ~ %cw beam(r [%da now]))
-          ==  ==
-        ::
-        [build [%build-result %success %reef pit] accessed-builds]
       ::
       =/  hoon-scry
         [date.build [%scry %c %x [disc /hoon/hoon/sys]]]
@@ -3801,6 +3783,26 @@
       ::
       ?.  ?=([~ %success %scry *] zuse-scry-result)
         (wrap-error zuse-scry-result)
+      ::  short-circuit to :pit if asked for current %home desk
+      ::
+      ::    This avoids needing to recompile the kernel if we're asked
+      ::    for the kernel we're already running. Note that this fails
+      ::    referential transparency if |autoload is turned off.
+      ::
+      ?:  ?&  =(disc [our %home])
+              ::  is :date.build the latest commit on the %home desk?
+              ::
+              ?|  =(now date.build)
+                  ::
+                  =/  =beam  [[our %home [%da date.build]] /hoon/hoon/sys]
+                  ::
+                  .=  (scry [%143 %noun] ~ %cw beam)
+                  (scry [%143 %noun] ~ %cw beam(r [%da now]))
+          ==  ==
+        ::
+        ~&  %reef-short-circuit
+        [build [%build-result %success %reef pit] accessed-builds]
+      ~&  [%didnt---short---circiut---reef our date.build now]
       ::  omit case from path to prevent cache misses
       ::
       =/  hoon-path=path
