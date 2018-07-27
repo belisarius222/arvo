@@ -2019,7 +2019,10 @@
     ++  track-sub-builds
       |=  [client=build sub-builds=(list build)]
       ^+  ..execute
-      ~|  [%track-sub-builds build=(build-to-tape client) subs=(turn sub-builds build-to-tape)]
+      ::
+      ~|  :+  %track-sub-builds
+            build=(build-to-tape client)
+          subs=(turn sub-builds build-to-tape)]
       ::  mark :sub-builds as :subs in :build's +build-status
       ::
       =^  build-status  builds.state
@@ -4933,70 +4936,69 @@
   ::
   ++  remove-builds
     |=  builds=(list build)
+    ^+  state
+    ::
     ~|  [%remove-builds (turn builds build-to-tape)]
     ::
-    |^  ^+  state
-        ::
-        ?~  builds
-          state
-        ::
-        ?~  maybe-build-status=(~(get by builds.state) i.builds)
-          $(builds t.builds)
-        =/  subs  ~(tap in ~(key by subs.u.maybe-build-status))
-        ::
-        =^  removed  state  (remove-single-build i.builds u.maybe-build-status)
-        ?.  removed
-          $(builds t.builds)
-        ::
-        $(builds (welp t.builds subs))
-    ::  +remove-build: stop storing :build in the state
+    ?~  builds
+      state
     ::
-    ::    Removes all linkages to and from sub-builds.
+    ?~  maybe-build-status=(~(get by builds.state) i.builds)
+      $(builds t.builds)
+    =/  subs  ~(tap in ~(key by subs.u.maybe-build-status))
     ::
-    ++  remove-single-build
-      |=  [=build =build-status]
-      ^+  [removed=| state]
-      ~|  [%remove-single-build (build-to-tape build)]
-      ::  never delete a build that something depends on
+    =^  removed  state  (remove-single-build i.builds u.maybe-build-status)
+    ?.  removed
+      $(builds t.builds)
+    ::
+    $(builds (welp t.builds subs))
+  ::  +remove-build: stop storing :build in the state
+  ::
+  ::    Removes all linkages to and from sub-builds.
+  ::
+  ++  remove-single-build
+    |=  [=build =build-status]
+    ^+  [removed=| state]
+    ~|  [%remove-single-build (build-to-tape build)]
+    ::  never delete a build that something depends on
+    ::
+    ?^  clients.build-status
+      ::  ~&  [%skip-has-clients (build-to-tape build)]
+      [removed=| state]
+    ?^  requesters.build-status
+      ::  ~&  [%skip-has-requesters (build-to-tape build)]
+      [removed=| state]
+    ::  ~&  [%removing (build-to-tape build)]
+    ::  nothing depends on :build, so we'll remove it
+    ::
+    :-  removed=&
+    ^+  state
+    ::
+    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
+    ::  for each sub, remove :build from its :clients
+    ::
+    =.  builds.state
+      |-  ^+  builds.state
+      ?~  subs  builds.state
       ::
-      ?^  clients.build-status
-        ::  ~&  [%skip-has-clients (build-to-tape build)]
-        [removed=| state]
-      ?^  requesters.build-status
-        ::  ~&  [%skip-has-requesters (build-to-tape build)]
-        [removed=| state]
-      ::  ~&  [%removing (build-to-tape build)]
-      ::  nothing depends on :build, so we'll remove it
-      ::
-      :-  removed=&
-      ^+  state
-      ::
-      =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
-      ::  for each sub, remove :build from its :clients
-      ::
-      =.  builds.state
-        |-  ^+  builds.state
-        ?~  subs  builds.state
+      =?  builds.state  (~(has by builds.state) i.subs)
         ::
-        =?  builds.state  (~(has by builds.state) i.subs)
-          ::
-          =<  builds
-          %+  update-build-status  i.subs
-          |=  build-status=^build-status
-          ^+  build-status
-          ::
-          build-status(clients (~(del ju clients.build-status) duct build))
+        =<  builds
+        %+  update-build-status  i.subs
+        |=  build-status=^build-status
+        ^+  build-status
         ::
-        $(subs t.subs)
+        build-status(clients (~(del ju clients.build-status) duct build))
       ::
-      %_    state
-          builds-by-schematic
-        (~(del by-schematic builds-by-schematic.state) build)
-      ::
-          builds
-        (~(del by builds.state) build)
-      ==
-    --
+      $(subs t.subs)
+    ::
+    %_    state
+        builds-by-schematic
+      (~(del by-schematic builds-by-schematic.state) build)
+    ::
+        builds
+      (~(del by builds.state) build)
+    ==
   ::  +update-build-status: replace :build's +build-status by running a function
   ::
   ++  update-build-status
@@ -5345,20 +5347,16 @@
     ?^  requesters.build-status
       ::  ~&  [%cleanup-requesters-no-op (build-to-tape build)]
       state
-    ?:  ?=([%complete %value * cached=%.y *] state.build-status)
-      ::  ~&  [%cleanup-cache-no-op (build-to-tape build)]
-      state
     ::  ~&  [%cleanup (build-to-tape build)]
-    ::  nothing is holding onto this build; cache or delete it
+    ::  cache or delete this build if we can, then recurse on sub-builds
     ::
     =.  state
-      ?:  ?=([%complete %value * cached=%.n *] state.build-status)
-        ::  :build is complete, so we can cache its result
-        ::
-        (add-build-to-cache build)
-      ::  no result to cache, so just delete :build
+      ?+    state.build-status
+          +:(remove-single-build build build-status)
       ::
-      (remove-builds ~[build])
+        [%complete %value * cached=%.y *]  state
+        [%complete %value * cached=%.n *]  (add-build-to-cache build)
+      ==
     ::  recurse on sub-builds
     ::
     =/  subs  ~(tap in ~(key by subs.build-status))
