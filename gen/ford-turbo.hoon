@@ -3,7 +3,7 @@
 /=  ford-turbo  /:  /===/sys/vane/turbo
                 /!noun/
 ::
-=,  ford-api
+=,  ford-api:ford-turbo
 ::
 :-  %say
 |=  [[now=@da eny=@ bek=beak] ~ ~]
@@ -80,9 +80,9 @@
 ::  test-alts-and-live
 ::  test-double-alts
   test-wipe-trivial
-::::    test-wipe-live-rebuild
-::::    test-wipe-live-promote
-::::    test-five-oh-wipe
+  test-wipe-live-rebuild
+  test-wipe-live-promote
+  test-five-oh-wipe
 ::::  ::  test-reef  ::  very slow
 ::  test-reef-short-circuit
 ::  test-path
@@ -3471,7 +3471,7 @@
         :~  :*  duct=~[/build]  %give  %made  ~1234.5.6  %complete  %success
                 [%scry %noun !>(42)]
             ==
-            :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -3496,7 +3496,7 @@
       scry=(scry-succeed ~1234.5.7 [%noun !>(43)])
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~[/build]
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/build]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
@@ -3505,7 +3505,7 @@
         :~  :*  duct=~[/build]  %give  %made  ~1234.5.7  %complete  %success
                 [%scry %noun !>(43)]
             ==
-            :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar]~)]
     ==  ==  ==
@@ -3519,7 +3519,7 @@
       call-args=[duct=~[/build] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/build]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -3566,7 +3566,7 @@
         :~  :*  duct=~[/ride]  %give  %made  ~1234.5.6  %complete
                 [%success [%ride scry-type %constant]]
             ==
-            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.6] (sy [%x /foo/bar] ~)]
     ==  ==  ==
@@ -3591,13 +3591,17 @@
       scry=scry
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~[/ride]
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/ride]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.7] (sy [%x /foo/bar]~)]
         ==
+      ::  produce a duplicate %made since we lost the previous result
       ::
       ^=  moves
-        :~  :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/ride]  %give  %made  ~1234.5.7  %complete
+                [%success [%ride scry-type %constant]]
+            ==
+            :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk
                 `[%mult [%da ~1234.5.7] (sy [%x /foo/bar] ~)]
     ==  ==  ==
@@ -3611,7 +3615,7 @@
       call-args=[duct=~[/ride] type=~ %kill ~nul]
       ::
       ^=  moves
-        :~  :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/ride]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -3634,13 +3638,16 @@
     %-  my  :~
       :-  [%cx [[~nul %desk %da ~1234.5.6] /a/posts]]
       [%noun scry-type [title='post-a' contents="post-a-contents"]]
-    ::
       :-  [%cx [[~nul %desk %da ~1234.5.6] /b/posts]]
+      [%noun scry-type [title='post-b' contents="post-b-contents"]]
+    ::
+      :-  [%cx [[~nul %desk %da ~1234.5.7] /a/posts]]
+      [%noun scry-type [title='post-a' contents="post-a-contents"]]
+      :-  [%cx [[~nul %desk %da ~1234.5.7] /b/posts]]
       [%noun scry-type [title='post-b' contents="post-b-contents"]]
     ::
       :-  [%cx [[~nul %desk %da ~1234.5.9] /a/posts]]
       [%noun scry-type [title='post-a' contents="post-a-contents-changed"]]
-    ::
       ::  unchanged, but might be requested if result gets wiped
       ::
       :-  [%cx [[~nul %desk %da ~1234.5.9] /b/posts]]
@@ -3685,7 +3692,7 @@
           ==
         %-  expect-eq  !>
         :_  i.t.moves
-        :*  duct=~[/post-a]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :*  duct=~[/post-a]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.6
             %c  %warp  [~nul ~nul]  %desk
             `[%mult [%da ~1234.5.6] (sy [%x /posts/a] [%x /posts/b] ~)]
     ==  ==
@@ -3702,14 +3709,21 @@
         |=  moves=(list move:ford-gate)
         ^-  tang
         ::
-        ?>  ?=([^ ~] moves)
-        %-  check-post-made  :*
-          move=i.moves
-          duct=~[/post-b]
-          type=scry-type
-          date=~1234.5.7
-          title='post-b'
-          contents="post-b-contents"
+        ?>  ?=([^ ^ ~] moves)
+        %+  weld
+          %-  check-post-made  :*
+            move=i.moves
+            duct=~[/post-b]
+            type=scry-type
+            date=~1234.5.7
+            title='post-b'
+            contents="post-b-contents"
+          ==
+        %-  expect-eq  !>
+        :_  i.t.moves
+        :*  duct=~[/post-b]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.7
+            %c  %warp  [~nul ~nul]  %desk
+            `[%mult [%da ~1234.5.7] (sy [%x /posts/a] [%x /posts/b] ~)]
     ==  ==
   ::
   =^  results3  ford-gate
@@ -3729,7 +3743,41 @@
       scry=scry
       ::
       ^=  take-args
-        :*  wire=/~nul/clay-sub/~nul/desk  duct=~[/post-a]
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.6  duct=~[/post-a]
+            ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
+            [%c %wris [%da ~1234.5.9] (sy [%x /posts/a]~)]
+        ==
+      ::
+      ^=  comparator
+        |=  moves=(list move:ford-gate)
+        ^-  tang
+        ::
+        ?>  ?=([^ ^ ~] moves)
+        ::
+        %+  welp
+          %-  check-post-made  :*
+            move=i.moves
+            duct=~[/post-a]
+            type=scry-type
+            date=~1234.5.9
+            title='post-a'
+            contents="post-a-contents-changed"
+          ==
+        %-  expect-eq  !>
+        :_  i.t.moves
+        :*  duct=~[/post-a]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.9
+            %c  %warp  [~nul ~nul]  %desk
+            `[%mult [%da ~1234.5.9] (sy [%x /posts/a] [%x /posts/b] ~)]
+    ==  ==
+  ::
+  =^  results5  ford-gate
+    %-  test-ford-take-with-comparator  :*
+      ford-gate
+      now=~1234.5.9
+      scry=scry
+      ::
+      ^=  take-args
+        :*  wire=/~nul/clay-sub/~nul/desk/~1234.5.7  duct=~[/post-b]
             ^=  wrapped-sign  ^-  (hypo sign:ford-gate)  :-  *type
             [%c %wris [%da ~1234.5.9] (sy [%x /posts/a]~)]
         ==
@@ -3739,6 +3787,7 @@
         ^-  tang
         ::
         =+  length=(lent moves)
+        ~&  %r5-l1
         ::  deal with mug ordering
         ::
         ::    This test depends on the mugs of types stored in ford, which is
@@ -3747,72 +3796,22 @@
         ::    because it was the entry which was evicted from the cache and one
         ::    where we don't because it wasn't. Check both cases.
         ::
-        ?:  =(length 2)
+        ?~  moves
           ::  the simple case where we don't send a spurious post-b %made
           ::
-          ?>  ?=([^ ^ ~] moves)
-          ::
-          %-  check-post-made  :*
-            move=i.moves
-            duct=~[/post-a]
-            type=scry-type
-            date=~1234.5.9
-            title='post-a'
-            contents="post-a-contents-changed"
-          ==
-        :: the complex case
-        ::
-        ::   Not only do we send a spurious %made, we don't have a set order
-        ::   that these events happen in, so check both ways.
-        ::
-        ?>  ?=([^ ^ ^ ~] moves)
-        ::
-        =/  post-a-first=tang
-          %+  welp
-            %-  check-post-made  :*
-              move=i.moves
-              duct=~[/post-a]
-              type=scry-type
-              date=~1234.5.9
-              title='post-a'
-              contents="post-a-contents-changed"
-            ==
-          %-  check-post-made  :*
-            move=i.t.moves
-            duct=~[/post-b]
-            type=scry-type
-            date=~1234.5.9
-            title='post-b'
-            contents="post-b-contents"
-          ==
-        ::  if we got a ~ for post-a-first, everything is fine
-        ::
-        ?~  post-a-first
           ~
-        ::  otherwise, its either post-b first or an error.
-        ::
-        ::    Either way, return post-b first check.
-        ::
-        %+  welp
-          %-  check-post-made  :*
-            move=i.moves
-            duct=~[/post-b]
-            type=scry-type
-            date=~1234.5.9
-            title='post-b'
-            contents="post-b"
-          ==
+        ?>  ?=([^ ~] moves)
         ::
         %-  check-post-made  :*
-          move=i.t.moves
-          duct=~[/post-a]
+          move=i.moves
+          duct=~[/post-b]
           type=scry-type
           date=~1234.5.9
-          title='post-a'
-          contents="post-a-contents-changed"
+          title='post-b'
+          contents="post-b-contents"
     ==  ==
   ::
-  =^  results5  ford-gate
+  =^  results6  ford-gate
     %-  test-ford-call  :*
       ford-gate
       now=~1234.5.10
@@ -3822,16 +3821,15 @@
       moves=~
     ==
   ::
-  =^  results6  ford-gate
+  =^  results7  ford-gate
     %-  test-ford-call  :*
       ford-gate
       now=~1234.5.11
       scry=scry-is-forbidden
       ::
       call-args=[duct=~[/post-a] type=~ %kill ~nul]
-      ::
       ^=  moves
-        :~  :*  duct=~[/post-a]  %pass  wire=/~nul/clay-sub/~nul/desk
+        :~  :*  duct=~[/post-a]  %pass  wire=/~nul/clay-sub/~nul/desk/~1234.5.9
                 %c  %warp  [~nul ~nul]  %desk  ~
     ==  ==  ==
   ::
@@ -3842,6 +3840,7 @@
     results4
     results5
     results6
+    results7
     (expect-ford-empty ford-gate ~nul)
   ==
 ::

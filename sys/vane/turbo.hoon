@@ -2022,7 +2022,7 @@
       ::
       ~|  :+  %track-sub-builds
             build=(build-to-tape client)
-          subs=(turn sub-builds build-to-tape)]
+          subs=(turn sub-builds build-to-tape)
       ::  mark :sub-builds as :subs in :build's +build-status
       ::
       =^  build-status  builds.state
@@ -5726,6 +5726,7 @@
     ++  take-rebuilds
       ^-  [(list move) ford-state]
       ::
+      ~|  [%take-rebuilds-wire wire=wire sign=sign]
       ?>  ?=([%c %wris *] sign)
       =+  [ship desk date]=(raid:wired t.t.wire ~[%p %tas %da])
       =/  disc  [ship desk]
