@@ -18,112 +18,112 @@
 =-  ((slog -) ~)
 ^-  tang
 ;:  weld
-::  test-tear
-::  test-unify-jugs
-::  test-resource-wire-encoding
-::  test-parse-scaffold
-::  test-parse-scaffold-sur-lib
-::  test-parse-scaffold-zuse-version
-::  test-parse-scaffold-crane-fssg
-::  test-parse-scaffold-crane-fsbc
-::  test-parse-scaffold-crane-fsbr
-::  test-parse-scaffold-crane-fsts
-::  test-parse-scaffold-crane-fsdt
-::  test-parse-scaffold-crane-fscm
-::  test-parse-scaffold-crane-fspm
-::  test-parse-scaffold-crane-fscb
-::  test-parse-scaffold-crane-fssm
-::  test-parse-scaffold-crane-fscl
-::  test-parse-scaffold-crane-fskt
-::  test-parse-scaffold-crane-fszp
-::  test-parse-scaffold-crane-fszy
-::  test-cache-put
-::  test-literal
-::  test-autocons-same
-::  test-autocons-different
-::  test-scry-clay-succeed
-::  test-scry-clay-fail
-::  test-scry-clay-block
-::  test-scry-clay-multiblock
-::  test-scry-clay-cancel
-::  test-scry-clay-live
-::  test-scry-clay-live-again
-::  test-scry-clay-same-path
-::  test-pinned-in-past
-::  test-pinned-in-future
-::  test-pinned-in-pin
-::  test-pinned-in-live
-::  test-live-build-that-blocks
-::  test-live-and-once
-::  test-live-two-deep
-::  test-live-three-deep
-::  test-live-triangle
-::  test-live-and-pinned-triangle
-::  test-call
-::  test-call-scry-succeed
-::  test-call-scry-fail
-::  test-call-scry-block
-::  test-call-scry-varies
-::  test-dude
-::  test-dude-error
-::  test-hood
-::  test-slim
-::  test-slit
-::  test-slit-error
-::  test-ride
-::  test-ride-scry-succeed
-::  test-ride-scry-fail
-::  test-ride-scry-block
-::  test-ride-scry-promote
-::  test-five-oh-fora
-::  test-alts
-::  test-alts-and-live
-::  test-double-alts
+  test-tear
+  test-unify-jugs
+  test-resource-wire-encoding
+  test-parse-scaffold
+  test-parse-scaffold-sur-lib
+  test-parse-scaffold-zuse-version
+  test-parse-scaffold-crane-fssg
+  test-parse-scaffold-crane-fsbc
+  test-parse-scaffold-crane-fsbr
+  test-parse-scaffold-crane-fsts
+  test-parse-scaffold-crane-fsdt
+  test-parse-scaffold-crane-fscm
+  test-parse-scaffold-crane-fspm
+  test-parse-scaffold-crane-fscb
+  test-parse-scaffold-crane-fssm
+  test-parse-scaffold-crane-fscl
+  test-parse-scaffold-crane-fskt
+  test-parse-scaffold-crane-fszp
+  test-parse-scaffold-crane-fszy
+  test-cache-put
+  test-literal
+  test-autocons-same
+  test-autocons-different
+  test-scry-clay-succeed
+  test-scry-clay-fail
+  test-scry-clay-block
+  test-scry-clay-multiblock
+  test-scry-clay-cancel
+  test-scry-clay-live
+  test-scry-clay-live-again
+  test-scry-clay-same-path
+  test-pinned-in-past
+  test-pinned-in-future
+  test-pinned-in-pin
+  test-pinned-in-live
+  test-live-build-that-blocks
+  test-live-and-once
+  test-live-two-deep
+  test-live-three-deep
+  test-live-triangle
+  test-live-and-pinned-triangle
+  test-call
+  test-call-scry-succeed
+  test-call-scry-fail
+  test-call-scry-block
+  test-call-scry-varies
+  test-dude
+  test-dude-error
+  test-hood
+  test-slim
+  test-slit
+  test-slit-error
+  test-ride
+  test-ride-scry-succeed
+  test-ride-scry-fail
+  test-ride-scry-block
+  test-ride-scry-promote
+  test-five-oh-fora
+  test-alts
+  test-alts-and-live
+  test-double-alts
   test-wipe-trivial
   test-wipe-live-rebuild
   test-wipe-live-promote
   test-five-oh-wipe
 ::::  ::  test-reef  ::  very slow
-::  test-reef-short-circuit
-::  test-path
-::  test-plan-hoon
-::  test-core
-::  test-core-linker
-::  test-core-multi-hoon
-::  test-core-fsts-fssg
-::  test-core-fsdt-fskt
-::  test-core-fskt-nest-fail
-::  test-core-fssm
-::  test-core-fsbr
-::  test-core-fsbr-out-of-options
-::  test-plan-fszp-as-noun
-::  test-core-fszp-as-mark
-::  test-core-fscl-fszp
-::  test-core-fscm
-::  test-plan-fsbc
-::  test-core-fscb
-::  test-core-fspm
-::  test-core-fszy-renderer
-::  test-bunt
-::  test-volt
-::  test-vale
-::  test-vale-error
-::  test-cast
-::  test-cast-grow
-::  test-mute
-::  test-bake-renderer
-::  test-bake-mark
-::  test-diff
-::  test-diff-form
-::  test-pact
-::  test-pact-mark
-::  test-join
-::  test-list
-::  test-mash
-::  test-multi-core-same-dependency  ::  TODO heisenbug
-::  test-walk-prefer-grab
-::  test-walk-large-graph
-::  test-cast-large-graph
+  test-reef-short-circuit
+  test-path
+  test-plan-hoon
+  test-core
+  test-core-linker
+  test-core-multi-hoon
+  test-core-fsts-fssg
+  test-core-fsdt-fskt
+  test-core-fskt-nest-fail
+  test-core-fssm
+  test-core-fsbr
+  test-core-fsbr-out-of-options
+  test-plan-fszp-as-noun
+  test-core-fszp-as-mark
+  test-core-fscl-fszp
+  test-core-fscm
+  test-plan-fsbc
+  test-core-fscb
+  test-core-fspm
+  test-core-fszy-renderer
+  test-bunt
+  test-volt
+  test-vale
+  test-vale-error
+  test-cast
+  test-cast-grow
+  test-mute
+  test-bake-renderer
+  test-bake-mark
+  test-diff
+  test-diff-form
+  test-pact
+  test-pact-mark
+  test-join
+  test-list
+  test-mash
+  test-multi-core-same-dependency  ::  TODO heisenbug
+  test-walk-prefer-grab
+  test-walk-large-graph
+  test-cast-large-graph
 ==
 ++  test-tear
   :-  `tank`leaf+"test-tear"
@@ -3928,15 +3928,7 @@
     %-  test-ford-call-with-comparator  :*
       ford-gate
       now=~1234.5.6
-      ^=  scry
-        |=  [* * =term =beam]
-        ^-  (unit (unit cage))
-        ::
-        ~|  [term=term beam=beam]
-        ?>  =(%cw term)
-        ?>  =([[~nul %home [%da ~1234.5.6]] /hoon/hoon/sys] beam)
-        ::
-        ``[%cass !>(`cass:clay`[ud=1 da=~1234.5.6])]
+      scry=(scry-reef ~1234.5.6)
       ::
       ^=  call-args
         :*  duct=~[/reef]  type=~  %build  ~nul  live=%.n
@@ -6343,6 +6335,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         %-  expect-eq  !>
@@ -6479,6 +6475,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         %-  expect-eq  !>
@@ -6628,6 +6628,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         %-  expect-eq  !>
@@ -6767,6 +6771,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         ;:  weld
@@ -6814,6 +6822,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         ;:  weld
@@ -6861,6 +6873,10 @@
             [%x /lib/gh/parse/hoon]
             [%x /lib/gh-parse/hoon]
             [%x /lib/connector/hoon]
+            ::
+            [%x /sys/arvo/hoon]
+            [%x /sys/hoon/hoon]
+            [%x /sys/zuse/hoon]
           ==
         ::
         ;:  weld
@@ -6993,7 +7009,12 @@
             :*  duct=~[/walk]  %pass  /~nul/clay-sub/~nul/home/~1234.5.6
                 %c  %warp  [~nul ~nul]  %home  ~  %mult  [%da ~1234.5.6]
                 %-  sy  :~
-                  [%x /mar/two/hoon]  [%x /mar/one/hoon]
+                  [%x /mar/two/hoon]
+                  [%x /mar/one/hoon]
+                  ::
+                  [%x /sys/arvo/hoon]
+                  [%x /sys/hoon/hoon]
+                  [%x /sys/zuse/hoon]
     ==  ==  ==  ==
   ::
   =^  results2  ford-gate
@@ -7039,8 +7060,14 @@
             :*  duct=~[/walk]  %pass  /~nul/clay-sub/~nul/home/~1234.5.6
                 %c  %warp  [~nul ~nul]  %home  ~  %mult  [%da ~1234.5.6]
                 %-  sy  :~
-                  [%x /mar/one/hoon]  [%x /mar/two/hoon]
-                  [%x /mar/four/hoon]  [%x /mar/five/hoon]
+                  [%x /mar/one/hoon]
+                  [%x /mar/two/hoon]
+                  [%x /mar/four/hoon]
+                  [%x /mar/five/hoon]
+                  ::
+                  [%x /sys/arvo/hoon]
+                  [%x /sys/hoon/hoon]
+                  [%x /sys/zuse/hoon]
     ==  ==  ==  ==
   ::
   =^  results2  ford-gate
@@ -7262,6 +7289,11 @@
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
   ::
+  =/  date=@da  ?>(?=(%da -.r.beam) p.r.beam)
+  ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
+  ::
   ~|  scry-with-results+[term=term beam=beam]
   ::
   [~ ~ (~(got by results) [term beam])]
@@ -7272,6 +7304,11 @@
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
   ::
+  =/  date=@da  ?>(?=(%da -.r.beam) p.r.beam)
+  ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
+  ::
   ~|  scry-with-results+[term=term beam=beam]
   ::
   [~ (~(got by results) [term beam])]
@@ -7281,6 +7318,9 @@
   |=  [date=@da result=cage]  ^-  sley
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
+  ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
   ::
   ~|  scry-succeed+[beam+beam term+term]
   ?>  =(term %cx)
@@ -7294,6 +7334,9 @@
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
   ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
+  ::
   ~|  scry-fail+[beam+beam term+term]
   ?>  =(term %cx)
   ?>  =(beam [[~nul %desk %da date] /bar/foo])
@@ -7306,11 +7349,15 @@
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
   ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
+  ::
   ~|  scry-block+[beam+beam term+term]
   ?>  =(term %cx)
   ?>  =(beam [[~nul %desk %da date] /bar/foo])
   ::
   ~
+::  +scry-blocks: block on a file at multiple dates; does not include %reef
 ::
 ++  scry-blocks
   |=  dates=(set @da)  ^-  sley
@@ -7329,8 +7376,34 @@
   |=  [* (unit (set monk)) =term =beam]
   ^-  (unit (unit cage))
   ::
+  =/  date=@da  ?>(?=(%da -.r.beam) p.r.beam)
+  ::
+  ?^  reef=((scry-reef date) +<.$)
+    reef
+  ::
   ~|  scry-is-forbidden+[beam+beam term+term]
   !!
+::
+++  scry-reef
+  |=  date=@da  ^-  sley
+  |=  [* (unit (set monk)) =term =beam]
+  ^-  (unit (unit cage))
+  ::
+  =-  ?~  res=(~(get by -) [term beam])
+        ~
+      `res
+  ::
+  %-  ~(gas by *(map [^term ^beam] cage))
+  :~  :-  [%cx [[~nul %home %da date] /hoon/hoon/sys]]
+      [%noun !>(~)]
+      :-  [%cx [[~nul %home %da date] /hoon/arvo/sys]]
+      [%noun !>(~)]
+      :-  [%cx [[~nul %home %da date] /hoon/zuse/sys]]
+      [%noun !>(~)]
+  ::
+      :-  [%cw [[~nul %home %da date] /hoon/hoon/sys]]
+      [%cass !>([ud=0 da=date])]
+  ==
 ::
 ++  test-ford-call
   |=  $:  ford-gate=_ford-gate
