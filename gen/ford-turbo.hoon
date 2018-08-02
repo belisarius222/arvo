@@ -39,6 +39,7 @@
   test-parse-scaffold-crane-fszy
   test-cache-put
   test-literal
+  test-cache-uncache
   test-autocons-same
   test-autocons-different
   test-scry-clay-succeed
@@ -674,7 +675,7 @@
   ::
   =/  ford  (ford-gate now=~1234.5.6 eny=0xdead.beef scry=scry-is-forbidden)
   ::
-  =/  schematic=schematic:ford  [%scry %c %x [~nul %home] /]
+  =/  schematic=schematic:ford-gate  [%scry %c %x [~nul %home] /]
   ::
   =|  c=build-cache:ford
   =.  max-size.c  2
@@ -765,12 +766,76 @@
       ^=  moves
         :~  :*  duct=~  %give  %made  ~1234.5.6
                 %complete  %success  %$  %noun  !>(**)
-        ==  ==
-    ==
+    ==  ==  ==
   ::
   %+  welp
     results1
   (expect-ford-empty ford-gate ~nul)
+::
+++  test-cache-uncache
+  :-  `tank`leaf+"test-cache-uncache"
+  ::
+  =/  noun-vase=vase  !>(~)
+  =/  schematic=schematic:ford-gate  [%$ %noun noun-vase]
+  ::
+  =^  results1  ford-gate
+    %-  test-ford-call  :*
+      ford-gate
+      now=~1234.5.6
+      scry=scry-is-forbidden
+      ::
+      call-args=[duct=~ type=~ %build ~nul live=%.n schematic]
+      ::
+      ^=  moves
+        :~  :*  duct=~  %give  %made  ~1234.5.6
+                %complete  %success  %$  %noun  noun-vase
+    ==  ==  ==
+  ::  the build-result from the previous build should be cached and promoted
+  ::
+  =^  results2  ford-gate
+    %-  test-ford-call  :*
+      ford-gate
+      now=~1234.5.7
+      scry=scry-is-forbidden
+      ::
+      call-args=[duct=~ type=~ %build ~nul live=%.n schematic]
+      ::
+      ^=  moves
+        :~  :*  duct=~  %give  %made  ~1234.5.7
+                %complete  %success  %$  %noun  noun-vase
+    ==  ==  ==
+  ::
+  =^  results3  ford-gate
+    %-  test-ford-call  :*
+      ford-gate
+      now=~1234.5.7
+      scry=scry-is-forbidden
+      ::
+      call-args=[duct=~[/keep] type=~ %keep 0]
+      moves=~
+    ==
+  ::  ask for the deleted build just to make sure nothing funny happens
+  ::
+  =^  results4  ford-gate
+    %-  test-ford-call  :*
+      ford-gate
+      now=~1234.5.7
+      scry=scry-is-forbidden
+      ::
+      call-args=[duct=~ type=~ %build ~nul live=%.n schematic]
+      ::
+      ^=  moves
+        :~  :*  duct=~  %give  %made  ~1234.5.7
+                %complete  %success  %$  %noun  noun-vase
+    ==  ==  ==
+  ::
+  ;:  welp
+    results1
+    results2
+    results3
+    results4
+    (expect-ford-empty ford-gate ~nul)
+  ==
 ::
 ++  test-autocons-same
   :-  `tank`leaf+"test-autocons-same"
