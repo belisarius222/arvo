@@ -1236,42 +1236,94 @@
   =/  =schematic  schematic.build
   ::
   %-  enclose
-  %+  welp  (trip (scot %da date))
-  %+  welp  " "
+  ::  %+  welp  (trip (scot %da date))
+  ::  %+  welp  " "
   ::
   ?+      -.schematic
-        :(welp "[" (trip -.schematic) " {<`@uvI`(mug schematic)>}]")
+        :(welp "%" (trip -.schematic) " {<`@uvI`(mug schematic)>}")
       ::
       %$
-    "literal"
+    "%$ {<p.literal.schematic>} {<`@uvI`(mug schematic)>}"
   ::
       ^
-    %-  enclose
     ;:(welp $(build [date head.schematic]) " " $(build [date tail.schematic]))
   ::
+      %pin
+    :(welp "%pin " <date.schematic> $(schematic.build schematic.schematic))
+  ::
       %alts
-    ;:  welp
-      %+  roll  choices.schematic
-      |=  [choice=^schematic txt=_"[alts"]
-      :(welp txt " " ^$(schematic.build choice))
-    ::
-      "]"
-    ==
+    %+  roll  choices.schematic
+    |=  [choice=^schematic txt=_"%alts"]
+    :(welp txt " " ^$(schematic.build choice))
+  ::
+      %cast
+    (welp "%cast {<mark.schematic>} " $(schematic.build input.schematic))
   ::
       %core
-    :(welp "[core " (spud (en-beam (rail-to-beam source-path.schematic))) "]")
+    (welp "%core " (spud (en-beam (rail-to-beam source-path.schematic))))
+  ::
+      %diff
+    ;:  welp
+      "%diff start="
+      $(schematic.build start.schematic)
+      " end="
+      $(schematic.build end.schematic)
+    ==
   ::
       %hood
-    :(welp "[hood " (spud (en-beam (rail-to-beam source-path.schematic))) "]")
+    (welp "%hood " (spud (en-beam (rail-to-beam source-path.schematic))))
+  ::
+      %list
+    %+  roll  schematics.schematic
+    |=  [sub=^schematic txt=_"%list"]
+    :(welp txt " " ^$(schematic.build sub))
+  ::
+      %mute
+    ;:  welp
+      "%mute subject="
+      $(schematic.build subject.schematic)
+      %-  enclose
+      %-  zing
+      %+  turn  mutations.schematic
+      |=  [=wing mutation=^schematic]
+      %+  welp  " "
+      %-  enclose
+      :(welp <wing> " " ^$(schematic.build mutation))
+    ==
+  ::
+      %pact
+    ;:  welp
+      "%pact start="
+      $(schematic.build start.schematic)
+      " diff="
+      $(schematic.build diff.schematic)
+    ==
+  ::
+      %path
+    "%path {<prefix.schematic>} {<raw-path.schematic>}"
   ::
       %plan
-    :(welp "[plan " (spud (en-beam (rail-to-beam path-to-render.schematic))) "]")
+    (welp "%plan " (spud (en-beam (rail-to-beam path-to-render.schematic))))
+  ::
+      %ride
+    ;:  welp
+      "%ride "
+      $(schematic.build subject.schematic)
+      " "
+      <`@uvI`(mug schematic)>
+    ==
   ::
       %scry
-    (spud (en-beam (extract-beam resource.schematic ~)))
+    (welp "%scry " (spud (en-beam (extract-beam resource.schematic ~))))
   ::
-    ::    %slim
-    ::  "slim {<subject-type.schematic>} {<formula.schematic>}"
+      %vale
+    "%vale {<mark.schematic>}"
+  ::
+      %volt
+    "%volt {<mark.schematic>}"
+  ::
+      %walk
+    "%walk {<source.schematic>} {<target.schematic>}"
   ==
 ::  +cache-key-to-tape: convert a cache-key to a printable format
 ::
@@ -2911,7 +2963,7 @@
     ::  accessed-builds: builds accessed/depended on during this run.
     ::
     =|  accessed-builds=(list ^build)
-    ::  ~&  [%turbo-make (build-to-tape build)]
+    ~&  [%turbo-make (build-to-tape build)]
     ::  dispatch based on the kind of +schematic in :build
     ::
     ::
