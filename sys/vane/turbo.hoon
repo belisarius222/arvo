@@ -2302,7 +2302,7 @@
   ++  remove-duct-from-root
     |=  [duct=^duct =build]
     ^+  state
-    ::  ~&  [%remove-duct-from-root (build-to-tape build) duct]
+    ~&  [%remove-duct-from-root (build-to-tape build) duct]
     ::
     =^  build-status  builds.state
       %+  update-build-status  build
@@ -2323,6 +2323,7 @@
       %+  update-build-status  build
       |=  =build-status
       ~|  [%add-build-to-cache (build-to-tape build) -.state.build-status]
+      ~&  [%add-build-to-cache (build-to-tape build) -.state.build-status]
       ?>  ?=([%complete %value * cached=%.n *] state.build-status)
       build-status(cached.build-record.state &)
     ::
@@ -2343,7 +2344,9 @@
       =<  builds
       %+  update-build-status  build
       |=  =build-status
-      ~|  [%remove-stale-build (build-to-tape build)]
+      ~|  [%remove-stale-build (build-to-tape build) state=-.state.build-status]
+      ~&  [%remove-stale-build (build-to-tape build) state=-.state.build-status]
+      ::
       ?>  ?=([%complete %value * cached=%.y *] state.build-status)
       build-status(cached.build-record.state |)
     ::
@@ -2391,6 +2394,7 @@
     |-  ^+  builds.state
     ?~  subs  builds.state
     ::
+    ~|  [%client (build-to-tape client) state=-.state.build-status]
     =/  sub-status=^build-status  (got-build-status i.subs)
     ::
     =/  already-had-duct=?  (~(has by clients.sub-status) duct)
@@ -2438,6 +2442,7 @@
     |=  [old-root=build new-date=@da]
     ^+  state
     ~|  [%copy-build-tree-as-provisional (build-to-tape old-root) new-date]
+    ~&  [%copy-build-tree-as-provisional (build-to-tape old-root) new-date]
     ::
     =/  old-client=build  old-root
     =/  new-client=build  old-client(date new-date)
@@ -2759,7 +2764,7 @@
       ::  track the fact that this promotion has occurred
       ::
       =.  promotions.perf  +(promotions.perf)
-      ::  ~&  [%promote-build (build-to-tape old-build) new-date]
+      ~&  [%promote-build (build-to-tape old-build) new-date]
       ::  grab the previous result, freshening the cache
       ::
       =^  old-build-record  ..execute  (access-build-record old-build)
@@ -5766,6 +5771,7 @@
     |=  =build
     ^+  state
     ~|  [%add-build (build-to-tape build)]
+    ~&  [%add-build (build-to-tape build)]
     ::  don't overwrite an existing entry
     ::
     ?:  (~(has by builds.state) build)
@@ -5789,9 +5795,10 @@
     ^+  state
     ::
     ~|  [%remove-builds (turn builds build-to-tape)]
+    ~&  [%remove-builds (turn builds build-to-tape)]
     ::
-    ?~  builds
-      state
+    |-  ^+  state
+    ?~  builds  state
     ::
     ?~  maybe-build-status=(~(get by builds.state) i.builds)
       $(builds t.builds)
@@ -5810,6 +5817,7 @@
     |=  [=build =build-status]
     ^+  [removed=| state]
     ~|  [%remove-single-build (build-to-tape build)]
+    ~&  [%remove-single-build (build-to-tape build)]
     ::  never delete a build that something depends on
     ::
     ?^  clients.build-status
@@ -6062,7 +6070,7 @@
       ::
       ..execute
     ==
-  ::  +send-incomplete:
+  ::  +send-incomplete: :build couldn't complete, so notify the requesting duct
   ::
   ++  send-incomplete
     |=  =build
@@ -6087,7 +6095,6 @@
   ++  cleanup-orphaned-provisional-builds
     |=  =build
     ^+  ..execute
-    ::  ~&  [%cleanup-orphaned-provisional-builds (build-to-tape build)]
     ::
     =/  =build-status  (got-build-status build)
     ::
@@ -6099,6 +6106,10 @@
       ?:  verified.build-relation
         ~
       `sub
+    ::
+    ~&  :+  %cleanup-orphaned-provisional-builds
+          build=(build-to-tape build)
+        orphans=(turn orphans build-to-tape)
     ::  remove links to orphans in :build's +build-status
     ::
     =^  build-status  builds.state
