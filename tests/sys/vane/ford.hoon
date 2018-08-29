@@ -1,4 +1,4 @@
-/+  tester
+/+  tester, test-ford
 ::
 /=  ford-turbo  /:  /===/sys/vane/ford  /!noun/
 ::

@@ -3607,7 +3607,7 @@
         ruf/raft                                      ::  revision tree
     ==                                                ::
 |=  {now/@da eny/@ ski/sley}                          ::  activate
-^?                                                    ::  opaque core
+::^?                                                    ::  opaque core
 |%                                                    ::
 ++  call                                              ::  handle request
   |=  $:  hen/duct

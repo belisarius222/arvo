@@ -88,5 +88,37 @@
     ?:  =(~ b)  ~  :: test OK
     :-  leaf+"in: '{a}'"
     (turn b |=(c=tank rose+[~ "  " ~]^~[c]))
+  ::
+  ::
+  ++  run-sequence
+    |*  [program=mold output=mold]
+    |=  $:  =program
+            $=  tests
+            %-  list
+            $:  input=$-(program [output program])
+                output=$-([output program] tang)
+        ==  ==
+    ^-  tang
+    ::
+    =|  result=tang
+    ::
+    |-  ^+  result
+    ?~  tests  result
+    ::
+    =^  moves  program  (input.i.tests program)
+    ::
+    =.  result
+      %+  weld  result
+      (output.i.tests moves program)
+    ::
+    $(tests t.tests)
+  ::
+  ::
+  ++  eq
+    |*  expected=[=type value=*]
+    |=  actual=_value.expected
+    ^-  tang
+    ::
+    (expect-eq expected [type actual])
   --
 --
