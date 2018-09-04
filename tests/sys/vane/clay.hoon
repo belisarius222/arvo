@@ -10,6 +10,14 @@
 ::
 |%
 ++  test-info  ^-  tang
+  =^  results0  clay-gate
+    %-  clay-call  :*
+      clay-gate
+      now=~1111.1.1
+      scry=*sley
+      call-args=[duct=~[/init] -:!>(*task:able:clay) [%init ~nul]]
+      expected-moves=~
+    ==
   ::
   =^  results1  clay-gate
     %-  clay-call-with-comparator  :*
@@ -178,7 +186,6 @@
         ==
       expected-moves=~
     ==
-  ~&  %results5
   ::
   =^  results5  clay-gate
     %-  clay-take-with-comparator  :*
@@ -249,15 +256,63 @@
                 0v1u.egg7f.h1o7a.22g2g.torgm.2kcfj.k8b3s.n5hlf.57i21.5m1nn.bhob7
             ::
             [%volt [~nul %home] %noun 'file1']
-        ==
-    ==
+    ==  ==
+  ::
+  =^  results6  clay-gate
+    %-  clay-take  :*
+      clay-gate
+      now=~6666.6.6
+      scry=*sley
+      ^=  take-args
+        :*  wire=/patching/~nul/home
+            duct=~[/info]
+            -:!>(*sign:clay-gate)
+            ^-  sign:clay-gate
+            :*  %f  %made  ~1111.1.1  %complete  %success  %list
+                ^-  (list build-result:ford)
+                :~  :+  %success
+                      :*  %success  %$  %path-hash  -:!>([*path *@uvI])
+                          /file2/noun
+                          0vj.5f6kr.5o1of.dubnd.6k5a7.jprgp.
+                          8ifgp.0ljbi.dqau7.7c0q0.fj144
+                      ==
+                    [%success %volt %noun %noun 'file2']
+                ::
+                    :+  %success
+                      :*  %success  %$  %path-hash  -:!>([*path *@uvI])
+                          /file1/noun
+                          0v1u.egg7f.h1o7a.22g2g.torgm.2kcfj.
+                          k8b3s.n5hlf.57i21.5m1nn.bhob7
+                      ==
+                    [%success %volt %noun %noun 'file1']
+        ==  ==  ==
+      ^=  expected-moves
+        :~  :*  duct=~[/init]  %give  %note  '+'  %rose
+                ["/" "/" ~]
+                :~  [%leaf "~nul"]
+                    [%leaf "home"]
+                    [%leaf "1"]
+                    [%leaf "file1"]
+                    [%leaf "noun"]
+            ==  ==
+        ::
+            :*  duct=~[/init]  %give  %note  '+'  %rose
+                ["/" "/" ~]
+                :~  [%leaf "~nul"]
+                    [%leaf "home"]
+                    [%leaf "1"]
+                    [%leaf "file2"]
+                    [%leaf "noun"]
+    ==  ==  ==  ==
   ::
   ;:  welp
+    results0
     results1
     results2
     results3
     results4
     results5
+    results6
   ==
 ::  |utilities: helper functions for testing
 ::

@@ -11,8 +11,6 @@
   |=  [expected=schematic actual=schematic]
   ^-  tang
   ::
-  ~&  tag=?@(-.expected -.expected %autocons)
-  ::
   ?^    -.expected
     ?.  ?=(^ -.actual)
       [%leaf "expected autocons, but got {<-.actual>}"]~
