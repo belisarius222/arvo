@@ -84,7 +84,7 @@
             (expect-eq !>(%.n) !>(live.note))
           ::
           %-  expect-schematic:test-ford
-          :_  !>(schematic.note)
+          :_  schematic.note
           ^-  schematic:ford
           :+  %pin  ~1111.1.1
           :-  %list
@@ -105,7 +105,7 @@
       scry=*sley
       ^=  take-args
         :*  wire=/castifying/~nul/home/~1111.1.1
-            duct=~[/info/]
+            duct=~[/info]
             -:!>(*sign:clay-gate)
             ^-  sign:clay-gate
             [%f %made ~1111.1.1 %complete %success %list ~]
@@ -113,13 +113,151 @@
       ^=  comparator
         |=  moves=(list move:clay-gate)
         ^-  tang
-        ~&  moves
-        ~
+        ::
+        ?.  ?=([* ~] moves)
+          [%leaf "wrong number of moves: {<(lent moves)>}"]~
+        ::
+        =/  move=move:clay-gate                        i.moves
+        =/  =duct                                      p.move
+        =/  card=(wind note:clay-gate gift:able:clay)  q.move
+        ::
+        %+  weld
+          (expect-eq !>(~[/info]) !>(duct))
+        ::
+        ?.  ?=(%pass -.card)
+          [%leaf "bad move, not a %pass: {<move>}"]~
+        ::
+        =/  =wire  p.card
+        ::
+        %+  weld
+          (expect-eq !>(/mutating/~nul/home/~1111.1.1) !>(wire))
+        ::
+        =/  note=note:clay-gate  q.card
+        ::
+        ?.  ?=([%f %build *] note)
+          [%leaf "bad move, not a %build: {<move>}"]~
+        ::
+        %+  weld
+          (expect-eq !>(~nul) !>(our.note))
+        ::
+        %+  weld
+          (expect-eq !>(%.n) !>(live.note))
+        ::
+        %-  expect-schematic:test-ford
+        :_  schematic.note
+        ^-  schematic:ford
+        [%pin ~1111.1.1 %list ~]
+    ==
+  ::
+  =^  results3  clay-gate
+    %-  clay-take  :*
+      clay-gate
+      now=~3333.3.3
+      scry=*sley
+      ^=  take-args
+        :*  wire=/mutating/~nul/home/~1111.1.1
+            duct=~[/info]
+            -:!>(*sign:clay-gate)
+            ^-  sign:clay-gate
+            [%f %made ~1111.1.1 %complete %success %list ~]
+        ==
+      expected-moves=~
+    ==
+  ::
+  =^  results4  clay-gate
+    %-  clay-take  :*
+      clay-gate
+      now=~4444.4.4
+      scry=*sley
+      ^=  take-args
+        :*  wire=/diffing/~nul/home/~1111.1.1
+            duct=~[/info]
+            -:!>(*sign:clay-gate)
+            ^-  sign:clay-gate
+            [%f %made ~1111.1.1 %complete %success %list ~]
+        ==
+      expected-moves=~
+    ==
+  ~&  %results5
+  ::
+  =^  results5  clay-gate
+    %-  clay-take-with-comparator  :*
+      clay-gate
+      now=~5555.5.5
+      scry=*sley
+      ^=  take-args
+        :*  wire=/inserting/~nul/home/~1111.1.1
+            duct=~[/info]
+            -:!>(*sign:clay-gate)
+            ^-  sign:clay-gate
+            :*  %f  %made  ~1111.1.1  %complete  %success  %list
+                ^-  (list build-result:ford)
+                :~  :+  %success
+                      [%success %$ %path -:!>(*path) /file1/noun]
+                    [%success %cast %noun %noun 'file1']
+                ::
+                    :+  %success
+                      [%success %$ %path -:!>(*path) /file2/noun]
+                    [%success %cast %noun %noun 'file2']
+        ==  ==  ==
+      ^=  comparator
+        |=  moves=(list move:clay-gate)
+        ^-  tang
+        ::
+        ?.  ?=([* ~] moves)
+          [%leaf "wrong number of moves: {<(lent moves)>}"]~
+        ::
+        =/  move=move:clay-gate                        i.moves
+        =/  =duct                                      p.move
+        =/  card=(wind note:clay-gate gift:able:clay)  q.move
+        ::
+        %+  weld
+          (expect-eq !>(~[/info]) !>(duct))
+        ::
+        ?.  ?=(%pass -.card)
+          [%leaf "bad move, not a %pass: {<move>}"]~
+        ::
+        =/  =wire  p.card
+        ::
+        %+  weld
+          (expect-eq !>(/patching/~nul/home) !>(wire))
+        ::
+        =/  note=note:clay-gate  q.card
+        ::
+        ?.  ?=([%f %build *] note)
+          [%leaf "bad move, not a %build: {<move>}"]~
+        ::
+        %+  weld
+          (expect-eq !>(~nul) !>(our.note))
+        ::
+        %+  weld
+          (expect-eq !>(%.n) !>(live.note))
+        ::
+        %-  expect-schematic:test-ford
+        :_  schematic.note
+        ^-  schematic:ford
+        :-  %list
+        ^-  (list schematic:ford)
+        :~  :-  :^  %$  %path-hash  -:!>([*path *@uvI])
+                :-  /file2/noun
+                0vj.5f6kr.5o1of.dubnd.6k5a7.jprgp.8ifgp.0ljbi.dqau7.7c0q0.fj144
+            ::
+            [%volt [~nul %home] %noun 'file2']
+        ::
+            :-  :^  %$  %path-hash  -:!>([*path *@uvI])
+                :-  /file1/noun
+                0v1u.egg7f.h1o7a.22g2g.torgm.2kcfj.k8b3s.n5hlf.57i21.5m1nn.bhob7
+            ::
+            [%volt [~nul %home] %noun 'file1']
+        ==
     ==
   ::
   ;:  welp
     results1
     results2
+    results3
+    results4
+    results5
   ==
 ::  |utilities: helper functions for testing
 ::
@@ -154,7 +292,7 @@
   |=  $:  clay-gate=_clay-gate
           now=@da
           scry=sley
-          take-args=[=duct =type wrapped-task=(hobo task:able:clay)]
+          call-args=[=duct =type wrapped-task=(hobo task:able:clay)]
           move-comparator=$-((list move:clay-gate) tang)
       ==
   ^-  [tang _clay-gate]
