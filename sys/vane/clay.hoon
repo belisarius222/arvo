@@ -187,7 +187,7 @@
 ::      location).
 ::  --  `hez` is the unix duct that %ergo's should be sent to.
 ::  --  `cez` is a collection of named permission groups.
-::  --  `cue` is a queue of request to perform in later events.
+::  --  `cue` is a queue of requests to perform in later events.
 ::  --  `tip` is the date of the last write; if now, enqueue incoming requests.
 ::
 ++  raft                                                ::  filesystem
