@@ -775,6 +775,7 @@
         let/@ud                                         ::  top id
         hit/(map @ud tako)                              ::  changes by id
         lab/(map @tas @ud)                              ::  labels
+        mim/(map path mime)                             ::  mime cache
     ==                                                  ::
   ++  germ                                              ::  merge style
     $?  $init                                           ::  new desk
