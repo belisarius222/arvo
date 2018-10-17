@@ -5,7 +5,7 @@
 ::  structures
 =,  ames
 ::  this number needs to be below 8
-=+  protocol-version=7
+=+  protocol-version=0
 |%
 +=  move  [p=duct q=(wind note:able gift:able)]         ::  local move
 --
