@@ -36,6 +36,10 @@
       [%collections-action action:collections]
       [%json json]
   ==
++=  state
+  $%  [%0 col=collection]
+  ==
+  
 --
 ::
 ::  state: 
@@ -43,7 +47,7 @@
 ::    stores the collection built by above by :cols so that we can compare old
 ::    and new versions whenever the rendered data changes
 ::
-|_  [bol=bowl:gall state=collection]
+|_  [bol=bowl:gall sta=state]
 ::
 ::  +this: app core subject
 ::
@@ -57,18 +61,18 @@
 ::    then update state to store the new collection data
 ::
 ++  prep
-  |=  old=(unit *)
+  |=  old=(unit state)
   ^-  (quip move _this)
   ?~  old
     =<  ta-done
     (ta-hall-create-circle:ta /c 'collections')
-  =/  old-col  ((soft collection) u.old)
-  ?~  old-col
-    [~ this(state cols)]
-  =^  mow  this
-    =<  ta-done
-    (ta-update:ta u.old-col)
-  [mow this(state cols)]
+  ?-    -.u.old
+      %0
+    =^  mow  this
+      =<  ta-done
+      (ta-update:ta col.u.old)
+    [mow this(sta [%0 cols])]
+  ==
 ::
 ::  +mack: 
 ::
