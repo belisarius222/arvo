@@ -51767,13 +51767,33 @@ function () {
 
         api$1.bind("/circle/i/grams/-999", "PUT");
         warehouse$1.pushCallback(['circle.gram', 'circle.nes'], function (rep) {
-          // Any message comes in to the /i circle
-          if (rep.from.path.split('/')[2] === "i") {
+          var circle = rep.from.path.split('/')[2]; // do nothing with gram binds to foreign ships
+
+          if (urbitOb.isShip(circle)) return; // Any message comes in to the /i circle
+
+          if (circle === "i") {
             var msgs = rep.type === "circle.gram" ? [rep.data.gam] : rep.data.map(function (m) {
               return m.gam;
             });
 
             _this2.quietlyAcceptDmInvites(msgs);
+          }
+
+          var lastReadNum;
+
+          if (lodash.isArray(rep.data) && rep.data.length > 0) {
+            lastReadNum = lodash.nth(rep.data, -1).num;
+          } else {
+            lastReadNum = rep.data.num;
+          }
+
+          if (lastReadNum) {
+            api$1.hall({
+              read: {
+                nom: circle,
+                red: lastReadNum
+              }
+            });
           }
 
           return false;
@@ -51789,6 +51809,12 @@ function () {
             }]);
             return false;
           }
+        });
+        warehouse$1.pushCallback('circle.cos.loc', function (rep) {
+          var fromCircle = rep.from && rep.from.path.split("/")[2];
+          warehouse$1.storeReports([{
+            type: "inbox.sources-loaded"
+          }]);
         });
         return true;
       }); // grab the config for the root collection circle
@@ -71150,6 +71176,8 @@ function (_Component) {
   }, {
     key: "componentDidMount",
     value: function componentDidMount() {
+      var _this3 = this;
+
       if (isDMStation(this.state.station)) {
         var cir = this.state.station.split("/")[1];
         this.props.api.hall({
@@ -71157,18 +71185,32 @@ function (_Component) {
             sis: cir.split(".")
           }
         });
-      } // TODO: Not exactly guaranteed to execute after "newdm" action -- probably
-      // conditional this to execute when "circles" returns, if not existing yet
+      }
 
-
-      var path = "/circle/".concat(this.state.circle, "/config-l/grams/-20");
-      this.props.api.bind(path, "PUT", this.state.host);
-      this.scrollIfLocked();
-      this.bindShortcuts();
       this.props.storeReports([{
         type: REPORT_PAGE_STATUS,
         data: PAGE_STATUS_PROCESSING
       }]);
+      this.props.pushCallback("inbox.sources-loaded", function (rep) {
+        var inboxSrc = _this3.props.store.messages.inbox.src;
+        var isSubscribed = inboxSrc.includes(_this3.state.station);
+        var isForeignHost = _this3.props.api.authTokens.ship !== _this3.state.host; // TODO: Not exactly guaranteed to execute after "newdm" action -- probably
+        // conditional this to execute when "circles" returns, if not existing yet
+
+        var path, host;
+
+        if (isForeignHost && isSubscribed) {
+          path = "/circle/inbox/".concat(_this3.state.station, "/config-l/grams/-20");
+          host = _this3.props.api.authTokens.ship;
+        } else {
+          path = "/circle/".concat(_this3.state.circle, "/config-l/grams/-20");
+          host = _this3.state.host;
+        }
+
+        _this3.props.api.bind(path, "PUT", host);
+      });
+      this.scrollIfLocked();
+      this.bindShortcuts();
     }
   }, {
     key: "componentDidUpdate",
@@ -71198,7 +71240,7 @@ function (_Component) {
   }, {
     key: "requestChatBatch",
     value: function requestChatBatch() {
-      var _this3 = this;
+      var _this4 = this;
 
       var newNumMessages = this.state.numMessages + 50;
       this.props.storeReports([{
@@ -71208,14 +71250,14 @@ function (_Component) {
       var path = "/circle/".concat(this.state.circle, "/grams/-").concat(newNumMessages, "/-").concat(this.state.numMessages);
       this.props.api.bind(path, "PUT", this.state.host).then(function (res) {
         if (res.status === 500) {
-          _this3.props.storeReports([{
+          _this4.props.storeReports([{
             type: REPORT_PAGE_STATUS,
             data: PAGE_STATUS_READY
           }]);
         }
       });
       this.props.pushCallback('circle.nes', function (rep) {
-        _this3.props.storeReports([{
+        _this4.props.storeReports([{
           type: REPORT_PAGE_STATUS,
           data: PAGE_STATUS_READY
         }]);
@@ -71250,7 +71292,7 @@ function (_Component) {
   }, {
     key: "messageSubmit",
     value: function messageSubmit() {
-      var _this4 = this;
+      var _this5 = this;
 
       var aud, sep;
       var wen = Date.now();
@@ -71258,7 +71300,7 @@ function (_Component) {
       var aut = this.props.api.authTokens.ship;
       if (isDMStation(this.state.station)) {
         aud = this.state.station.split("/")[1].split(".").map(function (mem) {
-          return "~".concat(mem, "/").concat(_this4.state.circle);
+          return "~".concat(mem, "/").concat(_this5.state.circle);
         });
       } else {
         aud = [this.state.station];
@@ -71296,7 +71338,7 @@ function (_Component) {
       //        There's probably a better way to do this
 
       setTimeout(function () {
-        if (_this4.scrollbarRef.current) _this4.scrollbarRef.current.scrollToBottom();
+        if (_this5.scrollbarRef.current) _this5.scrollbarRef.current.scrollToBottom();
       });
     }
   }, {
@@ -73247,7 +73289,7 @@ function () {
 var router = new UrbitRouter();
 window.router = router;
 
-var REPORT_KEYS = ['circle.gram', 'circle.nes', 'circle.pes.loc', 'circle.pes.rem', 'circle.cos.loc', 'circle.cos.rem', 'circle.config.dif.full', 'circle.config.dif.source', 'circle.config.dif.permit/circle.config', 'circle.config.dif.remove/circle.config', 'circles', REPORT_PAGE_STATUS, REPORT_NAVIGATE, 'public', 'menu.toggle', 'config.ext'];
+var REPORT_KEYS = ['circle.gram', 'circle.nes', 'circle.pes.loc', 'circle.pes.rem', 'circle.cos.loc', 'circle.cos.rem', 'circle.config.dif.full', 'circle.config.dif.source', 'circle.config.dif.permit/circle.config', 'circle.config.dif.remove/circle.config', 'circles', REPORT_PAGE_STATUS, REPORT_NAVIGATE, 'public', 'menu.toggle', 'config.ext', 'inbox.sources-loaded'];
 
 var UrbitWarehouse =
 /*#__PURE__*/
