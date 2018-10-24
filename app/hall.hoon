@@ -3225,7 +3225,7 @@
     :_  +>
     %-  ~(rep by sup.bol)
     |=  [[b=bone c=(pair ship path)] out=(list move)]
-    ?:  =(+.c p.a)
+    ?:  =(+.a p.c)
       [[b %quit ~] out]
     out
   ::
