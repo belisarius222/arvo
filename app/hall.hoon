@@ -3216,8 +3216,16 @@
   ?:  =(a 'kill-our-subs')
     :_  +>
     %-  ~(rep by sup.bol)
-    |=  [[b=bone a=(pair ship path)] out=(list move)]
-    ?:  =(our.bol p.a)
+    |=  [[b=bone c=(pair ship path)] out=(list move)]
+    ?:  =(our.bol p.c)
+      [[b %quit ~] out]
+    out
+  ::
+  ?:  ?=([%kill ship] a)
+    :_  +>
+    %-  ~(rep by sup.bol)
+    |=  [[b=bone c=(pair ship path)] out=(list move)]
+    ?:  =(+.c p.a)
       [[b %quit ~] out]
     out
   ::
