@@ -3126,8 +3126,16 @@
 ::TODO  for debug purposes. remove eventually.
 ::  users beware, here be dragons.
 ++  poke-noun
-  |=  a/@t
+  |=  a/*
   ^-  (quip move _+>)
+  ?:  ?=([%kill ship] a)
+    :_  +>
+    %-  ~(rep by sup.bol)
+    |=  [[b=bone c=(pair ship path)] out=(list move)]
+    ?:  =(+.a p.c)
+      [[b %quit ~] out]
+    out
+  ?>  ?=(@t a)
   ?:  =(a 'check')
     ~&  'verifying message reference integrity...'
     =-  ~&(- [~ +>.$])
@@ -3216,10 +3224,11 @@
   ?:  =(a 'kill-our-subs')
     :_  +>
     %-  ~(rep by sup.bol)
-    |=  [[b=bone a=(pair ship path)] out=(list move)]
-    ?:  =(our.bol p.a)
+    |=  [[b=bone c=(pair ship path)] out=(list move)]
+    ?:  =(our.bol p.c)
       [[b %quit ~] out]
     out
+  ::
   ::
   [~ +>]
 ::
