@@ -1,9 +1,9 @@
 :-  %say
 |=  $:  [now=@da eny=@uvJ byk=beak]
-        [pill=tape num=@ ~]
+        [num=@ ~]
         ~
     ==
-:-  %tang
+:-  %noun
 ::
 =/  nums=(list @)  (gulf 1 num)
 ::
@@ -16,9 +16,10 @@
     (mix (lsh 4 1 id) p.byk)
   !!
 ::
+%-  of-wain:format
+^-  wain
 %+  turn  nums
 |=  idx=@
 =/  her=@p  (gen-ship idx)
 =/  tic=@p  .^(@p /a/(scot %p p.byk)/tick/(scot %da now)/(scot %p her))
-:-  %leaf
-"urbit -u {pill} -H test.urbit.org -w {<her>} -t {<tic>}"
+(crip "{<her>},{<tic>}")
