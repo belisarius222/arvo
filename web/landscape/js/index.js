@@ -74722,13 +74722,12 @@ function (_Component) {
     key: "setPresence",
     value: function setPresence(station) {
       if (!this.presence) {
-        this.presence = true;
-        this.props.api.hall({
-          notify: {
-            aud: [station],
-            pes: "idle"
-          }
-        });
+        this.presence = true; // this.props.api.hall({
+        //   notify: {
+        //     aud: [station],
+        //     pes: "idle"
+        //   }
+        // });
       }
     }
   }, {
