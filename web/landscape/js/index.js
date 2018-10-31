@@ -54572,13 +54572,12 @@ function () {
         if (data.beat) {
           console.log('beat');
 
-          _this3.runPoll();
-        } else if (data.type === "quit") {
-          console.log("rebinding: ", data);
-          api$1.bind(data.from.path, "PUT", data.from.ship, data.from.appl);
-          _this3.seqn++;
+          _this3.runPoll(); // } else if (data.type === "quit") {
+          //   console.log("rebinding: ", data);
+          //   api.bind(data.from.path, "PUT", data.from.ship, data.from.appl);
+          //   this.seqn++;
+          //   this.runPoll();
 
-          _this3.runPoll();
         } else {
           console.log("new server data: ", data);
 
@@ -74481,6 +74480,7 @@ function (_Component) {
       message: "",
       invitee: "",
       numMessages: 0,
+      lastBatchRequested: 0,
       scrollLocked: true,
       pendingMessages: [],
       // dmStationCreated: false,
@@ -74534,25 +74534,31 @@ function (_Component) {
         data: PAGE_STATUS_PROCESSING
       }]);
       this.props.pushCallback("inbox.sources-loaded", function (rep) {
-        var inboxSrc = _this3.props.store.messages.inbox.src;
-        var isSubscribed = inboxSrc.includes(_this3.state.station);
-        var isForeignHost = _this3.props.api.authTokens.ship !== _this3.state.host; // TODO: Not exactly guaranteed to execute after "newdm" action -- probably
-        // conditional this to execute when "circles" returns, if not existing yet
-
-        var path, host;
-
-        if (isForeignHost && isSubscribed) {
-          path = "/circle/inbox/".concat(_this3.state.station, "/config-l/grams/-20");
-          host = _this3.props.api.authTokens.ship;
-        } else {
-          path = "/circle/".concat(_this3.state.circle, "/config-l/grams/-20");
-          host = _this3.state.host;
-        }
-
-        _this3.props.api.bind(path, "PUT", host);
+        _this3.intelligentlyBindGramRange([-20]);
       });
       this.scrollIfLocked();
       this.bindShortcuts();
+    }
+  }, {
+    key: "intelligentlyBindGramRange",
+    value: function intelligentlyBindGramRange(range) {
+      var inboxSrc = this.props.store.messages.inbox.src;
+      var isSubscribed = inboxSrc.includes(this.state.station);
+      var isForeignHost = this.props.api.authTokens.ship !== this.state.host; // TODO: Not exactly guaranteed to execute after "newdm" action -- probably
+      // conditional this to execute when "circles" returns, if not existing yet
+
+      var path, host;
+
+      if (isForeignHost && isSubscribed) {
+        path = "/circle/inbox/".concat(this.state.station, "/config-l/grams/").concat(range.join("/"));
+        host = this.props.api.authTokens.ship;
+      } else {
+        path = "/circle/".concat(this.state.circle, "/config-l/grams/").concat(range.join("/"));
+        host = this.state.host;
+      }
+
+      console.log("intelligently bind gram");
+      return this.props.api.bind(path, "PUT", host);
     }
   }, {
     key: "componentDidUpdate",
@@ -74585,12 +74591,19 @@ function (_Component) {
       var _this4 = this;
 
       var newNumMessages = this.state.numMessages + 50;
+
+      if (newNumMessages === this.state.lastBatchRequested) {
+        return;
+      }
+
       this.props.storeReports([{
         type: REPORT_PAGE_STATUS,
         data: PAGE_STATUS_PROCESSING
       }]);
-      var path = "/circle/".concat(this.state.circle, "/grams/-").concat(newNumMessages, "/-").concat(this.state.numMessages);
-      this.props.api.bind(path, "PUT", this.state.host).then(function (res) {
+      console.log("request chat batch");
+      this.intelligentlyBindGramRange([newNumMessages * -1, this.state.numMessages * -1]).then(function (res) {
+        console.log("intelligently bind gram response");
+
         if (res.status === 500) {
           _this4.props.storeReports([{
             type: REPORT_PAGE_STATUS,
@@ -74603,6 +74616,9 @@ function (_Component) {
           type: REPORT_PAGE_STATUS,
           data: PAGE_STATUS_READY
         }]);
+      });
+      this.setState({
+        lastBatchRequested: newNumMessages
       });
     }
   }, {
@@ -91670,6 +91686,7 @@ function () {
         transition: PAGE_STATUS_PROCESSING,
         inbox: "inbox-recent"
       },
+      reads: {},
       names: {},
       public: {},
       circles: [],
