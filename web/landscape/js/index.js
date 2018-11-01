@@ -54420,11 +54420,9 @@ function () {
             if (!existingDMStation) {
               api$1.hall({
                 newdm: {
-                  sis: cir.split(".")
+                  sis: xenoCir.split(".")
                 }
               });
-            } else {
-              console.log("test1 found station: ", existingDMStation);
             }
           }
         }
@@ -56620,7 +56618,7 @@ var circledS = "Ⓢ";
 var CircleMinus = "⊖";
 var CirclePlus = "⊕";
 var CircleTimes = "⊗";
-var cir$1 = "○";
+var cir = "○";
 var cirE = "⧃";
 var cire = "≗";
 var cirfnint = "⨐";
@@ -58744,7 +58742,7 @@ var entities = {
 	CircleMinus: CircleMinus,
 	CirclePlus: CirclePlus,
 	CircleTimes: CircleTimes,
-	cir: cir$1,
+	cir: cir,
 	cirE: cirE,
 	cire: cire,
 	cirfnint: cirfnint,
@@ -60872,7 +60870,7 @@ var entities$1 = Object.freeze({
 	CircleMinus: CircleMinus,
 	CirclePlus: CirclePlus,
 	CircleTimes: CircleTimes,
-	cir: cir$1,
+	cir: cir,
 	cirE: cirE,
 	cire: cire,
 	cirfnint: cirfnint,
@@ -66846,76 +66844,6 @@ function (_Component) {
   }]);
 
   return Elapsed;
-}(react_1);
-
-var CollectionPreview =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(CollectionPreview, _Component);
-
-  function CollectionPreview(props) {
-    var _this;
-
-    _classCallCheck(this, CollectionPreview);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(CollectionPreview).call(this, props));
-    _this.state = {
-      snipHtml: '' // if (props.messageDetails.type.includes('item')) {
-      //   fetch(this.snipUrl(props.messageDetails.postUrl, props.api.authTokens.ship)).then(res => {
-      //     return (res.text())
-      //   }).then(d => {
-      //     this.setState({snipHtml: d});
-      //   });
-      // }
-
-    };
-    return _this;
-  }
-
-  _createClass(CollectionPreview, [{
-    key: "dangerousHtml",
-    value: function dangerousHtml(string) {
-      return {
-        __html: string
-      };
-    }
-  }, {
-    key: "snipUrl",
-    value: function snipUrl(url, ship) {
-      //    if (!url.includes(`~${ship}`)) {
-      return "".concat(this.cleanSig(url), ".x-collections-snip"); //    } else {
-      //      return `${this.cleanSig(url)}.collections-snip`
-      //    }
-    } // HACK FOR TESTING
-
-  }, {
-    key: "cleanSig",
-    value: function cleanSig(url) {
-      if (url.includes('/~~')) {
-        return url.slice(3);
-      }
-
-      return url;
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      if (this.state.snipHtml) {
-        return (//        <div className="collection-preview">{this.props.messageDetails.postUrl}</div>
-          react.createElement("div", {
-            className: "collection-preview",
-            dangerouslySetInnerHTML: this.dangerousHtml(this.state.snipHtml)
-          })
-        );
-      } else {
-        return react.createElement("div", {
-          className: "collection-preview"
-        }, this.props.messageDetails.content);
-      }
-    }
-  }]);
-
-  return CollectionPreview;
 }(react_1);
 
 var Message =
@@ -74589,7 +74517,6 @@ function (_Component) {
         host = this.state.host;
       }
 
-      console.log("intelligently bind gram");
       return this.props.api.bind(path, "PUT", host);
     }
   }, {
@@ -74632,10 +74559,7 @@ function (_Component) {
         type: REPORT_PAGE_STATUS,
         data: PAGE_STATUS_PROCESSING
       }]);
-      console.log("request chat batch");
       this.intelligentlyBindGramRange([newNumMessages * -1, this.state.numMessages * -1]).then(function (res) {
-        console.log("intelligently bind gram response");
-
         if (res.status === 500) {
           _this4.props.storeReports([{
             type: REPORT_PAGE_STATUS,
