@@ -2116,8 +2116,7 @@
           [%sunk p=ship q=life]                         ::  report death
       ==  ==  ==                                        ::
     ++  public                                          ::  public key state
-      $:  live=?                                        ::  seen in current era
-          life=life                                     ::  current key number
+      $:  life=life                                     ::  current key number
           pubs=(map life pass)                          ::  pubkeys by number
       ==                                                ::
     ++  remote                                          ::  remote notification
@@ -2176,8 +2175,7 @@
     ==                                                  ::
   ++  snapshot                                          ::  rewind point
     =,  constitution:ethe                               ::
-    $:  eve=logs:able                                   ::  eth absolute state
-        kyz=(map ship public:able)                      ::  public key state
+    $:  kyz=(map ship public:able)                      ::  public key state
         $=  eth                                         ::
           $:  dns=dnses                                 ::  on-chain dns state
               hul=(map ship hull)                       ::  on-chain ship state
