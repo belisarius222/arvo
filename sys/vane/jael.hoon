@@ -701,7 +701,7 @@
         =/  cub  (nol:nu:crub:crypto key.seed.tac)
         %+  ~(put by kyz.puk.sub)
           our
-        [& lyf.seed.tac (my [lyf.seed.tac pub:ex:cub] ~)]
+        [lyf.seed.tac (my [lyf.seed.tac pub:ex:cub] ~)]
       ::  our initial private key, as a +tree of +rite
       ::
       =/  rit  (sy [%jewel (my [lyf.seed.tac key.seed.tac] ~)] ~)
@@ -767,7 +767,7 @@
       ::  our initial public key
       ::
       =.  kyz.puk.sub
-        (~(put by kyz.puk.sub) our [& 1 (my [1 pub:ex:cub] ~)])
+        (~(put by kyz.puk.sub) our [1 (my [1 pub:ex:cub] ~)])
       ::  our private key, as a +tree of +rite
       ::
       ::    Private key updates are disallowed for fake ships,
