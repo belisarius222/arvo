@@ -14,8 +14,7 @@
           ==                                            ::
 +*  broq  [a b]                                         ::  brodal skew qeu
           (list (sqeu a b))                             ::
-+$  move  {p/duct q/(wind note gift:able)}              ::  local move
-+$  note  ~                                             ::  out request $->
++$  move  {p/duct q/(wind note:able gift:able)}         ::  local move
 +$  sign  ~                                             ::  in result $<-
 +$  clok  (broq @da duct)                               ::  stored timers
 +$  coke  $~  [%0 ~ ~ ~]                                ::  all state
@@ -152,21 +151,19 @@
 ^?
 |%                                                      ::  poke+peek pattern
 ++  call                                                ::  handle request
-  |=  $:  hen/duct
-          hic/(hypo (hobo task:able))
+  |=  $:  hen=duct
+          type=*
+          wrapped-task=(hobo task:able)
       ==
-  =>  %=    .                                           ::  XX temporary
-          q.hic
-        ^-  task:able
-        ?:  ?=($soft -.q.hic)
-          ::  ~&  [%behn-call-soft (,@tas `*`-.p.q.hic)]
-          ((hard task:able) p.q.hic)
-        ?:  (~(nest ut -:!>(*task:able)) | p.hic)  q.hic
-        ~&  [%behn-call-flub (@tas `*`-.q.hic)]
-        ((hard task:able) q.hic)
-      ==
-  =*  req  q.hic
+  ::
+  =/  req=task:able
+    ?.  ?=(%soft -.wrapped-task)
+      wrapped-task
+    ((hard task:able) p.wrapped-task)
   |-  ^-  [(list move) _..^^$]
+  ::
+  ?:  ?=(%crud -.req)
+    [[[hen %slip %d %flog req] ~] ..^^$]
   ::
   ?:  ?=(%born -.req)
     =.  gad  hen
