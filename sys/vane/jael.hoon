@@ -1109,8 +1109,9 @@
   ++  extract-snap                                    ::  extract rewind point
     ^-  snapshot
     :*  kyz.puk.sub
-        +.eth.sub
-        etn(source *(each ship node-src))
+        [dns hul]:eth.sub
+        heard.etn
+        latest-block.etn
     ==
   ::                                                    ::  ++feed:su
   ++  feed                                              ::  subscribe to view
@@ -2099,7 +2100,7 @@
       ==
     =^  snap=snapshot  +>.$
       ?:  |(=(~ old-qeu) (lth block block-number:(need ~(top to old-qeu))))
-        [%*(. *snapshot latest-block.etn launch:contracts) +>.$]
+        [%*(. *snapshot latest-block launch:contracts) +>.$]
       |-  ^-  [snapshot _+>.^$]
       =^  snap=[block-number=@ud snap=snapshot]  old-qeu
         ~(get to old-qeu)
@@ -2110,7 +2111,7 @@
       ?:  |(=(~ old-qeu) (lth block block-number:(need ~(top to old-qeu))))
         [snap.snap +>.^$]
       $
-    ~&  [%restoring-block block latest-block.etn.snap ~(wyt by hul.eth.snap)]
+    ~&  [%restoring-block block latest-block.snap ~(wyt by hul.eth.snap)]
     (restore-snap snap &)
   ::                                                    ::  ++restore-snap:et
   ++  restore-snap                                      ::  restore snapshot
@@ -2132,10 +2133,11 @@
     ::  keep the following in sync with ++extract-snap:file:su
     ::
     %=    +>.$
-        etn           etn.snap(source source.etn)
-        kyz.puk.sub   kyz.snap
-        +.eth.sub     eth.snap
-        sap           sap(last-block 0)
+        heard.etn         heard.snap
+        latest-block.etn  latest-block.snap
+        kyz.puk.sub       kyz.snap
+        +.eth.sub         eth.snap
+        sap               sap(last-block 0)
         moves
       ?.  look  moves
       =-  [[hen %pass /wind/look %j %look our -] moves]
