@@ -77,6 +77,7 @@
         $:  yen=(set duct)                              ::  trackers
             dns=dnses                                   ::  on-chain dns state
             hul=(map ship hull)                         ::  on-chain ship state
+            ver=(unit vent-result)                      ::  defer eth diff send
             ::TODO  do we want (map ship diff-hull) too?
         ==                                              ::
   ==                                                    ::
@@ -959,9 +960,12 @@
       (~(sigh et hen our now.sys urb.lex sub.lex etn.lex sap.lex) wir p.hin)
     ::
         [%b %wake ~]
-      %^  cute  hen  our
       ::  XX cleanup
       ::
+      ?:  =(/set-eth-timer wir)
+        abet:~(feel su hen our 
+      ::
+      %^  cute  hen  our
       ?.  ?=([%init ~] wir)
         abet:~(wake et hen our now.sys urb.lex sub.lex etn.lex sap.lex)
       abet:(~(init et hen our now.sys [urb sub etn sap]:lex) our (sein our))
@@ -1228,6 +1232,18 @@
       ::TODO  see ++abet
       :: (exec yen.eth [%give %vent can])
       (vent-pass yen.eth ver)
+    ::  set a timer to update other ships of new blocks; wait for stable chain
+    ::
+    ++  set-eth-timer
+      |=  ver=vent-result
+      ^+  ..feel
+      ::
+      =.  ver.eth  `ver
+      ::  wait until the chain is less likely to be reorganized
+      ::
+      =/  send-at=@da  (add now ~s20)
+      ::
+      ..feel(moz :_(moz [hen %pass /set-eth-timer %b %wait send-at]))
     --
   ::                                                    ::  ++form:su
   ++  form                                              ::  generate reports
@@ -1339,7 +1355,7 @@
       ::      or better to move this into ++vent:feel?
       +>(dns.eth *dnses, hul.eth ~, kyz.puk ~)
     =?  +>  |(new !=(0 ~(wyt by evs)))
-      %-  vent:feel
+      %-  set-eth-timer:feel
       :-  %chain
       ?:(new &+evs |+evs)
     ::
@@ -2168,7 +2184,6 @@
       /(scot %p our)/vent-result
     ^-  note:able
     [%a %want [our who] /j/(scot %p our)/vent-result %vent-result res]
-  ::                                                    ::  ++feed:su
   --
 --
 ::                                                      ::::
