@@ -6170,7 +6170,7 @@
   ^-  toon
   ?.  &(?=(^ gat) ?=(^ +.gat))
     [%2 ~]
-  (mock [[-.gat [sam +>.gat]] -.gat] gul)
+  (mock [gat(+< sam) %9 2 %0 1] gul)
 ::
 ++  mule                                                ::  typed virtual
   ~/  %mule
@@ -6186,12 +6186,19 @@
 ++  mute                                                ::  untyped virtual
   |=  taq/_=>(~ ^?(|.(**)))
   ^-  (each * (list tank))
-  =+  ton=(mock [taq 9 2 0 1] |=({* *} ~))
+  =+  ton=(mock [taq %9 2 %0 1] |=({* *} ~))
   ?-  -.ton
     $0  [%& p.ton]
     $1  [%| (turn p.ton |=(a/* (smyt (path a))))]
     $2  [%| p.ton]
   ==
+::  +slum: slam a gate on a sample using raw nock, untyped
+::
+++  slum
+  ~/  %slum
+  |=  [gat=* sam=*]
+  ^-  *
+  .*(gat(+< sam) [%9 2 %0 1])
 ::
 ++  soft                                                ::  maybe remold
   |*  han/$-(* *)
@@ -11324,7 +11331,7 @@
         $type
       =+  tyr=|.((dial dole))
       =+  vol=tyr(sut lum)
-      =+  cis=((hard tank) .*(vol -:vol))
+      =+  cis=((hard tank) .*(vol [%9 2 %0 1]))
       :^  ~   %palm
         [~ ~ ~ ~]
       [[%leaf '#' 't' '/' ~] cis ~]
@@ -13997,11 +14004,11 @@
     ^-  {? worm}
     ?:  (~(has in nes) [sut ref])  [& +>+<]
     =+  gat=|=({a/type b/type} (~(nest ut a) | b))
-    ?.  (? .*(gat(+< [sut ref]) -.gat))
+    ?.  (? (slum gat [sut ref]))
       ~&  %nets-failed
       =+  tag=`*`skol
-      =+  foo=(tank .*(tag(+< ref) -.tag))
-      =+  bar=(tank .*(tag(+< sut) -.tag))
+      =+  foo=(tank (slum tag ref))
+      =+  bar=(tank (slum tag sut))
       ~&  %nets-need
       ~>  %slog.[0 bar]
       ~&  %nets-have
