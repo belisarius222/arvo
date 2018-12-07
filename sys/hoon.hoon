@@ -6198,7 +6198,7 @@
   ~/  %slum
   |=  [gat=* sam=*]
   ^-  *
-  .*(gat(+< sam) [%9 2 %0 1])
+  .*(gat [%9 2 %10 [6 1 sam] %0 1])
 ::
 ++  soft                                                ::  maybe remold
   |*  han/$-(* *)
