@@ -827,7 +827,7 @@
   ~/  %turn
   |*  [a=(list) b=gate]
   =>  .(a (homo a))
-  ^-  (list _(b ?~(a !! i.a)))
+  ^-  (list _?>(?=(^ a) (b i.a)))
   |-
   ?~  a  ~
   [i=(b i.a) t=$(a t.a)]
