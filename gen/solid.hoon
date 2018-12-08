@@ -66,7 +66,7 @@
       (module-ova:pill sys)
     .*(0 arvo-formula)
   |=  [ovo=ovum ken=*]
-  [~ (slum ken [now ovo])]
+  [~ .*(ken [%9 2 %10 [6 %1 now ovo] %0 1])]
 ::
 ::  our boot-ova is a list containing one massive formula:
 ::
