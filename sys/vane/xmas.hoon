@@ -154,6 +154,12 @@
 ::::                                                    ::::  arvo structures
   ::                                                    ::
 |%                                                      ::
+++  sub-safe
+  |=  [a=@ b=@]
+  ?:  (gte a b)
+    (sub a b)
+  a
+::
 ++  flam  |=(a/flap `@p`(mug a))                        ::  debug flap
 ++  msec  |=(a/@dr `@ud`(div a (div ~s1 1.000)))        ::  debug @dr
 ++  move  %+  pair                                      ::  local move
@@ -168,6 +174,60 @@
     %bond  p.meal
     %carp  [kos liq]:p.meal
   ==
+::
++$  coal-queue  (tree coal)
+::  +clue-queue: :clue treap as priority queue, in reverse chronological order
+::
++$  clue-queue  (tree clue)
+::  +part-older: is +part :a older than +part :b?
+::
+++  part-older
+  |=  [a=part b=part]
+  ^-  ?
+  |((lth q.a q.b) &(=(q.a q.b) (lth p.a p.b)))
+::  +clue-older: is +clue :a older than +clue :b?
+::
+++  clue-older
+  |=  [a=clue b=clue]
+  ^-  ?
+  ?:  (part-older tel.a tel.b)
+    %.y
+  &(=(tel.a tel.b) (lth fap.a fap.b))
+::  +coal-older: is +coal :a older than +coal :b?
+::
+++  coal-older
+  |=  [a=coal b=coal]
+  ^-  ?
+  &((lth out.a out.b) (lth lod.a lod.b))
+::  +insert-clue: ordered enqueue :clue into :clue-queue
+::
+++  insert-clue
+  |=  [q=clue-queue =clue]
+  ^+  q
+  ::
+  ?~  q
+    [clue ~ ~]
+  ::
+  ?:  (clue-older clue n.q)
+    q(r $(q r.q))
+  q(l $(q l.q))
+::  +delete-clue: cancel a message and all its constituent fragment packets
+::
+::    Traverses the +clue-queue, removing all elements whose message sequence
+::    number matches :tick. O(n) time.
+::
+++  delete-clues-at-tick
+  |=  [q=clue-queue =tick]
+  ^+  q
+  ::
+  ?~  q
+    ~
+  =*  recurse-leaves  q(l $(q l.q), r $(q r.q))
+  ::  if root matches, recurse then delete; otherwise, just recurse
+  ::
+  ?.  =(tick q.tel.n.q)
+    recurse-leaves
+  ~(nip to `(qeu clue)`recurse-leaves)
 ::                                                      ::
 ::::  loft                                              ::::  main transceiver
   ::                                                    ::
@@ -793,12 +853,12 @@
       ?>  =(rey.saw (lent ~(tap to lop)))
       ?>  =+  |=  {a/coal b/coal}
               &((lth out.a out.b) (lth lod.a lod.b))
-          |-  ?|  ?=($~ liv)
-                  ?&  ?|  ?=($~ r.liv)
+          |-  ?|  ?=(~ liv)
+                  ?&  ?|  ?=(~ r.liv)
                           ?&  (+< n.r.liv n.liv)
                               $(liv r.liv)
                       ==  ==
-                      ?|  ?=($~ l.liv)
+                      ?|  ?=(~ l.liv)
                           ?&  (+< n.liv n.l.liv)
                               $(liv l.liv)
                       ==  ==
@@ -818,13 +878,29 @@
                   ==
               ==
       .
-    ::                                                  ::
-    ++  back                                            ::  process raw ack
-      |=  {now/@da dam/flap cop/coop lag/@dr}
+    ::  +process-raw-ack: TODO finish
+    ::
+    ++  process-raw-ack
+      |=  [now=@da dam=flap cop=coop lag=@dr]
       ^+  +>
-      =-  =/  rtt  ?~(ack ~s0 (sub now out.u.ack))
+      ::  to finalize, adjust roundtrip time and timeout packets
+      ::
+      =-  ::  rtt: roundtrip time; if acking, measure packet roundtrip
+          ::
+          =/  rtt  ?~(ack ~s0 (sub now out.u.ack))
+          ::  if lag exceeded rtt, subtract lag from rtt
+          ::
           =.  rtt  ?:((gth rtt lag) (sub rtt lag) rtt)
+          ::
           (done:(lose(liv lov) ded) ack dam cop rtt)
+      ::  run main calculation
+      ::
+      ::      Produces the following:
+      ::
+      ::    ack: an optional packet to ack
+      ::    ded: list of newly dead packets
+      ::    lov: new queue of live packets
+      ::
       |-  ^-  $:  ack/(unit coal)
                   ded/(list coal)
                   lov/(qeu coal)
@@ -832,11 +908,9 @@
       ?~  liv  [~ ~ ~]
       =+  ryt=$(liv r.liv)
       ?^  ack.ryt
-        ::
         ::  found in front, no need to search back.
         ::
         [ack.ryt ded.ryt [n.liv l.liv lov.ryt]]
-      ::
       ::  lose unacked packets sent before an acked virgin.
       ::
       =+  ^-  $:  top/?
@@ -914,7 +988,7 @@
       ::  sent-at: set last-sent date to :now or incremented previous value
       ::
       =/  sent-at=@da  ?:((lte now las.saw) +(las.saw) now)
-      ::  deadline: set the deadline to twice roundtrip time, or increment previous
+      ::  deadline: set deadline to twice roundtrip time, or increment previous
       ::
       =/  deadline=@da  (add now (mul 2 rtt.saw))
       =.  deadline      ?:((lte deadline lad.saw) +(lad.saw) deadline)

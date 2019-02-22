@@ -1861,8 +1861,8 @@
     ?~  l.a  r.a
     ?~  r.a  l.a
     ?:  (mor n.l.a n.r.a)
-      [n.l.a l.l.a $(l.a r.l.a)]
-    [n.r.a $(r.a l.r.a) r.r.a]
+      l.a(r $(l.a r.l.a))
+    r.a(l $(r.a l.r.a))
   ::
   ++  nap                                               ::  removes head
     ?>  ?=(^ a)
