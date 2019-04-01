@@ -1,322 +1,322 @@
 ::
-::::  /hoon/metal/gen
+::::  /HOON/METAL/GEN
   ::
 /?    310
 ::
 ::::
   !:
-:-  %say
-|=  $:  {now/@da * bec/beak}
-        {{who/@p ~} try/_| ~}
+:-  %SAY
+|=  $:  {NOW/@DA * BEC/BEAK}
+        {{WHO/@P ~} TRY/_| ~}
     ==
 ::
-::  we're creating an event series E whose lifecycle can be computed
-::  with the urbit lifecycle formula L, `[2 [0 3] [0 2]]`.  that is:
-::  if E is the list of events processed by a computer in its life,
-::  its final state is S, where S is nock(E L).
+::  WE'RE CREATING AN EVENT SERIES E WHOSE LIFECYCLE CAN BE COMPUTED
+::  WITH THE URBIT LIFECYCLE FORMULA L, `[2 [0 3] [0 2]]`.  THAT IS:
+::  IF E IS THE LIST OF EVENTS PROCESSED BY A COMPUTER IN ITS LIFE,
+::  ITS FINAL STATE IS S, WHERE S IS NOCK(E L).
 ::
-::  in practice, the first five nouns in E are: two boot formulas,
-::  a hoon compiler as a nock formula, the same compiler as source,
-::  and the arvo kernel as source.
+::  IN PRACTICE, THE FIRST FIVE NOUNS IN E ARE: TWO BOOT FORMULAS,
+::  A HOON COMPILER AS A NOCK FORMULA, THE SAME COMPILER AS SOURCE,
+::  AND THE ARVO KERNEL AS SOURCE.
 ::
-::  after the first five special events, we enter an iterative
-::  sequence of regular events which continues for the rest of the
-::  computer's life.  during this sequence, each state is a function
-::  that, passed the next event, produces the next state.
+::  AFTER THE FIRST FIVE SPECIAL EVENTS, WE ENTER AN ITERATIVE
+::  SEQUENCE OF REGULAR EVENTS WHICH CONTINUES FOR THE REST OF THE
+::  COMPUTER'S LIFE.  DURING THIS SEQUENCE, EACH STATE IS A FUNCTION
+::  THAT, PASSED THE NEXT EVENT, PRODUCES THE NEXT STATE.
 ::
-::  each event is a `[date wire type data]` tuple, where `date` is a
-::  128-bit Urbit date; `wire` is an opaque path which output can
-::  match to track causality; `type` is a symbol describing the type
-::  of input; and `data` is input data specific to `type`.
+::  EACH EVENT IS A `[DATE WIRE TYPE DATA]` TUPLE, WHERE `DATE` IS A
+::  128-BIT URBIT DATE; `WIRE` IS AN OPAQUE PATH WHICH OUTPUT CAN
+::  MATCH TO TRACK CAUSALITY; `TYPE` IS A SYMBOL DESCRIBING THE TYPE
+::  OF INPUT; AND `DATA` IS INPUT DATA SPECIFIC TO `TYPE`.
 ::
-::  in real life we don't actually run the lifecycle loop,
-::  since real life is updated incrementally and also cares
-::  about things like output.  we couple to the internal
-::  structure of the state machine and work directly with
-::  the underlying arvo engine.
+::  IN REAL LIFE WE DON'T ACTUALLY RUN THE LIFECYCLE LOOP,
+::  SINCE REAL LIFE IS UPDATED INCREMENTALLY AND ALSO CARES
+::  ABOUT THINGS LIKE OUTPUT.  WE COUPLE TO THE INTERNAL
+::  STRUCTURE OF THE STATE MACHINE AND WORK DIRECTLY WITH
+::  THE UNDERLYING ARVO ENGINE.
 ::
-::  this arvo core, which is at `+7` (Lisp `cddr`) of the state
-::  function (see its public interface in `sys/arvo`), gives us
-::  extra features, like output, which are relevant to running
-::  a real-life urbit vm, but don't affect the formal definition.
+::  THIS ARVO CORE, WHICH IS AT `+7` (LISP `CDDR`) OF THE STATE
+::  FUNCTION (SEE ITS PUBLIC INTERFACE IN `SYS/ARVO`), GIVES US
+::  EXTRA FEATURES, LIKE OUTPUT, WHICH ARE RELEVANT TO RUNNING
+::  A REAL-LIFE URBIT VM, BUT DON'T AFFECT THE FORMAL DEFINITION.
 ::
-::  so a real-life urbit interpreter is coupled to the shape of
-::  the arvo core.  it becomes very hard to change this shape.
-::  fortunately, it is not a very complex interface.
+::  SO A REAL-LIFE URBIT INTERPRETER IS COUPLED TO THE SHAPE OF
+::  THE ARVO CORE.  IT BECOMES VERY HARD TO CHANGE THIS SHAPE.
+::  FORTUNATELY, IT IS NOT A VERY COMPLEX INTERFACE.
 ::
-:-  %noun
+:-  %NOUN
 ::
-::  boot-one: lifecycle formula
+::  BOOT-ONE: LIFECYCLE FORMULA
 ::
-=+  ^=  boot-one
+=+  ^=  BOOT-ONE
     ::
-    ::  event 1 is the lifecycle formula which computes the final
-    ::  state from the full event sequence.
+    ::  EVENT 1 IS THE LIFECYCLE FORMULA WHICH COMPUTES THE FINAL
+    ::  STATE FROM THE FULL EVENT SEQUENCE.
     ::
-    ::  the formal urbit state is always just a gate (function)
-    ::  which, passed the next event, produces the next state.
+    ::  THE FORMAL URBIT STATE IS ALWAYS JUST A GATE (FUNCTION)
+    ::  WHICH, PASSED THE NEXT EVENT, PRODUCES THE NEXT STATE.
     ::
-    =>  [boot-formula=* full-sequence=*]
+    =>  [BOOT-FORMULA=* FULL-SEQUENCE=*]
     !=  ::
-        ::  first we use the boot formula (event 1) to set up
-        ::  the pair of state function and main sequence.  the boot
-        ::  formula peels off the first n (currently 3) events
-        ::  to set up the lifecycle loop.
+        ::  FIRST WE USE THE BOOT FORMULA (EVENT 1) TO SET UP
+        ::  THE PAIR OF STATE FUNCTION AND MAIN SEQUENCE.  THE BOOT
+        ::  FORMULA PEELS OFF THE FIRST N (CURRENTLY 3) EVENTS
+        ::  TO SET UP THE LIFECYCLE LOOP.
         ::
-        =+  [state-gate main-sequence]=.*(full-sequence boot-formula)
+        =+  [STATE-GATE MAIN-SEQUENCE]=.*(FULL-SEQUENCE BOOT-FORMULA)
         ::
-        ::  in this lifecycle loop, we replace the state function
-        ::  with its product, called on the next event, until
-        ::  we run out of events.
+        ::  IN THIS LIFECYCLE LOOP, WE REPLACE THE STATE FUNCTION
+        ::  WITH ITS PRODUCT, CALLED ON THE NEXT EVENT, UNTIL
+        ::  WE RUN OUT OF EVENTS.
         ::
-        |-  ?@  main-sequence
-              state-gate
+        |-  ?@  MAIN-SEQUENCE
+              STATE-GATE
             %=  $
-              main-sequence  +.main-sequence
-              state-gate  .*(state-gate [%9 2 %10 [6 %1 -.main-sequence] %0 1])
+              MAIN-SEQUENCE  +.MAIN-SEQUENCE
+              STATE-GATE  .*(STATE-GATE [%9 2 %10 [6 %1 -.MAIN-SEQUENCE] %0 1])
             ==
 ::
-::  boot-two: startup formula
+::  BOOT-TWO: STARTUP FORMULA
 ::
-=+  ^=  boot-two
+=+  ^=  BOOT-TWO
     ::
-    ::  event 2 is the startup formula, which verifies the compiler
-    ::  and starts the main lifecycle.
+    ::  EVENT 2 IS THE STARTUP FORMULA, WHICH VERIFIES THE COMPILER
+    ::  AND STARTS THE MAIN LIFECYCLE.
     ::
-    =>  :*  ::  event 3: a formula producing the hoon compiler
+    =>  :*  ::  EVENT 3: A FORMULA PRODUCING THE HOON COMPILER
             ::
-            compiler-formula=**
+            COMPILER-FORMULA=**
             ::
-            ::  event 4: hoon compiler source, compiling to event 2
+            ::  EVENT 4: HOON COMPILER SOURCE, COMPILING TO EVENT 2
             ::
-            compiler-source=*@t
+            COMPILER-SOURCE=*@T
             ::
-            ::  event 5: arvo kernel source
+            ::  EVENT 5: ARVO KERNEL SOURCE
             ::
-            arvo-source=*@t
+            ARVO-SOURCE=*@T
             ::
-            ::  events 6..n: main sequence with normal semantics
+            ::  EVENTS 6..N: MAIN SEQUENCE WITH NORMAL SEMANTICS
             ::
-            main-sequence=**
+            MAIN-SEQUENCE=**
         ==
-    !=  :_  main-sequence
+    !=  :_  MAIN-SEQUENCE
         ::
-        ::  activate the compiler gate.  the product of this formula
-        ::  is smaller than the formula.  so you might think we should
-        ::  save the gate itself rather than the formula producing it.
-        ::  but we have to run the formula at runtime, to register jets.
+        ::  ACTIVATE THE COMPILER GATE.  THE PRODUCT OF THIS FORMULA
+        ::  IS SMALLER THAN THE FORMULA.  SO YOU MIGHT THINK WE SHOULD
+        ::  SAVE THE GATE ITSELF RATHER THAN THE FORMULA PRODUCING IT.
+        ::  BUT WE HAVE TO RUN THE FORMULA AT RUNTIME, TO REGISTER JETS.
         ::
-        ::  as always, we have to use raw nock as we have no type.
-        ::  the gate is in fact ++ride.
+        ::  AS ALWAYS, WE HAVE TO USE RAW NOCK AS WE HAVE NO TYPE.
+        ::  THE GATE IS IN FACT ++RIDE.
         ::
-        ~>  %slog.[0 leaf+"1-b"]
-        =+  ^=  compiler-gate
-            .*(0 compiler-formula)
+        ~>  %SLOG.[0 LEAF+"1-B"]
+        =+  ^=  COMPILER-GATE
+            .*(0 COMPILER-FORMULA)
         ::
-        ::  compile the compiler source, producing (pair span nock).
-        ::  the compiler ignores its input so we use a trivial span.
+        ::  COMPILE THE COMPILER SOURCE, PRODUCING (PAIR SPAN NOCK).
+        ::  THE COMPILER IGNORES ITS INPUT SO WE USE A TRIVIAL SPAN.
         ::
-        ~>  %slog.[0 leaf+"1-c"]
-        =+  ^=  compiler-tool
-            .*(compiler-gate [%9 2 %10 [6 %1 [%noun compiler-source]] %0 1])
+        ~>  %SLOG.[0 LEAF+"1-C"]
+        =+  ^=  COMPILER-TOOL
+            .*(COMPILER-GATE [%9 2 %10 [6 %1 [%NOUN COMPILER-SOURCE]] %0 1])
         ::
-        ::  switch to the second-generation compiler.  we want to be
-        ::  able to generate matching reflection nouns even if the
-        ::  language changes -- the first-generation formula will
-        ::  generate last-generation spans for `!>`, etc.
+        ::  SWITCH TO THE SECOND-GENERATION COMPILER.  WE WANT TO BE
+        ::  ABLE TO GENERATE MATCHING REFLECTION NOUNS EVEN IF THE
+        ::  LANGUAGE CHANGES -- THE FIRST-GENERATION FORMULA WILL
+        ::  GENERATE LAST-GENERATION SPANS FOR `!>`, ETC.
         ::
-        ~>  %slog.[0 leaf+"1-d"]
-        =.  compiler-gate  .*(0 +:compiler-tool)
+        ~>  %SLOG.[0 LEAF+"1-D"]
+        =.  COMPILER-GATE  .*(0 +:COMPILER-TOOL)
         ::
-        ::  get the span (type) of the kernel core, which is the context
-        ::  of the compiler gate.  we just compiled the compiler,
-        ::  so we know the span (type) of the compiler gate.  its
-        ::  context is at tree address `+>` (ie, `+7` or Lisp `cddr`).
-        ::  we use the compiler again to infer this trivial program.
+        ::  GET THE SPAN (TYPE) OF THE KERNEL CORE, WHICH IS THE CONTEXT
+        ::  OF THE COMPILER GATE.  WE JUST COMPILED THE COMPILER,
+        ::  SO WE KNOW THE SPAN (TYPE) OF THE COMPILER GATE.  ITS
+        ::  CONTEXT IS AT TREE ADDRESS `+>` (IE, `+7` OR LISP `CDDR`).
+        ::  WE USE THE COMPILER AGAIN TO INFER THIS TRIVIAL PROGRAM.
         ::
-        ~>  %slog.[0 leaf+"1-e"]
-        =+  ^=  kernel-span
-            -:.*(compiler-gate [%9 2 %10 [6 %1 [-.compiler-tool '+>']] %0 1])
+        ~>  %SLOG.[0 LEAF+"1-E"]
+        =+  ^=  KERNEL-SPAN
+            -:.*(COMPILER-GATE [%9 2 %10 [6 %1 [-.COMPILER-TOOL '+>']] %0 1])
         ::
-        ::  compile the arvo source against the kernel core.
+        ::  COMPILE THE ARVO SOURCE AGAINST THE KERNEL CORE.
         ::
-        ~>  %slog.[0 leaf+"1-f"]
-        =+  ^=  kernel-tool
-            .*(compiler-gate [%9 2 %10 [6 %1 [kernel-span arvo-source]] %0 1])
+        ~>  %SLOG.[0 LEAF+"1-F"]
+        =+  ^=  KERNEL-TOOL
+            .*(COMPILER-GATE [%9 2 %10 [6 %1 [KERNEL-SPAN ARVO-SOURCE]] %0 1])
         ::
-        ::  create the arvo kernel, whose subject is the kernel core.
+        ::  CREATE THE ARVO KERNEL, WHOSE SUBJECT IS THE KERNEL CORE.
         ::
-        ~>  %slog.[0 leaf+"1-g"]
-        .*(+>:compiler-gate +:kernel-tool)
+        ~>  %SLOG.[0 LEAF+"1-G"]
+        .*(+>:COMPILER-GATE +:KERNEL-TOOL)
 ::
-::  sys: root path to boot system, `/~me/[desk]/now/sys`
+::  SYS: ROOT PATH TO BOOT SYSTEM, `/~ME/[DESK]/NOW/SYS`
 ::
-=+  sys=`path`/(scot %p p.bec)/[q.bec]/(scot %da now)/sys
+=+  SYS=`PATH`/(SCOT %P P.BEC)/[Q.BEC]/(SCOT %DA NOW)/SYS
 ::
-::  compiler-source: hoon source file producing compiler, `sys/hoon`
+::  COMPILER-SOURCE: HOON SOURCE FILE PRODUCING COMPILER, `SYS/HOON`
 ::
-=+  compiler-source=.^(@t %cx (welp sys /hoon/hoon))
+=+  COMPILER-SOURCE=.^(@T %CX (WELP SYS /HOON/HOON))
 ::
-::  compiler-twig: compiler as hoon expression
+::  COMPILER-TWIG: COMPILER AS HOON EXPRESSION
 ::
-~&  %metal-parsing
-=+  compiler-twig=(ream compiler-source)
-~&  %metal-parsed
+~&  %METAL-PARSING
+=+  COMPILER-TWIG=(REAM COMPILER-SOURCE)
+~&  %METAL-PARSED
 ::
-::  compiler-formula: compiler as nock formula
+::  COMPILER-FORMULA: COMPILER AS NOCK FORMULA
 ::
-~&  %metal-compiling
-=+  compiler-formula=q:(~(mint ut %noun) %noun compiler-twig)
-~&  %metal-compiled
+~&  %METAL-COMPILING
+=+  COMPILER-FORMULA=Q:(~(MINT UT %NOUN) %NOUN COMPILER-TWIG)
+~&  %METAL-COMPILED
 ::
-::  arvo-source: hoon source file producing arvo kernel, `sys/arvo`
+::  ARVO-SOURCE: HOON SOURCE FILE PRODUCING ARVO KERNEL, `SYS/ARVO`
 ::
-=+  arvo-source=.^(@t %cx (welp sys /arvo/hoon))
+=+  ARVO-SOURCE=.^(@T %CX (WELP SYS /ARVO/HOON))
 ::
-::  main-moves: installation actions
+::  MAIN-MOVES: INSTALLATION ACTIONS
 ::
-=+  ^=  main-moves
-    |^  ^-  (list ovum)
+=+  ^=  MAIN-MOVES
+    |^  ^-  (LIST OVUM)
         :~  ::
-            ::  configure identity
+            ::  CONFIGURE IDENTITY
             ::
-            [[%name (scot %p who) ~] [%veal who]]
+            [[%NAME (SCOT %P WHO) ~] [%VEAL WHO]]
             ::
-            ::  sys/zuse: standard library
+            ::  SYS/ZUSE: STANDARD LIBRARY
             ::
-            (vent %$ /zuse)
+            (VENT %$ /ZUSE)
             ::
-            ::  sys/vane/ames: network
+            ::  SYS/VANE/AMES: NETWORK
             ::
-            (vent %a /vane/ames)
+            (VENT %A /VANE/AMES)
             ::
-            ::  sys/vane/behn: timer
+            ::  SYS/VANE/BEHN: TIMER
             ::
-            (vent %b /vane/behn)
+            (VENT %B /VANE/BEHN)
             ::
-            ::  sys/vane/clay: revision control
+            ::  SYS/VANE/CLAY: REVISION CONTROL
             ::
-            (vent %c /vane/clay)
+            (VENT %C /VANE/CLAY)
             ::
-            ::  sys/vane/dill: console
+            ::  SYS/VANE/DILL: CONSOLE
             ::
-            (vent %d /vane/dill)
+            (VENT %D /VANE/DILL)
             ::
-            ::  sys/vane/eyre: web
+            ::  SYS/VANE/EYRE: WEB
             ::
-            (vent %e /vane/eyre)
+            (VENT %E /VANE/EYRE)
             ::
-            ::  sys/vane/ford: build
+            ::  SYS/VANE/FORD: BUILD
             ::
-            (vent %f /vane/ford)
+            (VENT %F /VANE/FORD)
             ::
-            ::  sys/vane/gall: applications
+            ::  SYS/VANE/GALL: APPLICATIONS
             ::
-            (vent %g /vane/gall)
+            (VENT %G /VANE/GALL)
             ::
-            ::  sys/vane/jael: security
+            ::  SYS/VANE/JAEL: SECURITY
             ::
-            (vent %j /vane/jael)
+            (VENT %J /VANE/JAEL)
             ::
-            ::  legacy boot event
+            ::  LEGACY BOOT EVENT
             ::
-            [[%$ %term '1' ~] [%boot %sith who `@uw`who &]]
+            [[%$ %TERM '1' ~] [%BOOT %SITH WHO `@UW`WHO &]]
             ::
-            ::  userspace:
+            ::  USERSPACE:
             ::
-            ::    /app    %gall applications
-            ::    /gen    :dojo generators
-            ::    /lib    %ford libraries
-            ::    /mar    %ford marks
-            ::    /sur    %ford structures
-            ::    /ren    %ford renderers
-            ::    /web    %eyre web content
-            ::    /sys    system files
+            ::    /APP    %GALL APPLICATIONS
+            ::    /GEN    :DOJO GENERATORS
+            ::    /LIB    %FORD LIBRARIES
+            ::    /MAR    %FORD MARKS
+            ::    /SUR    %FORD STRUCTURES
+            ::    /REN    %FORD RENDERERS
+            ::    /WEB    %EYRE WEB CONTENT
+            ::    /SYS    SYSTEM FILES
             ::
-            (user /app /gen /lib /mar /ren /sec /sur /sys /web ~)
+            (USER /APP /GEN /LIB /MAR /REN /SEC /SUR /SYS /WEB ~)
         ==
     ::                                                  ::
-    ++  user                                            ::  userspace loading
-      |=  ::  sal: all spurs to load from
+    ++  USER                                            ::  USERSPACE LOADING
+      |=  ::  SAL: ALL SPURS TO LOAD FROM
           ::
-          sal/(list spur)
-      ^-  ovum
+          SAL/(LIST SPUR)
+      ^-  OVUM
       ::
-      ::  hav: all user files
+      ::  HAV: ALL USER FILES
       ::
-      =;  hav  ~&  user-files+(lent hav)
-               [[%$ %sync ~] [%into %$ & hav]]
-      =|  hav/mode:clay
-      |-  ^+  hav
-      ?~  sal  ~
-      =.  hav  $(sal t.sal)
+      =;  HAV  ~&  USER-FILES+(LENT HAV)
+               [[%$ %SYNC ~] [%INTO %$ & HAV]]
+      =|  HAV/MODE:CLAY
+      |-  ^+  HAV
+      ?~  SAL  ~
+      =.  HAV  $(SAL T.SAL)
       ::
-      ::  tyl: spur
+      ::  TYL: SPUR
       ::
-      =/  tyl  i.sal
-      |-  ^+  hav
+      =/  TYL  I.SAL
+      |-  ^+  HAV
       ::
-      ::  pax: full path at `tyl`
-      ::  lon: directory at `tyl`
+      ::  PAX: FULL PATH AT `TYL`
+      ::  LON: DIRECTORY AT `TYL`
       ::
-      =/  pax  (en-beam:format bec tyl)
-      =/  lon  .^(arch %cy pax)
-      =?  hav  ?=(^ fil.lon)
-          ?.  ?=({$hoon *} tyl)
+      =/  PAX  (EN-BEAM:FORMAT BEC TYL)
+      =/  LON  .^(ARCH %CY PAX)
+      =?  HAV  ?=(^ FIL.LON)
+          ?.  ?=({$HOON *} TYL)
             ::
-            ::  install only hoon files for now
+            ::  INSTALL ONLY HOON FILES FOR NOW
             ::
-            hav
+            HAV
           ::
-          ::  cot: file as plain-text octet-stream
+          ::  COT: FILE AS PLAIN-TEXT OCTET-STREAM
           ::
-          =;  cot  [[(flop `path`tyl) `[/text/plain cot]] hav]
-          ^-  octs
-          ?-    tyl
-              {$hoon *}
-            =/  dat  .^(@t %cx pax)
-            [(met 3 dat) dat]
+          =;  COT  [[(FLOP `PATH`TYL) `[/TEXT/PLAIN COT]] HAV]
+          ^-  OCTS
+          ?-    TYL
+              {$HOON *}
+            =/  DAT  .^(@T %CX PAX)
+            [(MET 3 DAT) DAT]
           ==
-      =/  all  ~(tap by dir.lon)
-      |-  ^-  mode:clay
-      ?~  all  hav
-      $(all t.all, hav ^$(tyl [p.i.all tyl]))
+      =/  ALL  ~(TAP BY DIR.LON)
+      |-  ^-  MODE:CLAY
+      ?~  ALL  HAV
+      $(ALL T.ALL, HAV ^$(TYL [P.I.ALL TYL]))
     ::
-    ++  vent
-      |=  {abr/term den/path}
-      =+  pax=(weld sys den)
-      =+  txt=.^(@ %cx (welp pax /hoon))
-      `ovum`[[%vane den] [%veer abr pax txt]]
+    ++  VENT
+      |=  {ABR/TERM DEN/PATH}
+      =+  PAX=(WELD SYS DEN)
+      =+  TXT=.^(@ %CX (WELP PAX /HOON))
+      `OVUM`[[%VANE DEN] [%VEER ABR PAX TXT]]
     --
 ::
-::  main-events: full events with advancing times
+::  MAIN-EVENTS: FULL EVENTS WITH ADVANCING TIMES
 ::
-=.  now  ~2017.3.1
-=+  ^=  main-events
-    |-  ^-  (list (pair @da ovum))
-    ?~  main-moves  ~
-    :-  [now i.main-moves]
-    $(main-moves t.main-moves, now (add now (bex 48)))
+=.  NOW  ~2017.3.1
+=+  ^=  MAIN-EVENTS
+    |-  ^-  (LIST (PAIR @DA OVUM))
+    ?~  MAIN-MOVES  ~
+    :-  [NOW I.MAIN-MOVES]
+    $(MAIN-MOVES T.MAIN-MOVES, NOW (ADD NOW (BEX 48)))
 ::
-~?  try
-  ~&  %metal-testing
-  =+  ^=  yop
-      ^-  @p
-      %-  mug
-      .*  :*  boot-one
-              boot-two
-              compiler-formula
-              compiler-source
-              arvo-source
-              main-events
+~?  TRY
+  ~&  %METAL-TESTING
+  =+  ^=  YOP
+      ^-  @P
+      %-  MUG
+      .*  :*  BOOT-ONE
+              BOOT-TWO
+              COMPILER-FORMULA
+              COMPILER-SOURCE
+              ARVO-SOURCE
+              MAIN-EVENTS
           ==
       [2 [0 3] [0 2]]
-  [%metal-tested yop]
+  [%METAL-TESTED YOP]
 ::
-:*  boot-one
-    boot-two
-    compiler-formula
-    compiler-source
-    arvo-source
-    main-events
+:*  BOOT-ONE
+    BOOT-TWO
+    COMPILER-FORMULA
+    COMPILER-SOURCE
+    ARVO-SOURCE
+    MAIN-EVENTS
 ==

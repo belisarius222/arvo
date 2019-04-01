@@ -1,11 +1,11 @@
 ::
-::::  /hoon/noun/mar
+::::  /HOON/NOUN/MAR
   ::
 /?    310
 !:
-::::  A minimal noun mark
-|_  non/*
-++  grab  |%
-          ++  noun  *
+::::  A MINIMAL NOUN MARK
+|_  NON/*
+++  GRAB  |%
+          ++  NOUN  *
           --
 --

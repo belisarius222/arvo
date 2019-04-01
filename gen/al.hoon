@@ -1,457 +1,457 @@
 !:
-:-  %say
+:-  %SAY
 |=  *
-:-  %noun
-=-  %hello
+:-  %NOUN
+=-  %HELLO
 =>  |%
-    ++  tope                                            ::  topographic type
-      $@  $?  %&                                        ::  cell or atom
-              %|                                        ::  atom
+    ++  TOPE                                            ::  TOPOGRAPHIC TYPE
+      $@  $?  %&                                        ::  CELL OR ATOM
+              %|                                        ::  ATOM
           ==                                            ::
-      (pair tope tope)                                  ::  cell
+      (PAIR TOPE TOPE)                                  ::  CELL
     --
 |%
-++  ax
-  =+  :*  dom=`axis`1
-          doc=*(list what)
+++  AX
+  =+  :*  DOM=`AXIS`1
+          DOC=*(LIST WHAT)
       ==
-  |_  mod/tile
-  ++  home
-    ::  express a hoon against the original subject
+  |_  MOD/TILE
+  ++  HOME
+    ::  EXPRESS A HOON AGAINST THE ORIGINAL SUBJECT
     ::
-    |=(gen/hoon ^-(hoon ?:(=(1 dom) gen [%tsgr [%$ dom] gen])))
+    |=(GEN/HOON ^-(HOON ?:(=(1 DOM) GEN [%TSGR [%$ DOM] GEN])))
   ::
-  ++  default
-    ::  produce a hoon that makes the model's default value, untyped
+  ++  DEFAULT
+    ::  PRODUCE A HOON THAT MAKES THE MODEL'S DEFAULT VALUE, UNTYPED
     ::
-    |-  ^-  hoon
-    ?-    mod
+    |-  ^-  HOON
+    ?-    MOD
         {^ *}
-      [$(mod -.mod) $(mod +.mod)]
+      [$(MOD -.MOD) $(MOD +.MOD)]
     ::
-        {$axil *}
-      ?+  p.mod  [%rock %$ 0]
-        $cell  [[%rock %$ 0] [%rock %$ 0]]
-        $void  [%zpzp ~]
+        {$AXIL *}
+      ?+  P.MOD  [%ROCK %$ 0]
+        $CELL  [[%ROCK %$ 0] [%ROCK %$ 0]]
+        $VOID  [%ZPZP ~]
       ==
     ::
-        {$bark *}
-      $(mod q.mod)
+        {$BARK *}
+      $(MOD Q.MOD)
     ::
-        {$herb *}
-      =+  cys=~(boil ap p.mod)
-      ?:  ?=($herb -.cys)
-        (home [%tsgl [%limb %$] p.mod])
-      $(mod cys)
+        {$HERB *}
+      =+  CYS=~(BOIL AP P.MOD)
+      ?:  ?=($HERB -.CYS)
+        (HOME [%TSGL [%LIMB %$] P.MOD])
+      $(MOD CYS)
     ::
-        {$deet *}
-      $(mod q.mod)
+        {$DEET *}
+      $(MOD Q.MOD)
     ::
-        {$fern *}
-      ::  last entry is the default value
+        {$FERN *}
+      ::  LAST ENTRY IS THE DEFAULT VALUE
       ::
-      |-  ^-  hoon
-      ?~(t.p.mod ^$(mod i.p.mod) $(i.p.mod i.t.p.mod, t.p.mod t.t.p.mod))
+      |-  ^-  HOON
+      ?~(T.P.MOD ^$(MOD I.P.MOD) $(I.P.MOD I.T.P.MOD, T.P.MOD T.T.P.MOD))
     ::
-        {$kelp *}
-      ::  last entry is the default value
+        {$KELP *}
+      ::  LAST ENTRY IS THE DEFAULT VALUE
       ::
-      |-  ^-  hoon
-      ?~(t.p.mod ^$(mod i.p.mod) $(i.p.mod i.t.p.mod, t.p.mod t.t.p.mod))
+      |-  ^-  HOON
+      ?~(T.P.MOD ^$(MOD I.P.MOD) $(I.P.MOD I.T.P.MOD, T.P.MOD T.T.P.MOD))
     ::
-        {$leaf *}
-      [%rock p.mod q.mod]
+        {$LEAF *}
+      [%ROCK P.MOD Q.MOD]
     ::
-        {$plow *}
-      $(mod q.mod)
+        {$PLOW *}
+      $(MOD Q.MOD)
     ::
-        {$reed *}
-      $(mod p.mod)
+        {$REED *}
+      $(MOD P.MOD)
     ::
-        {$vine *}
-      $(mod q.mod)
+        {$VINE *}
+      $(MOD Q.MOD)
     ::
-        {$weed *}
-      (home p.mod)
+        {$WEED *}
+      (HOME P.MOD)
     ==
   ::
-  ++  trivial
-    ::  ersatz by trivial construction
+  ++  TRIVIAL
+    ::  ERSATZ BY TRIVIAL CONSTRUCTION
     ::
-    ^-  hoon
-    :+  %tsls
-      [%bust %noun]
-    ~(construct sample [2 %|])
+    ^-  HOON
+    :+  %TSLS
+      [%BUST %NOUN]
+    ~(CONSTRUCT SAMPLE [2 %|])
   ::
-  ++  basic
-    |=  bas/base
-    ?-    bas
+  ++  BASIC
+    |=  BAS/BASE
+    ?-    BAS
     ::
-        {$atom *}
-      ::  trivial zero
+        {$ATOM *}
+      ::  TRIVIAL ZERO
       ::
-      [%sand p.bas 0]
+      [%SAND P.BAS 0]
     ::
-        $noun
-      ::  raw nock produces noun type
+        $NOUN
+      ::  RAW NOCK PRODUCES NOUN TYPE
       ::
-      =+([%rock %$ 0] [%ktls [%dttr - - [%rock %$ 1]] -])
+      =+([%ROCK %$ 0] [%KTLS [%DTTR - - [%ROCK %$ 1]] -])
     ::
-        $cell
-      ::  reduce to pair of nouns
+        $CELL
+      ::  REDUCE TO PAIR OF NOUNS
       ::
-      =+($(mod [%axil %noun]) [- -])
+      =+($(MOD [%AXIL %NOUN]) [- -])
     ::
-        $bean
-      ::  comparison produces boolean type
+        $BEAN
+      ::  COMPARISON PRODUCES BOOLEAN TYPE
       ::
-      =+([%rock %$ 0] [%ktls [%dtts - -] -])
+      =+([%ROCK %$ 0] [%KTLS [%DTTS - -] -])
     ::
-        $null
-      [%rock %n 0]
+        $NULL
+      [%ROCK %N 0]
     ::
-        $void
-      ::  should not actually be a thing
+        $VOID
+      ::  SHOULD NOT ACTUALLY BE A THING
       ::
-      [%zpzp ~]
+      [%ZPZP ~]
     ==
   ::
-  ++  decorate
-    ::  document
+  ++  DECORATE
+    ::  DOCUMENT
     ::
-    |=  gen/hoon
-    ^-  hoon
-    ?~  doc  gen
-    =/  fin  $(doc t.doc)
-    ?~(i.doc gen [%docs u.i.doc gen])
+    |=  GEN/HOON
+    ^-  HOON
+    ?~  DOC  GEN
+    =/  FIN  $(DOC T.DOC)
+    ?~(I.DOC GEN [%DOCS U.I.DOC GEN])
   ::
-  ++  ersatz
-    ::  produce a correctly typed instance without subject
+  ++  ERSATZ
+    ::  PRODUCE A CORRECTLY TYPED INSTANCE WITHOUT SUBJECT
     ::
-    ^-  hoon
-    ?-    mod
+    ^-  HOON
+    ?-    MOD
         {^ *}
-      %-  decorate
-      =.  doc  ~
-      [ersatz(mod -.mod) ersatz(mod +.mod)]
+      %-  DECORATE
+      =.  DOC  ~
+      [ERSATZ(MOD -.MOD) ERSATZ(MOD +.MOD)]
     ::
-        {$axil *}
-      (decorate (basic p.mod))
+        {$AXIL *}
+      (DECORATE (BASIC P.MOD))
     ::
-        {$bark *}
-      [%ktts p.mod ersatz(mod q.mod)]
+        {$BARK *}
+      [%KTTS P.MOD ERSATZ(MOD Q.MOD)]
     ::
-        {$herb *}
-      %-  decorate
-      =.  doc  ~
-      =+  cys=~(boil ap p.mod)
-      ?:  ?=($herb -.cys)
-        (home [%tsgl [%limb %$] p.mod])
-      ersatz(mod cys)
+        {$HERB *}
+      %-  DECORATE
+      =.  DOC  ~
+      =+  CYS=~(BOIL AP P.MOD)
+      ?:  ?=($HERB -.CYS)
+        (HOME [%TSGL [%LIMB %$] P.MOD])
+      ERSATZ(MOD CYS)
     ::
-        {$deet *}
-      [%dbug p.mod ersatz(mod q.mod)]
+        {$DEET *}
+      [%DBUG P.MOD ERSATZ(MOD Q.MOD)]
     ::
-        {$fern *}
-      trivial
+        {$FERN *}
+      TRIVIAL
     ::
-        {$kelp *}
-      trivial
+        {$KELP *}
+      TRIVIAL
     ::
-        {$leaf *}
-      (decorate [%rock p.mod q.mod])
+        {$LEAF *}
+      (DECORATE [%ROCK P.MOD Q.MOD])
     ::
-        {$plow *}
-      ersatz(mod q.mod, doc [p.mod doc])
-    ::  atom/cell, $@
+        {$PLOW *}
+      ERSATZ(MOD Q.MOD, DOC [P.MOD DOC])
+    ::  ATOM/CELL, $@
     ::
-        {$reed *}
-      trivial
-    ::  pair/switch, $^
+        {$REED *}
+      TRIVIAL
+    ::  PAIR/SWITCH, $^
     ::
-        {$vine *}
-      trivial
+        {$VINE *}
+      TRIVIAL
     ::
-        {$weed *}
-      (home p.mod)
+        {$WEED *}
+      (HOME P.MOD)
     ==
   ::
-  ++  factory
-    ::  produce a normalizing gate (mold)
+  ++  FACTORY
+    ::  PRODUCE A NORMALIZING GATE (MOLD)
     ::
-    ^-  hoon
-    :^  %brts  ~^~
-      [%base %noun]
-    ~(construct sample [6 %&])
+    ^-  HOON
+    :^  %BRTS  ~^~
+      [%BASE %NOUN]
+    ~(CONSTRUCT SAMPLE [6 %&])
   ::
-  ++  sample
-    ::  normalize a sample of the subject
+  ++  SAMPLE
+    ::  NORMALIZE A SAMPLE OF THE SUBJECT
     ::
-    |_  $:  ::  axe: axis to sample
-            ::  top: topographic type of sample
+    |_  $:  ::  AXE: AXIS TO SAMPLE
+            ::  TOP: TOPOGRAPHIC TYPE OF SAMPLE
             ::
-            axe/axis
-            top/tope
+            AXE/AXIS
+            TOP/TOPE
         ==
-    ++  basic
-      |=  bas/base
-      ::  apply documentation
+    ++  BASIC
+      |=  BAS/BASE
+      ::  APPLY DOCUMENTATION
       ::
-      ?^  doc  document
-      ?-    bas
-          {%atom *}
-        ::  rez: fake instance
+      ?^  DOC  DOCUMENT
+      ?-    BAS
+          {%ATOM *}
+        ::  REZ: FAKE INSTANCE
         ::
-        =/  rez  ersatz
-        ?^  top  rez
-        ?:  =(%| top)
-          ::  xx sanitize
+        =/  REZ  ERSATZ
+        ?^  TOP  REZ
+        ?:  =(%| TOP)
+          ::  XX SANITIZE
           ::
-          fetch
-        [%wtpt fetch-wing fetch rez]
+          FETCH
+        [%WTPT FETCH-WING FETCH REZ]
       ::
-          $noun
-        fetch
+          $NOUN
+        FETCH
       ::
-          $cell
-        ?^  top  fetch
-        ::  rez: fake instance
+          $CELL
+        ?^  TOP  FETCH
+        ::  REZ: FAKE INSTANCE
         ::
-        =/  rez  ersatz
-        ?:  =(%| top)
-          rez
-        [%wtpt fetch-wing rez fetch]
+        =/  REZ  ERSATZ
+        ?:  =(%| TOP)
+          REZ
+        [%WTPT FETCH-WING REZ FETCH]
       ::
-          $bean
-        ?^  top  ersatz
-        :^    %wtcl
-            [%dtts [%rock %$ |] [%$ axe]]
-          [%rock %f |]
-        [%rock %f &]
+          $BEAN
+        ?^  TOP  ERSATZ
+        :^    %WTCL
+            [%DTTS [%ROCK %$ |] [%$ AXE]]
+          [%ROCK %F |]
+        [%ROCK %F &]
       ::
-          $null
-        ersatz
+          $NULL
+        ERSATZ
       ::
-          $void
-        ersatz
+          $VOID
+        ERSATZ
       ==
-    ++  fetch
-      ::  load the sample
+    ++  FETCH
+      ::  LOAD THE SAMPLE
       ::
-      ^-  hoon
-      [%$ axe]
+      ^-  HOON
+      [%$ AXE]
     ::
-    ++  fetch-wing
-      ::  load, as a wing
+    ++  FETCH-WING
+      ::  LOAD, AS A WING
       ::
-      ^-  wing
-      [[%& axe] ~]
+      ^-  WING
+      [[%& AXE] ~]
     ::
-    ++  choice
-      ::  match full models, by trying them
+    ++  CHOICE
+      ::  MATCH FULL MODELS, BY TRYING THEM
       ::
-      |=  $:  ::  one: first option
-              ::  rep: other options
+      |=  $:  ::  ONE: FIRST OPTION
+              ::  REP: OTHER OPTIONS
               ::
-              one/tile
-              rep/(list tile)
+              ONE/TILE
+              REP/(LIST TILE)
           ==
-      ^-  hoon
-      ::  if no other choices, construct head
+      ^-  HOON
+      ::  IF NO OTHER CHOICES, CONSTRUCT HEAD
       ::
-      ?~  rep  construct(mod one)
-      ::  fin: loop completion
+      ?~  REP  CONSTRUCT(MOD ONE)
+      ::  FIN: LOOP COMPLETION
       ::
-      =/  fin/hoon  $(one i.rep, rep t.rep)
-      ::  new: trial product
-      ::  old: original subject
+      =/  FIN/HOON  $(ONE I.REP, REP T.REP)
+      ::  NEW: TRIAL PRODUCT
+      ::  OLD: ORIGINAL SUBJECT
       ::
-      =/  new  [%$ 2]
-      =*  old  [%$ 3]
-      ::  build trial noun
+      =/  NEW  [%$ 2]
+      =*  OLD  [%$ 3]
+      ::  BUILD TRIAL NOUN
       ::
-      :+  %tsls
-        ::  build the sample with the first option
+      :+  %TSLS
+        ::  BUILD THE SAMPLE WITH THE FIRST OPTION
         ::
-        construct(mod one)
-      ::  build test
+        CONSTRUCT(MOD ONE)
+      ::  BUILD TEST
       ::
-      :^    %wtcl
-          ::  if the trial noun equals the sample
+      :^    %WTCL
+          ::  IF THE TRIAL NOUN EQUALS THE SAMPLE
           ::
-          [%dtts new fetch]
-        ::  produce the trial noun
+          [%DTTS NEW FETCH]
+        ::  PRODUCE THE TRIAL NOUN
         ::
-        new
-      ::  continue with the original subject
+        NEW
+      ::  CONTINUE WITH THE ORIGINAL SUBJECT
       ::
-      [%tsgr old fin]
+      [%TSGR OLD FIN]
     ::
-    ++  switch
-      |=  $:  ::  one: first format
-              ::  two: more formats
+    ++  SWITCH
+      |=  $:  ::  ONE: FIRST FORMAT
+              ::  TWO: MORE FORMATS
               ::
-              one/line
-              rep/(list line)
+              ONE/LINE
+              REP/(LIST LINE)
           ==
-      ^-  hoon
-      ::  if no other choices, construct head
+      ^-  HOON
+      ::  IF NO OTHER CHOICES, CONSTRUCT HEAD
       ::
-      ?~  rep  construct(mod `tile`one)
-      ::  fin: loop completion
+      ?~  REP  CONSTRUCT(MOD `TILE`ONE)
+      ::  FIN: LOOP COMPLETION
       ::
-      =/  fin/hoon  $(one i.rep, rep t.rep)
-      ::  interrogate this instance
+      =/  FIN/HOON  $(ONE I.REP, REP T.REP)
+      ::  INTERROGATE THIS INSTANCE
       ::
-      :^    %wtcl
-          ::  test if we match this wing
+      :^    %WTCL
+          ::  TEST IF WE MATCH THIS WING
           ::
-          [%wtts p.i.rep fetch-wing]
-        ::  use this format
+          [%WTTS P.I.REP FETCH-WING]
+        ::  USE THIS FORMAT
         ::
-        :-  `hoon`p.i.rep
-        construct(mod q.i.rep, top &, axe (peg axe 3))
-      ::  continue in the loop
+        :-  `HOON`P.I.REP
+        CONSTRUCT(MOD Q.I.REP, TOP &, AXE (PEG AXE 3))
+      ::  CONTINUE IN THE LOOP
       ::
-      fin
+      FIN
     ::
-    ++  probe
-      ::  probe for cell or default
+    ++  PROBE
+      ::  PROBE FOR CELL OR DEFAULT
       ::
-      ^-  hoon
-      ::  against constructor
+      ^-  HOON
+      ::  AGAINST CONSTRUCTOR
       ::
-      :+  %tsgr
-        ::  constructor trap
+      :+  %TSGR
+        ::  CONSTRUCTOR TRAP
         ::
-        :+  %brdt  ~^~
-        ::  construct within trap
+        :+  %BRDT  ~^~
+        ::  CONSTRUCT WITHIN TRAP
         ::
-        %=  construct
-        ::  old context within trap context
+        %=  CONSTRUCT
+        ::  OLD CONTEXT WITHIN TRAP CONTEXT
         ::
-          dom  (peg 3 dom)
-        ::  old sample within trap sample
+          DOM  (PEG 3 DOM)
+        ::  OLD SAMPLE WITHIN TRAP SAMPLE
         ::
-          axe  (peg 3 axe)
-        ::  only kick trap if sample is known cell
+          AXE  (PEG 3 AXE)
+        ::  ONLY KICK TRAP IF SAMPLE IS KNOWN CELL
         ::
-          top  [& &]
+          TOP  [& &]
         ==
-      ::  boc: call constructor
-      ::  but: default, but coerce type to call
+      ::  BOC: CALL CONSTRUCTOR
+      ::  BUT: DEFAULT, BUT COERCE TYPE TO CALL
       ::
-      =/  boc/hoon  [%limb %$]
-      =/  but/hoon  [%ktls boc default]
-      ?:  =(& top)
-        ::  may be atom or cell; default or construct
+      =/  BOC/HOON  [%LIMB %$]
+      =/  BUT/HOON  [%KTLS BOC DEFAULT]
+      ?:  =(& TOP)
+        ::  MAY BE ATOM OR CELL; DEFAULT OR CONSTRUCT
         ::
-        [%wtpt fetch-wing but boc]
-      ::  must be atom; construct
+        [%WTPT FETCH-WING BUT BOC]
+      ::  MUST BE ATOM; CONSTRUCT
       ::
-      but
+      BUT
     ::
-    ++  document
-      ::  document and construct
+    ++  DOCUMENT
+      ::  DOCUMENT AND CONSTRUCT
       ::
-      |-  ^-  hoon
-      ?~  doc  construct
-      =/  fin  $(doc t.doc)
-      ?~(i.doc fin [%docs u.i.doc fin])
+      |-  ^-  HOON
+      ?~  DOC  CONSTRUCT
+      =/  FIN  $(DOC T.DOC)
+      ?~(I.DOC FIN [%DOCS U.I.DOC FIN])
     ::
-    ++  construct
-      ::  constructor at arbitrary sample
+    ++  CONSTRUCT
+      ::  CONSTRUCTOR AT ARBITRARY SAMPLE
       ::
-      ^-  hoon
-      ?-    mod
+      ^-  HOON
+      ?-    MOD
       ::
-      ::  cell
+      ::  CELL
       ::
           {^ *}
-        ::  apply help
+        ::  APPLY HELP
         ::
-        ?^  doc  document
-        ::  probe unless we know the sample is a cell
+        ?^  DOC  DOCUMENT
+        ::  PROBE UNLESS WE KNOW THE SAMPLE IS A CELL
         ::
-        ?@  top  probe
-        ::  if known cell, descend directly
+        ?@  TOP  PROBE
+        ::  IF KNOWN CELL, DESCEND DIRECTLY
         ::
-        :-  construct(mod -.mod, top p.top, axe (peg axe 2))
-        construct(mod +.mod, top q.top, axe (peg axe 3))
+        :-  CONSTRUCT(MOD -.MOD, TOP P.TOP, AXE (PEG AXE 2))
+        CONSTRUCT(MOD +.MOD, TOP Q.TOP, AXE (PEG AXE 3))
       ::
-      ::  base
+      ::  BASE
       ::
-          {$axil *}
-        (basic p.mod)
+          {$AXIL *}
+        (BASIC P.MOD)
       ::
-      ::  name, $=
+      ::  NAME, $=
       ::
-          {$bark *}
-        [%ktts p.mod construct(mod q.mod)]
+          {$BARK *}
+        [%KTTS P.MOD CONSTRUCT(MOD Q.MOD)]
       ::
-      ::  debug
+      ::  DEBUG
       ::
-          {$deet *}
-        [%dbug p.mod construct(mod q.mod)]
+          {$DEET *}
+        [%DBUG P.MOD CONSTRUCT(MOD Q.MOD)]
       ::
-      ::  choice, $?
+      ::  CHOICE, $?
       ::
-          {$fern *}
-        (choice i.p.mod t.p.mod)
+          {$FERN *}
+        (CHOICE I.P.MOD T.P.MOD)
       ::
-      ::  synthesis, $;
+      ::  SYNTHESIS, $;
       ::
-          {$herb *}
-        ?^  doc  document
-        =+  cys=~(boil ap p.mod)
-        ?:  ?=($herb -.cys)
-          [%cnhp (home p.mod) fetch ~]
-        construct(mod cys)
+          {$HERB *}
+        ?^  DOC  DOCUMENT
+        =+  CYS=~(BOIL AP P.MOD)
+        ?:  ?=($HERB -.CYS)
+          [%CNHP (HOME P.MOD) FETCH ~]
+        CONSTRUCT(MOD CYS)
       ::
-      ::  switch, $%
+      ::  SWITCH, $%
       ::
-          {$kelp *}
-        ::  if atom or unknown, probe
+          {$KELP *}
+        ::  IF ATOM OR UNKNOWN, PROBE
         ::
-        ?@  top  probe
-        ::  if cell, enter switch directly
+        ?@  TOP  PROBE
+        ::  IF CELL, ENTER SWITCH DIRECTLY
         ::
-        (switch i.p.mod t.p.mod)
+        (SWITCH I.P.MOD T.P.MOD)
       ::
-      ::  constant
+      ::  CONSTANT
       ::
-          {$leaf *}
-        (decorate [%rock p.mod q.mod])
+          {$LEAF *}
+        (DECORATE [%ROCK P.MOD Q.MOD])
       ::
-      ::  documentation
+      ::  DOCUMENTATION
       ::
-          {$plow *}
-        construct(doc [p.mod doc], mod q.mod)
+          {$PLOW *}
+        CONSTRUCT(DOC [P.MOD DOC], MOD Q.MOD)
       ::
-      ::  branch, $@
+      ::  BRANCH, $@
       ::
-          {$reed *}
-        ?^  doc  document
-        ?@  top
-          ?:  =(%| top)
-            construct(mod p.mod)
-          [%wtpt fetch-wing construct(mod p.mod) construct(mod q.mod)]
-        construct(mod q.mod)
+          {$REED *}
+        ?^  DOC  DOCUMENT
+        ?@  TOP
+          ?:  =(%| TOP)
+            CONSTRUCT(MOD P.MOD)
+          [%WTPT FETCH-WING CONSTRUCT(MOD P.MOD) CONSTRUCT(MOD Q.MOD)]
+        CONSTRUCT(MOD Q.MOD)
       ::
-      ::  bridge, $^
+      ::  BRIDGE, $^
       ::
-          {$vine *}
-        ?^  doc  document
-        ?@  top  probe
-        :^    %wtpt
-            fetch-wing(axe (peg axe 2))
-          construct(mod q.mod)
-        construct(mod p.mod)
+          {$VINE *}
+        ?^  DOC  DOCUMENT
+        ?@  TOP  PROBE
+        :^    %WTPT
+            FETCH-WING(AXE (PEG AXE 2))
+          CONSTRUCT(MOD Q.MOD)
+        CONSTRUCT(MOD P.MOD)
       ::
-      ::  weed, $_
+      ::  WEED, $_
       ::
-          {$weed *}
-        (decorate (home p.mod))
+          {$WEED *}
+        (DECORATE (HOME P.MOD))
       ==
     --
   --

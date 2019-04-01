@@ -1,84 +1,84 @@
-::  |rsa: primitive, textbook RSA
+::  |RSA: PRIMITIVE, TEXTBOOK RSA
 ::
-::    Unpadded, unsafe, unsuitable for encryption!
+::    UNPADDED, UNSAFE, UNSUITABLE FOR ENCRYPTION!
 ::
 |%
-::  +key:rsa: rsa public or private key
+::  +KEY:RSA: RSA PUBLIC OR PRIVATE KEY
 ::
-+=  key
-  $:  ::  pub:  public parameters (n=modulus, e=pub-exponent)
++=  KEY
+  $:  ::  PUB:  PUBLIC PARAMETERS (N=MODULUS, E=PUB-EXPONENT)
       ::
-      pub=[n=@ux e=@ux]
-      ::  sek:  secret parameters (d=private-exponent, p/q=primes)
+      PUB=[N=@UX E=@UX]
+      ::  SEK:  SECRET PARAMETERS (D=PRIVATE-EXPONENT, P/Q=PRIMES)
       ::
-      sek=(unit [d=@ux p=@ux q=@ux])
+      SEK=(UNIT [D=@UX P=@UX Q=@UX])
   ==
-::  +ramp: make rabin-miller probabilistic prime
+::  +RAMP: MAKE RABIN-MILLER PROBABILISTIC PRIME
 ::
-::    XX replace +ramp:number?
-::    a: bitwidth
-::    b: snags (XX small primes to check divisibility?)
-::    c: entropy
+::    XX REPLACE +RAMP:NUMBER?
+::    A: BITWIDTH
+::    B: SNAGS (XX SMALL PRIMES TO CHECK DIVISIBILITY?)
+::    C: ENTROPY
 ::
-++  ramp
-  |=  [a=@ b=(list @) c=@]
-  =.  c  (shas %ramp c)
-  :: XX what is this value?
+++  RAMP
+  |=  [A=@ B=(LIST @) C=@]
+  =.  C  (SHAS %RAMP C)
+  :: XX WHAT IS THIS VALUE?
   ::
-  =|  d=@
-  |-  ^-  @ux
-  :: XX what is this condition?
+  =|  D=@
+  |-  ^-  @UX
+  :: XX WHAT IS THIS CONDITION?
   ::
-  ?:  =((mul 100 a) d)
-    ~|(%ar-ramp !!)
-  :: e: prime candidate
+  ?:  =((MUL 100 A) D)
+    ~|(%AR-RAMP !!)
+  :: E: PRIME CANDIDATE
   ::
-  ::   Sets low bit, as prime must be odd.
-  ::   Sets high bit, as +raw:og only gives up to :a bits.
+  ::   SETS LOW BIT, AS PRIME MUST BE ODD.
+  ::   SETS HIGH BIT, AS +RAW:OG ONLY GIVES UP TO :A BITS.
   ::
-  =/  e  :(con 1 (lsh 0 (dec a) 1) (~(raw og c) a))
-  :: XX what algorithm is this modular remainder check?
+  =/  E  :(CON 1 (LSH 0 (DEC A) 1) (~(RAW OG C) A))
+  :: XX WHAT ALGORITHM IS THIS MODULAR REMAINDER CHECK?
   ::
-  ?:  ?&  (levy b |=(f/@ !=(1 (mod e f))))
-          (pram:number e)
+  ?:  ?&  (LEVY B |=(F/@ !=(1 (MOD E F))))
+          (PRAM:NUMBER E)
       ==
-    e
-  $(c +(c), d (shax d))
-::  +elcm:rsa: carmichael totient
+    E
+  $(C +(C), D (SHAX D))
+::  +ELCM:RSA: CARMICHAEL TOTIENT
 ::
-++  elcm
-  |=  [a=@ b=@]
-  (div (mul a b) d:(egcd a b))
-::  +new-key:rsa: write somethingXXX
+++  ELCM
+  |=  [A=@ B=@]
+  (DIV (MUL A B) D:(EGCD A B))
+::  +NEW-KEY:RSA: WRITE SOMETHINGXXX
 ::
-++  new-key
-  =/  e  `@ux`65.537
-  |=  [wid=@ eny=@]
-  ^-  key
-  =/  diw  (rsh 0 1 wid)
-  =/  p=@ux  (ramp diw [3 5 ~] eny)
-  =/  q=@ux  (ramp diw [3 5 ~] +(eny))
-  =/  n=@ux  (mul p q)
-  =/  d=@ux  (~(inv fo (elcm (dec p) (dec q))) e)
-  [[n e] `[d p q]]
-::  +en:rsa: primitive RSA encryption
+++  NEW-KEY
+  =/  E  `@UX`65.537
+  |=  [WID=@ ENY=@]
+  ^-  KEY
+  =/  DIW  (RSH 0 1 WID)
+  =/  P=@UX  (RAMP DIW [3 5 ~] ENY)
+  =/  Q=@UX  (RAMP DIW [3 5 ~] +(ENY))
+  =/  N=@UX  (MUL P Q)
+  =/  D=@UX  (~(INV FO (ELCM (DEC P) (DEC Q))) E)
+  [[N E] `[D P Q]]
+::  +EN:RSA: PRIMITIVE RSA ENCRYPTION
 ::
-::    ciphertext = message^e (mod n)
+::    CIPHERTEXT = MESSAGE^E (MOD N)
 ::
-++  en
-  |=  [m=@ k=key]
-  ~|  %rsa-len
-  ?>  (lte (met 0 m) (met 0 n.pub.k))
-  (~(exp fo n.pub.k) e.pub.k m)
-::  +de:rsa: primitive RSA decryption
+++  EN
+  |=  [M=@ K=KEY]
+  ~|  %RSA-LEN
+  ?>  (LTE (MET 0 M) (MET 0 N.PUB.K))
+  (~(EXP FO N.PUB.K) E.PUB.K M)
+::  +DE:RSA: PRIMITIVE RSA DECRYPTION
 ::
-::    message = ciphertext^d (mod e)
+::    MESSAGE = CIPHERTEXT^D (MOD E)
 ::
-++  de
-  |=  [m=@ k=key]
-  :: XX assert rsa-len here too?
-  ~|  %rsa-need-ring
-  ?>  ?=(^ sek.k)
-  =/  fu  (fu:number p.u.sek.k q.u.sek.k)
-  (out.fu (exp.fu d.u.sek.k (sit.fu m)))
+++  DE
+  |=  [M=@ K=KEY]
+  :: XX ASSERT RSA-LEN HERE TOO?
+  ~|  %RSA-NEED-RING
+  ?>  ?=(^ SEK.K)
+  =/  FU  (FU:NUMBER P.U.SEK.K Q.U.SEK.K)
+  (OUT.FU (EXP.FU D.U.SEK.K (SIT.FU M)))
 --

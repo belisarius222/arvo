@@ -1,19 +1,19 @@
 ::
-::::  /hoon/md/mar
+::::  /HOON/MD/MAR
   ::
 /?    310
 ::
-=,  format
-=,  mimes:html
-|_  txt/wain
+=,  FORMAT
+=,  MIMES:HTML
+|_  TXT/WAIN
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  mime  |=({p/mite:eyre q/octs:eyre} (to-wain q.q))
-  ++  noun  wain                                        ::  clam from %noun
+  ++  MIME  |=({P/MITE:EYRE Q/OCTS:EYRE} (TO-WAIN Q.Q))
+  ++  NOUN  WAIN                                        ::  CLAM FROM %NOUN
   --
-++  grow
+++  GROW
   |%
-  ++  mime  [/text/plain (as-octs (of-wain txt))]
+  ++  MIME  [/TEXT/PLAIN (AS-OCTS (OF-WAIN TXT))]
   --
 --

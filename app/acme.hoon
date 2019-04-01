@@ -1,1368 +1,1368 @@
-/-  asn1, hall
-/+  base64, der, primitive-rsa, *pkcs, *jose
-=,  eyre
-=*  rsa  primitive-rsa
+/-  ASN1, HALL
+/+  BASE64, DER, PRIMITIVE-RSA, *PKCS, *JOSE
+=,  EYRE
+=*  RSA  PRIMITIVE-RSA
 ::
 |%
-::  +en-base64url: url-safe base64 encoding, without padding
+::  +EN-BASE64URL: URL-SAFE BASE64 ENCODING, WITHOUT PADDING
 ::
-++  en-base64url
-  ~(en base64 | &)
-::  +de-base64url: url-safe base64 decoding, without padding
+++  EN-BASE64URL
+  ~(EN BASE64 | &)
+::  +DE-BASE64URL: URL-SAFE BASE64 DECODING, WITHOUT PADDING
 ::
-++  de-base64url
-  ~(de base64 | &)
-::  |octn: encode/decode unsigned atoms as big-endian octet stream
+++  DE-BASE64URL
+  ~(DE BASE64 | &)
+::  |OCTN: ENCODE/DECODE UNSIGNED ATOMS AS BIG-ENDIAN OCTET STREAM
 ::
-++  octn
+++  OCTN
   |%
-  ++  en  |=(a=@u `octs`[(met 3 a) (swp 3 a)])
-  ++  de  |=(a=octs `@u`(rev 3 p.a q.a))
+  ++  EN  |=(A=@U `OCTS`[(MET 3 A) (SWP 3 A)])
+  ++  DE  |=(A=OCTS `@U`(REV 3 P.A Q.A))
   --
-::  |body: acme api response body types
+::  |BODY: ACME API RESPONSE BODY TYPES
 ::
-++  body
+++  BODY
   |%
-  +$  acct  [id=@t wen=@t sas=@t]
+  +$  ACCT  [ID=@T WEN=@T SAS=@T]
   ::
-  +$  order
-    $:  exp=@t
-        sas=@t
-        aut=(list purl)
-        fin=(unit purl)
-        cer=(unit purl)
+  +$  ORDER
+    $:  EXP=@T
+        SAS=@T
+        AUT=(LIST PURL)
+        FIN=(UNIT PURL)
+        CER=(UNIT PURL)
     ==
   ::
-  +$  auth
-    $:  dom=turf
-        sas=@t
-        exp=@t
-        cal=challenge
+  +$  AUTH
+    $:  DOM=TURF
+        SAS=@T
+        EXP=@T
+        CAL=CHALLENGE
     ==
   ::
-  +$  challenge  [typ=@t sas=@t url=purl tok=@t err=(unit error)]
+  +$  CHALLENGE  [TYP=@T SAS=@T URL=PURL TOK=@T ERR=(UNIT ERROR)]
   ::
-  +$  error  [type=@t detail=@t]
+  +$  ERROR  [TYPE=@T DETAIL=@T]
   --
 ::
-::  |grab: acme api response json reparsers
+::  |GRAB: ACME API RESPONSE JSON REPARSERS
 ::
-++  grab
-  =,  dejs:format
+++  GRAB
+  =,  DEJS:FORMAT
   |%
-  ::  +json-purl: parse url
+  ::  +JSON-PURL: PARSE URL
   ::
-  ++  json-purl  (su auri:de-purl:html)
-  ::  +json-date: parse iso-8601
+  ++  JSON-PURL  (SU AURI:DE-PURL:HTML)
+  ::  +JSON-DATE: PARSE ISO-8601
   ::
-  ::    XX actually parse
+  ::    XX ACTUALLY PARSE
   ::
-  ++  json-date  so
-  ::  +directory: parse ACME service directory
+  ++  JSON-DATE  SO
+  ::  +DIRECTORY: PARSE ACME SERVICE DIRECTORY
   ::
-  ++  directory
-    %-  ot
-    :~  'newAccount'^json-purl
-        'newNonce'^json-purl
-        'newOrder'^json-purl
-        'revokeCert'^json-purl
-        'keyChange'^json-purl
+  ++  DIRECTORY
+    %-  OT
+    :~  'NEWACCOUNT'^JSON-PURL
+        'NEWNONCE'^JSON-PURL
+        'NEWORDER'^JSON-PURL
+        'REVOKECERT'^JSON-PURL
+        'KEYCHANGE'^JSON-PURL
     ==
-  ::  +acct: parse ACME service account
+  ::  +ACCT: PARSE ACME SERVICE ACCOUNT
   ::
-  ++  acct
-    ^-  $-(json acct:body)
-    ::  ignoring key, contact, initialIp
+  ++  ACCT
+    ^-  $-(JSON ACCT:BODY)
+    ::  IGNORING KEY, CONTACT, INITIALIP
     ::
-    (ot 'id'^no 'createdAt'^json-date 'status'^so ~)
-  ::  +order: parse certificate order
+    (OT 'ID'^NO 'CREATEDAT'^JSON-DATE 'STATUS'^SO ~)
+  ::  +ORDER: PARSE CERTIFICATE ORDER
   ::
-  ++  order
-    ^-  $-(json order:body)
-    %-  ou
-    :~  'expires'^(un json-date)
-        'status'^(un so)
-        'authorizations'^(uf ~ (ar json-purl))
-        'finalize'^(uf ~ (mu json-purl))
-        'certificate'^(uf ~ (mu json-purl))
+  ++  ORDER
+    ^-  $-(JSON ORDER:BODY)
+    %-  OU
+    :~  'EXPIRES'^(UN JSON-DATE)
+        'STATUS'^(UN SO)
+        'AUTHORIZATIONS'^(UF ~ (AR JSON-PURL))
+        'FINALIZE'^(UF ~ (MU JSON-PURL))
+        'CERTIFICATE'^(UF ~ (MU JSON-PURL))
     ==
-  ::  +auth: parse authorization
+  ::  +AUTH: PARSE AUTHORIZATION
   ::
-  ++  auth
+  ++  AUTH
     =>  |%
-        ::  +iden: extract +turf from service identifier
+        ::  +IDEN: EXTRACT +TURF FROM SERVICE IDENTIFIER
         ::
-        ++  iden
-          |=  [typ=@t hot=host]
-          ^-  turf
-          ?>(&(?=(%dns typ) ?=([%& *] hot)) p.hot)
-        ::  +http-trial: extract %http-01 challenge
+        ++  IDEN
+          |=  [TYP=@T HOT=HOST]
+          ^-  TURF
+          ?>(&(?=(%DNS TYP) ?=([%& *] HOT)) P.HOT)
+        ::  +HTTP-TRIAL: EXTRACT %HTTP-01 CHALLENGE
         ::
-        ++  trial
-          |=  a=(list challenge:body)
-          ^-  challenge:body
-          =/  b  (skim a |=([typ=@t *] ?=(%http-01 typ)))
-          ?>(?=(^ b) i.b)
+        ++  TRIAL
+          |=  A=(LIST CHALLENGE:BODY)
+          ^-  CHALLENGE:BODY
+          =/  B  (SKIM A |=([TYP=@T *] ?=(%HTTP-01 TYP)))
+          ?>(?=(^ B) I.B)
         --
-    ^-  $-(json auth:body)
-    %-  ot
-    :~  'identifier'^(cu iden (ot type+so value+(su thos:de-purl:html) ~))
-        'status'^so
-        'expires'^json-date
-        'challenges'^(cu trial (ar challenge))
+    ^-  $-(JSON AUTH:BODY)
+    %-  OT
+    :~  'IDENTIFIER'^(CU IDEN (OT TYPE+SO VALUE+(SU THOS:DE-PURL:HTML) ~))
+        'STATUS'^SO
+        'EXPIRES'^JSON-DATE
+        'CHALLENGES'^(CU TRIAL (AR CHALLENGE))
     ==
-  ::  +challenge: parse domain validation challenge
+  ::  +CHALLENGE: PARSE DOMAIN VALIDATION CHALLENGE
   ::
-  ++  challenge
-    ^-  $-(json challenge:body)
-    %-  ou
-    :~  'type'^(un so)
-        'status'^(un so)
-        'url'^(un json-purl)
-        'token'^(un so)
-        'error'^(uf ~ (mu error))
+  ++  CHALLENGE
+    ^-  $-(JSON CHALLENGE:BODY)
+    %-  OU
+    :~  'TYPE'^(UN SO)
+        'STATUS'^(UN SO)
+        'URL'^(UN JSON-PURL)
+        'TOKEN'^(UN SO)
+        'ERROR'^(UF ~ (MU ERROR))
     ==
-  ::  +error: parse ACME service error response
+  ::  +ERROR: PARSE ACME SERVICE ERROR RESPONSE
   ::
-  ++  error
-    ^-  $-(json error:body)
-    (ot type+so detail+so ~)
+  ++  ERROR
+    ^-  $-(JSON ERROR:BODY)
+    (OT TYPE+SO DETAIL+SO ~)
   --
 --
 ::
-::::  acme state
+::::  ACME STATE
 ::
 |%
-::  +move: output effect
+::  +MOVE: OUTPUT EFFECT
 ::
-+$  move  [bone card]
-::  +card: output effect payload
++$  MOVE  [BONE CARD]
+::  +CARD: OUTPUT EFFECT PAYLOAD
 ::
-+$  card
-  $%  [%hiss wire ~ %httr %hiss hiss:eyre]
-      [%poke wire dock poke]
-      [%rule wire %cert (unit [wain wain])]
-      [%wait wire @da]
-      [%well wire path (unit mime)]
++$  CARD
+  $%  [%HISS WIRE ~ %HTTR %HISS HISS:EYRE]
+      [%POKE WIRE DOCK POKE]
+      [%RULE WIRE %CERT (UNIT [WAIN WAIN])]
+      [%WAIT WIRE @DA]
+      [%WELL WIRE PATH (UNIT MIME)]
   ==
-::  +poke: outgoing app pokes
+::  +POKE: OUTGOING APP POKES
 ::
-+$  poke
-  $%  [%hall-action %phrase audience:hall (list speech:hall)]
++$  POKE
+  $%  [%HALL-ACTION %PHRASE AUDIENCE:HALL (LIST SPEECH:HALL)]
   ==
-::  +nonce-next: next effect to emit upon receiving nonce
+::  +NONCE-NEXT: NEXT EFFECT TO EMIT UPON RECEIVING NONCE
 ::
-+$  nonce-next
-  $?  %register
-      %new-order
-      %finalize-order
-      %finalize-trial
++$  NONCE-NEXT
+  $?  %REGISTER
+      %NEW-ORDER
+      %FINALIZE-ORDER
+      %FINALIZE-TRIAL
   ==
-::  +acct: an ACME service account
+::  +ACCT: AN ACME SERVICE ACCOUNT
 ::
-+$  acct
-  $:  ::  key: account keypair
++$  ACCT
+  $:  ::  KEY: ACCOUNT KEYPAIR
       ::
-      key=key:rsa
-      ::  reg: account registration
+      KEY=KEY:RSA
+      ::  REG: ACCOUNT REGISTRATION
       ::
-      ::    XX wen=@da once parser is fixed
+      ::    XX WEN=@DA ONCE PARSER IS FIXED
       ::
-      reg=(unit [wen=@t kid=@t])
+      REG=(UNIT [WEN=@T KID=@T])
   ==
-::  +config: finalized configuration
+::  +CONFIG: FINALIZED CONFIGURATION
 ::
-+$  config
-  $:  ::  dom: domains
++$  CONFIG
+  $:  ::  DOM: DOMAINS
       ::
-      dom=(set turf)
-      ::  key: certificate keypair
+      DOM=(SET TURF)
+      ::  KEY: CERTIFICATE KEYPAIR
       ::
-      key=key:rsa
-      ::  cer: signed certificate
+      KEY=KEY:RSA
+      ::  CER: SIGNED CERTIFICATE
       ::
-      cer=wain
-      ::  exp: expiration date
+      CER=WAIN
+      ::  EXP: EXPIRATION DATE
       ::
-      exp=@da
-      ::  dor: source ACME service order URL
+      EXP=@DA
+      ::  DOR: SOURCE ACME SERVICE ORDER URL
       ::
-      dor=purl
+      DOR=PURL
   ==
-::  +trial: domain validation challenge
+::  +TRIAL: DOMAIN VALIDATION CHALLENGE
 ::
-+$  trial
-  $%  ::  %http only for now
++$  TRIAL
+  $%  ::  %HTTP ONLY FOR NOW
       ::
-      $:  %http
-          ::  ego: ACME service challenge url
+      $:  %HTTP
+          ::  EGO: ACME SERVICE CHALLENGE URL
           ::
-          ego=purl
-          ::  tok: challenge token
+          EGO=PURL
+          ::  TOK: CHALLENGE TOKEN
           ::
-          tok=@t
-          ::  sas: challenge status
+          TOK=@T
+          ::  SAS: CHALLENGE STATUS
           ::
-          sas=?(%recv %pend %auth)
+          SAS=?(%RECV %PEND %AUTH)
   ==  ==
-::  +auth: domain authorization
+::  +AUTH: DOMAIN AUTHORIZATION
 ::
-+$  auth
-  $:  ::  ego: ACME service authorization url
++$  AUTH
+  $:  ::  EGO: ACME SERVICE AUTHORIZATION URL
       ::
-      ego=purl
-      ::  dom: domain under authorization
+      EGO=PURL
+      ::  DOM: DOMAIN UNDER AUTHORIZATION
       ::
-      dom=turf
-      ::  cal: domain validation challenge
+      DOM=TURF
+      ::  CAL: DOMAIN VALIDATION CHALLENGE
       ::
-      cal=trial
+      CAL=TRIAL
   ==
-::  +order-auth: domain authorization state for order processing
+::  +ORDER-AUTH: DOMAIN AUTHORIZATION STATE FOR ORDER PROCESSING
 ::
-+$  order-auth
-  $:  ::  pending: remote authorization urls
++$  ORDER-AUTH
+  $:  ::  PENDING: REMOTE AUTHORIZATION URLS
       ::
-      pending=(list purl)
-      ::  active: authorization in progress
+      PENDING=(LIST PURL)
+      ::  ACTIVE: AUTHORIZATION IN PROGRESS
       ::
-      active=(unit [idx=@ auth])
-      ::  done: finalized authorizations (XX or failed?)
+      ACTIVE=(UNIT [IDX=@ AUTH])
+      ::  DONE: FINALIZED AUTHORIZATIONS (XX OR FAILED?)
       ::
-      done=(list auth)
+      DONE=(LIST AUTH)
   ==
-::  +order: ACME certificate order
+::  +ORDER: ACME CERTIFICATE ORDER
 ::
-+$  order
-  $:  ::  dom: domains
++$  ORDER
+  $:  ::  DOM: DOMAINS
       ::
-      dom=(set turf)
-      ::  try: attempt number
+      DOM=(SET TURF)
+      ::  TRY: ATTEMPT NUMBER
       ::
-      try=@ud
-      ::  sas: order state
+      TRY=@UD
+      ::  SAS: ORDER STATE
       ::
-      sas=$@(%wake [%rest wen=@da])
-      ::  exp: expiration date
+      SAS=$@(%WAKE [%REST WEN=@DA])
+      ::  EXP: EXPIRATION DATE
       ::
-      ::    XX @da once ISO-8601 parser
+      ::    XX @DA ONCE ISO-8601 PARSER
       ::
-      exp=@t
-      ::  ego: ACME service order url
+      EXP=@T
+      ::  EGO: ACME SERVICE ORDER URL
       ::
-      ego=purl
-      ::  fin: ACME service order finalization url
+      EGO=PURL
+      ::  FIN: ACME SERVICE ORDER FINALIZATION URL
       ::
-      fin=purl
-      ::  key: certificate keypair
+      FIN=PURL
+      ::  KEY: CERTIFICATE KEYPAIR
       ::
-      key=key:rsa
-      ::  csr: DER-encoded PKCS10 certificate signing request
+      KEY=KEY:RSA
+      ::  CSR: DER-ENCODED PKCS10 CERTIFICATE SIGNING REQUEST
       ::
-      csr=@ux
-      ::  aut: authorizations required by this order
+      CSR=@UX
+      ::  AUT: AUTHORIZATIONS REQUIRED BY THIS ORDER
       ::
-      aut=order-auth
+      AUT=ORDER-AUTH
   ==
-::  +history: archive of past ACME service interactions
+::  +HISTORY: ARCHIVE OF PAST ACME SERVICE INTERACTIONS
 ::
-+$  history
-  $:  ::  act: list of revoked account keypairs
++$  HISTORY
+  $:  ::  ACT: LIST OF REVOKED ACCOUNT KEYPAIRS
       ::
-      act=(list acct)
-      ::  fig: list of expired configurations
+      ACT=(LIST ACCT)
+      ::  FIG: LIST OF EXPIRED CONFIGURATIONS
       ::
-      fig=(list config)
-      ::  fal: list of failed order attempts
+      FIG=(LIST CONFIG)
+      ::  FAL: LIST OF FAILED ORDER ATTEMPTS
       ::
-      fal=(list order)
+      FAL=(LIST ORDER)
   ==
-::  +directory: ACME v2 service directory
+::  +DIRECTORY: ACME V2 SERVICE DIRECTORY
 ::
-+$  directory
-  $:  ::  register: registration url (newAccount)
++$  DIRECTORY
+  $:  ::  REGISTER: REGISTRATION URL (NEWACCOUNT)
       ::
-      register=purl
-      ::  nonce: nonce creation url (newNonce)
+      REGISTER=PURL
+      ::  NONCE: NONCE CREATION URL (NEWNONCE)
       ::
-      nonce=purl
-      ::  new-order: order creation url (newOrder)
+      NONCE=PURL
+      ::  NEW-ORDER: ORDER CREATION URL (NEWORDER)
       ::
-      new-order=purl
-      ::  revoke: certificate revocation url (revokeCert)
+      NEW-ORDER=PURL
+      ::  REVOKE: CERTIFICATE REVOCATION URL (REVOKECERT)
       ::
-      revoke=purl
-      ::  rekey: account key revocation url (keyChange)
+      REVOKE=PURL
+      ::  REKEY: ACCOUNT KEY REVOCATION URL (KEYCHANGE)
       ::
-      rekey=purl
+      REKEY=PURL
   ==
-::  +acme: complete app state
+::  +ACME: COMPLETE APP STATE
 ::
-+$  acme
-  $:  ::  dir: ACME service directory
++$  ACME
+  $:  ::  DIR: ACME SERVICE DIRECTORY
       ::
-      dir=directory
-      ::  act: ACME service account
+      DIR=DIRECTORY
+      ::  ACT: ACME SERVICE ACCOUNT
       ::
-      act=acct
-      ::  liv: active, live configuration
+      ACT=ACCT
+      ::  LIV: ACTIVE, LIVE CONFIGURATION
       ::
-      liv=(unit config)
-      ::  hit: ACME account history
+      LIV=(UNIT CONFIG)
+      ::  HIT: ACME ACCOUNT HISTORY
       ::
-      hit=history
-      ::  nonces: list of unused nonces
+      HIT=HISTORY
+      ::  NONCES: LIST OF UNUSED NONCES
       ::
-      nonces=(list @t)
-      ::  rod: active, in-progress order
+      NONCES=(LIST @T)
+      ::  ROD: ACTIVE, IN-PROGRESS ORDER
       ::
-      rod=(unit order)
-      ::  next-order: queued domains for validation
+      ROD=(UNIT ORDER)
+      ::  NEXT-ORDER: QUEUED DOMAINS FOR VALIDATION
       ::
-      next-order=(unit (map turf [idx=@ud valid=?]))
-      ::  cey: certificate key XX move?
+      NEXT-ORDER=(UNIT (MAP TURF [IDX=@UD VALID=?]))
+      ::  CEY: CERTIFICATE KEY XX MOVE?
       ::
-      cey=key:rsa
+      CEY=KEY:RSA
   ==
 --
 ::
-::::  acme app
+::::  ACME APP
 ::
-::  directory-base: LetsEncrypt service directory url
+::  DIRECTORY-BASE: LETSENCRYPT SERVICE DIRECTORY URL
 ::
-=/  directory-base=purl
-  =-  (need (de-purl:html -))
-  'https://acme-v02.api.letsencrypt.org/directory'
-::  mov: list of outgoing moves for the current transaction
+=/  DIRECTORY-BASE=PURL
+  =-  (NEED (DE-PURL:HTML -))
+  'HTTPS://ACME-V02.API.LETSENCRYPT.ORG/DIRECTORY'
+::  MOV: LIST OF OUTGOING MOVES FOR THE CURRENT TRANSACTION
 ::
-=|  mov=(list move)
+=|  MOV=(LIST MOVE)
 ::
-|_  [bow=bowl:gall acme]
-::  +this: self
+|_  [BOW=BOWL:GALL ACME]
+::  +THIS: SELF
 ::
-::    XX Should be a +* core alias, see urbit/arvo#712
+::    XX SHOULD BE A +* CORE ALIAS, SEE URBIT/ARVO#712
 ::
-++  this  .
-::  +emit: emit a move
+++  THIS  .
+::  +EMIT: EMIT A MOVE
 ::
-++  emit
-  |=  car=card
-  this(mov [[ost.bow car] mov])
-::  +abet: finalize transaction
+++  EMIT
+  |=  CAR=CARD
+  THIS(MOV [[OST.BOW CAR] MOV])
+::  +ABET: FINALIZE TRANSACTION
 ::
-++  abet
-  ^-  (quip move _this)
-  [(flop mov) this(mov ~)]
-::  +backoff: calculate exponential backoff
+++  ABET
+  ^-  (QUIP MOVE _THIS)
+  [(FLOP MOV) THIS(MOV ~)]
+::  +BACKOFF: CALCULATE EXPONENTIAL BACKOFF
 ::
-++  backoff
-  |=  try=@ud
-  ^-  @dr
-  ?:  =(0 try)  ~s0
-  %+  add
-    (mul ~s1 (bex (dec try)))
-  (mul ~s0..0001 (~(rad og eny.bow) 1.000))
-::  +acme-wire: create :acme http-request wire
+++  BACKOFF
+  |=  TRY=@UD
+  ^-  @DR
+  ?:  =(0 TRY)  ~S0
+  %+  ADD
+    (MUL ~S1 (BEX (DEC TRY)))
+  (MUL ~S0..0001 (~(RAD OG ENY.BOW) 1.000))
+::  +ACME-WIRE: CREATE :ACME HTTP-REQUEST WIRE
 ::
-++  acme-wire
-  |=  [try=@ud act=@tas =wire]
-  ^-  ^wire
-  (weld /acme/try/(scot %ud try)/[act] wire)
-::  +notify: send :hall notification
+++  ACME-WIRE
+  |=  [TRY=@UD ACT=@TAS =WIRE]
+  ^-  ^WIRE
+  (WELD /ACME/TRY/(SCOT %UD TRY)/[ACT] WIRE)
+::  +NOTIFY: SEND :HALL NOTIFICATION
 ::
-++  notify
-  |=  [=cord =tang]
-  ^-  card
-  =/  msg=speech:hall
-    :+  %app  dap.bow
-    =/  line  [%lin & cord]
-    ?~(tang line [%fat [%tank tang] line])
-  =/  act
-    [%phrase (sy [our.bow %inbox] ~) [msg ~]]
-  [%poke / [our.bow %hall] %hall-action act]
-::  +request: unauthenticated http request
+++  NOTIFY
+  |=  [=CORD =TANG]
+  ^-  CARD
+  =/  MSG=SPEECH:HALL
+    :+  %APP  DAP.BOW
+    =/  LINE  [%LIN & CORD]
+    ?~(TANG LINE [%FAT [%TANK TANG] LINE])
+  =/  ACT
+    [%PHRASE (SY [OUR.BOW %INBOX] ~) [MSG ~]]
+  [%POKE / [OUR.BOW %HALL] %HALL-ACTION ACT]
+::  +REQUEST: UNAUTHENTICATED HTTP REQUEST
 ::
-++  request
-  |=  [wir=wire req=hiss]
-  ^-  card
-  [%hiss wir ~ %httr %hiss req]
-::  +signed-request: JWS JSON POST
+++  REQUEST
+  |=  [WIR=WIRE REQ=HISS]
+  ^-  CARD
+  [%HISS WIR ~ %HTTR %HISS REQ]
+::  +SIGNED-REQUEST: JWS JSON POST
 ::
-++  signed-request
-  |=  [url=purl non=@t bod=json]
-  ^-  hiss
-  :^  url  %post
-    (my content-type+['application/jose+json' ~] ~)
+++  SIGNED-REQUEST
+  |=  [URL=PURL NON=@T BOD=JSON]
+  ^-  HISS
+  :^  URL  %POST
+    (MY CONTENT-TYPE+['APPLICATION/JOSE+JSON' ~] ~)
   :-  ~
-  ^-  octs
-  =;  pro=json
-    (as-octt:mimes:html (en-json:html (sign:jws key.act pro bod)))
-  :-  %o  %-  my  :~
-    nonce+s+non
-    url+s+(crip (en-purl:html url))
-    ?^  reg.act
-      kid+s+kid.u.reg.act
-    jwk+(pass:en:jwk key.act)
+  ^-  OCTS
+  =;  PRO=JSON
+    (AS-OCTT:MIMES:HTML (EN-JSON:HTML (SIGN:JWS KEY.ACT PRO BOD)))
+  :-  %O  %-  MY  :~
+    NONCE+S+NON
+    URL+S+(CRIP (EN-PURL:HTML URL))
+    ?^  REG.ACT
+      KID+S+KID.U.REG.ACT
+    JWK+(PASS:EN:JWK KEY.ACT)
   ==
-::  +stateful-request: emit signed, nonce'd request
+::  +STATEFUL-REQUEST: EMIT SIGNED, NONCE'D REQUEST
 ::
-++  stateful-request
-  |=  [[try=@ud act=@tas =wire] =purl =json]
-  ^+  this
-  ?~  nonces
-    (nonce:effect [act wire])
-  %-  emit(nonces t.nonces)
-  %+  request  (acme-wire try act wire)
-  (signed-request purl i.nonces json)
-::  +bad-nonce: check if an http response is a badNonce error
+++  STATEFUL-REQUEST
+  |=  [[TRY=@UD ACT=@TAS =WIRE] =PURL =JSON]
+  ^+  THIS
+  ?~  NONCES
+    (NONCE:EFFECT [ACT WIRE])
+  %-  EMIT(NONCES T.NONCES)
+  %+  REQUEST  (ACME-WIRE TRY ACT WIRE)
+  (SIGNED-REQUEST PURL I.NONCES JSON)
+::  +BAD-NONCE: CHECK IF AN HTTP RESPONSE IS A BADNONCE ERROR
 ::
-++  bad-nonce
-  |=  rep=httr
+++  BAD-NONCE
+  |=  REP=HTTR
   ^-  ?
-  ::  XX always 400?
+  ::  XX ALWAYS 400?
   ::
-  ?.  =(400 p.rep)  |
-  ?~  r.rep  |
-  =/  jon=(unit json)  (de-json:html q.u.r.rep)
-  ?~  jon  |
-  =('urn:ietf:params:acme:error:badNonce' type:(error:grab u.jon))
-::  +rate-limited: handle Acme service rate-limits
+  ?.  =(400 P.REP)  |
+  ?~  R.REP  |
+  =/  JON=(UNIT JSON)  (DE-JSON:HTML Q.U.R.REP)
+  ?~  JON  |
+  =('URN:IETF:PARAMS:ACME:ERROR:BADNONCE' TYPE:(ERROR:GRAB U.JON))
+::  +RATE-LIMITED: HANDLE ACME SERVICE RATE-LIMITS
 ::
-++  rate-limited
-  |=  [try=@ud act=@tas spur=wire bod=(unit octs)]
-  ^+  this
-  =/  jon=(unit json)
-    ?~(bod ~ (de-json:html q.u.bod))
-  ?~  jon
-    ::  no details, back way off
-    ::  XX specifically based on wire
+++  RATE-LIMITED
+  |=  [TRY=@UD ACT=@TAS SPUR=WIRE BOD=(UNIT OCTS)]
+  ^+  THIS
+  =/  JON=(UNIT JSON)
+    ?~(BOD ~ (DE-JSON:HTML Q.U.BOD))
+  ?~  JON
+    ::  NO DETAILS, BACK WAY OFF
+    ::  XX SPECIFICALLY BASED ON WIRE
     ::
-    (retry:effect try act spur (min ~d1 (backoff (add 10 try))))
-  =/  err  (error:grab u.jon)
-  ?.  =('params:acme:error:rateLimited' type.err)
-    ::  incorrect 429 status? backoff normally
+    (RETRY:EFFECT TRY ACT SPUR (MIN ~D1 (BACKOFF (ADD 10 TRY))))
+  =/  ERR  (ERROR:GRAB U.JON)
+  ?.  =('PARAMS:ACME:ERROR:RATELIMITED' TYPE.ERR)
+    ::  INCORRECT 429 STATUS? BACKOFF NORMALLY
     ::
-    (retry:effect try act spur (min ~h1 (backoff try)))
+    (RETRY:EFFECT TRY ACT SPUR (MIN ~H1 (BACKOFF TRY)))
 
-  =/  detail  (trip detail.err)
-  ::  too many certificates for these domains
+  =/  DETAIL  (TRIP DETAIL.ERR)
+  ::  TOO MANY CERTIFICATES FOR THESE DOMAINS
   ::
-  ?:  ?=(^ (find "already issued for exact" detail))
-    =.  ..this  (retry:effect try act spur ~d7)
-    =/  msg=cord
-      %+  rap  3
-      :~  'rate limit exceeded: '
-          ' too many certificates issued for '
-          ?~  rod
-            ::  XX shouldn't happen
+  ?:  ?=(^ (FIND "ALREADY ISSUED FOR EXACT" DETAIL))
+    =.  ..THIS  (RETRY:EFFECT TRY ACT SPUR ~D7)
+    =/  MSG=CORD
+      %+  RAP  3
+      :~  'RATE LIMIT EXCEEDED: '
+          ' TOO MANY CERTIFICATES ISSUED FOR '
+          ?~  ROD
+            ::  XX SHOULDN'T HAPPEN
             ::
-            (join '.' /network/arvo/(crip +:(scow %p our.bow)))
-          (join ', ' (turn ~(tap in dom.u.rod) |=(a=turf (join '.' a))))
-          '. retrying in ~d7.'
+            (JOIN '.' /NETWORK/ARVO/(CRIP +:(SCOW %P OUR.BOW)))
+          (JOIN ', ' (TURN ~(TAP IN DOM.U.ROD) |=(A=TURF (JOIN '.' A))))
+          '. RETRYING IN ~D7.'
       ==
-    (emit (notify msg ~))
-  ::  too many certificates for top-level-domain
+    (EMIT (NOTIFY MSG ~))
+  ::  TOO MANY CERTIFICATES FOR TOP-LEVEL-DOMAIN
   ::
-  ?:  ?=(^ (find "too many certificates already" detail))
-    =.  ..this  (retry:effect try act spur ~d7)
-    =/  lul=@dr
-      (add ~d7 (mul ~m1 (~(rad og eny.bow) (bex 10))))
-    =/  msg=cord
-      %+  rap  3
-      :~  'rate limit exceeded: '
-          ' too many certificates issued for '
-          ::  XX get from detail
+  ?:  ?=(^ (FIND "TOO MANY CERTIFICATES ALREADY" DETAIL))
+    =.  ..THIS  (RETRY:EFFECT TRY ACT SPUR ~D7)
+    =/  LUL=@DR
+      (ADD ~D7 (MUL ~M1 (~(RAD OG ENY.BOW) (BEX 10))))
+    =/  MSG=CORD
+      %+  RAP  3
+      :~  'RATE LIMIT EXCEEDED: '
+          ' TOO MANY CERTIFICATES ISSUED FOR '
+          ::  XX GET FROM DETAIL
           ::
-          (join '.' /network/arvo)
-          '. retrying in '
-          (scot %dr lul)  '.'
+          (JOIN '.' /NETWORK/ARVO)
+          '. RETRYING IN '
+          (SCOT %DR LUL)  '.'
       ==
-    (emit (notify msg ~))
-  ::  XX match more rate-limit conditions
-  ::  or backoff by wire
+    (EMIT (NOTIFY MSG ~))
+  ::  XX MATCH MORE RATE-LIMIT CONDITIONS
+  ::  OR BACKOFF BY WIRE
   ::
-  ::    - "too many registrations for this IP"
-  ::    - "too many registrations for this IP range"
-  ::    - "too many currently pending authorizations"
-  ::    - "too many failed authorizations recently"
-  ::    - "too many new orders recently"
+  ::    - "TOO MANY REGISTRATIONS FOR THIS IP"
+  ::    - "TOO MANY REGISTRATIONS FOR THIS IP RANGE"
+  ::    - "TOO MANY CURRENTLY PENDING AUTHORIZATIONS"
+  ::    - "TOO MANY FAILED AUTHORIZATIONS RECENTLY"
+  ::    - "TOO MANY NEW ORDERS RECENTLY"
   ::
-  (retry:effect try act spur (min ~d1 (backoff (add 10 try))))
-::  +failure-message: generic http failure message
+  (RETRY:EFFECT TRY ACT SPUR (MIN ~D1 (BACKOFF (ADD 10 TRY))))
+::  +FAILURE-MESSAGE: GENERIC HTTP FAILURE MESSAGE
 ::
-++  failure-message
-  |=  =purl
-  ^-  cord
-  %+  rap  3
-  :~  'unable to reach '
-      (crip (en-purl:html purl))  '. '
-      'please confirm your urbit has network connectivity.'
+++  FAILURE-MESSAGE
+  |=  =PURL
+  ^-  CORD
+  %+  RAP  3
+  :~  'UNABLE TO REACH '
+      (CRIP (EN-PURL:HTML PURL))  '. '
+      'PLEASE CONFIRM YOUR URBIT HAS NETWORK CONNECTIVITY.'
   ==
-::  |effect: send moves to advance
+::  |EFFECT: SEND MOVES TO ADVANCE
 ::
-++  effect
-  |_  try-count=(unit @ud)
-  ::  +try: this effect attempt number
+++  EFFECT
+  |_  TRY-COUNT=(UNIT @UD)
+  ::  +TRY: THIS EFFECT ATTEMPT NUMBER
   ::
-  ++  try  (fall try-count 1)
-  ::  +validate-domain: confirm that a pending domain resolves to us
+  ++  TRY  (FALL TRY-COUNT 1)
+  ::  +VALIDATE-DOMAIN: CONFIRM THAT A PENDING DOMAIN RESOLVES TO US
   ::
-  ++  validate-domain
-    |=  idx=@ud
-    ^+  this
-    ~|  %validate-domain-effect-fail
-    ?.  ?=(^ next-order)  ~|(%no-next-order !!)
-    =/  pending
-      (skip ~(tap by u.next-order) |=([turf @ud valid=?] valid))
-    ?:  =(~ pending)
-      new-order:effect
-    =/  next=[=turf idx=@ud valid=?]
-      ~|  [%no-next-domain idx=idx]
-      (head (skim pending |=([turf idx=@ud ?] =(idx ^idx))))
-    ::  XX should confirm that :turf points to us
-    ::  confirms that domain exists (and an urbit is on :80)
+  ++  VALIDATE-DOMAIN
+    |=  IDX=@UD
+    ^+  THIS
+    ~|  %VALIDATE-DOMAIN-EFFECT-FAIL
+    ?.  ?=(^ NEXT-ORDER)  ~|(%NO-NEXT-ORDER !!)
+    =/  PENDING
+      (SKIP ~(TAP BY U.NEXT-ORDER) |=([TURF @UD VALID=?] VALID))
+    ?:  =(~ PENDING)
+      NEW-ORDER:EFFECT
+    =/  NEXT=[=TURF IDX=@UD VALID=?]
+      ~|  [%NO-NEXT-DOMAIN IDX=IDX]
+      (HEAD (SKIM PENDING |=([TURF IDX=@UD ?] =(IDX ^IDX))))
+    ::  XX SHOULD CONFIRM THAT :TURF POINTS TO US
+    ::  CONFIRMS THAT DOMAIN EXISTS (AND AN URBIT IS ON :80)
     ::
-    =/  =purl
-        :-  [sec=| por=~ host=[%& turf.next]]
-        [[ext=`~.udon path=/static] query=~]
-    =/  =wire
-      (acme-wire try %validate-domain /idx/(scot %ud idx.next))
-    (emit (request wire purl %get ~ ~))
-  ::  +directory: get ACME service directory
+    =/  =PURL
+        :-  [SEC=| POR=~ HOST=[%& TURF.NEXT]]
+        [[EXT=`~.UDON PATH=/STATIC] QUERY=~]
+    =/  =WIRE
+      (ACME-WIRE TRY %VALIDATE-DOMAIN /IDX/(SCOT %UD IDX.NEXT))
+    (EMIT (REQUEST WIRE PURL %GET ~ ~))
+  ::  +DIRECTORY: GET ACME SERVICE DIRECTORY
   ::
-  ++  directory
-    ^+  this
-    ::  XX now in wire?
+  ++  DIRECTORY
+    ^+  THIS
+    ::  XX NOW IN WIRE?
     ::
-    (emit (request (acme-wire try %directory /) directory-base %get ~ ~))
-  ::  +nonce: get a new nonce for the next request
+    (EMIT (REQUEST (ACME-WIRE TRY %DIRECTORY /) DIRECTORY-BASE %GET ~ ~))
+  ::  +NONCE: GET A NEW NONCE FOR THE NEXT REQUEST
   ::
-  ++  nonce
-    |=  nex=wire
-    ~|  [%bad-nonce-next nex]
-    ?>  ?&  ?=(^ nex)
-            ?=(nonce-next i.nex)
+  ++  NONCE
+    |=  NEX=WIRE
+    ~|  [%BAD-NONCE-NEXT NEX]
+    ?>  ?&  ?=(^ NEX)
+            ?=(NONCE-NEXT I.NEX)
         ==
-    ^+  this
-    ::  XX now in wire?
+    ^+  THIS
+    ::  XX NOW IN WIRE?
     ::
-    =/  =wire
-       (acme-wire try %nonce [%next nex])
-    (emit (request wire nonce.dir %get ~ ~))
-  ::  +register: create ACME service account
+    =/  =WIRE
+       (ACME-WIRE TRY %NONCE [%NEXT NEX])
+    (EMIT (REQUEST WIRE NONCE.DIR %GET ~ ~))
+  ::  +REGISTER: CREATE ACME SERVICE ACCOUNT
   ::
-  ::    Note: accepts services ToS.
-  ::    XX add rekey mechanism
+  ::    NOTE: ACCEPTS SERVICES TOS.
+  ::    XX ADD REKEY MECHANISM
   ::
-  ++  register
-    ^+  this
-    ?.  =(~ reg.act)
-      ?:  =(~ next-order)
-        this
-      (validate-domain:effect 0)
-    =/  =json  [%o (my [['termsOfServiceAgreed' b+&] ~])]
-    ::  XX date in wire?
+  ++  REGISTER
+    ^+  THIS
+    ?.  =(~ REG.ACT)
+      ?:  =(~ NEXT-ORDER)
+        THIS
+      (VALIDATE-DOMAIN:EFFECT 0)
+    =/  =JSON  [%O (MY [['TERMSOFSERVICEAGREED' B+&] ~])]
+    ::  XX DATE IN WIRE?
     ::
-    =/  wire-params  [try %register /]
-    (stateful-request wire-params register.dir json)
-  ::  +renew: renew certificate
+    =/  WIRE-PARAMS  [TRY %REGISTER /]
+    (STATEFUL-REQUEST WIRE-PARAMS REGISTER.DIR JSON)
+  ::  +RENEW: RENEW CERTIFICATE
   ::
-  ++  renew
-    ^+  this
-    ~|  %renew-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ liv)      ~|(%no-live-config !!)
-    =<  new-order:effect
-    (queue-next-order & dom.u.liv)
-  ::  +new-order: create a new certificate order
+  ++  RENEW
+    ^+  THIS
+    ~|  %RENEW-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ LIV)      ~|(%NO-LIVE-CONFIG !!)
+    =<  NEW-ORDER:EFFECT
+    (QUEUE-NEXT-ORDER & DOM.U.LIV)
+  ::  +NEW-ORDER: CREATE A NEW CERTIFICATE ORDER
   ::
-  ++  new-order
-    ^+  this
-    ~|  %new-order-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=([~ ^] next-order)  ~|(%no-domains !!)
-    =/  =json
-      :-  %o  %-  my  :~
-        :-  %identifiers
-        :-  %a
-        %+  turn
-          ~(tap in ~(key by `(map turf *)`u.next-order))
-        |=(a=turf [%o (my type+s+'dns' value+s+(join '.' a) ~)])
+  ++  NEW-ORDER
+    ^+  THIS
+    ~|  %NEW-ORDER-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=([~ ^] NEXT-ORDER)  ~|(%NO-DOMAINS !!)
+    =/  =JSON
+      :-  %O  %-  MY  :~
+        :-  %IDENTIFIERS
+        :-  %A
+        %+  TURN
+          ~(TAP IN ~(KEY BY `(MAP TURF *)`U.NEXT-ORDER))
+        |=(A=TURF [%O (MY TYPE+S+'DNS' VALUE+S+(JOIN '.' A) ~)])
       ==
-    =/  wire-params  [try %new-order /(scot %da now.bow)]
-    (stateful-request wire-params new-order.dir json)
-  ::  +cancel-order: cancel failed order, set retry timer
+    =/  WIRE-PARAMS  [TRY %NEW-ORDER /(SCOT %DA NOW.BOW)]
+    (STATEFUL-REQUEST WIRE-PARAMS NEW-ORDER.DIR JSON)
+  ::  +CANCEL-ORDER: CANCEL FAILED ORDER, SET RETRY TIMER
   ::
-  ++  cancel-order
-    ^+  this
-    ~|  %cancel-order-effect-fail
-    :: ?>  ?=(^ rod)
-    ::  XX get failure reason
+  ++  CANCEL-ORDER
+    ^+  THIS
+    ~|  %CANCEL-ORDER-EFFECT-FAIL
+    :: ?>  ?=(^ ROD)
+    ::  XX GET FAILURE REASON
     ::
-    =/  try=@ud  ?~(rod 1 try.u.rod)
-    ::  backoff faster than usual
+    =/  TRY=@UD  ?~(ROD 1 TRY.U.ROD)
+    ::  BACKOFF FASTER THAN USUAL
     ::
-    =/  lul=@dr  (min ~h1 (backoff (add 4 try)))
-    =/  msg=cord
-      (cat 3 'retrying certificate request in ' (scot %dr lul))
-    =.  ..this  (emit (notify msg ~))
-    =.  ..this  (retry:effect try %new-order / lul)
-    ::  domains might already be validated
+    =/  LUL=@DR  (MIN ~H1 (BACKOFF (ADD 4 TRY)))
+    =/  MSG=CORD
+      (CAT 3 'RETRYING CERTIFICATE REQUEST IN ' (SCOT %DR LUL))
+    =.  ..THIS  (EMIT (NOTIFY MSG ~))
+    =.  ..THIS  (RETRY:EFFECT TRY %NEW-ORDER / LUL)
+    ::  DOMAINS MIGHT ALREADY BE VALIDATED
     ::
-    =.  ..this  (queue-next-order & ?>(?=(^ rod) dom.u.rod))
-    cancel-current-order
-  ::  +finalize-order: finalize completed order
+    =.  ..THIS  (QUEUE-NEXT-ORDER & ?>(?=(^ ROD) DOM.U.ROD))
+    CANCEL-CURRENT-ORDER
+  ::  +FINALIZE-ORDER: FINALIZE COMPLETED ORDER
   ::
-  ++  finalize-order
-    ^+  this
-    ~|  %finalize-order-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(~ pending.aut.u.rod)  ~|(%pending-authz !!)
-    ?.  ?=(~ active.aut.u.rod)   ~|(%active-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  FINALIZE-ORDER
+    ^+  THIS
+    ~|  %FINALIZE-ORDER-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(~ PENDING.AUT.U.ROD)  ~|(%PENDING-AUTHZ !!)
+    ?.  ?=(~ ACTIVE.AUT.U.ROD)   ~|(%ACTIVE-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =/  =json
-      [%o (my csr+s+(en-base64url (met 3 csr.u.rod) `@`csr.u.rod) ~)]
-    =/  wire-params  [try %finalize-order /(scot %da now.bow)]
-    (stateful-request wire-params fin.u.rod json)
-  ::  +check-order: check completed order for certificate availability
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =/  =JSON
+      [%O (MY CSR+S+(EN-BASE64URL (MET 3 CSR.U.ROD) `@`CSR.U.ROD) ~)]
+    =/  WIRE-PARAMS  [TRY %FINALIZE-ORDER /(SCOT %DA NOW.BOW)]
+    (STATEFUL-REQUEST WIRE-PARAMS FIN.U.ROD JSON)
+  ::  +CHECK-ORDER: CHECK COMPLETED ORDER FOR CERTIFICATE AVAILABILITY
   ::
-  ++  check-order
-    ^+  this
-    ~|  %check-order-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(~ pending.aut.u.rod)  ~|(%pending-authz !!)
-    ?.  ?=(~ active.aut.u.rod)   ~|(%active-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  CHECK-ORDER
+    ^+  THIS
+    ~|  %CHECK-ORDER-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(~ PENDING.AUT.U.ROD)  ~|(%PENDING-AUTHZ !!)
+    ?.  ?=(~ ACTIVE.AUT.U.ROD)   ~|(%ACTIVE-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =/  =wire
-       (acme-wire try %check-order /(scot %da now.bow))
-    (emit (request wire ego.u.rod %get ~ ~))
-  ::  +certificate: download PEM-encoded certificate
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =/  =WIRE
+       (ACME-WIRE TRY %CHECK-ORDER /(SCOT %DA NOW.BOW))
+    (EMIT (REQUEST WIRE EGO.U.ROD %GET ~ ~))
+  ::  +CERTIFICATE: DOWNLOAD PEM-ENCODED CERTIFICATE
   ::
-  ++  certificate
-    |=  url=purl
-    ^+  this
-    ~|  %certificate-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    =/  hed  (my accept+['applicate/x-pem-file' ~] ~)
-    =/  =wire
-       (acme-wire try %certificate /(scot %da now.bow))
-    (emit (request wire url %get hed ~))
-  ::  +install: tell %eyre about our certificate
+  ++  CERTIFICATE
+    |=  URL=PURL
+    ^+  THIS
+    ~|  %CERTIFICATE-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    =/  HED  (MY ACCEPT+['APPLICATE/X-PEM-FILE' ~] ~)
+    =/  =WIRE
+       (ACME-WIRE TRY %CERTIFICATE /(SCOT %DA NOW.BOW))
+    (EMIT (REQUEST WIRE URL %GET HED ~))
+  ::  +INSTALL: TELL %EYRE ABOUT OUR CERTIFICATE
   ::
-  ++  install
-    ^+  this
-    ~|  %install-effect-fail
-    ?>  ?=(^ liv)
-    =/  key=wain  (ring:en:pem:pkcs8 key.u.liv)
-    (emit %rule /install %cert `[key `wain`cer.u.liv])
-  ::  +get-authz: get next ACME service domain authorization object
+  ++  INSTALL
+    ^+  THIS
+    ~|  %INSTALL-EFFECT-FAIL
+    ?>  ?=(^ LIV)
+    =/  KEY=WAIN  (RING:EN:PEM:PKCS8 KEY.U.LIV)
+    (EMIT %RULE /INSTALL %CERT `[KEY `WAIN`CER.U.LIV])
+  ::  +GET-AUTHZ: GET NEXT ACME SERVICE DOMAIN AUTHORIZATION OBJECT
   ::
-  ++  get-authz
-    ^+  this
-    ~|  %get-authz-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(^ pending.aut.u.rod)  ~|(%no-pending-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  GET-AUTHZ
+    ^+  THIS
+    ~|  %GET-AUTHZ-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(^ PENDING.AUT.U.ROD)  ~|(%NO-PENDING-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =/  =wire
-      (acme-wire try %get-authz /(scot %da now.bow))
-    (emit (request wire i.pending.aut.u.rod %get ~ ~))
-  ::  XX check/finalize-authz ??
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =/  =WIRE
+      (ACME-WIRE TRY %GET-AUTHZ /(SCOT %DA NOW.BOW))
+    (EMIT (REQUEST WIRE I.PENDING.AUT.U.ROD %GET ~ ~))
+  ::  XX CHECK/FINALIZE-AUTHZ ??
   ::
-  ::  +save-trial: save ACME domain validation challenge to /.well-known/
+  ::  +SAVE-TRIAL: SAVE ACME DOMAIN VALIDATION CHALLENGE TO /.WELL-KNOWN/
   ::
-  ++  save-trial
-    ^+  this
-    ~|  %save-trial-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(^ active.aut.u.rod)  ~|(%no-active-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  SAVE-TRIAL
+    ^+  THIS
+    ~|  %SAVE-TRIAL-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(^ ACTIVE.AUT.U.ROD)  ~|(%NO-ACTIVE-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =*  aut  u.active.aut.u.rod
-    %-  emit
-    :^    %well
-        ::  XX idx in wire?
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =*  AUT  U.ACTIVE.AUT.U.ROD
+    %-  EMIT
+    :^    %WELL
+        ::  XX IDX IN WIRE?
         ::
-        /acme/save-trial/(scot %da now.bow)
-      /acme-challenge/[tok.cal.aut]
+        /ACME/SAVE-TRIAL/(SCOT %DA NOW.BOW)
+      /ACME-CHALLENGE/[TOK.CAL.AUT]
     :+  ~
-      /text/plain
-    %-  as-octs:mimes:html
-    (rap 3 [tok.cal.aut '.' (pass:thumb:jwk key.act) ~])
-  ::  +test-trial: confirm that ACME domain validation challenge is available
+      /TEXT/PLAIN
+    %-  AS-OCTS:MIMES:HTML
+    (RAP 3 [TOK.CAL.AUT '.' (PASS:THUMB:JWK KEY.ACT) ~])
+  ::  +TEST-TRIAL: CONFIRM THAT ACME DOMAIN VALIDATION CHALLENGE IS AVAILABLE
   ::
-  ++  test-trial
-    ^+  this
-    ~|  %test-trial-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(^ active.aut.u.rod)  ~|(%no-active-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  TEST-TRIAL
+    ^+  THIS
+    ~|  %TEST-TRIAL-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(^ ACTIVE.AUT.U.ROD)  ~|(%NO-ACTIVE-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =*  aut  u.active.aut.u.rod
-    =/  pat=path  /'.well-known'/acme-challenge/[tok.cal.aut]
-    ::  note: requires port 80, just as the ACME service will
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =*  AUT  U.ACTIVE.AUT.U.ROD
+    =/  PAT=PATH  /'.WELL-KNOWN'/ACME-CHALLENGE/[TOK.CAL.AUT]
+    ::  NOTE: REQUIRES PORT 80, JUST AS THE ACME SERVICE WILL
     ::
-    =/  url=purl  [[sec=| por=~ hos=[%& dom.aut]] [ext=~ pat] hed=~]
-    ::  =/  url=purl  [[sec=| por=`8.081 hos=[%& /localhost]] [ext=~ pat] hed=~]
-    ::  XX idx in wire?
+    =/  URL=PURL  [[SEC=| POR=~ HOS=[%& DOM.AUT]] [EXT=~ PAT] HED=~]
+    ::  =/  URL=PURL  [[SEC=| POR=`8.081 HOS=[%& /LOCALHOST]] [EXT=~ PAT] HED=~]
+    ::  XX IDX IN WIRE?
     ::
-    =/  =wire
-      (acme-wire try %test-trial /(scot %da now.bow))
-    (emit (request wire url %get ~ ~))
-  ::  +finalize-trial: notify ACME service that challenge is ready
+    =/  =WIRE
+      (ACME-WIRE TRY %TEST-TRIAL /(SCOT %DA NOW.BOW))
+    (EMIT (REQUEST WIRE URL %GET ~ ~))
+  ::  +FINALIZE-TRIAL: NOTIFY ACME SERVICE THAT CHALLENGE IS READY
   ::
-  ++  finalize-trial
-    ^+  this
-    ~|  %finalize-trial-effect-fail
-    ?.  ?=(^ reg.act)  ~|(%no-account !!)
-    ?.  ?=(^ rod)      ~|(%no-active-order !!)
-    ?.  ?=(^ active.aut.u.rod)  ~|(%no-active-authz !!)
-    ::  XX revisit wrt rate limits
+  ++  FINALIZE-TRIAL
+    ^+  THIS
+    ~|  %FINALIZE-TRIAL-EFFECT-FAIL
+    ?.  ?=(^ REG.ACT)  ~|(%NO-ACCOUNT !!)
+    ?.  ?=(^ ROD)      ~|(%NO-ACTIVE-ORDER !!)
+    ?.  ?=(^ ACTIVE.AUT.U.ROD)  ~|(%NO-ACTIVE-AUTHZ !!)
+    ::  XX REVISIT WRT RATE LIMITS
     ::
-    ?>  ?=(%wake sas.u.rod)
-    =*  aut  u.active.aut.u.rod
-    ::  empty object included for signature
-    ::  XX include index in wire?
+    ?>  ?=(%WAKE SAS.U.ROD)
+    =*  AUT  U.ACTIVE.AUT.U.ROD
+    ::  EMPTY OBJECT INCLUDED FOR SIGNATURE
+    ::  XX INCLUDE INDEX IN WIRE?
     ::
-    =/  wire-params  [try %finalize-trial /(scot %da now.bow)]
-    (stateful-request wire-params ego.cal.aut [%o ~])
-  ::  XX delete-trial?
+    =/  WIRE-PARAMS  [TRY %FINALIZE-TRIAL /(SCOT %DA NOW.BOW)]
+    (STATEFUL-REQUEST WIRE-PARAMS EGO.CAL.AUT [%O ~])
+  ::  XX DELETE-TRIAL?
   ::
-  ::  +retry: retry effect after timeout
+  ::  +RETRY: RETRY EFFECT AFTER TIMEOUT
   ::
-  ++  retry
-    |=  [try=@ud act=@tas =wire lull=@dr]
-    ::  XX validate wire
+  ++  RETRY
+    |=  [TRY=@UD ACT=@TAS =WIRE LULL=@DR]
+    ::  XX VALIDATE WIRE
     ::
-    (emit %wait (acme-wire +(try) act wire) (add now.bow lull))
+    (EMIT %WAIT (ACME-WIRE +(TRY) ACT WIRE) (ADD NOW.BOW LULL))
   --
-::  |event: accept event, emit next effect(s)
+::  |EVENT: ACCEPT EVENT, EMIT NEXT EFFECT(S)
 ::
-::    XX should these next effects be triggered at call sites instead?
+::    XX SHOULD THESE NEXT EFFECTS BE TRIGGERED AT CALL SITES INSTEAD?
 ::
-++  event
-  |_  try=@ud
-  ::  +validate-domain: accept a pending domain confirmation response
+++  EVENT
+  |_  TRY=@UD
+  ::  +VALIDATE-DOMAIN: ACCEPT A PENDING DOMAIN CONFIRMATION RESPONSE
   ::
-  ++  validate-domain
-    |=  [=wire rep=httr]
-    ^+  this
-    ?>  ?=([%idx @ *] wire)
-    ?.  ?=(^ next-order)
-      this
-    =/  idx  (slav %ud i.t.wire)
-    =/  valid  =(200 p.rep)
-    =/  item=(list [=turf idx=@ud valid=?])
-      (skim ~(tap by u.next-order) |=([turf idx=@ud ?] =(^idx idx)))
-    ?.  ?&  ?=([^ ~] item)
-            !valid.i.item
+  ++  VALIDATE-DOMAIN
+    |=  [=WIRE REP=HTTR]
+    ^+  THIS
+    ?>  ?=([%IDX @ *] WIRE)
+    ?.  ?=(^ NEXT-ORDER)
+      THIS
+    =/  IDX  (SLAV %UD I.T.WIRE)
+    =/  VALID  =(200 P.REP)
+    =/  ITEM=(LIST [=TURF IDX=@UD VALID=?])
+      (SKIM ~(TAP BY U.NEXT-ORDER) |=([TURF IDX=@UD ?] =(^IDX IDX)))
+    ?.  ?&  ?=([^ ~] ITEM)
+            !VALID.I.ITEM
         ==
-      this
-    =.  u.next-order
-      (~(put by u.next-order) turf.i.item [idx valid])
-    ?.  valid
-      ?:  (lth try 10)
-        =/  lul=@dr  (min ~h1 (backoff try))
-        (retry:effect try %validate-domain /idx/(scot %ud idx) lul)
-      ::  XX remove next-order, cancel pending requests
-      ::  XX include suggestion to fix
+      THIS
+    =.  U.NEXT-ORDER
+      (~(PUT BY U.NEXT-ORDER) TURF.I.ITEM [IDX VALID])
+    ?.  VALID
+      ?:  (LTH TRY 10)
+        =/  LUL=@DR  (MIN ~H1 (BACKOFF TRY))
+        (RETRY:EFFECT TRY %VALIDATE-DOMAIN /IDX/(SCOT %UD IDX) LUL)
+      ::  XX REMOVE NEXT-ORDER, CANCEL PENDING REQUESTS
+      ::  XX INCLUDE SUGGESTION TO FIX
       ::
-      =/  msg=cord
-        %+  rap  3
-        :~  'unable to reach '  (scot %p our.bow)
-            ' via http at '  (join '.' turf.i.item)  ':80'
+      =/  MSG=CORD
+        %+  RAP  3
+        :~  'UNABLE TO REACH '  (SCOT %P OUR.BOW)
+            ' VIA HTTP AT '  (JOIN '.' TURF.I.ITEM)  ':80'
         ==
-      (emit(next-order ~) (notify msg [(sell !>(rep)) ~]))
-    ?:  ?=(~ (skip ~(val by u.next-order) |=([@ud valid=?] valid)))
-      new-order:effect
-    (validate-domain:effect +(idx))
-  ::  +directory: accept ACME service directory, trigger registration
+      (EMIT(NEXT-ORDER ~) (NOTIFY MSG [(SELL !>(REP)) ~]))
+    ?:  ?=(~ (SKIP ~(VAL BY U.NEXT-ORDER) |=([@UD VALID=?] VALID)))
+      NEW-ORDER:EFFECT
+    (VALIDATE-DOMAIN:EFFECT +(IDX))
+  ::  +DIRECTORY: ACCEPT ACME SERVICE DIRECTORY, TRIGGER REGISTRATION
   ::
-  ++  directory
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ?.  =(200 p.rep)
-      ?:  (lth try 10)
-        (retry:effect try %directory / (min ~m30 (backoff try)))
-      (emit (notify (failure-message directory-base) [(sell !>(rep)) ~]))
-    =.  dir  (directory:grab (need (de-json:html q:(need r.rep))))
-    ?~(reg.act register:effect this)
-  ::  +nonce: accept new nonce and trigger next effect
+  ++  DIRECTORY
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ?.  =(200 P.REP)
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %DIRECTORY / (MIN ~M30 (BACKOFF TRY)))
+      (EMIT (NOTIFY (FAILURE-MESSAGE DIRECTORY-BASE) [(SELL !>(REP)) ~]))
+    =.  DIR  (DIRECTORY:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+    ?~(REG.ACT REGISTER:EFFECT THIS)
+  ::  +NONCE: ACCEPT NEW NONCE AND TRIGGER NEXT EFFECT
   ::
-  ::    Nonce has already been saved in +sigh-httr. The next effect
-  ::    is specified in the wire.
+  ::    NONCE HAS ALREADY BEEN SAVED IN +SIGH-HTTR. THE NEXT EFFECT
+  ::    IS SPECIFIED IN THE WIRE.
   ::
-  ++  nonce
-    |=  [=wire rep=httr]
-    ^+  this
-    ~|  [%unrecognized-nonce-wire wire]
-    ?>  &(?=(^ wire) ?=([%next ^] wire))
-    =*  nex  i.t.wire
-    ~|  [%unknown-nonce-next nex]
-    ?>  ?=(nonce-next nex)
-    ?.  =(204 p.rep)
-      ?:  (lth try 10)
-        (retry:effect try %nonce t.wire (min ~m30 (backoff try)))
-      (emit (notify (failure-message nonce.dir) [(sell !>(rep)) ~]))
-    ?-  nex
-      %register        register:effect
-      %new-order       new-order:effect
-      %finalize-order  finalize-order:effect
-      %finalize-trial  finalize-trial:effect
+  ++  NONCE
+    |=  [=WIRE REP=HTTR]
+    ^+  THIS
+    ~|  [%UNRECOGNIZED-NONCE-WIRE WIRE]
+    ?>  &(?=(^ WIRE) ?=([%NEXT ^] WIRE))
+    =*  NEX  I.T.WIRE
+    ~|  [%UNKNOWN-NONCE-NEXT NEX]
+    ?>  ?=(NONCE-NEXT NEX)
+    ?.  =(204 P.REP)
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %NONCE T.WIRE (MIN ~M30 (BACKOFF TRY)))
+      (EMIT (NOTIFY (FAILURE-MESSAGE NONCE.DIR) [(SELL !>(REP)) ~]))
+    ?-  NEX
+      %REGISTER        REGISTER:EFFECT
+      %NEW-ORDER       NEW-ORDER:EFFECT
+      %FINALIZE-ORDER  FINALIZE-ORDER:EFFECT
+      %FINALIZE-TRIAL  FINALIZE-TRIAL:EFFECT
     ==
-  ::  +register: accept ACME service registration
+  ::  +REGISTER: ACCEPT ACME SERVICE REGISTRATION
   ::
-  ++  register
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ?.  |(=(200 p.rep) =(201 p.rep))
-      ::  XX possible 204?
+  ++  REGISTER
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ?.  |(=(200 P.REP) =(201 P.REP))
+      ::  XX POSSIBLE 204?
       ::
-      ?:  (lth try 10)
-        (retry:effect try %register / (min ~h1 (backoff try)))
-      (emit (notify (failure-message register.dir) [(sell !>(rep)) ~]))
-    =/  loc=@t
-      q:(head (skim q.rep |=((pair @t @t) ?=(%location p))))
-    ::  XX @da once parser is fixed
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %REGISTER / (MIN ~H1 (BACKOFF TRY)))
+      (EMIT (NOTIFY (FAILURE-MESSAGE REGISTER.DIR) [(SELL !>(REP)) ~]))
+    =/  LOC=@T
+      Q:(HEAD (SKIM Q.REP |=((PAIR @T @T) ?=(%LOCATION P))))
+    ::  XX @DA ONCE PARSER IS FIXED
     ::
-    =/  wen=@t
-      ?~  r.rep
-        (scot %da now.bow)
-      =/  bod=acct:body
-        (acct:grab (need (de-json:html q.u.r.rep)))
-      ?>  ?=(%valid sas.bod)
-      wen.bod
-    =.  reg.act  `[wen loc]
-    ?:  =(~ next-order)
-      this
-    (validate-domain:effect 0)
-  ::  XX rekey
+    =/  WEN=@T
+      ?~  R.REP
+        (SCOT %DA NOW.BOW)
+      =/  BOD=ACCT:BODY
+        (ACCT:GRAB (NEED (DE-JSON:HTML Q.U.R.REP)))
+      ?>  ?=(%VALID SAS.BOD)
+      WEN.BOD
+    =.  REG.ACT  `[WEN LOC]
+    ?:  =(~ NEXT-ORDER)
+      THIS
+    (VALIDATE-DOMAIN:EFFECT 0)
+  ::  XX REKEY
   ::
-  ::  +new-order: order created, begin processing authorizations
+  ::  +NEW-ORDER: ORDER CREATED, BEGIN PROCESSING AUTHORIZATIONS
   ::
-  ++  new-order
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ?.  =(201 p.rep)
-      ::  XX possible 204?
+  ++  NEW-ORDER
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ?.  =(201 P.REP)
+      ::  XX POSSIBLE 204?
       ::
-      ?:  (lth try 10)
-        (retry:effect try %new-order / (min ~h1 (backoff try)))
-      ::  XX next steps, retrying in ??
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %NEW-ORDER / (MIN ~H1 (BACKOFF TRY)))
+      ::  XX NEXT STEPS, RETRYING IN ??
       ::
-      (emit (notify (failure-message register.dir) [(sell !>(rep)) ~]))
-    ?>  ?=(^ next-order)
-    =/  loc=@t
-      q:(head (skim q.rep |=((pair @t @t) ?=(%location p))))
-    =/  ego=purl  (need (de-purl:html loc))
-    ::  XX parse identifiers, confirm equal to pending domains
-    ::  XX check status
+      (EMIT (NOTIFY (FAILURE-MESSAGE REGISTER.DIR) [(SELL !>(REP)) ~]))
+    ?>  ?=(^ NEXT-ORDER)
+    =/  LOC=@T
+      Q:(HEAD (SKIM Q.REP |=((PAIR @T @T) ?=(%LOCATION P))))
+    =/  EGO=PURL  (NEED (DE-PURL:HTML LOC))
+    ::  XX PARSE IDENTIFIERS, CONFIRM EQUAL TO PENDING DOMAINS
+    ::  XX CHECK STATUS
     ::
-    =/  bod=order:body
-      (order:grab (need (de-json:html q:(need r.rep))))
-    =/  dom=(set turf)  ~(key by u.next-order)
-    ::  XX maybe generate key here?
+    =/  BOD=ORDER:BODY
+      (ORDER:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+    =/  DOM=(SET TURF)  ~(KEY BY U.NEXT-ORDER)
+    ::  XX MAYBE GENERATE KEY HERE?
     ::
-    =/  csr=@ux  +:(en:der:pkcs10 cey ~(tap in dom))
-    =/  dor=order
-      [dom try=1 sas=%wake exp.bod ego (need fin.bod) cey csr [aut.bod ~ ~]]
-    get-authz:effect(rod `dor, next-order ~)
-  ::  +finalize-order: order finalized, poll for certificate
+    =/  CSR=@UX  +:(EN:DER:PKCS10 CEY ~(TAP IN DOM))
+    =/  DOR=ORDER
+      [DOM TRY=1 SAS=%WAKE EXP.BOD EGO (NEED FIN.BOD) CEY CSR [AUT.BOD ~ ~]]
+    GET-AUTHZ:EFFECT(ROD `DOR, NEXT-ORDER ~)
+  ::  +FINALIZE-ORDER: ORDER FINALIZED, POLL FOR CERTIFICATE
   ::
-  ++  finalize-order
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ?:  =(504 p.rep)
-      ::  retry timeouts frequently
+  ++  FINALIZE-ORDER
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ?:  =(504 P.REP)
+      ::  RETRY TIMEOUTS FREQUENTLY
       ::
-      (retry:effect try %finalize-order / (min ~m10 (backoff try)))
-    ::  check-order regardless of status code
+      (RETRY:EFFECT TRY %FINALIZE-ORDER / (MIN ~M10 (BACKOFF TRY)))
+    ::  CHECK-ORDER REGARDLESS OF STATUS CODE
     ::
-    check-order:effect
-  ::  +check-order: check order status, dispatch appropriately
+    CHECK-ORDER:EFFECT
+  ::  +CHECK-ORDER: CHECK ORDER STATUS, DISPATCH APPROPRIATELY
   ::
-  ++  check-order
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ~|  [%strange-check-order wir]
-    ?>  ?=(^ rod)
-    ?.  =(200 p.rep)
-      ?:  (lth try 10)
-        (retry:effect try %check-order / (min ~m10 (backoff try)))
-      ::  XX next steps, retrying in, delete order ??
+  ++  CHECK-ORDER
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ~|  [%STRANGE-CHECK-ORDER WIR]
+    ?>  ?=(^ ROD)
+    ?.  =(200 P.REP)
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %CHECK-ORDER / (MIN ~M10 (BACKOFF TRY)))
+      ::  XX NEXT STEPS, RETRYING IN, DELETE ORDER ??
       ::
-      (emit (notify (failure-message ego.u.rod) [(sell !>(rep)) ~]))
-    =/  bod=order:body
-      (order:grab (need (de-json:html q:(need r.rep))))
-    ?+  sas.bod
-      ~&  [%check-order-status-unknown sas.bod]
-      this
-    ::  order failed (at any stage)
+      (EMIT (NOTIFY (FAILURE-MESSAGE EGO.U.ROD) [(SELL !>(REP)) ~]))
+    =/  BOD=ORDER:BODY
+      (ORDER:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+    ?+  SAS.BOD
+      ~&  [%CHECK-ORDER-STATUS-UNKNOWN SAS.BOD]
+      THIS
+    ::  ORDER FAILED (AT ANY STAGE)
     ::
-        %invalid
-      ~&  [%check-order-fail %invalid wir rep]
-      ::  XX check authz, get the failure reason
-      ::  XX possible to retry any reasons?
+        %INVALID
+      ~&  [%CHECK-ORDER-FAIL %INVALID WIR REP]
+      ::  XX CHECK AUTHZ, GET THE FAILURE REASON
+      ::  XX POSSIBLE TO RETRY ANY REASONS?
       ::
-      =<  cancel-order:effect
-      (emit (notify 'certificate order failed' [(sell !>(rep)) ~]))
-    ::  initial order state
+      =<  CANCEL-ORDER:EFFECT
+      (EMIT (NOTIFY 'CERTIFICATE ORDER FAILED' [(SELL !>(REP)) ~]))
+    ::  INITIAL ORDER STATE
     ::
-        %pending
-      check-order:effect
-    ::  validations completed
+        %PENDING
+      CHECK-ORDER:EFFECT
+    ::  VALIDATIONS COMPLETED
     ::
-        %ready
-      finalize-order:effect
-    ::  finalization requested
+        %READY
+      FINALIZE-ORDER:EFFECT
+    ::  FINALIZATION REQUESTED
     ::
-        %processing
-      check-order:effect
-    ::  certificate issued
+        %PROCESSING
+      CHECK-ORDER:EFFECT
+    ::  CERTIFICATE ISSUED
     ::
-        %valid
-      ::  XX update order state
-      ::  XX =< delete-trial
+        %VALID
+      ::  XX UPDATE ORDER STATE
+      ::  XX =< DELETE-TRIAL
       ::
-      ~|  impossible-order+[wir rep bod]
-      (certificate:effect (need cer.bod))
+      ~|  IMPOSSIBLE-ORDER+[WIR REP BOD]
+      (CERTIFICATE:EFFECT (NEED CER.BOD))
     ==
   ::
-  ::  +certificate: accept PEM-encoded certificate
+  ::  +CERTIFICATE: ACCEPT PEM-ENCODED CERTIFICATE
   ::
-  ++  certificate
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ~|  [%strange-certificate-response wir]
-    ?>  ?=(^ rod)
-    ?.  =(200 p.rep)
-      ::  will re-attempt certificate download per order status
+  ++  CERTIFICATE
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ~|  [%STRANGE-CERTIFICATE-RESPONSE WIR]
+    ?>  ?=(^ ROD)
+    ?.  =(200 P.REP)
+      ::  WILL RE-ATTEMPT CERTIFICATE DOWNLOAD PER ORDER STATUS
       ::
-      ?:  (lth try 10)
-        (retry:effect try %check-order / (min ~m10 (backoff try)))
-      ::  XX next steps, retrying in, get url somehow ??
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %CHECK-ORDER / (MIN ~M10 (BACKOFF TRY)))
+      ::  XX NEXT STEPS, RETRYING IN, GET URL SOMEHOW ??
       ::
-      =/  msg=cord
-        %+  rap  3
-        :~  'unable to download certificate. '
-            'please confirm that your urbit has network connectivity.'
+      =/  MSG=CORD
+        %+  RAP  3
+        :~  'UNABLE TO DOWNLOAD CERTIFICATE. '
+            'PLEASE CONFIRM THAT YOUR URBIT HAS NETWORK CONNECTIVITY.'
         ==
-      (emit (notify msg [(sell !>(rep)) ~]))
-    =/  cer=wain  (to-wain:format q:(need r.rep))
-    =/  fig=config
-      ::  XX expiration date
+      (EMIT (NOTIFY MSG [(SELL !>(REP)) ~]))
+    =/  CER=WAIN  (TO-WAIN:FORMAT Q:(NEED R.REP))
+    =/  FIG=CONFIG
+      ::  XX EXPIRATION DATE
       ::
-      [dom.u.rod key.u.rod cer (add now.bow ~d90) ego.u.rod]
-    ::  archive live config
+      [DOM.U.ROD KEY.U.ROD CER (ADD NOW.BOW ~D90) EGO.U.ROD]
+    ::  ARCHIVE LIVE CONFIG
     ::
-    =?  fig.hit  ?=(^ liv)  [u.liv fig.hit]
-    ::  save new live config, clear active order
+    =?  FIG.HIT  ?=(^ LIV)  [U.LIV FIG.HIT]
+    ::  SAVE NEW LIVE CONFIG, CLEAR ACTIVE ORDER
     ::
-    =>  .(liv (some fig), rod ~)
-    ?>  ?=(^ liv)
-    ::  notify :hall
+    =>  .(LIV (SOME FIG), ROD ~)
+    ?>  ?=(^ LIV)
+    ::  NOTIFY :HALL
     ::
-    =>  =/  msg=cord
-          %+  rap  3
-          :~  'received https certificate for '
-              (join ', ' (turn ~(tap in dom.u.liv) |=(a=turf (join '.' a))))
+    =>  =/  MSG=CORD
+          %+  RAP  3
+          :~  'RECEIVED HTTPS CERTIFICATE FOR '
+              (JOIN ', ' (TURN ~(TAP IN DOM.U.LIV) |=(A=TURF (JOIN '.' A))))
           ==
-        (emit (notify msg ~))
-    ::  set renewal timer, install certificate in %eyre
+        (EMIT (NOTIFY MSG ~))
+    ::  SET RENEWAL TIMER, INSTALL CERTIFICATE IN %EYRE
     ::
-    ::    Certificates expire after ~d90. We want time for retries and
-    ::    to work around rate limits, so our renewal timer is for ~d60.
-    ::    Renewals count towards weekly rate limits, but are allowed to
-    ::    continue past rate limits, so fudge the timer towards the end
-    ::    of the week nearest ~d60.
+    ::    CERTIFICATES EXPIRE AFTER ~D90. WE WANT TIME FOR RETRIES AND
+    ::    TO WORK AROUND RATE LIMITS, SO OUR RENEWAL TIMER IS FOR ~D60.
+    ::    RENEWALS COUNT TOWARDS WEEKLY RATE LIMITS, BUT ARE ALLOWED TO
+    ::    CONTINUE PAST RATE LIMITS, SO FUDGE THE TIMER TOWARDS THE END
+    ::    OF THE WEEK NEAREST ~D60.
     ::
-    =<  install:effect
-    =;  lul=@dr
-      (retry:effect 0 %renew / lul)
-    %+  add
-      (mul ~m1 (~(rad og eny.bow) (bex 8)))
-    =/  weekday  (daws:chrono:userlib (yore now.bow))
-    ?:  (gth weekday 4)
-      (sub ~d60 (mul ~d1 (sub weekday 4)))
-    (add ~d60 (mul ~d1 (sub 4 weekday)))
-  ::  +get-authz: accept ACME service authorization object
+    =<  INSTALL:EFFECT
+    =;  LUL=@DR
+      (RETRY:EFFECT 0 %RENEW / LUL)
+    %+  ADD
+      (MUL ~M1 (~(RAD OG ENY.BOW) (BEX 8)))
+    =/  WEEKDAY  (DAWS:CHRONO:USERLIB (YORE NOW.BOW))
+    ?:  (GTH WEEKDAY 4)
+      (SUB ~D60 (MUL ~D1 (SUB WEEKDAY 4)))
+    (ADD ~D60 (MUL ~D1 (SUB 4 WEEKDAY)))
+  ::  +GET-AUTHZ: ACCEPT ACME SERVICE AUTHORIZATION OBJECT
   ::
-  ++  get-authz
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ~|  [%strange-authorization wir]
-    ?>  ?=(^ rod)
-    ?>  ?=(^ pending.aut.u.rod)
-    ?.  =(200 p.rep)
-      ?:  (lth try 10)
-        (retry:effect try %get-authz / (min ~m10 (backoff try)))
-      ::  XX next steps, retrying in ??
+  ++  GET-AUTHZ
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ~|  [%STRANGE-AUTHORIZATION WIR]
+    ?>  ?=(^ ROD)
+    ?>  ?=(^ PENDING.AUT.U.ROD)
+    ?.  =(200 P.REP)
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %GET-AUTHZ / (MIN ~M10 (BACKOFF TRY)))
+      ::  XX NEXT STEPS, RETRYING IN ??
       ::
-      (emit (notify (failure-message i.pending.aut.u.rod) [(sell !>(rep)) ~]))
-    =/  bod=auth:body
-      (auth:grab (need (de-json:html q:(need r.rep))))
-    =/  cal=trial
-       ::  XX parse token to verify url-safe base64?
+      (EMIT (NOTIFY (FAILURE-MESSAGE I.PENDING.AUT.U.ROD) [(SELL !>(REP)) ~]))
+    =/  BOD=AUTH:BODY
+      (AUTH:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+    =/  CAL=TRIAL
+       ::  XX PARSE TOKEN TO VERIFY URL-SAFE BASE64?
        ::
-      [%http url.cal.bod tok.cal.bod %recv]
-    ::  XX check that URLs are the same
+      [%HTTP URL.CAL.BOD TOK.CAL.BOD %RECV]
+    ::  XX CHECK THAT URLS ARE THE SAME
     ::
-   =/  tau=auth  [i.pending.aut.u.rod dom.bod cal]
-    ::  XX get idx from wire instead?
+   =/  TAU=AUTH  [I.PENDING.AUT.U.ROD DOM.BOD CAL]
+    ::  XX GET IDX FROM WIRE INSTEAD?
     ::
-    =/  idx=@ud  +((lent done.aut.u.rod))
-    =/  rod-aut=order-auth
-      %=  aut.u.rod
-        pending  t.pending.aut.u.rod
-        active   `[idx tau]
+    =/  IDX=@UD  +((LENT DONE.AUT.U.ROD))
+    =/  ROD-AUT=ORDER-AUTH
+      %=  AUT.U.ROD
+        PENDING  T.PENDING.AUT.U.ROD
+        ACTIVE   `[IDX TAU]
       ==
-    =<  test-trial:effect
-    save-trial:effect(aut.u.rod rod-aut)
-  ::  XX check/finalize-authz ??
+    =<  TEST-TRIAL:EFFECT
+    SAVE-TRIAL:EFFECT(AUT.U.ROD ROD-AUT)
+  ::  XX CHECK/FINALIZE-AUTHZ ??
   ::
-  ::  +test-trial: accept response from challenge test
+  ::  +TEST-TRIAL: ACCEPT RESPONSE FROM CHALLENGE TEST
   ::
-  ::    Note that +save-trial:effect has no corresponding event.
+  ::    NOTE THAT +SAVE-TRIAL:EFFECT HAS NO CORRESPONDING EVENT.
   ::
-  ++  test-trial
-    |=  [wir=wire rep=httr]
-    ~|  [%strange-test-trial wir]
-    ?>  ?=(^ rod)
-    ?>  ?=(^ active.aut.u.rod)
-    =*  aut  u.active.aut.u.rod
-    ^+  this
-    ?.  =(200 p.rep)
-      ?:  (lth try 10)
-        (retry:effect try %test-trial / (min ~m10 (backoff try)))
-      ::  XX next steps, check connectivity, etc. ??
+  ++  TEST-TRIAL
+    |=  [WIR=WIRE REP=HTTR]
+    ~|  [%STRANGE-TEST-TRIAL WIR]
+    ?>  ?=(^ ROD)
+    ?>  ?=(^ ACTIVE.AUT.U.ROD)
+    =*  AUT  U.ACTIVE.AUT.U.ROD
+    ^+  THIS
+    ?.  =(200 P.REP)
+      ?:  (LTH TRY 10)
+        (RETRY:EFFECT TRY %TEST-TRIAL / (MIN ~M10 (BACKOFF TRY)))
+      ::  XX NEXT STEPS, CHECK CONNECTIVITY, ETC. ??
       ::
-      =<  cancel-order:effect
-      =/  msg=cord
-        %+  rap  3
-        :~  'unable to retrieve self-hosted domain validation token '
-            'via '  (join '.' dom.aut)  '. '
-            'please confirm your urbit has network connectivity.'
+      =<  CANCEL-ORDER:EFFECT
+      =/  MSG=CORD
+        %+  RAP  3
+        :~  'UNABLE TO RETRIEVE SELF-HOSTED DOMAIN VALIDATION TOKEN '
+            'VIA '  (JOIN '.' DOM.AUT)  '. '
+            'PLEASE CONFIRM YOUR URBIT HAS NETWORK CONNECTIVITY.'
         ==
-      (emit (notify msg [(sell !>(rep)) ~]))
-    =/  bod
-      %-  as-octs:mimes:html
-      (rap 3 [tok.cal.aut '.' (pass:thumb:jwk key.act) ~])
-    ?.  ?&  ?=(^ r.rep)
-            =(bod u.r.rep)
+      (EMIT (NOTIFY MSG [(SELL !>(REP)) ~]))
+    =/  BOD
+      %-  AS-OCTS:MIMES:HTML
+      (RAP 3 [TOK.CAL.AUT '.' (PASS:THUMB:JWK KEY.ACT) ~])
+    ?.  ?&  ?=(^ R.REP)
+            =(BOD U.R.REP)
         ==
-      ::  XX save-trial again?
-      ::  XX probably a DNS misconfiguration
+      ::  XX SAVE-TRIAL AGAIN?
+      ::  XX PROBABLY A DNS MISCONFIGURATION
       ::
-      =/  =tang
-        :~  ?~(r.rep leaf+"~" (sell !>(u.r.rep)))
-            leaf+"actual:"
-            (sell !>((some bod)))
-            leaf+"expected:"
+      =/  =TANG
+        :~  ?~(R.REP LEAF+"~" (SELL !>(U.R.REP)))
+            LEAF+"ACTUAL:"
+            (SELL !>((SOME BOD)))
+            LEAF+"EXPECTED:"
         ==
-      (emit (notify 'domain validation value is wrong' tang))
-    finalize-trial:effect
-  ::  +finalize-trial:
+      (EMIT (NOTIFY 'DOMAIN VALIDATION VALUE IS WRONG' TANG))
+    FINALIZE-TRIAL:EFFECT
+  ::  +FINALIZE-TRIAL:
   ::
-  ++  finalize-trial
-    |=  [wir=wire rep=httr]
-    ^+  this
-    ~|  [%strange-finalize-trial wir]
-    ?>  ?=(^ rod)
-    ?>  ?=(^ active.aut.u.rod)
-    =*  aut  u.active.aut.u.rod
-    ?.  =(200 p.rep)
-      ::  XX possible 204? assume pending?
-      ::  XX handle "challenge is not pending"
+  ++  FINALIZE-TRIAL
+    |=  [WIR=WIRE REP=HTTR]
+    ^+  THIS
+    ~|  [%STRANGE-FINALIZE-TRIAL WIR]
+    ?>  ?=(^ ROD)
+    ?>  ?=(^ ACTIVE.AUT.U.ROD)
+    =*  AUT  U.ACTIVE.AUT.U.ROD
+    ?.  =(200 P.REP)
+      ::  XX POSSIBLE 204? ASSUME PENDING?
+      ::  XX HANDLE "CHALLENGE IS NOT PENDING"
       ::
-      ?:  =(504 p.rep)
-        ::  retry timeouts frequently
+      ?:  =(504 P.REP)
+        ::  RETRY TIMEOUTS FREQUENTLY
         ::
-        ?:  (lth try 10)
-          (retry:effect try %finalize-trial / (min ~m10 (backoff try)))
-        ::  XX next steps, check connectivity, etc. ??
+        ?:  (LTH TRY 10)
+          (RETRY:EFFECT TRY %FINALIZE-TRIAL / (MIN ~M10 (BACKOFF TRY)))
+        ::  XX NEXT STEPS, CHECK CONNECTIVITY, ETC. ??
         ::
-        (emit (notify (failure-message ego.cal.aut) [(sell !>(rep)) ~]))
-      ::  XX get challenge, confirm urn:ietf:params:acme:error:connection
+        (EMIT (NOTIFY (FAILURE-MESSAGE EGO.CAL.AUT) [(SELL !>(REP)) ~]))
+      ::  XX GET CHALLENGE, CONFIRM URN:IETF:PARAMS:ACME:ERROR:CONNECTION
       ::
-      ::  =/  err=error:body
-      ::    (error:grab (need (de-json:html q:(need r.rep))))
-      ::  ?:  =('urn:ietf:params:acme:error:malformed' status.err)
+      ::  =/  ERR=ERROR:BODY
+      ::    (ERROR:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+      ::  ?:  =('URN:IETF:PARAMS:ACME:ERROR:MALFORMED' STATUS.ERR)
       ::
-      =<  cancel-order:effect
-      =/  msg=cord
-       'unable to finalize domain validation challenge'
-      (emit (notify msg [(sell !>(rep)) ~]))
-    =/  bod=challenge:body
-      (challenge:grab (need (de-json:html q:(need r.rep))))
-    ::  XX check for other possible values in 200 response
-    ::  note: may have already been validated
+      =<  CANCEL-ORDER:EFFECT
+      =/  MSG=CORD
+       'UNABLE TO FINALIZE DOMAIN VALIDATION CHALLENGE'
+      (EMIT (NOTIFY MSG [(SELL !>(REP)) ~]))
+    =/  BOD=CHALLENGE:BODY
+      (CHALLENGE:GRAB (NEED (DE-JSON:HTML Q:(NEED R.REP))))
+    ::  XX CHECK FOR OTHER POSSIBLE VALUES IN 200 RESPONSE
+    ::  NOTE: MAY HAVE ALREADY BEEN VALIDATED
     ::
-    ?>  ?=(?(%pending %valid) sas.bod)
-    =/  rod-aut=order-auth
-      aut.u.rod(active ~, done [+.aut(sas.cal %pend) done.aut.u.rod])
-    ?~  pending.aut.u.rod
-      check-order:effect(aut.u.rod rod-aut)
-    get-authz:effect(aut.u.rod rod-aut)
-  ::  XX delete-trial?
+    ?>  ?=(?(%PENDING %VALID) SAS.BOD)
+    =/  ROD-AUT=ORDER-AUTH
+      AUT.U.ROD(ACTIVE ~, DONE [+.AUT(SAS.CAL %PEND) DONE.AUT.U.ROD])
+    ?~  PENDING.AUT.U.ROD
+      CHECK-ORDER:EFFECT(AUT.U.ROD ROD-AUT)
+    GET-AUTHZ:EFFECT(AUT.U.ROD ROD-AUT)
+  ::  XX DELETE-TRIAL?
   ::
-  ::  +retry: retry effect after timeout
+  ::  +RETRY: RETRY EFFECT AFTER TIMEOUT
   ::
-  ++  retry
-    |=  =wire
-    ^+  this
-    ?>  ?=([%try @ @tas *] wire)
-    =/  try  (slav %ud i.t.wire)
-    =*  fec  ~(. effect (some +(try)))
-    =*  act  i.t.t.wire
-    =*  spur  t.t.t.wire
-    ?+  act
-        ~&([%unknown-retry act] this)
-      %validate-domain
-                       ?>  ?=([%idx @ ~] spur)
-                       (validate-domain:fec (slav %ud i.t.spur))
-      %directory       directory:fec
-      %nonce           ?>  ?=(^ spur)
-                       (nonce:fec t.spur)
-      %register        register:fec
-      %renew           renew:fec
-      %new-order       new-order:fec
-      %finalize-order  finalize-order:fec
-      %check-order     check-order:fec
-      %certificate     check-order:fec :: intentional
-      %get-authz       get-authz:fec
-      %test-trial      test-trial:fec
-      %finalize-trial  finalize-trial:fec
+  ++  RETRY
+    |=  =WIRE
+    ^+  THIS
+    ?>  ?=([%TRY @ @TAS *] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    =*  FEC  ~(. EFFECT (SOME +(TRY)))
+    =*  ACT  I.T.T.WIRE
+    =*  SPUR  T.T.T.WIRE
+    ?+  ACT
+        ~&([%UNKNOWN-RETRY ACT] THIS)
+      %VALIDATE-DOMAIN
+                       ?>  ?=([%IDX @ ~] SPUR)
+                       (VALIDATE-DOMAIN:FEC (SLAV %UD I.T.SPUR))
+      %DIRECTORY       DIRECTORY:FEC
+      %NONCE           ?>  ?=(^ SPUR)
+                       (NONCE:FEC T.SPUR)
+      %REGISTER        REGISTER:FEC
+      %RENEW           RENEW:FEC
+      %NEW-ORDER       NEW-ORDER:FEC
+      %FINALIZE-ORDER  FINALIZE-ORDER:FEC
+      %CHECK-ORDER     CHECK-ORDER:FEC
+      %CERTIFICATE     CHECK-ORDER:FEC :: INTENTIONAL
+      %GET-AUTHZ       GET-AUTHZ:FEC
+      %TEST-TRIAL      TEST-TRIAL:FEC
+      %FINALIZE-TRIAL  FINALIZE-TRIAL:FEC
     ==
   --
-::  +sigh-tang: handle http request failure
+::  +SIGH-TANG: HANDLE HTTP REQUEST FAILURE
 ::
-++  sigh-tang
-  |=  [=wire =tang]
-  ^-  (quip move _this)
-  ?>  ?=([%acme ^] wire)
-  ::  XX may God forgive me for this
+++  SIGH-TANG
+  |=  [=WIRE =TANG]
+  ^-  (QUIP MOVE _THIS)
+  ?>  ?=([%ACME ^] WIRE)
+  ::  XX MAY GOD FORGIVE ME FOR THIS
   ::
-  =<  abet
-  =-  ?:(?=(%& -.-) p.- this)
-  %-  mule  |.
-  (retry:event t.wire)
-::  +sigh-recoverable-error: handle http rate-limit response
+  =<  ABET
+  =-  ?:(?=(%& -.-) P.- THIS)
+  %-  MULE  |.
+  (RETRY:EVENT T.WIRE)
+::  +SIGH-RECOVERABLE-ERROR: HANDLE HTTP RATE-LIMIT RESPONSE
 ::
-::    XX we won't receive this unless we request a
-::    mark conversion and it fails
+::    XX WE WON'T RECEIVE THIS UNLESS WE REQUEST A
+::    MARK CONVERSION AND IT FAILS
 ::
-++  sigh-recoverable-error
-  |=  [=wire %429 %rate-limit lim=(unit @da)]
-  ^-  (quip move _this)
-  ~&  [%sigh-recoverable wire lim]
-  ?>  ?=([%acme ^] wire)
-  abet:(retry:event t.wire)
-::  +sigh-httr: accept http response
+++  SIGH-RECOVERABLE-ERROR
+  |=  [=WIRE %429 %RATE-LIMIT LIM=(UNIT @DA)]
+  ^-  (QUIP MOVE _THIS)
+  ~&  [%SIGH-RECOVERABLE WIRE LIM]
+  ?>  ?=([%ACME ^] WIRE)
+  ABET:(RETRY:EVENT T.WIRE)
+::  +SIGH-HTTR: ACCEPT HTTP RESPONSE
 ::
-++  sigh-httr
-  |=  [=wire rep=httr]
-  ^-  (quip move _this)
-  ?>  ?=([%acme ^] wire)
-  =<  abet
-  ::  add nonce to pool, if present
+++  SIGH-HTTR
+  |=  [=WIRE REP=HTTR]
+  ^-  (QUIP MOVE _THIS)
+  ?>  ?=([%ACME ^] WIRE)
+  =<  ABET
+  ::  ADD NONCE TO POOL, IF PRESENT
   ::
-  =/  nonhed  (skim q.rep |=((pair @t @t) ?=(%replay-nonce p)))
-  =?  nonces  ?=(^ nonhed)  [q.i.nonhed nonces]
+  =/  NONHED  (SKIM Q.REP |=((PAIR @T @T) ?=(%REPLAY-NONCE P)))
+  =?  NONCES  ?=(^ NONHED)  [Q.I.NONHED NONCES]
   ::
-  ?>  ?=([%try @ @tas *] t.wire)
-  =/  try  (slav %ud i.t.t.wire)
-  =*  ven  ~(. event try)
-  =*  act  i.t.t.t.wire
-  =*  spur  t.t.t.t.wire
-  ::  backoff if rate-limited
+  ?>  ?=([%TRY @ @TAS *] T.WIRE)
+  =/  TRY  (SLAV %UD I.T.T.WIRE)
+  =*  VEN  ~(. EVENT TRY)
+  =*  ACT  I.T.T.T.WIRE
+  =*  SPUR  T.T.T.T.WIRE
+  ::  BACKOFF IF RATE-LIMITED
   ::
-  ?:  =(429 p.rep)
-    (rate-limited try act spur r.rep)
-  ::  request nonce if expired-invalid
+  ?:  =(429 P.REP)
+    (RATE-LIMITED TRY ACT SPUR R.REP)
+  ::  REQUEST NONCE IF EXPIRED-INVALID
   ::
-  ?:  (bad-nonce rep)
-    (nonce:effect spur)
-  ::  XX replace with :hall notification
+  ?:  (BAD-NONCE REP)
+    (NONCE:EFFECT SPUR)
+  ::  XX REPLACE WITH :HALL NOTIFICATION
   ::
-  ~|  [%sigh-fail wire]
-  %.  [spur rep]
-  ?+  act
-      ~&([%unknown-http-response act] !!)
-    %validate-domain
-                     validate-domain:ven
-    %directory       directory:ven
-    %nonce           nonce:ven
-    %register        register:ven
-    ::  XX rekey
+  ~|  [%SIGH-FAIL WIRE]
+  %.  [SPUR REP]
+  ?+  ACT
+      ~&([%UNKNOWN-HTTP-RESPONSE ACT] !!)
+    %VALIDATE-DOMAIN
+                     VALIDATE-DOMAIN:VEN
+    %DIRECTORY       DIRECTORY:VEN
+    %NONCE           NONCE:VEN
+    %REGISTER        REGISTER:VEN
+    ::  XX REKEY
     ::
-    %new-order       new-order:ven
-    %finalize-order  finalize-order:ven
-    %check-order     check-order:ven
-    %certificate     certificate:ven
-    %get-authz       get-authz:ven
-    ::  XX check/finalize-authz ??
+    %NEW-ORDER       NEW-ORDER:VEN
+    %FINALIZE-ORDER  FINALIZE-ORDER:VEN
+    %CHECK-ORDER     CHECK-ORDER:VEN
+    %CERTIFICATE     CERTIFICATE:VEN
+    %GET-AUTHZ       GET-AUTHZ:VEN
+    ::  XX CHECK/FINALIZE-AUTHZ ??
     ::
-    %test-trial      test-trial:ven
-    %finalize-trial  finalize-trial:ven
-    ::  XX delete-trial?
+    %TEST-TRIAL      TEST-TRIAL:VEN
+    %FINALIZE-TRIAL  FINALIZE-TRIAL:VEN
+    ::  XX DELETE-TRIAL?
     ::
   ==
-::  +wake: timer wakeup event
+::  +WAKE: TIMER WAKEUP EVENT
 ::
-++  wake
-  |=  [wir=wire ~]
-  ^-  (quip move _this)
-  ?>  ?=([%acme *] wir)
-  abet:(retry:event t.wir)
-::  +poke-acme-order: create new order for a set of domains
+++  WAKE
+  |=  [WIR=WIRE ~]
+  ^-  (QUIP MOVE _THIS)
+  ?>  ?=([%ACME *] WIR)
+  ABET:(RETRY:EVENT T.WIR)
+::  +POKE-ACME-ORDER: CREATE NEW ORDER FOR A SET OF DOMAINS
 ::
-++  poke-acme-order
-  |=  a=(set turf)
-  abet:(add-order a)
-::  +poke-noun: for debugging
+++  POKE-ACME-ORDER
+  |=  A=(SET TURF)
+  ABET:(ADD-ORDER A)
+::  +POKE-NOUN: FOR DEBUGGING
 ::
-++  poke-noun
-  |=  a=*
-  ^-  (quip move _this)
-  =<  abet
-  ?+  a
-    this
+++  POKE-NOUN
+  |=  A=*
+  ^-  (QUIP MOVE _THIS)
+  =<  ABET
+  ?+  A
+    THIS
   ::
-      %dbug-account
-    ~&  registered=reg.act
-    ~&  [%public (pass:en:pem:pkcs1 key.act)]
-    ~?  !=(~ sek.key.act)
-      [%private (ring:en:pem:pkcs1 key.act)]
-    this
+      %DBUG-ACCOUNT
+    ~&  REGISTERED=REG.ACT
+    ~&  [%PUBLIC (PASS:EN:PEM:PKCS1 KEY.ACT)]
+    ~?  !=(~ SEK.KEY.ACT)
+      [%PRIVATE (RING:EN:PEM:PKCS1 KEY.ACT)]
+    THIS
   ::
-      %dbug-certificate
-    ?~  liv  ~&(~ this)
-    ~&  [%key (ring:en:pem:pkcs8 key.u.liv)]
-    ~&  [%cert `wain`cer.u.liv]
-    ~&  [%expires exp.u.liv]
-    ~&  :-  %domains
-        (join ', ' (turn ~(tap in dom.u.liv) |=(a=turf (join '.' a))))
-    this
+      %DBUG-CERTIFICATE
+    ?~  LIV  ~&(~ THIS)
+    ~&  [%KEY (RING:EN:PEM:PKCS8 KEY.U.LIV)]
+    ~&  [%CERT `WAIN`CER.U.LIV]
+    ~&  [%EXPIRES EXP.U.LIV]
+    ~&  :-  %DOMAINS
+        (JOIN ', ' (TURN ~(TAP IN DOM.U.LIV) |=(A=TURF (JOIN '.' A))))
+    THIS
   ::
-      %dbug-history
-    ~&  [%account-history act.hit]
-    ~&  [%config-history fig.hit]
-    ~&  [%failed-order-history fal.hit]
-    this
+      %DBUG-HISTORY
+    ~&  [%ACCOUNT-HISTORY ACT.HIT]
+    ~&  [%CONFIG-HISTORY FIG.HIT]
+    ~&  [%FAILED-ORDER-HISTORY FAL.HIT]
+    THIS
   ::
-      %init
-    init
+      %INIT
+    INIT
   ::
-      %register
-    register:effect
+      %REGISTER
+    REGISTER:EFFECT
   ::
-      %poll
-    check-order:effect
+      %POLL
+    CHECK-ORDER:EFFECT
   ::
-      %retry
-    (add-order (sy /network/arvo/(crip +:(scow %p our.bow)) ~))
+      %RETRY
+    (ADD-ORDER (SY /NETWORK/ARVO/(CRIP +:(SCOW %P OUR.BOW)) ~))
   ==
-::  +poke-path: for debugging
+::  +POKE-PATH: FOR DEBUGGING
 ::
-++  poke-path
-  |=(a=path abet:(add-order (sy a ~)))
-::  +prep: initialize and adapt state
+++  POKE-PATH
+  |=(A=PATH ABET:(ADD-ORDER (SY A ~)))
+::  +PREP: INITIALIZE AND ADAPT STATE
 ::
-++  prep
-  |=  old=(unit acme)
-  ^-  (quip move _this)
-  ?~  old
-    [~ this]
-  [~ this(+<+ u.old)]
-::  +rekey: create new 2.048 bit RSA key
+++  PREP
+  |=  OLD=(UNIT ACME)
+  ^-  (QUIP MOVE _THIS)
+  ?~  OLD
+    [~ THIS]
+  [~ THIS(+<+ U.OLD)]
+::  +REKEY: CREATE NEW 2.048 BIT RSA KEY
 ::
-::    XX do something about this iteration
+::    XX DO SOMETHING ABOUT THIS ITERATION
 ::
-++  rekey
-  |=  eny=@
-  =|  i=@
-  |-  ^-  key:rsa
-  =/  k  (new-key:rsa 2.048 eny)
-  =/  m  (met 0 n.pub.k)
-  ::  ?:  =(0 (mod m 8))  k
-  ?:  =(2.048 m)  k
-  ~&  [%key iter=i width=m]
-  $(i +(i), eny +(eny))
-::  +init: initialize :acme state
+++  REKEY
+  |=  ENY=@
+  =|  I=@
+  |-  ^-  KEY:RSA
+  =/  K  (NEW-KEY:RSA 2.048 ENY)
+  =/  M  (MET 0 N.PUB.K)
+  ::  ?:  =(0 (MOD M 8))  K
+  ?:  =(2.048 M)  K
+  ~&  [%KEY ITER=I WIDTH=M]
+  $(I +(I), ENY +(ENY))
+::  +INIT: INITIALIZE :ACME STATE
 ::
-::    We defer the initial request for independence from the causal event,
-::    which is necessary to init on the boot event. Which we no longer do,
-::    but we're preserving the pattern for future flexibility.
+::    WE DEFER THE INITIAL REQUEST FOR INDEPENDENCE FROM THE CAUSAL EVENT,
+::    WHICH IS NECESSARY TO INIT ON THE BOOT EVENT. WHICH WE NO LONGER DO,
+::    BUT WE'RE PRESERVING THE PATTERN FOR FUTURE FLEXIBILITY.
 ::
-++  init
-  =<  (retry:effect 0 %directory / `@dr`1)
-  %=  this
-    act  [(rekey eny.bow) ~]
-    cey  (rekey (mix eny.bow (shaz now.bow)))
+++  INIT
+  =<  (RETRY:EFFECT 0 %DIRECTORY / `@DR`1)
+  %=  THIS
+    ACT  [(REKEY ENY.BOW) ~]
+    CEY  (REKEY (MIX ENY.BOW (SHAZ NOW.BOW)))
   ==
-::  +queue-next-order: enqueue domains for validation
+::  +QUEUE-NEXT-ORDER: ENQUEUE DOMAINS FOR VALIDATION
 ::
-++  queue-next-order
-  |=  [valid=? dom=(set turf)]
-  ^+  this
-  %=  this  next-order
+++  QUEUE-NEXT-ORDER
+  |=  [VALID=? DOM=(SET TURF)]
+  ^+  THIS
+  %=  THIS  NEXT-ORDER
     :-  ~
-    %+  roll
-      ~(tap in dom)
-    |=  [=turf state=(map turf [idx=@ud valid=?])]
-    (~(put by state) turf [~(wyt by state) valid])
+    %+  ROLL
+      ~(TAP IN DOM)
+    |=  [=TURF STATE=(MAP TURF [IDX=@UD VALID=?])]
+    (~(PUT BY STATE) TURF [~(WYT BY STATE) VALID])
   ==
-::  +cancel-current-order: and archive failure for future autopsy
+::  +CANCEL-CURRENT-ORDER: AND ARCHIVE FAILURE FOR FUTURE AUTOPSY
 ::
-::    XX we may have pending moves out for this order
-::    put dates in wires, check against order creation date?
-::    or re-use order-id?
+::    XX WE MAY HAVE PENDING MOVES OUT FOR THIS ORDER
+::    PUT DATES IN WIRES, CHECK AGAINST ORDER CREATION DATE?
+::    OR RE-USE ORDER-ID?
 ::
-++  cancel-current-order
-  ^+  this
-  ?~  rod  this
-  %=  this
-    rod      ~
-    fal.hit  [u.rod fal.hit]
+++  CANCEL-CURRENT-ORDER
+  ^+  THIS
+  ?~  ROD  THIS
+  %=  THIS
+    ROD      ~
+    FAL.HIT  [U.ROD FAL.HIT]
   ==
-::  +add-order: add new certificate order
+::  +ADD-ORDER: ADD NEW CERTIFICATE ORDER
 ::
-++  add-order
-  |=  dom=(set turf)
-  ^+  this
-  ?:  =(~ dom)
-    ~|(%acme-empty-certificate-order !!)
-  ?:  ?=(?(%earl %pawn) (clan:title our.bow))
-    this
-  =.  ..this  (queue-next-order | dom)
-  =.  ..this  cancel-current-order
-  ::  notify :hall
+++  ADD-ORDER
+  |=  DOM=(SET TURF)
+  ^+  THIS
+  ?:  =(~ DOM)
+    ~|(%ACME-EMPTY-CERTIFICATE-ORDER !!)
+  ?:  ?=(?(%EARL %PAWN) (CLAN:TITLE OUR.BOW))
+    THIS
+  =.  ..THIS  (QUEUE-NEXT-ORDER | DOM)
+  =.  ..THIS  CANCEL-CURRENT-ORDER
+  ::  NOTIFY :HALL
   ::
-  =.  ..this
-    =/  msg=cord
-      %+  rap  3
-      :~  'requesting an https certificate for '
-          (join ', ' (turn ~(tap in dom) |=(a=turf (join '.' a))))
+  =.  ..THIS
+    =/  MSG=CORD
+      %+  RAP  3
+      :~  'REQUESTING AN HTTPS CERTIFICATE FOR '
+          (JOIN ', ' (TURN ~(TAP IN DOM) |=(A=TURF (JOIN '.' A))))
       ==
-    (emit (notify msg ~))
-  ::  if registered, create order
+    (EMIT (NOTIFY MSG ~))
+  ::  IF REGISTERED, CREATE ORDER
   ::
-  ?^  reg.act
-    (validate-domain:effect 0)
-  ::  if initialized, defer
+  ?^  REG.ACT
+    (VALIDATE-DOMAIN:EFFECT 0)
+  ::  IF INITIALIZED, DEFER
   ::
-  ?.(=(act *acct) this init)
+  ?.(=(ACT *ACCT) THIS INIT)
 --

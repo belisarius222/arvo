@@ -1,14 +1,14 @@
 ::
-::::  /hoon/purl/mar
+::::  /HOON/PURL/MAR
   ::
 /?    310
-=,  eyre
-|_  url/purl
+=,  EYRE
+|_  URL/PURL
 ::
-++  grow  |%    ++  hiss  [url %get ~ ~]
+++  GROW  |%    ++  HISS  [URL %GET ~ ~]
           --
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  purl                                        ::  clam from %noun
+  ++  NOUN  PURL                                        ::  CLAM FROM %NOUN
   --
 --

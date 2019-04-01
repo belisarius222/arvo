@@ -1,22 +1,22 @@
 ::
-::::   /ren/collections/hoon
+::::   /REN/COLLECTIONS/HOON
   ::
 /?  309
-/+  collections
+/+  COLLECTIONS
 ::
-::  collections:
+::  COLLECTIONS:
 ::
-::    get collection-config file at rendered path,
-::    and all collections-item files  the subpath.
-::    outputs a +collection defined in /lib/collections/hoon
+::    GET COLLECTION-CONFIG FILE AT RENDERED PATH,
+::    AND ALL COLLECTIONS-ITEM FILES  THE SUBPATH.
+::    OUTPUTS A +COLLECTION DEFINED IN /LIB/COLLECTIONS/HOON
 ::
-::    recursive renderer, see its counterpart in /ren/collections/item/hoon
+::    RECURSIVE RENDERER, SEE ITS COUNTERPART IN /REN/COLLECTIONS/ITEM/HOON
 ::
-/=  collection
-  /^  collection:collections
-  /;  |=  [a=config:collections b=(map knot item:collections) ~]
-          [a b]
-      /.  /collections-config/
-          /_  /collections-item/
+/=  COLLECTION
+  /^  COLLECTION:COLLECTIONS
+  /;  |=  [A=CONFIG:COLLECTIONS B=(MAP KNOT ITEM:COLLECTIONS) ~]
+          [A B]
+      /.  /COLLECTIONS-CONFIG/
+          /_  /COLLECTIONS-ITEM/
       ==
-collection
+COLLECTION

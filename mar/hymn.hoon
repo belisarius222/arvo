@@ -1,16 +1,16 @@
 ::
-::::  /hoon/hymn/mar
+::::  /HOON/HYMN/MAR
   ::
 /?    310
-=,  mimes:html
-=,  html
-|_  own/manx
+=,  MIMES:HTML
+=,  HTML
+|_  OWN/MANX
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  html  (crip (en-xml own))                         ::  convert to %html
-  ++  mime  [/text/html (as-octs html)]                 ::  convert to %mime
+  ++  HTML  (CRIP (EN-XML OWN))                         ::  CONVERT TO %HTML
+  ++  MIME  [/TEXT/HTML (AS-OCTS HTML)]                 ::  CONVERT TO %MIME
   --
-++  grab  |%                                            ::  convert from
-          ++  noun  manx                                ::  clam from %noun
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  MANX                                ::  CLAM FROM %NOUN
 --        --

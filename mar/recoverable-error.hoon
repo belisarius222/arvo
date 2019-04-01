@@ -1,31 +1,31 @@
-::  Possibly non-fatal http error
+::  POSSIBLY NON-FATAL HTTP ERROR
 ::
-::::  /hoon/recoverable-error/mar
+::::  /HOON/RECOVERABLE-ERROR/MAR
   ::
-/-    recoverable-error
+/-    RECOVERABLE-ERROR
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-=,  eyre
-=,  format
-=,  html
-|_   recoverable-error
-++  grab
+=,  EYRE
+=,  FORMAT
+=,  HTML
+|_   RECOVERABLE-ERROR
+++  GRAB
   |%
-  ++  noun  recoverable-error
-  ++  httr
-    |=  a/^httr  ^-  recoverable-error
-    ~&  [%recoverable-httr a]
-    ~!  a
-    ?+  p.a  ~|(non-recoverable+p.a !!)
-      $429  :+  p.a  %rate-limit
-            %.  %x-rate-limit-reset
-            ;~  biff
-              ~(get by (malt q.a))
-              de-json
-              ni:dejs-soft
+  ++  NOUN  RECOVERABLE-ERROR
+  ++  HTTR
+    |=  A/^HTTR  ^-  RECOVERABLE-ERROR
+    ~&  [%RECOVERABLE-HTTR A]
+    ~!  A
+    ?+  P.A  ~|(NON-RECOVERABLE+P.A !!)
+      $429  :+  P.A  %RATE-LIMIT
+            %.  %X-RATE-LIMIT-RESET
+            ;~  BIFF
+              ~(GET BY (MALT Q.A))
+              DE-JSON
+              NI:DEJS-SOFT
             ==
     ==
   --
-++  grow  |%  ++  tank  >[+<]<  --
+++  GROW  |%  ++  TANK  >[+<]<  --
 --

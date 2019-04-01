@@ -1,27 +1,27 @@
-::    Console front-end
+::    CONSOLE FRONT-END
 ::
-::::  /hoon/dojo/web
+::::  /HOON/DOJO/WEB
   ::
 /?    310
 |%
-++  cdnj  |=(a/tape ;script(src "//cdnjs.cloudflare.com/ajax/libs/{a}");)
+++  CDNJ  |=(A/TAPE ;SCRIPT(SRC "//CDNJS.CLOUDFLARE.COM/AJAX/LIBS/{A}");)
 --
 ::
 ::::
   ::
-^-  manx
-;module
-    =nav_title   "Dojo"
-    =nav_no-dpad  ""
-    =nav_no-sibs  ""
-  ;script(src "//cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.js");
-  ;style:'''
-         #term { width: 100%; }
-         #term * { margin: 0px; }
-         .module pre { margin-bottom: 0; }
+^-  MANX
+;MODULE
+    =NAV_TITLE   "DOJO"
+    =NAV_NO-DPAD  ""
+    =NAV_NO-SIBS  ""
+  ;SCRIPT(SRC "//CDNJS.CLOUDFLARE.COM/AJAX/LIBS/MOUSETRAP/1.4.6/MOUSETRAP.JS");
+  ;STYLE:'''
+         #TERM { WIDTH: 100%; }
+         #TERM * { MARGIN: 0PX; }
+         .MODULE PRE { MARGIN-BOTTOM: 0; }
          '''
-  ;div#err;
-  ;div#term:""
-  ;script@"/lib/js/sole.js";
-  ;sole(appl "dojo");
+  ;DIV#ERR;
+  ;DIV#TERM:""
+  ;SCRIPT@"/LIB/JS/SOLE.JS";
+  ;SOLE(APPL "DOJO");
 ==

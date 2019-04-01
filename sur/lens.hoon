@@ -1,30 +1,30 @@
 ^?
 |%
-++  command
-  $:  source/source
-      sink/sink
+++  COMMAND
+  $:  SOURCE/SOURCE
+      SINK/SINK
   ==
-++  source
-  $%  {$data data/@}
-      {$dojo command/@t}
-      {$clay pax/@t}
-      {$url url/purl:eyre}
-      {$api api/term command/@t}
-      {$get-api api/term endpoint/(list @t)}
-      {$as mar/mark next/source}          ::  can't be at the
-      {$hoon code/@t next/source}         ::  end since they
-      {$tuple next/(list source)}         ::  don't bunt well
-      {$listen-api api/term event/term}
+++  SOURCE
+  $%  {$DATA DATA/@}
+      {$DOJO COMMAND/@T}
+      {$CLAY PAX/@T}
+      {$URL URL/PURL:EYRE}
+      {$API API/TERM COMMAND/@T}
+      {$GET-API API/TERM ENDPOINT/(LIST @T)}
+      {$AS MAR/MARK NEXT/SOURCE}          ::  CAN'T BE AT THE
+      {$HOON CODE/@T NEXT/SOURCE}         ::  END SINCE THEY
+      {$TUPLE NEXT/(LIST SOURCE)}         ::  DON'T BUNT WELL
+      {$LISTEN-API API/TERM EVENT/TERM}
   ==
-++  sink
-  $%  {$stdout ~}
-      {$output-file pax/@t}
-      {$output-pill pax/@t}
-      {$output-clay pax/path}
-      {$url url/purl:eyre}
-      {$to-api api/term command/@t}
-      {$send-api api/term endpoint/(list @t)}
-      {$command command/@t}
-      {$app app/term}
+++  SINK
+  $%  {$STDOUT ~}
+      {$OUTPUT-FILE PAX/@T}
+      {$OUTPUT-PILL PAX/@T}
+      {$OUTPUT-CLAY PAX/PATH}
+      {$URL URL/PURL:EYRE}
+      {$TO-API API/TERM COMMAND/@T}
+      {$SEND-API API/TERM ENDPOINT/(LIST @T)}
+      {$COMMAND COMMAND/@T}
+      {$APP APP/TERM}
   ==
 --

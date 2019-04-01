@@ -1,38 +1,38 @@
-::  eth-watcher utilities
+::  ETH-WATCHER UTILITIES
 ::
-/-  *eth-watcher
+/-  *ETH-WATCHER
 ::
 |%
-::  +log-to-id: extract the event-id from an event-log
+::  +LOG-TO-ID: EXTRACT THE EVENT-ID FROM AN EVENT-LOG
 ::
-++  log-to-id
-  |=  log=event-log:rpc:ethereum
-  ^-  event-id:ethereum
-  ?>  ?=(^ mined.log)
-  :-  block-number.u.mined.log
-  log-index.u.mined.log
+++  LOG-TO-ID
+  |=  LOG=EVENT-LOG:RPC:ETHEREUM
+  ^-  EVENT-ID:ETHEREUM
+  ?>  ?=(^ MINED.LOG)
+  :-  BLOCK-NUMBER.U.MINED.LOG
+  LOG-INDEX.U.MINED.LOG
 ::
-::  +store-new-logs: add logs to an old loglist, ensuring newest-first ordering
+::  +STORE-NEW-LOGS: ADD LOGS TO AN OLD LOGLIST, ENSURING NEWEST-FIRST ORDERING
 ::
-::    assumes :new is already ordered newest-first
+::    ASSUMES :NEW IS ALREADY ORDERED NEWEST-FIRST
 ::
-++  store-new-logs
-  |=  [new=loglist old=loglist]
-  ^-  loglist
-  ?~  new  old
-  =+  new-place=(log-to-id i.new)
+++  STORE-NEW-LOGS
+  |=  [NEW=LOGLIST OLD=LOGLIST]
+  ^-  LOGLIST
+  ?~  NEW  OLD
+  =+  NEW-PLACE=(LOG-TO-ID I.NEW)
   |-
-  ?~  old  [i.new old]
-  =+  old-place=(log-to-id i.old)
-  ::  if the :old-place is older than :new-place,
-  ::    put :new-place down, and grab the next one from :new
-  ::  otherwise, keep looking through :old
+  ?~  OLD  [I.NEW OLD]
+  =+  OLD-PLACE=(LOG-TO-ID I.OLD)
+  ::  IF THE :OLD-PLACE IS OLDER THAN :NEW-PLACE,
+  ::    PUT :NEW-PLACE DOWN, AND GRAB THE NEXT ONE FROM :NEW
+  ::  OTHERWISE, KEEP LOOKING THROUGH :OLD
   ::
-  ?:  ?|  (gth block.new-place block.old-place)
-          ?&  =(block.new-place block.old-place)
-              (gth log.new-place log.old-place)
+  ?:  ?|  (GTH BLOCK.NEW-PLACE BLOCK.OLD-PLACE)
+          ?&  =(BLOCK.NEW-PLACE BLOCK.OLD-PLACE)
+              (GTH LOG.NEW-PLACE LOG.OLD-PLACE)
           ==
       ==
-    [i.new ^$(new t.new)]
-  [i.old $(old t.old)]
+    [I.NEW ^$(NEW T.NEW)]
+  [I.OLD $(OLD T.OLD)]
 --

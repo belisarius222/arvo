@@ -1,150 +1,150 @@
-::  |number-to-words: conversion of unsigned integers to a tape
+::  |NUMBER-TO-WORDS: CONVERSION OF UNSIGNED INTEGERS TO A TAPE
 ::
-::  returns a unit because not all numbers can always be represented
+::  RETURNS A UNIT BECAUSE NOT ALL NUMBERS CAN ALWAYS BE REPRESENTED
 ::
 |%
-++  numbers
+++  NUMBERS
   |%
-  ++  ten                    10
-  ++  one-hundred            100
-  ++  one-thousand           (pow 10 3)
-  ++  one-million            (pow 10 6)
-  ++  one-billion            (pow 10 9)
-  ++  one-trillion           (pow 10 12)
-  ++  one-quadrillion        (pow 10 15)
-  ++  one-quintillion        (pow 10 18)
-  ++  one-sextillion         (pow 10 21)
-  ++  one-septillion         (pow 10 24)
-  ++  one-octillion          (pow 10 27)
-  ++  one-nonillion          (pow 10 30)
-  ++  one-decillion          (pow 10 33)
-  ++  one-undecillion        (pow 10 36)
-  ++  one-duodecillion       (pow 10 39)
-  ++  one-tredecillion       (pow 10 42)
-  ++  one-quattuordecillion  (pow 10 45)
-  ++  one-quindecillion      (pow 10 48)
-  ++  one-sexdecillion       (pow 10 51)
-  ++  one-septendecillion    (pow 10 54)
-  ++  one-octodecillion      (pow 10 57)
-  ++  one-novemdecillion     (pow 10 60)
-  ++  one-vigintillion       (pow 10 63)
-  ++  max                    (pow 10 66)
+  ++  TEN                    10
+  ++  ONE-HUNDRED            100
+  ++  ONE-THOUSAND           (POW 10 3)
+  ++  ONE-MILLION            (POW 10 6)
+  ++  ONE-BILLION            (POW 10 9)
+  ++  ONE-TRILLION           (POW 10 12)
+  ++  ONE-QUADRILLION        (POW 10 15)
+  ++  ONE-QUINTILLION        (POW 10 18)
+  ++  ONE-SEXTILLION         (POW 10 21)
+  ++  ONE-SEPTILLION         (POW 10 24)
+  ++  ONE-OCTILLION          (POW 10 27)
+  ++  ONE-NONILLION          (POW 10 30)
+  ++  ONE-DECILLION          (POW 10 33)
+  ++  ONE-UNDECILLION        (POW 10 36)
+  ++  ONE-DUODECILLION       (POW 10 39)
+  ++  ONE-TREDECILLION       (POW 10 42)
+  ++  ONE-QUATTUORDECILLION  (POW 10 45)
+  ++  ONE-QUINDECILLION      (POW 10 48)
+  ++  ONE-SEXDECILLION       (POW 10 51)
+  ++  ONE-SEPTENDECILLION    (POW 10 54)
+  ++  ONE-OCTODECILLION      (POW 10 57)
+  ++  ONE-NOVEMDECILLION     (POW 10 60)
+  ++  ONE-VIGINTILLION       (POW 10 63)
+  ++  MAX                    (POW 10 66)
   --
-++  eng-us
+++  ENG-US
   |%
-  ++  to-words
-    |=  num=@u
-    ^-  (unit tape)
-    =+  numbers
-    ?:  (gte num max)
+  ++  TO-WORDS
+    |=  NUM=@U
+    ^-  (UNIT TAPE)
+    =+  NUMBERS
+    ?:  (GTE NUM MAX)
       ~
     :-  ~
     |-
-    ^-  tape
+    ^-  TAPE
     ::  0-19
-    ?:  =(num 0)   "zero"
-    ?:  =(num 1)   "one"
-    ?:  =(num 2)   "two"
-    ?:  =(num 3)   "three"
-    ?:  =(num 4)   "four"
-    ?:  =(num 5)   "five"
-    ?:  =(num 6)   "six"
-    ?:  =(num 7)   "seven"
-    ?:  =(num 8)   "eight"
-    ?:  =(num 9)   "nine"
-    ?:  =(num 10)  "ten"
-    ?:  =(num 11)  "eleven"
-    ?:  =(num 12)  "twelve"
-    ?:  =(num 13)  "thirteen"
-    ?:  =(num 14)  "fourteen"
-    ?:  =(num 15)  "fifteen"
-    ?:  =(num 16)  "sixteen"
-    ?:  =(num 17)  "seventeen"
-    ?:  =(num 18)  "eighteen"
-    ?:  =(num 19)  "nineteen"
+    ?:  =(NUM 0)   "ZERO"
+    ?:  =(NUM 1)   "ONE"
+    ?:  =(NUM 2)   "TWO"
+    ?:  =(NUM 3)   "THREE"
+    ?:  =(NUM 4)   "FOUR"
+    ?:  =(NUM 5)   "FIVE"
+    ?:  =(NUM 6)   "SIX"
+    ?:  =(NUM 7)   "SEVEN"
+    ?:  =(NUM 8)   "EIGHT"
+    ?:  =(NUM 9)   "NINE"
+    ?:  =(NUM 10)  "TEN"
+    ?:  =(NUM 11)  "ELEVEN"
+    ?:  =(NUM 12)  "TWELVE"
+    ?:  =(NUM 13)  "THIRTEEN"
+    ?:  =(NUM 14)  "FOURTEEN"
+    ?:  =(NUM 15)  "FIFTEEN"
+    ?:  =(NUM 16)  "SIXTEEN"
+    ?:  =(NUM 17)  "SEVENTEEN"
+    ?:  =(NUM 18)  "EIGHTEEN"
+    ?:  =(NUM 19)  "NINETEEN"
     ::  20-99
     ::
-    ::  tpl: tens place
-    ::  rem: ones place
-    ::  sfx: suffix
+    ::  TPL: TENS PLACE
+    ::  REM: ONES PLACE
+    ::  SFX: SUFFIX
     ::
-    =/  tpl  (div num ten)
-    =/  rem  (mod num ten)
-    =/  sfx
-      ?:  |(=(rem 0) (gte tpl 10))
+    =/  TPL  (DIV NUM TEN)
+    =/  REM  (MOD NUM TEN)
+    =/  SFX
+      ?:  |(=(REM 0) (GTE TPL 10))
         ~
-      ['-' $(num rem)]
-    ?:  =(tpl 2)  (weld "twenty" sfx)
-    ?:  =(tpl 3)  (weld "thirty" sfx)
-    ?:  =(tpl 4)  (weld "forty" sfx)
-    ?:  =(tpl 5)  (weld "fifty" sfx)
-    ?:  =(tpl 6)  (weld "sixty" sfx)
-    ?:  =(tpl 7)  (weld "seventy" sfx)
-    ?:  =(tpl 8)  (weld "eighty" sfx)
-    ?:  =(tpl 9)  (weld "ninety" sfx)
-    ::  100-max
+      ['-' $(NUM REM)]
+    ?:  =(TPL 2)  (WELD "TWENTY" SFX)
+    ?:  =(TPL 3)  (WELD "THIRTY" SFX)
+    ?:  =(TPL 4)  (WELD "FORTY" SFX)
+    ?:  =(TPL 5)  (WELD "FIFTY" SFX)
+    ?:  =(TPL 6)  (WELD "SIXTY" SFX)
+    ?:  =(TPL 7)  (WELD "SEVENTY" SFX)
+    ?:  =(TPL 8)  (WELD "EIGHTY" SFX)
+    ?:  =(TPL 9)  (WELD "NINETY" SFX)
+    ::  100-MAX
     ::
-    ::  num-break: repeated pattern from 100 on
+    ::  NUM-BREAK: REPEATED PATTERN FROM 100 ON
     ::
-    =/  num-break
+    =/  NUM-BREAK
       ::
-      ::  min: minimum to qualify for this break
-      ::  str: english word for this break
+      ::  MIN: MINIMUM TO QUALIFY FOR THIS BREAK
+      ::  STR: ENGLISH WORD FOR THIS BREAK
       ::
-      |=  [min=@u str=tape]
-      =/  rem  (mod num min)
-      ;:  weld
-        ^$(num (div num min))
-        [' ' str]
-        ?:  =(rem 0)
+      |=  [MIN=@U STR=TAPE]
+      =/  REM  (MOD NUM MIN)
+      ;:  WELD
+        ^$(NUM (DIV NUM MIN))
+        [' ' STR]
+        ?:  =(REM 0)
           ~
-        %+  weld
-          ?:((lth rem one-hundred) " and " ", ")
-        ^$(num rem)
+        %+  WELD
+          ?:((LTH REM ONE-HUNDRED) " AND " ", ")
+        ^$(NUM REM)
       ==
     ::
-    ?:  (lth num one-thousand)
-      (num-break one-hundred "hundred")
-    ?:  (lth num one-million)
-      (num-break one-thousand "thousand")
-    ?:  (lth num one-billion)
-      (num-break one-million "million")
-    ?:  (lth num one-trillion)
-      (num-break one-billion "billion")
-    ?:  (lth num one-quadrillion)
-      (num-break one-trillion "trillion")
-    ?:  (lth num one-quintillion)
-      (num-break one-quadrillion "quadrillion")
-    ?:  (lth num one-sextillion)
-      (num-break one-quintillion "quintillion")
-    ?:  (lth num one-septillion)
-      (num-break one-sextillion "sextillion")
-    ?:  (lth num one-octillion)
-      (num-break one-septillion "septillion")
-    ?:  (lth num one-nonillion)
-      (num-break one-octillion "octillion")
-    ?:  (lth num one-decillion)
-      (num-break one-nonillion "nonillion")
-    ?:  (lth num one-undecillion)
-      (num-break one-decillion "decillion")
-    ?:  (lth num one-duodecillion)
-      (num-break one-undecillion "undecillion")
-    ?:  (lth num one-tredecillion)
-      (num-break one-duodecillion "duodecillion")
-    ?:  (lth num one-quattuordecillion)
-      (num-break one-tredecillion "tredecillion")
-    ?:  (lth num one-quindecillion)
-      (num-break one-quattuordecillion "quattuordecillion")
-    ?:  (lth num one-sexdecillion)
-      (num-break one-quindecillion "quindecillion")
-    ?:  (lth num one-septendecillion)
-      (num-break one-sexdecillion "sexdecillion")
-    ?:  (lth num one-octodecillion)
-      (num-break one-septendecillion "septendecillion")
-    ?:  (lth num one-novemdecillion)
-      (num-break one-octodecillion "octodecillion")
-    ?:  (lth num one-vigintillion)
-      (num-break one-novemdecillion "novemdecillion")
-    (num-break one-vigintillion "vigintillion")
+    ?:  (LTH NUM ONE-THOUSAND)
+      (NUM-BREAK ONE-HUNDRED "HUNDRED")
+    ?:  (LTH NUM ONE-MILLION)
+      (NUM-BREAK ONE-THOUSAND "THOUSAND")
+    ?:  (LTH NUM ONE-BILLION)
+      (NUM-BREAK ONE-MILLION "MILLION")
+    ?:  (LTH NUM ONE-TRILLION)
+      (NUM-BREAK ONE-BILLION "BILLION")
+    ?:  (LTH NUM ONE-QUADRILLION)
+      (NUM-BREAK ONE-TRILLION "TRILLION")
+    ?:  (LTH NUM ONE-QUINTILLION)
+      (NUM-BREAK ONE-QUADRILLION "QUADRILLION")
+    ?:  (LTH NUM ONE-SEXTILLION)
+      (NUM-BREAK ONE-QUINTILLION "QUINTILLION")
+    ?:  (LTH NUM ONE-SEPTILLION)
+      (NUM-BREAK ONE-SEXTILLION "SEXTILLION")
+    ?:  (LTH NUM ONE-OCTILLION)
+      (NUM-BREAK ONE-SEPTILLION "SEPTILLION")
+    ?:  (LTH NUM ONE-NONILLION)
+      (NUM-BREAK ONE-OCTILLION "OCTILLION")
+    ?:  (LTH NUM ONE-DECILLION)
+      (NUM-BREAK ONE-NONILLION "NONILLION")
+    ?:  (LTH NUM ONE-UNDECILLION)
+      (NUM-BREAK ONE-DECILLION "DECILLION")
+    ?:  (LTH NUM ONE-DUODECILLION)
+      (NUM-BREAK ONE-UNDECILLION "UNDECILLION")
+    ?:  (LTH NUM ONE-TREDECILLION)
+      (NUM-BREAK ONE-DUODECILLION "DUODECILLION")
+    ?:  (LTH NUM ONE-QUATTUORDECILLION)
+      (NUM-BREAK ONE-TREDECILLION "TREDECILLION")
+    ?:  (LTH NUM ONE-QUINDECILLION)
+      (NUM-BREAK ONE-QUATTUORDECILLION "QUATTUORDECILLION")
+    ?:  (LTH NUM ONE-SEXDECILLION)
+      (NUM-BREAK ONE-QUINDECILLION "QUINDECILLION")
+    ?:  (LTH NUM ONE-SEPTENDECILLION)
+      (NUM-BREAK ONE-SEXDECILLION "SEXDECILLION")
+    ?:  (LTH NUM ONE-OCTODECILLION)
+      (NUM-BREAK ONE-SEPTENDECILLION "SEPTENDECILLION")
+    ?:  (LTH NUM ONE-NOVEMDECILLION)
+      (NUM-BREAK ONE-OCTODECILLION "OCTODECILLION")
+    ?:  (LTH NUM ONE-VIGINTILLION)
+      (NUM-BREAK ONE-NOVEMDECILLION "NOVEMDECILLION")
+    (NUM-BREAK ONE-VIGINTILLION "VIGINTILLION")
   --
 --

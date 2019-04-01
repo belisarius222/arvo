@@ -1,22 +1,22 @@
-::  Display directory contents
+::  DISPLAY DIRECTORY CONTENTS
 ::
-::::  /hoon/show-dir/lib
+::::  /HOON/SHOW-DIR/LIB
   ::
 /?    310
-|=  {vane/?($g $c) pax/path des/(map @t ~)}
-^-  tank
-:+  %rose  [" " `~]
-%+  turn  (sort ~(tap by des) aor)
-|=  {kid/@ta ~}
-=+  paf=`path`/[kid]
-=-  :+  %rose  ["/" ~ ?:(dir "/" ~)]
-    (turn paf |=(a/knot leaf+(trip a)))
-|-  ^-  {dir/? paf/path}
-=+  arf=.^(arch (cat 3 vane %y) (weld pax paf))
-?^  fil.arf
-  [| paf]
-?~  dir.arf
-  [& paf]  ::  !!
-?.  ?=({^ ~ ~} dir.arf)
-  [& paf]
-$(paf (welp paf /[p.n.dir.arf]))
+|=  {VANE/?($G $C) PAX/PATH DES/(MAP @T ~)}
+^-  TANK
+:+  %ROSE  [" " `~]
+%+  TURN  (SORT ~(TAP BY DES) AOR)
+|=  {KID/@TA ~}
+=+  PAF=`PATH`/[KID]
+=-  :+  %ROSE  ["/" ~ ?:(DIR "/" ~)]
+    (TURN PAF |=(A/KNOT LEAF+(TRIP A)))
+|-  ^-  {DIR/? PAF/PATH}
+=+  ARF=.^(ARCH (CAT 3 VANE %Y) (WELD PAX PAF))
+?^  FIL.ARF
+  [| PAF]
+?~  DIR.ARF
+  [& PAF]  ::  !!
+?.  ?=({^ ~ ~} DIR.ARF)
+  [& PAF]
+$(PAF (WELP PAF /[P.N.DIR.ARF]))

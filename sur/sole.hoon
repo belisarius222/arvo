@@ -1,93 +1,93 @@
 ::
-::::  /hoon/sole/sur
+::::  /HOON/SOLE/SUR
   ::
 ^?
 |%
-++  sole-action                                         ::  sole to app
-  $%  ::  {$abo ~}                                      ::  reset interaction
-      {$det sole-change}                                ::  command line edit
-      {$ret ~}                                         ::  submit and clear
-      {$clr ~}                                         ::  exit context
+++  SOLE-ACTION                                         ::  SOLE TO APP
+  $%  ::  {$ABO ~}                                      ::  RESET INTERACTION
+      {$DET SOLE-CHANGE}                                ::  COMMAND LINE EDIT
+      {$RET ~}                                         ::  SUBMIT AND CLEAR
+      {$CLR ~}                                         ::  EXIT CONTEXT
   ==                                                    ::
-++  sole-buffer  (list @c)                              ::  command state
-++  sole-change                                         ::  network change
-  $:  ler/sole-clock                                    ::  destination clock
-      haw/@uvH                                          ::  source hash
-      ted/sole-edit                                     ::  state change
+++  SOLE-BUFFER  (LIST @C)                              ::  COMMAND STATE
+++  SOLE-CHANGE                                         ::  NETWORK CHANGE
+  $:  LER/SOLE-CLOCK                                    ::  DESTINATION CLOCK
+      HAW/@UVH                                          ::  SOURCE HASH
+      TED/SOLE-EDIT                                     ::  STATE CHANGE
   ==                                                    ::
-++  sole-clock  {own/@ud his/@ud}                       ::  vector clock
-++  sole-edit                                           ::  shared state change
-  $%  {$del p/@ud}                                      ::  delete one at
-      {$ins p/@ud q/@c}                                 ::  insert at
-      {$mor p/(list sole-edit)}                         ::  combination
-      {$nop ~}                                         ::  no-op
-      {$set p/sole-buffer}                              ::  discontinuity
+++  SOLE-CLOCK  {OWN/@UD HIS/@UD}                       ::  VECTOR CLOCK
+++  SOLE-EDIT                                           ::  SHARED STATE CHANGE
+  $%  {$DEL P/@UD}                                      ::  DELETE ONE AT
+      {$INS P/@UD Q/@C}                                 ::  INSERT AT
+      {$MOR P/(LIST SOLE-EDIT)}                         ::  COMBINATION
+      {$NOP ~}                                         ::  NO-OP
+      {$SET P/SOLE-BUFFER}                              ::  DISCONTINUITY
   ==                                                    ::
-++  sole-effect                                         ::  app to sole
-  $%  {$bel ~}                                         ::  beep
-      {$blk p/@ud q/@c}                                 ::  blink+match char at
-      {$clr ~}                                         ::  clear screen
-      {$det sole-change}                                ::  edit command
-      {$err p/@ud}                                      ::  error point
-      {$klr p/styx}                                     ::  styled text line
-      {$mor p/(list sole-effect)}                       ::  multiple effects
-      {$nex ~}                                         ::  save clear command
-      {$pro sole-prompt}                                ::  set prompt
-      {$sag p/path q/*}                                 ::  save to jamfile
-      {$sav p/path q/@}                                 ::  save to file
-      {$tan p/(list tank)}                              ::  classic tank
-  ::  {$taq p/tanq}                                     ::  modern tank
-      {$txt p/tape}                                     ::  text line
-      {$url p/@t}                                       ::  activate url
+++  SOLE-EFFECT                                         ::  APP TO SOLE
+  $%  {$BEL ~}                                         ::  BEEP
+      {$BLK P/@UD Q/@C}                                 ::  BLINK+MATCH CHAR AT
+      {$CLR ~}                                         ::  CLEAR SCREEN
+      {$DET SOLE-CHANGE}                                ::  EDIT COMMAND
+      {$ERR P/@UD}                                      ::  ERROR POINT
+      {$KLR P/STYX}                                     ::  STYLED TEXT LINE
+      {$MOR P/(LIST SOLE-EFFECT)}                       ::  MULTIPLE EFFECTS
+      {$NEX ~}                                         ::  SAVE CLEAR COMMAND
+      {$PRO SOLE-PROMPT}                                ::  SET PROMPT
+      {$SAG P/PATH Q/*}                                 ::  SAVE TO JAMFILE
+      {$SAV P/PATH Q/@}                                 ::  SAVE TO FILE
+      {$TAN P/(LIST TANK)}                              ::  CLASSIC TANK
+  ::  {$TAQ P/TANQ}                                     ::  MODERN TANK
+      {$TXT P/TAPE}                                     ::  TEXT LINE
+      {$URL P/@T}                                       ::  ACTIVATE URL
   ==                                                    ::
-++  sole-command                                        ::  command state
-  $:  pos/@ud                                           ::  cursor position
-      say/sole-share                                    ::  cursor
+++  SOLE-COMMAND                                        ::  COMMAND STATE
+  $:  POS/@UD                                           ::  CURSOR POSITION
+      SAY/SOLE-SHARE                                    ::  CURSOR
   ==                                                    ::
-++  sole-prompt                                         ::  prompt definition
-  $:  vis/?                                             ::  command visible
-      tag/term                                          ::  history mode
-      cad/styx                                          ::  caption
+++  SOLE-PROMPT                                         ::  PROMPT DEFINITION
+  $:  VIS/?                                             ::  COMMAND VISIBLE
+      TAG/TERM                                          ::  HISTORY MODE
+      CAD/STYX                                          ::  CAPTION
   ==                                                    ::
-++  sole-share                                          ::  symmetric state
-  $:  ven/sole-clock                                    ::  our vector clock
-      leg/(list sole-edit)                              ::  unmerged edits
-      buf/sole-buffer                                   ::  sole state
+++  SOLE-SHARE                                          ::  SYMMETRIC STATE
+  $:  VEN/SOLE-CLOCK                                    ::  OUR VECTOR CLOCK
+      LEG/(LIST SOLE-EDIT)                              ::  UNMERGED EDITS
+      BUF/SOLE-BUFFER                                   ::  SOLE STATE
   ==                                                    ::
 ::                                                      ::
 ::                                                      ::
-++  sole-dialog                                         ::  standard dialog
-  |*  out/$-(* *)                                       ::  output structure
-  $-(sole-input (sole-result out))                      ::  output function
+++  SOLE-DIALOG                                         ::  STANDARD DIALOG
+  |*  OUT/$-(* *)                                       ::  OUTPUT STRUCTURE
+  $-(SOLE-INPUT (SOLE-RESULT OUT))                      ::  OUTPUT FUNCTION
 ::                                                      ::
-++  sole-input  tape                                    ::  prompt input
-++  sole-result                                         ::  conditional result
-  |*  out/$-(* *)                                       ::  output structure
-  $@(@ud (sole-product out))                            ::  error position
+++  SOLE-INPUT  TAPE                                    ::  PROMPT INPUT
+++  SOLE-RESULT                                         ::  CONDITIONAL RESULT
+  |*  OUT/$-(* *)                                       ::  OUTPUT STRUCTURE
+  $@(@UD (SOLE-PRODUCT OUT))                            ::  ERROR POSITION
 ::                                                      ::
-++  sole-product                                        ::  success result
-  |*  out/$-(* *)                                       ::
-  %+  pair  (list tank)                                 ::
-  %+  each  (unit out)                                  ::  ~ is abort
-  (pair sole-prompt (sole-dialog out))                  ::  ask and continue
+++  SOLE-PRODUCT                                        ::  SUCCESS RESULT
+  |*  OUT/$-(* *)                                       ::
+  %+  PAIR  (LIST TANK)                                 ::
+  %+  EACH  (UNIT OUT)                                  ::  ~ IS ABORT
+  (PAIR SOLE-PROMPT (SOLE-DIALOG OUT))                  ::  ASK AND CONTINUE
 ::                                                      ::
-++  sole-request                                         ::  scraper result
-  |*  out/$-(* *)                                       ::  output structure
-  %+  pair  (list tank)                                 ::
-  %+  each  (unit out)                                  ::  ~ is abort
-  %^    trel                                            ::  fetch and continue
-      (unit knot)
-    hiss:eyre
-  $-(httr:eyre (sole-request out))
+++  SOLE-REQUEST                                         ::  SCRAPER RESULT
+  |*  OUT/$-(* *)                                       ::  OUTPUT STRUCTURE
+  %+  PAIR  (LIST TANK)                                 ::
+  %+  EACH  (UNIT OUT)                                  ::  ~ IS ABORT
+  %^    TREL                                            ::  FETCH AND CONTINUE
+      (UNIT KNOT)
+    HISS:EYRE
+  $-(HTTR:EYRE (SOLE-REQUEST OUT))
 ::                                                      ::
-++  sole-gen                                            ::  XX virtual type
-  $%  {$say $-((sole-args) (cask))}                     ::  direct noun
-      {$ask $-((sole-args) (sole-product (cask)))}      ::  dialog
-      {$get $-((sole-args) (sole-request (cask)))}      ::  scraper
+++  SOLE-GEN                                            ::  XX VIRTUAL TYPE
+  $%  {$SAY $-((SOLE-ARGS) (CASK))}                     ::  DIRECT NOUN
+      {$ASK $-((SOLE-ARGS) (SOLE-PRODUCT (CASK)))}      ::  DIALOG
+      {$GET $-((SOLE-ARGS) (SOLE-REQUEST (CASK)))}      ::  SCRAPER
   ==                                                    ::
-++  sole-args                                           ::  generator arguments
+++  SOLE-ARGS                                           ::  GENERATOR ARGUMENTS
   |*  _[* *]                                            ::
-  {{now/@da eny/@uvJ bek/beak} {,+<- ,+<+}}             ::
+  {{NOW/@DA ENY/@UVJ BEK/BEAK} {,+<- ,+<+}}             ::
 ::                                                      ::
 ::                                                      ::
 --

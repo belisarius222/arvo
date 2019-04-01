@@ -1,66 +1,66 @@
-::  usage:
-::    :eth-manage %look
-::      kick polling from eth mainnet node
-::    :eth-manage [%wind 1.000.000]
-::      rewind to block 1.000.000
+::  USAGE:
+::    :ETH-MANAGE %LOOK
+::      KICK POLLING FROM ETH MAINNET NODE
+::    :ETH-MANAGE [%WIND 1.000.000]
+::      REWIND TO BLOCK 1.000.000
 =>  $~  |%
-    ++  move  (pair bone card)
-    ++  card
-      $%  [%turf wire ~]
-          [%vein wire]
-          [%look wire src=(each ship purl:eyre)]
-          [%wind wire p=@ud]
-          [%snap wire snapshot=snapshot:jael kick=?]
+    ++  MOVE  (PAIR BONE CARD)
+    ++  CARD
+      $%  [%TURF WIRE ~]
+          [%VEIN WIRE]
+          [%LOOK WIRE SRC=(EACH SHIP PURL:EYRE)]
+          [%WIND WIRE P=@UD]
+          [%SNAP WIRE SNAPSHOT=SNAPSHOT:JAEL KICK=?]
       ==
-    ++  state
-      $:  a/@
+    ++  STATE
+      $:  A/@
       ==
     --
-=,  gall
-|_  $:  hid/bowl
-        state
+=,  GALL
+|_  $:  HID/BOWL
+        STATE
     ==
-++  poke
-  |=  [mar=@tas val=*]
-  ^-  (quip move _+>)
+++  POKE
+  |=  [MAR=@TAS VAL=*]
+  ^-  (QUIP MOVE _+>)
   :_  +>.$
-  ?+  val  ~&(%oops ~)
-      %turf         [ost.hid %turf /hi ~]~
-      %vein         [ost.hid %vein /hi]~
-      [%wind @ud]   [ost.hid %wind /hi +.val]~
-      [%snap * ?]
-    [ost.hid %snap /hi (snapshot:jael +<.val) +>.val]~
+  ?+  VAL  ~&(%OOPS ~)
+      %TURF         [OST.HID %TURF /HI ~]~
+      %VEIN         [OST.HID %VEIN /HI]~
+      [%WIND @UD]   [OST.HID %WIND /HI +.VAL]~
+      [%SNAP * ?]
+    [OST.HID %SNAP /HI (SNAPSHOT:JAEL +<.VAL) +>.VAL]~
   ::
-      %look-ethnode
+      %LOOK-ETHNODE
     :_  ~
-    =/  pul
-      (need (de-purl:html 'http://eth-mainnet.urbit.org:8545'))
-    [ost.hid %look /hi |+pul]
+    =/  PUL
+      (NEED (DE-PURL:HTML 'HTTP://ETH-MAINNET.URBIT.ORG:8545'))
+    [OST.HID %LOOK /HI |+PUL]
   ::
-      [%look-kick who=@p]
+      [%LOOK-KICK WHO=@P]
     :_  ~
-    [ost.hid %look /hi %& who.val]
+    [OST.HID %LOOK /HI %& WHO.VAL]
   ==
 ::
-++  vein
-  |=  [wir/wire =life ven=(map life ring)]
-  ^-  (quip move _+>)
-  ~&  [%pierc life ven]
+++  VEIN
+  |=  [WIR/WIRE =LIFE VEN=(MAP LIFE RING)]
+  ^-  (QUIP MOVE _+>)
+  ~&  [%PIERC LIFE VEN]
   `+>.$
 ::
-++  turf
-  |=  [wir/wire pax=(list path)]
-  ^-  (quip move _+>)
-  ~&  [%slurp pax]
+++  TURF
+  |=  [WIR/WIRE PAX=(LIST PATH)]
+  ^-  (QUIP MOVE _+>)
+  ~&  [%SLURP PAX]
   `+>.$
 ::
-++  prep
-  |=  old/(unit noun)
-  ^-  [(list move) _+>.$]
-  ?~  old
+++  PREP
+  |=  OLD/(UNIT NOUN)
+  ^-  [(LIST MOVE) _+>.$]
+  ?~  OLD
     `+>.$
-  =+  new=((soft state) u.old)
-  ?~  new
+  =+  NEW=((SOFT STATE) U.OLD)
+  ?~  NEW
     `+>.$
-  `+>.$(+<+ u.new)
+  `+>.$(+<+ U.NEW)
 --

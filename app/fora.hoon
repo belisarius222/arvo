@@ -1,104 +1,104 @@
 ::
-::  /app/fora/hoon
+::  /APP/FORA/HOON
 ::
-::TODO  maybe stop relying on %hood one day.
+::TODO  MAYBE STOP RELYING ON %HOOD ONE DAY.
 ::
-/-  hall
-/+  hall, time-to-id
-=,  format
-=,  title
+/-  HALL
+/+  HALL, TIME-TO-ID
+=,  FORMAT
+=,  TITLE
 ::
 |%
-++  move  (pair bone card)
-++  card
-  $%  {$poke wire dock poke}
-      {$info wire @p toro:clay}
+++  MOVE  (PAIR BONE CARD)
+++  CARD
+  $%  {$POKE WIRE DOCK POKE}
+      {$INFO WIRE @P TORO:CLAY}
   ==
-++  poke
-  $%  {$hall-action action:hall}
-      {$write-fora-post spur ship cord cord}
-      {$write-comment spur ship cord}
+++  POKE
+  $%  {$HALL-ACTION ACTION:HALL}
+      {$WRITE-FORA-POST SPUR SHIP CORD CORD}
+      {$WRITE-COMMENT SPUR SHIP CORD}
   ==
 --
 ::
-|_  {bol/bowl:gall ~}
+|_  {BOL/BOWL:GALL ~}
 ::
-++  prep
-  |=  old/(unit ~)
-  ^-  (quip move _..prep)
-  ?^  old  [~ ..prep(+<+ u.old)]
-  :_  ..prep
-  :~  (act %create %fora-posts 'fora posts' %journal)
-      (act %create %fora-comments 'fora comments' %journal)
+++  PREP
+  |=  OLD/(UNIT ~)
+  ^-  (QUIP MOVE _..PREP)
+  ?^  OLD  [~ ..PREP(+<+ U.OLD)]
+  :_  ..PREP
+  :~  (ACT %CREATE %FORA-POSTS 'FORA POSTS' %JOURNAL)
+      (ACT %CREATE %FORA-COMMENTS 'FORA COMMENTS' %JOURNAL)
   ==
 ::
-++  act
-  |=  a/action:hall
-  ^-  move
-  [ost.bol %poke / [our.bol %hall] %hall-action a]
+++  ACT
+  |=  A/ACTION:HALL
+  ^-  MOVE
+  [OST.BOL %POKE / [OUR.BOL %HALL] %HALL-ACTION A]
 ::
-++  ra-base-hart  .^(hart:eyre %e /(scot %p our.bol)/host/(scot %da now.bol))
+++  RA-BASE-HART  .^(HART:EYRE %E /(SCOT %P OUR.BOL)/HOST/(SCOT %DA NOW.BOL))
 ::
-++  poke-fora-post
-  |=  {pax/path sup/spur hed/@t txt/@t}
-  ^-  (quip move _+>)
+++  POKE-FORA-POST
+  |=  {PAX/PATH SUP/SPUR HED/@T TXT/@T}
+  ^-  (QUIP MOVE _+>)
   :_  +>
   ::
-  ::  if txt is blank then return no moves.
+  ::  IF TXT IS BLANK THEN RETURN NO MOVES.
   ::
-  ?:  ?=(^ (rush txt spac:de-json:html))  ~
+  ?:  ?=(^ (RUSH TXT SPAC:DE-JSON:HTML))  ~
   ::
-  ::  otherwise, post the content.
+  ::  OTHERWISE, POST THE CONTENT.
   ::
-  :~  %-  act
-      :+  %phrase  [[our.bol %fora-posts] ~ ~]
+  :~  %-  ACT
+      :+  %PHRASE  [[OUR.BOL %FORA-POSTS] ~ ~]
       :_  ~
-      :+  %app  dap.bol
-      :+  %fat
-        :+  %name
-          (crip "post by {(cite src.bol)}: {(trip hed)}")
-        text+(to-wain txt)
-      =.  pax  (welp pax /posts/(crip "{<now.bol>}~"))
-      [%url [ra-base-hart `pax ~] ~]
+      :+  %APP  DAP.BOL
+      :+  %FAT
+        :+  %NAME
+          (CRIP "POST BY {(CITE SRC.BOL)}: {(TRIP HED)}")
+        TEXT+(TO-WAIN TXT)
+      =.  PAX  (WELP PAX /POSTS/(CRIP "{<NOW.BOL>}~"))
+      [%URL [RA-BASE-HART `PAX ~] ~]
     ::
-      :*  ost.bol
-          %poke
-          /fora-post
-          [our.bol %hood]
-          [%write-fora-post sup src.bol hed txt]
+      :*  OST.BOL
+          %POKE
+          /FORA-POST
+          [OUR.BOL %HOOD]
+          [%WRITE-FORA-POST SUP SRC.BOL HED TXT]
       ==
   ==
 ::
-++  poke-fora-comment
-  |=  {pax/path sup/spur txt/@t}
-  ^-  (quip move _+>)
+++  POKE-FORA-COMMENT
+  |=  {PAX/PATH SUP/SPUR TXT/@T}
+  ^-  (QUIP MOVE _+>)
   :_  +>
   ::
-  ::  if txt is blank then return no moves.
+  ::  IF TXT IS BLANK THEN RETURN NO MOVES.
   ::
-  ?:  ?=(^ (rush txt spac:de-json:html))  ~
+  ?:  ?=(^ (RUSH TXT SPAC:DE-JSON:HTML))  ~
   ::
-  ::  otherwise, post the content.
+  ::  OTHERWISE, POST THE CONTENT.
   ::
-  :~  ^-  move
-      %-  act
-      :+  %phrase  [[our.bol %fora-comments] ~ ~]
+  :~  ^-  MOVE
+      %-  ACT
+      :+  %PHRASE  [[OUR.BOL %FORA-COMMENTS] ~ ~]
       :_  ~
-      :+  %app  dap.bol
-      ^-  speech:hall
-      :+  %fat
-        :+  %name
-          =+  nam=?~(sup "" (trip i.sup))
-          (crip "comment by {(cite src.bol)} on /{nam}")
-        text+(to-wain txt)
-      =+  fra=(crip (time-to-id now.bol))
-      [%url [ra-base-hart `pax ~] `fra]
+      :+  %APP  DAP.BOL
+      ^-  SPEECH:HALL
+      :+  %FAT
+        :+  %NAME
+          =+  NAM=?~(SUP "" (TRIP I.SUP))
+          (CRIP "COMMENT BY {(CITE SRC.BOL)} ON /{NAM}")
+        TEXT+(TO-WAIN TXT)
+      =+  FRA=(CRIP (TIME-TO-ID NOW.BOL))
+      [%URL [RA-BASE-HART `PAX ~] `FRA]
     ::
-      :*  ost.bol
-          %poke
-          /fora-comment
-          [our.bol %hood]
-          [%write-comment sup src.bol txt]
+      :*  OST.BOL
+          %POKE
+          /FORA-COMMENT
+          [OUR.BOL %HOOD]
+          [%WRITE-COMMENT SUP SRC.BOL TXT]
       ==
   ==
 --

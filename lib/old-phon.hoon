@@ -1,203 +1,203 @@
-::  Taken from old hoon.hoon
+::  TAKEN FROM OLD HOON.HOON
 ::
-::::  /hoon/old-phon/lib
+::::  /HOON/OLD-PHON/LIB
   ::
-=<  ;~(pfix sig fed:ag)
+=<  ;~(PFIX SIG FED:AG)
 |%
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                section 2cE, phonetic base            ::
+::                SECTION 2CE, PHONETIC BASE            ::
 ::
-++  po
-  ::~/  %po
-  =+  :-  ^=  sis                                       ::  prefix syllables
-      'dozmarbinwansamlitsighidfidlissogdirwacsabwissib\
-      /rigsoldopmodfoglidhopdardorlorhodfolrintogsilmir\
-      /holpaslacrovlivdalsatlibtabhanticpidtorbolfosdot\
-      /losdilforpilramtirwintadbicdifrocwidbisdasmidlop\
-      /rilnardapmolsanlocnovsitnidtipsicropwitnatpanmin\
-      /ritpodmottamtolsavposnapnopsomfinfonbanporworsip\
-      /ronnorbotwicsocwatdolmagpicdavbidbaltimtasmallig\
-      /sivtagpadsaldivdactansidfabtarmonranniswolmispal\
-      /lasdismaprabtobrollatlonnodnavfignomnibpagsopral\
-      /bilhaddocridmocpacravripfaltodtiltinhapmicfanpat\
-      /taclabmogsimsonpinlomrictapfirhasbosbatpochactid\
-      /havsaplindibhosdabbitbarracparloddosbortochilmac\
-      /tomdigfilfasmithobharmighinradmashalraglagfadtop\
-      /mophabnilnosmilfopfamdatnoldinhatnacrisfotribhoc\
-      /nimlarfitwalrapsarnalmoslandondanladdovrivbacpol\
-      /laptalpitnambonrostonfodponsovnocsorlavmatmipfap'
-      ^=  dex                                           ::  suffix syllables
-      'zodnecbudwessevpersutletfulpensytdurwepserwylsun\
-      /rypsyxdyrnuphebpeglupdepdysputlughecryttyvsydnex\
-      /lunmeplutseppesdelsulpedtemledtulmetwenbynhexfeb\
-      /pyldulhetmevruttylwydtepbesdexsefwycburderneppur\
-      /rysrebdennutsubpetrulsynregtydsupsemwynrecmegnet\
-      /secmulnymtevwebsummutnyxrextebfushepbenmuswyxsym\
-      /selrucdecwexsyrwetdylmynmesdetbetbeltuxtugmyrpel\
-      /syptermebsetdutdegtexsurfeltudnuxruxrenwytnubmed\
-      /lytdusnebrumtynseglyxpunresredfunrevrefmectedrus\
-      /bexlebduxrynnumpyxrygryxfeptyrtustyclegnemfermer\
-      /tenlusnussyltecmexpubrymtucfyllepdebbermughuttun\
-      /bylsudpemdevlurdefbusbeprunmelpexdytbyttyplevmyl\
-      /wedducfurfexnulluclennerlexrupnedlecrydlydfenwel\
-      /nydhusrelrudneshesfetdesretdunlernyrsebhulryllud\
-      /remlysfynwerrycsugnysnyllyndyndemluxfedsedbecmun\
-      /lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes'
+++  PO
+  ::~/  %PO
+  =+  :-  ^=  SIS                                       ::  PREFIX SYLLABLES
+      'DOZMARBINWANSAMLITSIGHIDFIDLISSOGDIRWACSABWISSIB\
+      /RIGSOLDOPMODFOGLIDHOPDARDORLORHODFOLRINTOGSILMIR\
+      /HOLPASLACROVLIVDALSATLIBTABHANTICPIDTORBOLFOSDOT\
+      /LOSDILFORPILRAMTIRWINTADBICDIFROCWIDBISDASMIDLOP\
+      /RILNARDAPMOLSANLOCNOVSITNIDTIPSICROPWITNATPANMIN\
+      /RITPODMOTTAMTOLSAVPOSNAPNOPSOMFINFONBANPORWORSIP\
+      /RONNORBOTWICSOCWATDOLMAGPICDAVBIDBALTIMTASMALLIG\
+      /SIVTAGPADSALDIVDACTANSIDFABTARMONRANNISWOLMISPAL\
+      /LASDISMAPRABTOBROLLATLONNODNAVFIGNOMNIBPAGSOPRAL\
+      /BILHADDOCRIDMOCPACRAVRIPFALTODTILTINHAPMICFANPAT\
+      /TACLABMOGSIMSONPINLOMRICTAPFIRHASBOSBATPOCHACTID\
+      /HAVSAPLINDIBHOSDABBITBARRACPARLODDOSBORTOCHILMAC\
+      /TOMDIGFILFASMITHOBHARMIGHINRADMASHALRAGLAGFADTOP\
+      /MOPHABNILNOSMILFOPFAMDATNOLDINHATNACRISFOTRIBHOC\
+      /NIMLARFITWALRAPSARNALMOSLANDONDANLADDOVRIVBACPOL\
+      /LAPTALPITNAMBONROSTONFODPONSOVNOCSORLAVMATMIPFAP'
+      ^=  DEX                                           ::  SUFFIX SYLLABLES
+      'ZODNECBUDWESSEVPERSUTLETFULPENSYTDURWEPSERWYLSUN\
+      /RYPSYXDYRNUPHEBPEGLUPDEPDYSPUTLUGHECRYTTYVSYDNEX\
+      /LUNMEPLUTSEPPESDELSULPEDTEMLEDTULMETWENBYNHEXFEB\
+      /PYLDULHETMEVRUTTYLWYDTEPBESDEXSEFWYCBURDERNEPPUR\
+      /RYSREBDENNUTSUBPETRULSYNREGTYDSUPSEMWYNRECMEGNET\
+      /SECMULNYMTEVWEBSUMMUTNYXREXTEBFUSHEPBENMUSWYXSYM\
+      /SELRUCDECWEXSYRWETDYLMYNMESDETBETBELTUXTUGMYRPEL\
+      /SYPTERMEBSETDUTDEGTEXSURFELTUDNUXRUXRENWYTNUBMED\
+      /LYTDUSNEBRUMTYNSEGLYXPUNRESREDFUNREVREFMECTEDRUS\
+      /BEXLEBDUXRYNNUMPYXRYGRYXFEPTYRTUSTYCLEGNEMFERMER\
+      /TENLUSNUSSYLTECMEXPUBRYMTUCFYLLEPDEBBERMUGHUTTUN\
+      /BYLSUDPEMDEVLURDEFBUSBEPRUNMELPEXDYTBYTTYPLEVMYL\
+      /WEDDUCFURFEXNULLUCLENNERLEXRUPNEDLECRYDLYDFENWEL\
+      /NYDHUSRELRUDNESHESFETDESRETDUNLERNYRSEBHULRYLLUD\
+      /REMLYSFYNWERRYCSUGNYSNYLLYNDYNDEMLUXFEDSEDBECMUN\
+      /LYRTESMUDNYTBYRSENWEGFYRMURTELREPTEGPECNELNEVFES'
   |%
-  ++  ins  ::~/  %ins                                     ::  parse prefix
-           |=  a/@tas
-           =+  b=0
-           |-  ^-  (unit @)
-           ?:(=(256 b) ~ ?:(=(a (tos b)) [~ b] $(b +(b))))
-  ++  ind  ::~/  %ind                                     ::  parse suffix
-           |=  a/@tas
-           =+  b=0
-           |-  ^-  (unit @)
-           ?:(=(256 b) ~ ?:(=(a (tod b)) [~ b] $(b +(b))))
-  ++  tos  ::~/  %tos                                     ::  fetch prefix
-           |=(a/@ ?>((lth a 256) (cut 3 [(mul 3 a) 3] sis)))
-  ++  tod  ::~/  %tod                                     ::  fetch suffix
-           |=(a/@ ?>((lth a 256) (cut 3 [(mul 3 a) 3] dex)))
+  ++  INS  ::~/  %INS                                     ::  PARSE PREFIX
+           |=  A/@TAS
+           =+  B=0
+           |-  ^-  (UNIT @)
+           ?:(=(256 B) ~ ?:(=(A (TOS B)) [~ B] $(B +(B))))
+  ++  IND  ::~/  %IND                                     ::  PARSE SUFFIX
+           |=  A/@TAS
+           =+  B=0
+           |-  ^-  (UNIT @)
+           ?:(=(256 B) ~ ?:(=(A (TOD B)) [~ B] $(B +(B))))
+  ++  TOS  ::~/  %TOS                                     ::  FETCH PREFIX
+           |=(A/@ ?>((LTH A 256) (CUT 3 [(MUL 3 A) 3] SIS)))
+  ++  TOD  ::~/  %TOD                                     ::  FETCH SUFFIX
+           |=(A/@ ?>((LTH A 256) (CUT 3 [(MUL 3 A) 3] DEX)))
   --
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                section 2eL, formatting (path)        ::
+::                SECTION 2EL, FORMATTING (PATH)        ::
 ::
-++  ab
+++  AB
   |%
-  ++  hif  (boss 256 ;~(plug tip tiq (easy ~)))
-  ++  huf  %+  cook
-             |=({a/@ b/@} (wred:un ~(zug mu ~(zag mu [a b]))))
-           ;~(plug hif ;~(pfix hep hif))
-  ++  hyf  (bass 0x1.0000.0000 ;~(plug huf ;~(pfix hep huf) (easy ~)))
-  ++  tip  (sear |=(a/@ (ins:po a)) til)
-  ++  tiq  (sear |=(a/@ (ind:po a)) til)
-  ++  til  (boss 256 (stun [3 3] low))
+  ++  HIF  (BOSS 256 ;~(PLUG TIP TIQ (EASY ~)))
+  ++  HUF  %+  COOK
+             |=({A/@ B/@} (WRED:UN ~(ZUG MU ~(ZAG MU [A B]))))
+           ;~(PLUG HIF ;~(PFIX HEP HIF))
+  ++  HYF  (BASS 0X1.0000.0000 ;~(PLUG HUF ;~(PFIX HEP HUF) (EASY ~)))
+  ++  TIP  (SEAR |=(A/@ (INS:PO A)) TIL)
+  ++  TIQ  (SEAR |=(A/@ (IND:PO A)) TIL)
+  ++  TIL  (BOSS 256 (STUN [3 3] LOW))
   --
-++  ag
+++  AG
   |%
-  ++  fed  ;~  pose
-             %+  bass  0x1.0000.0000.0000.0000
-             ;~((glue doh) ;~(pose hyf:ab huf:ab) (more doh hyf:ab))
+  ++  FED  ;~  POSE
+             %+  BASS  0X1.0000.0000.0000.0000
+             ;~((GLUE DOH) ;~(POSE HYF:AB HUF:AB) (MORE DOH HYF:AB))
            ::
-             hyf:ab
-             huf:ab
-             hif:ab
-             tiq:ab
+             HYF:AB
+             HUF:AB
+             HIF:AB
+             TIQ:AB
            ==
   --
 ::
-++  mu
-  |_  {top/@ bot/@}
-  ++  zag  [p=(end 4 1 (add top bot)) q=bot]
-  ++  zig  [p=(end 4 1 (add top (sub 0x1.0000 bot))) q=bot]
-  ++  zug  (mix (lsh 4 1 top) bot)
+++  MU
+  |_  {TOP/@ BOT/@}
+  ++  ZAG  [P=(END 4 1 (ADD TOP BOT)) Q=BOT]
+  ++  ZIG  [P=(END 4 1 (ADD TOP (SUB 0X1.0000 BOT))) Q=BOT]
+  ++  ZUG  (MIX (LSH 4 1 TOP) BOT)
   --
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                section 2eN, pseudo-cryptography      ::
+::                SECTION 2EN, PSEUDO-CRYPTOGRAPHY      ::
 ::
-++  un                                                  ::  =(x (wred (wren x)))
+++  UN                                                  ::  =(X (WRED (WREN X)))
   |%
-  ++  wren                                              ::  conceal structure
-    |=  pyn/@  ^-  @
-    =+  len=(met 3 pyn)
-    ?:  =(0 len)
+  ++  WREN                                              ::  CONCEAL STRUCTURE
+    |=  PYN/@  ^-  @
+    =+  LEN=(MET 3 PYN)
+    ?:  =(0 LEN)
       0
-    =>  .(len (dec len))
-    =+  mig=(zaft (xafo len (cut 3 [len 1] pyn)))
-    %+  can  3
-    %-  flop  ^-  (list {@ @})
-    :-  [1 mig]
-    |-  ^-  (list {@ @})
-    ?:  =(0 len)
+    =>  .(LEN (DEC LEN))
+    =+  MIG=(ZAFT (XAFO LEN (CUT 3 [LEN 1] PYN)))
+    %+  CAN  3
+    %-  FLOP  ^-  (LIST {@ @})
+    :-  [1 MIG]
+    |-  ^-  (LIST {@ @})
+    ?:  =(0 LEN)
       ~
-    =>  .(len (dec len))
-    =+  mog=(zyft :(mix mig (end 3 1 len) (cut 3 [len 1] pyn)))
-    [[1 mog] $(mig mog)]
+    =>  .(LEN (DEC LEN))
+    =+  MOG=(ZYFT :(MIX MIG (END 3 1 LEN) (CUT 3 [LEN 1] PYN)))
+    [[1 MOG] $(MIG MOG)]
   ::
-  ++  wred                                              ::  restore structure
-    |=  cry/@  ^-  @
-    =+  len=(met 3 cry)
-    ?:  =(0 len)
+  ++  WRED                                              ::  RESTORE STRUCTURE
+    |=  CRY/@  ^-  @
+    =+  LEN=(MET 3 CRY)
+    ?:  =(0 LEN)
       0
-    =>  .(len (dec len))
-    =+  mig=(cut 3 [len 1] cry)
-    %+  can  3
-    %-  flop  ^-  (list {@ @})
-    :-  [1 (xaro len (zart mig))]
-    |-  ^-  (list {@ @})
-    ?:  =(0 len)
+    =>  .(LEN (DEC LEN))
+    =+  MIG=(CUT 3 [LEN 1] CRY)
+    %+  CAN  3
+    %-  FLOP  ^-  (LIST {@ @})
+    :-  [1 (XARO LEN (ZART MIG))]
+    |-  ^-  (LIST {@ @})
+    ?:  =(0 LEN)
       ~
-    =>  .(len (dec len))
-    =+  mog=(cut 3 [len 1] cry)
-    [[1 :(mix mig (end 3 1 len) (zyrt mog))] $(mig mog)]
+    =>  .(LEN (DEC LEN))
+    =+  MOG=(CUT 3 [LEN 1] CRY)
+    [[1 :(MIX MIG (END 3 1 LEN) (ZYRT MOG))] $(MIG MOG)]
   ::
-  ++  xafo  |=({a/@ b/@} +((mod (add (dec b) a) 255)))
-  ++  xaro  |=({a/@ b/@} +((mod (add (dec b) (sub 255 (mod a 255))) 255)))
+  ++  XAFO  |=({A/@ B/@} +((MOD (ADD (DEC B) A) 255)))
+  ++  XARO  |=({A/@ B/@} +((MOD (ADD (DEC B) (SUB 255 (MOD A 255))) 255)))
   ::
-  ++  zaft                                              ::  forward 255-sbox
-    |=  a/@D
-    =+  ^=  b
-        0xcc.75bc.86c8.2fb1.9a42.f0b3.79a0.92ca.21f6.1e41.cde5.fcc0.
-        7e85.51ae.1005.c72d.1246.07e8.7c64.a914.8d69.d9f4.59c2.8038.
-        1f4a.dca2.6fdf.66f9.f561.a12e.5a16.f7b0.a39f.364e.cb70.7318.
-        1de1.ad31.63d1.abd4.db68.6a33.134d.a760.edee.5434.493a.e323.
-        930d.8f3d.3562.bb81.0b24.43cf.bea5.a6eb.52b4.0229.06b2.6704.
-        78c9.45ec.d75e.58af.c577.b7b9.c40e.017d.90c3.87f8.96fa.1153.
-        0372.7f30.1c32.ac83.ff17.c6e4.d36d.6b55.e2ce.8c71.8a5b.b6f3.
-        9d4b.eab5.8b3c.e7f2.a8fe.9574.5de0.bf20.3f15.9784.9939.5f9c.
-        e609.564f.d8a4.b825.9819.94aa.2c08.8e4c.9b22.477a.2840.3ed6.
-        3750.6ef1.44dd.89ef.6576.d00a.fbda.9ed2.3b6c.7b0c.bde9.2ade.
-        5c88.c182.481a.1b0f.2bfd.d591.2726.57ba
-    (cut 3 [(dec a) 1] b)
+  ++  ZAFT                                              ::  FORWARD 255-SBOX
+    |=  A/@D
+    =+  ^=  B
+        0XCC.75BC.86C8.2FB1.9A42.F0B3.79A0.92CA.21F6.1E41.CDE5.FCC0.
+        7E85.51AE.1005.C72D.1246.07E8.7C64.A914.8D69.D9F4.59C2.8038.
+        1F4A.DCA2.6FDF.66F9.F561.A12E.5A16.F7B0.A39F.364E.CB70.7318.
+        1DE1.AD31.63D1.ABD4.DB68.6A33.134D.A760.EDEE.5434.493A.E323.
+        930D.8F3D.3562.BB81.0B24.43CF.BEA5.A6EB.52B4.0229.06B2.6704.
+        78C9.45EC.D75E.58AF.C577.B7B9.C40E.017D.90C3.87F8.96FA.1153.
+        0372.7F30.1C32.AC83.FF17.C6E4.D36D.6B55.E2CE.8C71.8A5B.B6F3.
+        9D4B.EAB5.8B3C.E7F2.A8FE.9574.5DE0.BF20.3F15.9784.9939.5F9C.
+        E609.564F.D8A4.B825.9819.94AA.2C08.8E4C.9B22.477A.2840.3ED6.
+        3750.6EF1.44DD.89EF.6576.D00A.FBDA.9ED2.3B6C.7B0C.BDE9.2ADE.
+        5C88.C182.481A.1B0F.2BFD.D591.2726.57BA
+    (CUT 3 [(DEC A) 1] B)
   ::
-  ++  zart                                              ::  reverse 255-sbox
-    |=  a/@D
-    =+  ^=  b
-        0x68.4f07.ea1c.73c9.75c2.efc8.d559.5125.f621.a7a8.8591.5613.
-        dd52.40eb.65a2.60b7.4bcb.1123.ceb0.1bd6.3c84.2906.b164.19b3.
-        1e95.5fec.ffbc.f187.fbe2.6680.7c77.d30e.e94a.9414.fd9a.017d.
-        3a7e.5a55.8ff5.8bf9.c181.e5b6.6ab2.35da.50aa.9293.3bc0.cdc6.
-        f3bf.1a58.4130.f844.3846.744e.36a0.f205.789e.32d8.5e54.5c22.
-        0f76.fce7.4569.0d99.d26e.e879.dc16.2df4.887f.1ffe.4dba.6f5d.
-        bbcc.2663.1762.aed7.af8a.ca20.dbb4.9bc7.a942.834c.105b.c4d4.
-        8202.3e61.a671.90e6.273d.bdab.3157.cfa4.0c2e.df86.2496.f7ed.
-        2b48.2a9d.5318.a343.d128.be9c.a5ad.6bb5.6dfa.c5e1.3408.128d.
-        2c04.0339.97a1.2ff0.49d0.eeb8.6c0a.0b37.b967.c347.d9ac.e072.
-        e409.7b9f.1598.1d3f.33de.8ce3.8970.8e7a
-    (cut 3 [(dec a) 1] b)
+  ++  ZART                                              ::  REVERSE 255-SBOX
+    |=  A/@D
+    =+  ^=  B
+        0X68.4F07.EA1C.73C9.75C2.EFC8.D559.5125.F621.A7A8.8591.5613.
+        DD52.40EB.65A2.60B7.4BCB.1123.CEB0.1BD6.3C84.2906.B164.19B3.
+        1E95.5FEC.FFBC.F187.FBE2.6680.7C77.D30E.E94A.9414.FD9A.017D.
+        3A7E.5A55.8FF5.8BF9.C181.E5B6.6AB2.35DA.50AA.9293.3BC0.CDC6.
+        F3BF.1A58.4130.F844.3846.744E.36A0.F205.789E.32D8.5E54.5C22.
+        0F76.FCE7.4569.0D99.D26E.E879.DC16.2DF4.887F.1FFE.4DBA.6F5D.
+        BBCC.2663.1762.AED7.AF8A.CA20.DBB4.9BC7.A942.834C.105B.C4D4.
+        8202.3E61.A671.90E6.273D.BDAB.3157.CFA4.0C2E.DF86.2496.F7ED.
+        2B48.2A9D.5318.A343.D128.BE9C.A5AD.6BB5.6DFA.C5E1.3408.128D.
+        2C04.0339.97A1.2FF0.49D0.EEB8.6C0A.0B37.B967.C347.D9AC.E072.
+        E409.7B9F.1598.1D3F.33DE.8CE3.8970.8E7A
+    (CUT 3 [(DEC A) 1] B)
   ::
-  ++  zyft                                              ::  forward 256-sbox
-    |=  a/@D
-    =+  ^=  b
-        0xbb49.b71f.b881.b402.17e4.6b86.69b5.1647.115f.dddb.7ca5.
-          8371.4bd5.19a9.b092.605d.0d9b.e030.a0cc.78ba.5706.4d2d.
-          986a.768c.f8e8.c4c7.2f1c.effe.3cae.01c0.253e.65d3.3872.
-          ce0e.7a74.8ac6.daac.7e5c.6479.44ec.4143.3d20.4af0.ee6c.
-          c828.deca.0377.249f.ffcd.7b4f.eb7d.66f2.8951.042e.595a.
-          8e13.f9c3.a79a.f788.6199.9391.7fab.6200.4ce5.0758.e2f1.
-          7594.c945.d218.4248.afa1.e61a.54fb.1482.bea4.96a2.3473.
-          63c2.e7cb.155b.120a.4ed7.bfd8.b31b.4008.f329.fca3.5380.
-          9556.0cb2.8722.2bea.e96e.3ac5.d1bc.10e3.2c52.a62a.b1d6.
-          35aa.d05e.f6a8.0f3b.31ed.559d.09ad.f585.6d21.fd1d.8d67.
-          370b.26f4.70c1.b923.4684.6fbd.cf8b.5036.0539.9cdc.d93f.
-          9068.1edf.8f33.b632.d427.97fa.9ee1
-    (cut 3 [a 1] b)
+  ++  ZYFT                                              ::  FORWARD 256-SBOX
+    |=  A/@D
+    =+  ^=  B
+        0XBB49.B71F.B881.B402.17E4.6B86.69B5.1647.115F.DDDB.7CA5.
+          8371.4BD5.19A9.B092.605D.0D9B.E030.A0CC.78BA.5706.4D2D.
+          986A.768C.F8E8.C4C7.2F1C.EFFE.3CAE.01C0.253E.65D3.3872.
+          CE0E.7A74.8AC6.DAAC.7E5C.6479.44EC.4143.3D20.4AF0.EE6C.
+          C828.DECA.0377.249F.FFCD.7B4F.EB7D.66F2.8951.042E.595A.
+          8E13.F9C3.A79A.F788.6199.9391.7FAB.6200.4CE5.0758.E2F1.
+          7594.C945.D218.4248.AFA1.E61A.54FB.1482.BEA4.96A2.3473.
+          63C2.E7CB.155B.120A.4ED7.BFD8.B31B.4008.F329.FCA3.5380.
+          9556.0CB2.8722.2BEA.E96E.3AC5.D1BC.10E3.2C52.A62A.B1D6.
+          35AA.D05E.F6A8.0F3B.31ED.559D.09AD.F585.6D21.FD1D.8D67.
+          370B.26F4.70C1.B923.4684.6FBD.CF8B.5036.0539.9CDC.D93F.
+          9068.1EDF.8F33.B632.D427.97FA.9EE1
+    (CUT 3 [A 1] B)
   ::
-  ++  zyrt                                              ::  reverse 256-sbox
-    |=  a/@D
-    =+  ^=  b
-        0x9fc8.2753.6e02.8fcf.8b35.2b20.5598.7caa.c9a9.30b0.9b48.
-          47ce.6371.80f6.407d.00dd.0aa5.ed10.ecb7.0f5a.5c3a.e605.
-          c077.4337.17bd.9eda.62a4.79a7.ccb8.44cd.8e64.1ec4.5b6b.
-          1842.ffd8.1dfb.fd07.f2f9.594c.3be3.73c6.2cb6.8438.e434.
-          8d3d.ea6a.5268.72db.a001.2e11.de8c.88d3.0369.4f7a.87e2.
-          860d.0991.25d0.16b9.978a.4bf4.2a1a.e96c.fa50.85b5.9aeb.
-          9dbb.b2d9.a2d1.7bba.66be.e81f.1946.29a8.f5d2.f30c.2499.
-          c1b3.6583.89e1.ee36.e0b4.6092.937e.d74e.2f6f.513e.9615.
-          9c5d.d581.e7ab.fe74.f01b.78b1.ae75.af57.0ec2.adc7.3245.
-          12bf.2314.3967.0806.31dc.cb94.d43f.493c.54a6.0421.c3a1.
-          1c4a.28ac.fc0b.26ca.5870.e576.f7f1.616d.905f.ef41.33bc.
-          df4d.225e.2d56.7fd6.1395.a3f8.c582
-    (cut 3 [a 1] b)
+  ++  ZYRT                                              ::  REVERSE 256-SBOX
+    |=  A/@D
+    =+  ^=  B
+        0X9FC8.2753.6E02.8FCF.8B35.2B20.5598.7CAA.C9A9.30B0.9B48.
+          47CE.6371.80F6.407D.00DD.0AA5.ED10.ECB7.0F5A.5C3A.E605.
+          C077.4337.17BD.9EDA.62A4.79A7.CCB8.44CD.8E64.1EC4.5B6B.
+          1842.FFD8.1DFB.FD07.F2F9.594C.3BE3.73C6.2CB6.8438.E434.
+          8D3D.EA6A.5268.72DB.A001.2E11.DE8C.88D3.0369.4F7A.87E2.
+          860D.0991.25D0.16B9.978A.4BF4.2A1A.E96C.FA50.85B5.9AEB.
+          9DBB.B2D9.A2D1.7BBA.66BE.E81F.1946.29A8.F5D2.F30C.2499.
+          C1B3.6583.89E1.EE36.E0B4.6092.937E.D74E.2F6F.513E.9615.
+          9C5D.D581.E7AB.FE74.F01B.78B1.AE75.AF57.0EC2.ADC7.3245.
+          12BF.2314.3967.0806.31DC.CB94.D43F.493C.54A6.0421.C3A1.
+          1C4A.28AC.FC0B.26CA.5870.E576.F7F1.616D.905F.EF41.33BC.
+          DF4D.225E.2D56.7FD6.1395.A3F8.C582
+    (CUT 3 [A 1] B)
   --
 --

@@ -1,87 +1,87 @@
-::  Compile arvo as a pill noun, without compiler changes.
-::  usage
+::  COMPILE ARVO AS A PILL NOUN, WITHOUT COMPILER CHANGES.
+::  USAGE
 ::
-::    .urbit/pill +solid
+::    .URBIT/PILL +SOLID
 ::
-::::  /hoon/solid/gen
+::::  /HOON/SOLID/GEN
   ::
 /?    310
-/+  pill
+/+  PILL
 ::
 ::::
   !:
-:-  %say
-|=  $:  [now=@da eny=@uvJ bec=beak]
-        arg=$@(~ [top=path ~])
-        dub=_|
+:-  %SAY
+|=  $:  [NOW=@DA ENY=@UVJ BEC=BEAK]
+        ARG=$@(~ [TOP=PATH ~])
+        DUB=_|
     ==
-:-  %noun
-::  sys: root path to boot system, `/~me/[desk]/now/sys`
+:-  %NOUN
+::  SYS: ROOT PATH TO BOOT SYSTEM, `/~ME/[DESK]/NOW/SYS`
 ::
-=/  sys=path
-  ?^  arg  top.arg
-  /(scot %p p.bec)/[q.bec]/(scot %da now)/sys
+=/  SYS=PATH
+  ?^  ARG  TOP.ARG
+  /(SCOT %P P.BEC)/[Q.BEC]/(SCOT %DA NOW)/SYS
 ::
-=/  compiler-path  (weld sys /hoon)
-=/  arvo-path      (weld sys /arvo)
-~&  %solid-start
-=/  compiler-src  .^(@t %cx (weld compiler-path /hoon))
-=/  arvo-src      .^(@t %cx (weld arvo-path /hoon))
-=/  arvo-formula
-  ~&  %solid-loaded
-  =/  compiler-hoon  (rain compiler-path compiler-src)
-  ?.  dub
-    ::  compile arvo against hoon, with our current compiler
+=/  COMPILER-PATH  (WELD SYS /HOON)
+=/  ARVO-PATH      (WELD SYS /ARVO)
+~&  %SOLID-START
+=/  COMPILER-SRC  .^(@T %CX (WELD COMPILER-PATH /HOON))
+=/  ARVO-SRC      .^(@T %CX (WELD ARVO-PATH /HOON))
+=/  ARVO-FORMULA
+  ~&  %SOLID-LOADED
+  =/  COMPILER-HOON  (RAIN COMPILER-PATH COMPILER-SRC)
+  ?.  DUB
+    ::  COMPILE ARVO AGAINST HOON, WITH OUR CURRENT COMPILER
     ::
-    =/  whole-hoon=hoon
-      [%tsbn compiler-hoon [%tsbn [%$ 7] (rain arvo-path arvo-src)]]
-    ~&  %solid-parsed
-    =/  whole-formula  q:(~(mint ut %noun) %noun whole-hoon)
-    ~&  %solid-arvo
-    whole-formula
-  ::  compile arvo against hoon, with a freshly compiled hoon (via +ride)
+    =/  WHOLE-HOON=HOON
+      [%TSBN COMPILER-HOON [%TSBN [%$ 7] (RAIN ARVO-PATH ARVO-SRC)]]
+    ~&  %SOLID-PARSED
+    =/  WHOLE-FORMULA  Q:(~(MINT UT %NOUN) %NOUN WHOLE-HOON)
+    ~&  %SOLID-ARVO
+    WHOLE-FORMULA
+  ::  COMPILE ARVO AGAINST HOON, WITH A FRESHLY COMPILED HOON (VIA +RIDE)
   ::
-  ~&  %solid-parsed
-  =/  compiler-formula  q:(~(mint ut %noun) %noun compiler-hoon)
-  ~&  %solid-compiled
-  =/  whole-src
-    (rap 3 ['=>  ' compiler-src '=>  +7  ' arvo-src ~])
-  ~&  %solid-double-loaded
-  =/  whole-formula
+  ~&  %SOLID-PARSED
+  =/  COMPILER-FORMULA  Q:(~(MINT UT %NOUN) %NOUN COMPILER-HOON)
+  ~&  %SOLID-COMPILED
+  =/  WHOLE-SRC
+    (RAP 3 ['=>  ' COMPILER-SRC '=>  +7  ' ARVO-SRC ~])
+  ~&  %SOLID-DOUBLE-LOADED
+  =/  WHOLE-FORMULA
     =<  +
     .*  0
     :+  %7
-      compiler-formula
-    [%9 2 %10 [6 %1 %noun whole-src] [%0 1]]
-  ~&  %solid-double-compiled
-  whole-formula
+      COMPILER-FORMULA
+    [%9 2 %10 [6 %1 %NOUN WHOLE-SRC] [%0 1]]
+  ~&  %SOLID-DOUBLE-COMPILED
+  WHOLE-FORMULA
 ::
-~&  [%solid-kernel `@ux`(mug arvo-formula)]
+~&  [%SOLID-KERNEL `@UX`(MUG ARVO-FORMULA)]
 ::
-::  installed: Arvo gate (formal interface) with %zuse and vanes installed
+::  INSTALLED: ARVO GATE (FORMAL INTERFACE) WITH %ZUSE AND VANES INSTALLED
 ::
-=/  installed
-  =<  q
-  %^    spin
-      (module-ova:pill sys)
-    .*(0 arvo-formula)
-  |=  [ovo=ovum ken=*]
-  [~ (slum ken [now ovo])]
+=/  INSTALLED
+  =<  Q
+  %^    SPIN
+      (MODULE-OVA:PILL SYS)
+    .*(0 ARVO-FORMULA)
+  |=  [OVO=OVUM KEN=*]
+  [~ (SLUM KEN [NOW OVO])]
 ::
-::  our boot-ova is a list containing one massive formula:
+::  OUR BOOT-OVA IS A LIST CONTAINING ONE MASSIVE FORMULA:
 ::
-::    We evaluate :arvo-formula (for jet registration),
-::    then ignore the result and produce :installed
+::    WE EVALUATE :ARVO-FORMULA (FOR JET REGISTRATION),
+::    THEN IGNORE THE RESULT AND PRODUCE :INSTALLED
 ::
-=/  boot-ova=(list)
-  [[%7 arvo-formula %1 installed] ~]
+=/  BOOT-OVA=(LIST)
+  [[%7 ARVO-FORMULA %1 INSTALLED] ~]
 ::
-::  a pill is a 3-tuple of event-lists: [boot kernel userspace]
+::  A PILL IS A 3-TUPLE OF EVENT-LISTS: [BOOT KERNEL USERSPACE]
 ::
-::    Our kernel event-list is ~, as we've already installed them.
-::    Our userspace event-list is a list containing a full %clay
-::    filesystem sync event.
+::    OUR KERNEL EVENT-LIST IS ~, AS WE'VE ALREADY INSTALLED THEM.
+::    OUR USERSPACE EVENT-LIST IS A LIST CONTAINING A FULL %CLAY
+::    FILESYSTEM SYNC EVENT.
 ::
-:+  boot-ova  ~
-=/  bas  (flop (tail (flop sys)))
-[(file-ovum:pill bas) ~]
+:+  BOOT-OVA  ~
+=/  BAS  (FLOP (TAIL (FLOP SYS)))
+[(FILE-OVUM:PILL BAS) ~]

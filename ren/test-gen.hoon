@@ -1,4 +1,4 @@
-/+  test-runner
-/=  test-core  /!noun/
+/+  TEST-RUNNER
+/=  TEST-CORE  /!NOUN/
 ::
-(get-test-arms:test-runner !>(test-core))
+(GET-TEST-ARMS:TEST-RUNNER !>(TEST-CORE))

@@ -1,21 +1,21 @@
 ::
-::::  /hoon/css/mar
+::::  /HOON/CSS/MAR
   ::
 /?    310
-=,  eyre
-=,  mimes:html
-|_  mud/@t
-++  grow                                                ::  convert to
-  |%  ++  mime  [/text/css (as-octs mud)]               ::  convert to %mime
-      ++  elem  ;style                                  ::  convert to %hymn
-                  ;-  (trip mud)
+=,  EYRE
+=,  MIMES:HTML
+|_  MUD/@T
+++  GROW                                                ::  CONVERT TO
+  |%  ++  MIME  [/TEXT/CSS (AS-OCTS MUD)]               ::  CONVERT TO %MIME
+      ++  ELEM  ;STYLE                                  ::  CONVERT TO %HYMN
+                  ;-  (TRIP MUD)
                 ==
-      ++  hymn  ;html:(head:"{elem}" body)
+      ++  HYMN  ;HTML:(HEAD:"{ELEM}" BODY)
   --
-++  grab
-  |%                                                    ::  convert from
-  ++  mime  |=({p/mite q/octs} (@t q.q))
-  ++  noun  @t                                         ::  clam from %noun
+++  GRAB
+  |%                                                    ::  CONVERT FROM
+  ++  MIME  |=({P/MITE Q/OCTS} (@T Q.Q))
+  ++  NOUN  @T                                         ::  CLAM FROM %NOUN
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

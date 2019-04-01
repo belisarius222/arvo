@@ -1,34 +1,34 @@
-::  Basic authentication
+::  BASIC AUTHENTICATION
 ::
-::::  /hoon/basic-auth/lib
+::::  /HOON/BASIC-AUTH/LIB
   ::
-=,  eyre
+=,  EYRE
 |%
-++  keys  @t
+++  KEYS  @T
 --
 ::
 ::::
   ::
-|_  {bal/(bale keys) ~}
-++  auth
+|_  {BAL/(BALE KEYS) ~}
+++  AUTH
   |%
-  ++  header
-    ^-  cord
-    ?~  key.bal
-      ~_  leaf+"Run |init-auth-basic {<`path`dom.bal>}"
-      ~|(%basic-auth-no-key !!)
-    (cat 3 'Basic ' key.bal)
+  ++  HEADER
+    ^-  CORD
+    ?~  KEY.BAL
+      ~_  LEAF+"RUN |INIT-AUTH-BASIC {<`PATH`DOM.BAL>}"
+      ~|(%BASIC-AUTH-NO-KEY !!)
+    (CAT 3 'BASIC ' KEY.BAL)
   --
 ::
-++  add-auth-header
-  |=  a/hiss  ^-  hiss
-  ~&  auth+(en-purl:html p.a)
-  %_(a q.q (~(add ja q.q.a) %authorization header:auth))
+++  ADD-AUTH-HEADER
+  |=  A/HISS  ^-  HISS
+  ~&  AUTH+(EN-PURL:HTML P.A)
+  %_(A Q.Q (~(ADD JA Q.Q.A) %AUTHORIZATION HEADER:AUTH))
 ::
-++  standard
+++  STANDARD
   |%
-  ++  out-adding-header
-    |=  a/hiss  ^-  sec-move
-    [%send (add-auth-header a)]
+  ++  OUT-ADDING-HEADER
+    |=  A/HISS  ^-  SEC-MOVE
+    [%SEND (ADD-AUTH-HEADER A)]
   --
 --

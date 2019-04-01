@@ -1,61 +1,61 @@
 ::
-::::  /hoon/snip/mar
+::::  /HOON/SNIP/MAR
   ::
 /?    310
-=,  html
+=,  HTML
 |%
-  ++  words  1
-  ++  hedtal
-    =|  met/marl
-    |=  a/marl  ^-  {hed/marl tal/marl}
-    ?~  a  [~ ~]
-    ?.  ?=($h1 n.g.i.a)
-      ?:  ?=($meta n.g.i.a)
-        $(a t.a, met [i.a met])
-      =+  had=$(a c.i.a)
-      ?^  -.had  had
-      $(a t.a)
-    [c.i.a (weld (flop met) (limit words t.a))]
+  ++  WORDS  1
+  ++  HEDTAL
+    =|  MET/MARL
+    |=  A/MARL  ^-  {HED/MARL TAL/MARL}
+    ?~  A  [~ ~]
+    ?.  ?=($H1 N.G.I.A)
+      ?:  ?=($META N.G.I.A)
+        $(A T.A, MET [I.A MET])
+      =+  HAD=$(A C.I.A)
+      ?^  -.HAD  HAD
+      $(A T.A)
+    [C.I.A (WELD (FLOP MET) (LIMIT WORDS T.A))]
   ::
-  ++  limit
-    |=  {lim/@u mal/marl}
-    =<  res
-    |-  ^-  {rem/@u res/marl}
-    ?~  mal  [lim ~]
-    ?~  lim  [0 ~]
-    =+  ^-  {lam/@u hed/manx}
-      ?:  ?=(_;/(**) i.mal)
-        [lim ;/(tay)]:(deword lim v.i.a.g.i.mal)
-      [rem ele(c res)]:[ele=i.mal $(mal c.i.mal)]
-    [rem - res]:[hed $(lim lam, mal t.mal)]
+  ++  LIMIT
+    |=  {LIM/@U MAL/MARL}
+    =<  RES
+    |-  ^-  {REM/@U RES/MARL}
+    ?~  MAL  [LIM ~]
+    ?~  LIM  [0 ~]
+    =+  ^-  {LAM/@U HED/MANX}
+      ?:  ?=(_;/(**) I.MAL)
+        [LIM ;/(TAY)]:(DEWORD LIM V.I.A.G.I.MAL)
+      [REM ELE(C RES)]:[ELE=I.MAL $(MAL C.I.MAL)]
+    [REM - RES]:[HED $(LIM LAM, MAL T.MAL)]
   ::
-  ++  deword
-    |=  {lim/@u tay/tape}  ^-  {lim/@u tay/tape}
-    ?~  tay  [lim tay]
-    ?~  lim  [0 ~]
-    =+  wer=(dot 1^1 tay)
-    ?~  q.wer
-      [lim - tay]:[i.tay $(tay t.tay)]
-    =+  nex=$(lim (dec lim), tay q.q.u.q.wer)
-    [-.nex [(wonk wer) +.nex]]
+  ++  DEWORD
+    |=  {LIM/@U TAY/TAPE}  ^-  {LIM/@U TAY/TAPE}
+    ?~  TAY  [LIM TAY]
+    ?~  LIM  [0 ~]
+    =+  WER=(DOT 1^1 TAY)
+    ?~  Q.WER
+      [LIM - TAY]:[I.TAY $(TAY T.TAY)]
+    =+  NEX=$(LIM (DEC LIM), TAY Q.Q.U.Q.WER)
+    [-.NEX [(WONK WER) +.NEX]]
 --
 ::
 ::
-=,  mimes:html
-|_  {hed/marl tal/marl}
+=,  MIMES:HTML
+|_  {HED/MARL TAL/MARL}
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  mime
-    =<  mime
+  ++  MIME
+    =<  MIME
     |%
-    ++  elem  ;div:(h1:"*{hed}" div:"*{tal}")           ::  convert to %elem
-    ++  hymn  ;html:(head:title:"snip" body:"+{elem}")  ::  convert to %hymn
-    ++  html  (crip (en-xml hymn))                      ::  convert to %html
-    ++  mime  [/text/html (as-octs html)]               ::  convert to %mime
+    ++  ELEM  ;DIV:(H1:"*{HED}" DIV:"*{TAL}")           ::  CONVERT TO %ELEM
+    ++  HYMN  ;HTML:(HEAD:TITLE:"SNIP" BODY:"+{ELEM}")  ::  CONVERT TO %HYMN
+    ++  HTML  (CRIP (EN-XML HYMN))                      ::  CONVERT TO %HTML
+    ++  MIME  [/TEXT/HTML (AS-OCTS HTML)]               ::  CONVERT TO %MIME
     --
   --
-++  grab  |%                                            ::  convert from
-          ++  noun  {marl marl}                         ::  clam from $noun
-          ++  elem  |=(a/manx (hedtal +.a))
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  {MARL MARL}                         ::  CLAM FROM $NOUN
+          ++  ELEM  |=(A/MANX (HEDTAL +.A))
 --        --

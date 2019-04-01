@@ -1,12 +1,12 @@
-::  Tree view recursive directory contents
+::  TREE VIEW RECURSIVE DIRECTORY CONTENTS
 ::
-::::  /hoon/tree/gen
+::::  /HOON/TREE/GEN
   ::
 /?    310
 ::
 ::::
   ::
-:-  %say
-|=  [^ [pax=path ~] ~]
+:-  %SAY
+|=  [^ [PAX=PATH ~] ~]
 ::
-[%tang `tang`(flop (turn .^((list path) %ct pax) smyt))]
+[%TANG `TANG`(FLOP (TURN .^((LIST PATH) %CT PAX) SMYT))]

@@ -1,80 +1,80 @@
-::  |asn1: small selection of types and constants for ASN.1
+::  |ASN1: SMALL SELECTION OF TYPES AND CONSTANTS FOR ASN.1
 ::
-::    A minimal representation of some basic ASN.1 types,
-::    created to support PKCS keys, digests, and cert requests.
+::    A MINIMAL REPRESENTATION OF SOME BASIC ASN.1 TYPES,
+::    CREATED TO SUPPORT PKCS KEYS, DIGESTS, AND CERT REQUESTS.
 ::
 ^?
 |%
-::  +bespoke:asn1: context-specific, generic ASN.1 tag type
+::  +BESPOKE:ASN1: CONTEXT-SPECIFIC, GENERIC ASN.1 TAG TYPE
 ::
-::    Note that *explicit* implies *constructed* (ie, bit 5 is set in DER).
+::    NOTE THAT *EXPLICIT* IMPLIES *CONSTRUCTED* (IE, BIT 5 IS SET IN DER).
 ::
-+=  bespoke
-  ::  imp: & is implicit, | is explicit
-  ::  tag: 5 bits for the custom tag number
++=  BESPOKE
+  ::  IMP: & IS IMPLICIT, | IS EXPLICIT
+  ::  TAG: 5 BITS FOR THE CUSTOM TAG NUMBER
   ::
-  [imp=? tag=@ud]
-::  +spec:asn1: minimal representations of basic ASN.1 types
+  [IMP=? TAG=@UD]
+::  +SPEC:ASN1: MINIMAL REPRESENTATIONS OF BASIC ASN.1 TYPES
 ::
-+=  spec
-  $%  ::  %int: arbitrary-sized, unsigned integers
++=  SPEC
+  $%  ::  %INT: ARBITRARY-SIZED, UNSIGNED INTEGERS
       ::
-      ::    Unsigned integers, represented as having a positive sign.
-      ::    Negative integers would be two's complement in DER,
-      ::    but we don't need them.
+      ::    UNSIGNED INTEGERS, REPRESENTED AS HAVING A POSITIVE SIGN.
+      ::    NEGATIVE INTEGERS WOULD BE TWO'S COMPLEMENT IN DER,
+      ::    BUT WE DON'T NEED THEM.
       ::
-      [%int int=@u]
-      ::  %bit: very minimal support for bit strings
+      [%INT INT=@U]
+      ::  %BIT: VERY MINIMAL SUPPORT FOR BIT STRINGS
       ::
-      ::    Specifically, values must already be padded and byte-aligned.
-      ::    len: bitwidth
-      ::    bit: data
+      ::    SPECIFICALLY, VALUES MUST ALREADY BE PADDED AND BYTE-ALIGNED.
+      ::    LEN: BITWIDTH
+      ::    BIT: DATA
       ::
-      [%bit len=@ud bit=@ux]
-      ::  %oct: octets in little-endian byte order
+      [%BIT LEN=@UD BIT=@UX]
+      ::  %OCT: OCTETS IN LITTLE-ENDIAN BYTE ORDER
       ::
-      ::    len: bytewidth
-      ::    bit: data
+      ::    LEN: BYTEWIDTH
+      ::    BIT: DATA
       ::
-      [%oct len=@ud oct=@ux]
-      ::  %nul: fully supported!
+      [%OCT LEN=@UD OCT=@UX]
+      ::  %NUL: FULLY SUPPORTED!
       ::
-      [%nul ~]
-      ::  %obj: object identifiers, pre-packed
+      [%NUL ~]
+      ::  %OBJ: OBJECT IDENTIFIERS, PRE-PACKED
       ::
-      ::    Object identifiers are technically a sequence of integers,
-      ::    represented here in their already-encoded form.
+      ::    OBJECT IDENTIFIERS ARE TECHNICALLY A SEQUENCE OF INTEGERS,
+      ::    REPRESENTED HERE IN THEIR ALREADY-ENCODED FORM.
       ::
-      [%obj obj=@ux]
-      ::  %seq: a list of specs
+      [%OBJ OBJ=@UX]
+      ::  %SEQ: A LIST OF SPECS
       ::
-      [%seq seq=(list spec)]
-      ::  %set: a logical set of specs
+      [%SEQ SEQ=(LIST SPEC)]
+      ::  %SET: A LOGICAL SET OF SPECS
       ::
-      ::    Implemented here as a list for the sake of simplicity.
-      ::    must be already deduplicated and sorted!
+      ::    IMPLEMENTED HERE AS A LIST FOR THE SAKE OF SIMPLICITY.
+      ::    MUST BE ALREADY DEDUPLICATED AND SORTED!
       ::
-      [%set set=(list spec)]
-      ::  %con: context-specific
+      [%SET SET=(LIST SPEC)]
+      ::  %CON: CONTEXT-SPECIFIC
       ::
-      ::    General support for context-specific tags.
-      ::    bes: custom tag number, implicit or explicit
-      ::    con: already-encoded bytes
+      ::    GENERAL SUPPORT FOR CONTEXT-SPECIFIC TAGS.
+      ::    BES: CUSTOM TAG NUMBER, IMPLICIT OR EXPLICIT
+      ::    CON: ALREADY-ENCODED BYTES
       ::
-      [%con bes=bespoke con=(list @D)]
+      [%CON BES=BESPOKE CON=(LIST @D)]
   ==
-::  |obj:asn1: constant object ids, pre-encoded
+::  |OBJ:ASN1: CONSTANT OBJECT IDS, PRE-ENCODED
 ::
-++  obj
+++  OBJ
   ^?
-  |%                                                ::    rfc4055
-  ++  sha-256      0x1.0204.0365.0148.8660          ::  2.16.840.1.101.3.4.2.1
-  ++  rsa          0x1.0101.0df7.8648.862a          ::  1.2.840.113549.1.1.1
-  ++  rsa-sha-256  0xb.0101.0df7.8648.862a          ::  1.2.840.113549.1.1.11
-                                                    ::    rfc2985
-  ++  csr-ext      0xe.0901.0df7.8648.862a          ::  1.2.840.113549.1.9.14
-                                                    ::    rfc3280
-  ++  sub-alt      0x11.1d55                        ::  2.5.29.17
+  |%                                                ::    RFC4055
+  ++  SHA-256      0X1.0204.0365.0148.8660          ::  2.16.840.1.101.3.4.2.1
+  ++  RSA          0X1.0101.0DF7.8648.862A          ::  1.2.840.113549.1.1.1
+  ++  RSA-SHA-256  0XB.0101.0DF7.8648.862A          ::  1.2.840.113549.1.1.11
+                                                    ::    RFC2985
+  ++  CSR-EXT      0XE.0901.0DF7.8648.862A          ::  1.2.840.113549.1.9.14
+                                                    ::    RFC3280
+  ++  SUB-ALT      0X11.1D55                        ::  2.5.29.17
   --
 --
 

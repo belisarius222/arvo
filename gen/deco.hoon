@@ -1,178 +1,178 @@
 ::
-::  this is a sample file designed to set conventions for
-::  high-quality conventional hoon.
+::  THIS IS A SAMPLE FILE DESIGNED TO SET CONVENTIONS FOR
+::  HIGH-QUALITY CONVENTIONAL HOON.
 ::
-::  all lines must be under 80 characters.  no blank lines.
-::  any line longer than 60 characters is probably too long.
-::  uppercase or non-ascii letters are strongly discouraged.
+::  ALL LINES MUST BE UNDER 80 CHARACTERS.  NO BLANK LINES.
+::  ANY LINE LONGER THAN 60 CHARACTERS IS PROBABLY TOO LONG.
+::  UPPERCASE OR NON-ASCII LETTERS ARE STRONGLY DISCOURAGED.
 ::
-::  informal comments (lines with {::}) should be used only for
-::  meta-discussion *about* the code.
+::  INFORMAL COMMENTS (LINES WITH {::}) SHOULD BE USED ONLY FOR
+::  META-DISCUSSION *ABOUT* THE CODE.
 ::
-::  whenever possible, use formal decorations. {:>} decorates
-::  the next expression; {:<} decorates the previous one.
+::  WHENEVER POSSIBLE, USE FORMAL DECORATIONS. {:>} DECORATES
+::  THE NEXT EXPRESSION; {:<} DECORATES THE PREVIOUS ONE.
 ::
-::  there are two places to put decorations: in line with the
-::  code, and on the right margin.
+::  THERE ARE TWO PLACES TO PUT DECORATIONS: IN LINE WITH THE
+::  CODE, AND ON THE RIGHT MARGIN.
 ::
-::  in comments and decorations, use *phrase* for emphasis
-::  and {braces} to surround code literals.  (documentation will
-::  eventually be automatically generated from formal comments.)
-::  %literal, ++literal, ~ship need no braces.  for a valid
-::  hoon expression, `exp.
+::  IN COMMENTS AND DECORATIONS, USE *PHRASE* FOR EMPHASIS
+::  AND {BRACES} TO SURROUND CODE LITERALS.  (DOCUMENTATION WILL
+::  EVENTUALLY BE AUTOMATICALLY GENERATED FROM FORMAL COMMENTS.)
+::  %LITERAL, ++LITERAL, ~SHIP NEED NO BRACES.  FOR A VALID
+::  HOON EXPRESSION, `EXP.
 ::
-::  there are three conventions for naming: *ultralapidary*,
-::  *lapidary*, and *natural*.  this file is mostly natural.
+::  THERE ARE THREE CONVENTIONS FOR NAMING: *ULTRALAPIDARY*,
+::  *LAPIDARY*, AND *NATURAL*.  THIS FILE IS MOSTLY NATURAL.
 ::
-::  when in doubt, use the *natural* naming convention.  for
-::  both arms and faces, natural naming means long, legible,
-::  english-language phrases, in hyphen-separated {kebab-case}.
+::  WHEN IN DOUBT, USE THE *NATURAL* NAMING CONVENTION.  FOR
+::  BOTH ARMS AND FACES, NATURAL NAMING MEANS LONG, LEGIBLE,
+::  ENGLISH-LANGUAGE PHRASES, IN HYPHEN-SEPARATED {KEBAB-CASE}.
 ::
-::  lapidary conventions should be used only for small, simple,
-::  self-contained systems.  lapidary mode means three-letter
-::  faces ("variable names") and four-letter arms ("methods").
+::  LAPIDARY CONVENTIONS SHOULD BE USED ONLY FOR SMALL, SIMPLE,
+::  SELF-CONTAINED SYSTEMS.  LAPIDARY MODE MEANS THREE-LETTER
+::  FACES ("VARIABLE NAMES") AND FOUR-LETTER ARMS ("METHODS").
 ::
-::  ultralapidary conventions use single-letter names starting
-::  with {a}.  use this convention only for one-liners, etc.
+::  ULTRALAPIDARY CONVENTIONS USE SINGLE-LETTER NAMES STARTING
+::  WITH {A}.  USE THIS CONVENTION ONLY FOR ONE-LINERS, ETC.
 ::
-::  the file below is a medium-sized generator, built around
-::  a typical two-core structure.  the cores are labeled {%arch}
-::  (structures) and {%work} (productions).  this is canonical.
+::  THE FILE BELOW IS A MEDIUM-SIZED GENERATOR, BUILT AROUND
+::  A TYPICAL TWO-CORE STRUCTURE.  THE CORES ARE LABELED {%ARCH}
+::  (STRUCTURES) AND {%WORK} (PRODUCTIONS).  THIS IS CANONICAL.
 ::
-::  this code is written to display the variety of formatting
-::  options the parser allows.  a specific convention should pick
-::  one of these styles and stick to it.
+::  THIS CODE IS WRITTEN TO DISPLAY THE VARIETY OF FORMATTING
+::  OPTIONS THE PARSER ALLOWS.  A SPECIFIC CONVENTION SHOULD PICK
+::  ONE OF THESE STYLES AND STICK TO IT.
 ::
-::  a forward decoration block {:>} is either a *document block* or
-::  a *definition block*.
+::  A FORWARD DECORATION BLOCK {:>} IS EITHER A *DOCUMENT BLOCK* OR
+::  A *DEFINITION BLOCK*.
 
-::  a document block has two parts, each of which is optional:
-::  the *title* and the *body*,
+::  A DOCUMENT BLOCK HAS TWO PARTS, EACH OF WHICH IS OPTIONAL:
+::  THE *TITLE* AND THE *BODY*,
 ::
-::  the title is a ++term preceded by {::  #  %}.  only cores
-::  and core chapters (preceded by {+|}) can use titles.  titles
-::  are optionally surrounded by blank or semi-blank decorations,
-::  {:>} or {::  #}.
+::  THE TITLE IS A ++TERM PRECEDED BY {::  #  %}.  ONLY CORES
+::  AND CORE CHAPTERS (PRECEDED BY {+|}) CAN USE TITLES.  TITLES
+::  ARE OPTIONALLY SURROUNDED BY BLANK OR SEMI-BLANK DECORATIONS,
+::  {:>} OR {::  #}.
 ::
-::  the body is either short or long.  a short body is a *single line*
-::  preceded by {::  } - ie, not indented.  a long body starts with
-::  a *single line* indented by two extra spaces, {::    }, then a
-::  blank line, then a series of paragraphs.
+::  THE BODY IS EITHER SHORT OR LONG.  A SHORT BODY IS A *SINGLE LINE*
+::  PRECEDED BY {::  } - IE, NOT INDENTED.  A LONG BODY STARTS WITH
+::  A *SINGLE LINE* INDENTED BY TWO EXTRA SPACES, {::    }, THEN A
+::  BLANK LINE, THEN A SERIES OF PARAGRAPHS.
 ::
-::  a definition block is a list of name definitions.  the twig below
-::  the block is traversed for bindings on these names.
+::  A DEFINITION BLOCK IS A LIST OF NAME DEFINITIONS.  THE TWIG BELOW
+::  THE BLOCK IS TRAVERSED FOR BINDINGS ON THESE NAMES.
 ::
-::  a name definition can be short or long.  a short definition is
-::  a *single line* of the form {::  name: value}.
+::  A NAME DEFINITION CAN BE SHORT OR LONG.  A SHORT DEFINITION IS
+::  A *SINGLE LINE* OF THE FORM {::  NAME: VALUE}.
 ::
-::  a long definition is a short definition, followed by a blank
-::  decoration {:>}, followed by a series of paragraphs each
-::  indented by an extra two spaces.
+::  A LONG DEFINITION IS A SHORT DEFINITION, FOLLOWED BY A BLANK
+::  DECORATION {:>}, FOLLOWED BY A SERIES OF PARAGRAPHS EACH
+::  INDENTED BY AN EXTRA TWO SPACES.
 ::
-::  a paragraph is a series of lines, not indented for text,
-::  indented by four extra spaces, {::      }, for code.
+::  A PARAGRAPH IS A SERIES OF LINES, NOT INDENTED FOR TEXT,
+::  INDENTED BY FOUR EXTRA SPACES, {::      }, FOR CODE.
 ::
-::  a backward decoration {:<} is only one line, always parsed
-::  as a short body.
+::  A BACKWARD DECORATION {:<} IS ONLY ONE LINE, ALWAYS PARSED
+::  AS A SHORT BODY.
 ::
-:-  %say
+:-  %SAY
 |=  *
-=<  [%noun (say-hello %world)]
-=>  ::  #  %arch
+=<  [%NOUN (SAY-HELLO %WORLD)]
+=>  ::  #  %ARCH
     ::
-    ::    structures for our imaginary hello, world generator.
+    ::    STRUCTURES FOR OUR IMAGINARY HELLO, WORLD GENERATOR.
     ::
-    ::  nothing forces us to put structures in a separate core.
-    ::  but compile-time evaluation doesn't work in the current
-    ::  core; we often want to statically evaluate structures.
+    ::  NOTHING FORCES US TO PUT STRUCTURES IN A SEPARATE CORE.
+    ::  BUT COMPILE-TIME EVALUATION DOESN'T WORK IN THE CURRENT
+    ::  CORE; WE OFTEN WANT TO STATICALLY EVALUATE STRUCTURES.
     ::
-    ::  there are three kinds of structures: models (normalizing
-    ::  functions), patterns (functions that build models), and
-    ::  constants (static data).
+    ::  THERE ARE THREE KINDS OF STRUCTURES: MODELS (NORMALIZING
+    ::  FUNCTIONS), PATTERNS (FUNCTIONS THAT BUILD MODELS), AND
+    ::  CONSTANTS (STATIC DATA).
     ::
-    ::  most code will not need its own patterns.  but put them
-    ::  in a separate chapter (separated by {+|}).
+    ::  MOST CODE WILL NOT NEED ITS OWN PATTERNS.  BUT PUT THEM
+    ::  IN A SEPARATE CHAPTER (SEPARATED BY {+|}).
     |%
-    ::  #  %model
+    ::  #  %MODEL
     ::
-    ::    models (molds) are functions that normalize nouns.
+    ::    MODELS (MOLDS) ARE FUNCTIONS THAT NORMALIZE NOUNS.
     ::
-    ::  arms producing molds are introduced with {+$}.  the
-    ::  compiler will copy the arm decoration onto its product
+    ::  ARMS PRODUCING MOLDS ARE INTRODUCED WITH {+$}.  THE
+    ::  COMPILER WILL COPY THE ARM DECORATION ONTO ITS PRODUCT
     :: +|
-    +$  spot  [p=@ q=@]                                 ::  a coordinate
-    +$  tops                                            ::  also a coordinate
-      [p=@ q=@]
-    +$  goof                                            ::  a simple tuple
-      $:  foo=@                                         ::  something mysterious
-          bar=@                                         ::  go here for drink
-          moo=(binary-tree juice)                       ::  cows do this
+    +$  SPOT  [P=@ Q=@]                                 ::  A COORDINATE
+    +$  TOPS                                            ::  ALSO A COORDINATE
+      [P=@ Q=@]
+    +$  GOOF                                            ::  A SIMPLE TUPLE
+      $:  FOO=@                                         ::  SOMETHING MYSTERIOUS
+          BAR=@                                         ::  GO HERE FOR DRINK
+          MOO=(BINARY-TREE JUICE)                       ::  COWS DO THIS
       ==
-    +$  juice                                           ::  fruity beverage
-      $%  [%plum p=@]                                   ::  fresh prune
-          [%pear p=@ q=@]                               ::  good for cider
-          [%acai p=@]                                   ::  aztec superfood
+    +$  JUICE                                           ::  FRUITY BEVERAGE
+      $%  [%PLUM P=@]                                   ::  FRESH PRUNE
+          [%PEAR P=@ Q=@]                               ::  GOOD FOR CIDER
+          [%ACAI P=@]                                   ::  AZTEC SUPERFOOD
       ==
     ::  #
-    ::  #  %pattern
+    ::  #  %PATTERN
     ::  #
     ::
-    ::    patterns are functions that build models.
+    ::    PATTERNS ARE FUNCTIONS THAT BUILD MODELS.
     ::
-    ::  other languages might call these "type constructors"
-    ::  or "higher-kinded types".
+    ::  OTHER LANGUAGES MIGHT CALL THESE "TYPE CONSTRUCTORS"
+    ::  OR "HIGHER-KINDED TYPES".
     :: +|
-    ++  binary-tree                                     ::  tree pattern
-      |*  a=$-(* *)
-      $@(~ [n=a l=(binary-tree a) r=(binary-tree a)])
+    ++  BINARY-TREE                                     ::  TREE PATTERN
+      |*  A=$-(* *)
+      $@(~ [N=A L=(BINARY-TREE A) R=(BINARY-TREE A)])
     ::  #
-    ::  #  %constant
+    ::  #  %CONSTANT
     ::  #
-    ::    if you have constants, put them in their own chapter.
+    ::    IF YOU HAVE CONSTANTS, PUT THEM IN THEIR OWN CHAPTER.
     :: +|
-    ++  answer                                          ::  answer to everything
+    ++  ANSWER                                          ::  ANSWER TO EVERYTHING
       42
     --
 ::  #
-::  #  %work
+::  #  %WORK
 ::  #
-::    engines for our imaginary hello, world app.
+::    ENGINES FOR OUR IMAGINARY HELLO, WORLD APP.
 ::
 |%
-++  say-hello                                           ::  say hi to someone
-  ::  friendly welcome message
+++  SAY-HELLO                                           ::  SAY HI TO SOMEONE
+  ::  FRIENDLY WELCOME MESSAGE
   ::
-  |=  ::  txt: friend to say hi to
+  |=  ::  TXT: FRIEND TO SAY HI TO
       ::
-      txt=term
-  ^-  tape
-  "hello, {(rip 3 txt)}"
-::    ++say-goodbye: say a really proper goodbye
+      TXT=TERM
+  ^-  TAPE
+  "HELLO, {(RIP 3 TXT)}"
+::    ++SAY-GOODBYE: SAY A REALLY PROPER GOODBYE
 ::
-::  some paragraphs about the goodbye algorithm, possibly
-::  including code indented by four extra spaces:
+::  SOME PARAGRAPHS ABOUT THE GOODBYE ALGORITHM, POSSIBLY
+::  INCLUDING CODE INDENTED BY FOUR EXTRA SPACES:
 ::
-::      ?:  =(%hello %world)
-::        %hello
-::      %world
+::      ?:  =(%HELLO %WORLD)
+::        %HELLO
+::      %WORLD
 ::
-++  say-goodbye                                         ::
-  ::  describe product of function
+++  SAY-GOODBYE                                         ::
+  ::  DESCRIBE PRODUCT OF FUNCTION
   ::
-  |=  ::  txt: departing friend
-      ::  num: number of friends
-      $:  txt=term
-          num=@
+  |=  ::  TXT: DEPARTING FRIEND
+      ::  NUM: NUMBER OF FRIENDS
+      $:  TXT=TERM
+          NUM=@
       ==
-  ^-  tape
-  ::  foo: four
-  ::  bar: forty-two
-  =/  foo  (add 2 2)
-  =/  bar  (add (mul num foo) 2)
-  =/  moo  (mul num bar)                                ::  for all the cows
-  "goodbye and {(scow %ud moo)}, {(rip 3 txt)}"
+  ^-  TAPE
+  ::  FOO: FOUR
+  ::  BAR: FORTY-TWO
+  =/  FOO  (ADD 2 2)
+  =/  BAR  (ADD (MUL NUM FOO) 2)
+  =/  MOO  (MUL NUM BAR)                                ::  FOR ALL THE COWS
+  "GOODBYE AND {(SCOW %UD MOO)}, {(RIP 3 TXT)}"
 ::
-++  say-minimum                                         ::  minimal decoration
-  |=  txt=term
-  "nothing to say to {(rip 3 txt)}"
+++  SAY-MINIMUM                                         ::  MINIMAL DECORATION
+  |=  TXT=TERM
+  "NOTHING TO SAY TO {(RIP 3 TXT)}"
 --

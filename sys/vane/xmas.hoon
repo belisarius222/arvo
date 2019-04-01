@@ -1,1159 +1,1159 @@
 ::                                                      ::  ::
-::::  /hoon/ames/arvo                                   ::::::  vane prelude
+::::  /HOON/AMES/ARVO                                   ::::::  VANE PRELUDE
   !:                                                    ::  ::
-|=  pit/vase                                            ::  kernel vase
+|=  PIT/VASE                                            ::  KERNEL VASE
 =>  =~                                                  ::
-=,  xmas
+=,  XMAS
 ::                                                      ::  ::
-::::                                                    ::::::  ames structures
+::::                                                    ::::::  AMES STRUCTURES
   ::                                                    ::  ::
 ::
-=*  pipe  channel:able:jael                             ::  secure channel
-=*  gree  farm:pki:jael                                 ::  pki information
+=*  PIPE  CHANNEL:ABLE:JAEL                             ::  SECURE CHANNEL
+=*  GREE  FARM:PKI:JAEL                                 ::  PKI INFORMATION
 |%                                                      ::
-++  bait  {p/skin q/@ud r/dove}                         ::  fmt nrecvd spec
-++  bath                                                ::  per friend
-          $:  det/pipe                                  ::  secure channel
-              lun/(unit lane)                           ::  latest route
-              zam/scar                                  ::  outbound boles
-              fon/(map bole lock)                       ::  inbound locks
-              sal/(map bole colt)                       ::  outbound flows
+++  BAIT  {P/SKIN Q/@UD R/DOVE}                         ::  FMT NRECVD SPEC
+++  BATH                                                ::  PER FRIEND
+          $:  DET/PIPE                                  ::  SECURE CHANNEL
+              LUN/(UNIT LANE)                           ::  LATEST ROUTE
+              ZAM/SCAR                                  ::  OUTBOUND BOLES
+              FON/(MAP BOLE LOCK)                       ::  INBOUND LOCKS
+              SAL/(MAP BOLE COLT)                       ::  OUTBOUND FLOWS
           ==                                            ::
-++  bole  bone                                          ::  inbound opaque
-++  cake  {p/sock q/skin r/@}                           ::  top level packet
-++  chan  path                                          ::  channel
-++  clue                                                ::  live packet state
-          $:  vig/?                                     ::  true iff virgin
-              tel/part                                  ::  block identity
-              fap/flap                                  ::  fragment hash
-              dat/rock                                  ::  fragment data
+++  BOLE  BONE                                          ::  INBOUND OPAQUE
+++  CAKE  {P/SOCK Q/SKIN R/@}                           ::  TOP LEVEL PACKET
+++  CHAN  PATH                                          ::  CHANNEL
+++  CLUE                                                ::  LIVE PACKET STATE
+          $:  VIG/?                                     ::  TRUE IFF VIRGIN
+              TEL/PART                                  ::  BLOCK IDENTITY
+              FAP/FLAP                                  ::  FRAGMENT HASH
+              DAT/ROCK                                  ::  FRAGMENT DATA
           ==                                            ::
-++  coal                                                ::  live packet state
-          $:  out/@da                                   ::  sent date
-              lod/@da                                   ::  lost-by deadline
-              clu/clue                                  ::  packet to send
+++  COAL                                                ::  LIVE PACKET STATE
+          $:  OUT/@DA                                   ::  SENT DATE
+              LOD/@DA                                   ::  LOST-BY DEADLINE
+              CLU/CLUE                                  ::  PACKET TO SEND
           ==                                            ::
-++  colt                                                ::  outbound state
-          $:  seq/tick                                  ::  next tick to fill
-              lac/tick                                  ::  acked tick until
-              cob/(map tick comb)                       ::  live messages
-              myn/mini                                  ::  packet pump
+++  COLT                                                ::  OUTBOUND STATE
+          $:  SEQ/TICK                                  ::  NEXT TICK TO FILL
+              LAC/TICK                                  ::  ACKED TICK UNTIL
+              COB/(MAP TICK COMB)                       ::  LIVE MESSAGES
+              MYN/MINI                                  ::  PACKET PUMP
           ==                                            ::
-++  comb                                                ::  live message
-          $:  cup/(unit coop)                           ::  final ack
-              cha/path                                  ::  channel
-              num/frag                                  ::  number of fragments
-              ack/frag                                  ::  number acked
-              cly/(list clue)                           ::  left to send
+++  COMB                                                ::  LIVE MESSAGE
+          $:  CUP/(UNIT COOP)                           ::  FINAL ACK
+              CHA/PATH                                  ::  CHANNEL
+              NUM/FRAG                                  ::  NUMBER OF FRAGMENTS
+              ACK/FRAG                                  ::  NUMBER ACKED
+              CLY/(LIST CLUE)                           ::  LEFT TO SEND
           ==                                            ::
-++  dove  {p/@ud q/(map @ud @)}                         ::  count 13-blocks
-++  flap  @uvH                                          ::  network packet id
-++  flea  (pair bole tick)                              ::  message id
-++  frag  @ud                                           ::  fragment number
-++  hand  @uvH                                          ::  128-bit hash
-++  lock                                                ::  inbound sequencer
-          $:  laq/tick                                  ::  acknowledged until
-              nys/(map tick bait)                       ::  inbound partials
-              laz/(unit (trel tick flap lane))          ::  awaiting app
-              exc/(map tick ares)                       ::  negative acks
+++  DOVE  {P/@UD Q/(MAP @UD @)}                         ::  COUNT 13-BLOCKS
+++  FLAP  @UVH                                          ::  NETWORK PACKET ID
+++  FLEA  (PAIR BOLE TICK)                              ::  MESSAGE ID
+++  FRAG  @UD                                           ::  FRAGMENT NUMBER
+++  HAND  @UVH                                          ::  128-BIT HASH
+++  LOCK                                                ::  INBOUND SEQUENCER
+          $:  LAQ/TICK                                  ::  ACKNOWLEDGED UNTIL
+              NYS/(MAP TICK BAIT)                       ::  INBOUND PARTIALS
+              LAZ/(UNIT (TREL TICK FLAP LANE))          ::  AWAITING APP
+              EXC/(MAP TICK ARES)                       ::  NEGATIVE ACKS
           ==                                            ::
-++  meal                                                ::  payload
-          $%  {$back p/bone q/flap r/coop s/@dr}        ::  acknowledgment
-              {$bond p/flea q/chan r/*}                 ::  message
-              {$carp p/moan q/(pair @ud @)}             ::  fragment
-              {$fore p/ship q/(unit lane) r/@}          ::  forwarded packet
+++  MEAL                                                ::  PAYLOAD
+          $%  {$BACK P/BONE Q/FLAP R/COOP S/@DR}        ::  ACKNOWLEDGMENT
+              {$BOND P/FLEA Q/CHAN R/*}                 ::  MESSAGE
+              {$CARP P/MOAN Q/(PAIR @UD @)}             ::  FRAGMENT
+              {$FORE P/SHIP Q/(UNIT LANE) R/@}          ::  FORWARDED PACKET
           ==                                            ::
-++  mini                                                ::  pump data
-          $:  saw/stat                                  ::  statistics
-              liv/(qeu coal)                            ::  live packets
-              lop/(qeu clue)                            ::  lost packets
+++  MINI                                                ::  PUMP DATA
+          $:  SAW/STAT                                  ::  STATISTICS
+              LIV/(QEU COAL)                            ::  LIVE PACKETS
+              LOP/(QEU CLUE)                            ::  LOST PACKETS
           ==                                            ::
-++  moan                                                ::  message invariant
-          $:  {kos/bole liq/tick}                       ::  flow identity
-              syn/@                                     ::  skin number
-              cnt/@                                     ::  number of packets
+++  MOAN                                                ::  MESSAGE INVARIANT
+          $:  {KOS/BOLE LIQ/TICK}                       ::  FLOW IDENTITY
+              SYN/@                                     ::  SKIN NUMBER
+              CNT/@                                     ::  NUMBER OF PACKETS
           ==                                            ::
-++  mute                                                ::  awaiting channel
-          $:  inn/(list (pair lane rock))               ::  inbound packets
-              out/(list (trel duct chan *))             ::  outbound messages
+++  MUTE                                                ::  AWAITING CHANNEL
+          $:  INN/(LIST (PAIR LANE ROCK))               ::  INBOUND PACKETS
+              OUT/(LIST (TREL DUCT CHAN *))             ::  OUTBOUND MESSAGES
           ==                                            ::
-++  part  (pair frag tick)                              ::  fragment of packet
-++  rock  @uvO                                          ::  packet
-++  silo                                                ::  global state
-          $:  lyf/life                                  ::  current version
-              wyr/(map life ring)                       ::  private keys
-              ech/(map ship mute)                       ::  waiting partners
-              pol/(map ship bath)                       ::  open partners
+++  PART  (PAIR FRAG TICK)                              ::  FRAGMENT OF PACKET
+++  ROCK  @UVO                                          ::  PACKET
+++  SILO                                                ::  GLOBAL STATE
+          $:  LYF/LIFE                                  ::  CURRENT VERSION
+              WYR/(MAP LIFE RING)                       ::  PRIVATE KEYS
+              ECH/(MAP SHIP MUTE)                       ::  WAITING PARTNERS
+              POL/(MAP SHIP BATH)                       ::  OPEN PARTNERS
           ==                                            ::
-++  skin  ?($none $open $fast $full)                    ::  encoding stem
-++  stat                                                ::  pump statistics
-          $:  $:  cur/@ud                               ::  window q length
-                  max/@ud                               ::  max pax out
-                  rey/@ud                               ::  retry q length
+++  SKIN  ?($NONE $OPEN $FAST $FULL)                    ::  ENCODING STEM
+++  STAT                                                ::  PUMP STATISTICS
+          $:  $:  CUR/@UD                               ::  WINDOW Q LENGTH
+                  MAX/@UD                               ::  MAX PAX OUT
+                  REY/@UD                               ::  RETRY Q LENGTH
               ==                                        ::
-              $:  rtt/@dr                               ::  roundtrip estimate
-                  las/@da                               ::  last sent
-                  lad/@da                               ::  last deadline
+              $:  RTT/@DR                               ::  ROUNDTRIP ESTIMATE
+                  LAS/@DA                               ::  LAST SENT
+                  LAD/@DA                               ::  LAST DEADLINE
               ==                                        ::
           ==                                            ::
-++  tick  @ud                                           ::  message sequence no
+++  TICK  @UD                                           ::  MESSAGE SEQUENCE NO
 --                                                      ::
 ::                                                      ::
-::::                                                    ::::  arvo structures
+::::                                                    ::::  ARVO STRUCTURES
   ::                                                    ::
 |%                                                      ::
-++  flam  |=(a/flap `@p`(mug a))                        ::  debug flap
-++  msec  |=(a/@dr `@ud`(div a (div ~s1 1.000)))        ::  debug @dr
-++  move  %+  pair                                      ::  local move
-            duct                                        ::
-          (wind note:able:xmas gift:able:xmas)          ::
+++  FLAM  |=(A/FLAP `@P`(MUG A))                        ::  DEBUG FLAP
+++  MSEC  |=(A/@DR `@UD`(DIV A (DIV ~S1 1.000)))        ::  DEBUG @DR
+++  MOVE  %+  PAIR                                      ::  LOCAL MOVE
+            DUCT                                        ::
+          (WIND NOTE:ABLE:XMAS GIFT:ABLE:XMAS)          ::
 ::                                                      ::
-::::  loft                                              ::::  main transceiver
+::::  LOFT                                              ::::  MAIN TRANSCEIVER
   ::                                                    ::
-++  loft                                                ::
+++  LOFT                                                ::
   =>  |%                                                ::
-      ++  gift                                          ::  output
-        $%  {$east p/duct q/ship r/chan s/*}            ::  network response
-            {$home p/lane q/@}                          ::  resend to self
-            {$line p/ship q/@da r/code}                 ::  add outbound key
-            {$link p/ship q/@da r/code}                 ::  add inbound key
-            {$meet p/gree}                              ::  add public key(s)
-            {$rest p/duct q/coop}                       ::  message result
-            {$send p/lane q/@}                          ::  transmit packet
-            {$veil p/ship}                              ::  cache channel
-            {$west p/ship q/bole r/chan s/*}            ::  outbound message
+      ++  GIFT                                          ::  OUTPUT
+        $%  {$EAST P/DUCT Q/SHIP R/CHAN S/*}            ::  NETWORK RESPONSE
+            {$HOME P/LANE Q/@}                          ::  RESEND TO SELF
+            {$LINE P/SHIP Q/@DA R/CODE}                 ::  ADD OUTBOUND KEY
+            {$LINK P/SHIP Q/@DA R/CODE}                 ::  ADD INBOUND KEY
+            {$MEET P/GREE}                              ::  ADD PUBLIC KEY(S)
+            {$REST P/DUCT Q/COOP}                       ::  MESSAGE RESULT
+            {$SEND P/LANE Q/@}                          ::  TRANSMIT PACKET
+            {$VEIL P/SHIP}                              ::  CACHE CHANNEL
+            {$WEST P/SHIP Q/BOLE R/CHAN S/*}            ::  OUTBOUND MESSAGE
         ==                                              ::
-      ++  task                                          ::  input
-        $%  {$clue p/ship q/pipe}                       ::  update channel
-            {$done p/ship q/bole r/coop}                ::  completion
-            {$hear p/lane q/@}                          ::  incoming packet
-            {$mess p/ship q/duct r/chan s/*}            ::  forward message
-            {$rend p/ship q/bole r/chan s/*}            ::  backward message
-            {$wake $~}                                  ::  wakeup
+      ++  TASK                                          ::  INPUT
+        $%  {$CLUE P/SHIP Q/PIPE}                       ::  UPDATE CHANNEL
+            {$DONE P/SHIP Q/BOLE R/COOP}                ::  COMPLETION
+            {$HEAR P/LANE Q/@}                          ::  INCOMING PACKET
+            {$MESS P/SHIP Q/DUCT R/CHAN S/*}            ::  FORWARD MESSAGE
+            {$REND P/SHIP Q/BOLE R/CHAN S/*}            ::  BACKWARD MESSAGE
+            {$WAKE $~}                                  ::  WAKEUP
         ==
       --
-  =|  $:  $:  now/@da
-              eny/@
+  =|  $:  $:  NOW/@DA
+              ENY/@
           ==
-          silo
-          fex/(list gift)
+          SILO
+          FEX/(LIST GIFT)
       ==
-  =*  syl  ->-
+  =*  SYL  ->-
   |%                                                    ::
-  ++  abet  [(flop fex) syl]                            ::  resolve
-  ++  apex                                              ::  compute
-    |=  job/task
+  ++  ABET  [(FLOP FEX) SYL]                            ::  RESOLVE
+  ++  APEX                                              ::  COMPUTE
+    |=  JOB/TASK
     ^+  +>
-    ?-    -.job
-        $clue  (dear p.job q.job)
-        $done  abet:(done:(etre p.job) q.job r.job)
-        $hear
-      =+  kec=(bite q.job)
-      ?>  =(our q.p.kec)
-      =+  buh=(~(get by pol) p.p.kec)
-      ?~  buh
-        ~&  [%ames-from p.p.kec]
-        =+  nut=(fall (~(get by ech) p.p.kec) *mute)
+    ?-    -.JOB
+        $CLUE  (DEAR P.JOB Q.JOB)
+        $DONE  ABET:(DONE:(ETRE P.JOB) Q.JOB R.JOB)
+        $HEAR
+      =+  KEC=(BITE Q.JOB)
+      ?>  =(OUR Q.P.KEC)
+      =+  BUH=(~(GET BY POL) P.P.KEC)
+      ?~  BUH
+        ~&  [%AMES-FROM P.P.KEC]
+        =+  NUT=(FALL (~(GET BY ECH) P.P.KEC) *MUTE)
         %_  +>.$
-          fex  [[%veil p.p.kec] fex]
-          ech  (~(put by ech) p.p.kec nut(inn [+.job inn.nut]))
+          FEX  [[%VEIL P.P.KEC] FEX]
+          ECH  (~(PUT BY ECH) P.P.KEC NUT(INN [+.JOB INN.NUT]))
         ==
-      abet:(~(hear et p.p.kec u.buh) p.job (shaf %flap q.job) q.kec r.kec)
+      ABET:(~(HEAR ET P.P.KEC U.BUH) P.JOB (SHAF %FLAP Q.JOB) Q.KEC R.KEC)
     ::
-        $mess
-      =+  buh=(~(get by pol) p.job)
-      ?~  buh
-        ~&  [%ames-unto p.job]
-        =+  nut=(fall (~(get by ech) p.job) *mute)
+        $MESS
+      =+  BUH=(~(GET BY POL) P.JOB)
+      ?~  BUH
+        ~&  [%AMES-UNTO P.JOB]
+        =+  NUT=(FALL (~(GET BY ECH) P.JOB) *MUTE)
         %_  +>.$
-          fex  [[%veil p.job] fex]
-          ech  (~(put by ech) p.job nut(out [+>.job out.nut]))
+          FEX  [[%VEIL P.JOB] FEX]
+          ECH  (~(PUT BY ECH) P.JOB NUT(OUT [+>.JOB OUT.NUT]))
         ==
-      =/  etc  ~(. et p.job u.buh)
-      =^  kos  etc  (blow:etc q.job)
-      abet:(mess:etc kos r.job s.job)
+      =/  ETC  ~(. ET P.JOB U.BUH)
+      =^  KOS  ETC  (BLOW:ETC Q.JOB)
+      ABET:(MESS:ETC KOS R.JOB S.JOB)
     ::
-        $rend
-      abet:(mess:(etre p.job) q.job r.job s.job)
+        $REND
+      ABET:(MESS:(ETRE P.JOB) Q.JOB R.JOB S.JOB)
     ::
-        $wake
+        $WAKE
       |-  ^+  +>.^$
-      ?~  pol  +>.^$
-      =+  lef=$(pol l.pol)
-      =+  ryt=$(pol r.pol, fex fex.lef)
-      =+  top=~(to-wake et(fex fex.ryt) n.pol)
-      +>.^$(fex fex.top, pol [+<.top pol.lef pol.ryt])
+      ?~  POL  +>.^$
+      =+  LEF=$(POL L.POL)
+      =+  RYT=$(POL R.POL, FEX FEX.LEF)
+      =+  TOP=~(TO-WAKE ET(FEX FEX.RYT) N.POL)
+      +>.^$(FEX FEX.TOP, POL [+<.TOP POL.LEF POL.RYT])
     ==
   ::                                                    ::
-  ++  dear                                              ::  neighbor update
-    |=  {who/@p det/pipe}
+  ++  DEAR                                              ::  NEIGHBOR UPDATE
+    |=  {WHO/@P DET/PIPE}
     ^+  +>
-    =+  noz=(~(get by ech) who)
-    ?~  noz
+    =+  NOZ=(~(GET BY ECH) WHO)
+    ?~  NOZ
       ::
-      ::  we're not waiting for this ship; we must have it
+      ::  WE'RE NOT WAITING FOR THIS SHIP; WE MUST HAVE IT
       ::
-      =+  bah=(~(got by pol) who)
-      +>.$(pol (~(put by pol) who bah(det det)))
+      =+  BAH=(~(GOT BY POL) WHO)
+      +>.$(POL (~(PUT BY POL) WHO BAH(DET DET)))
     ::
-    ::  new neighbor; run all waiting i/o
+    ::  NEW NEIGHBOR; RUN ALL WAITING I/O
     ::
-    =.  pol  (~(put by pol) who [det ~ [2 ~ ~] ~ ~])
-    =+  [inn out]=[(flop inn.u.noz) (flop out.u.noz)]
+    =.  POL  (~(PUT BY POL) WHO [DET ~ [2 ~ ~] ~ ~])
+    =+  [INN OUT]=[(FLOP INN.U.NOZ) (FLOP OUT.U.NOZ)]
     =.  +>.$
       |-  ^+  +>.^$
-      ?~  inn  +>.^$
-      $(inn t.inn, +>.^$ (apex `task`[%hear i.inn]))
+      ?~  INN  +>.^$
+      $(INN T.INN, +>.^$ (APEX `TASK`[%HEAR I.INN]))
     |-  ^+  +>.^$
-    ?~  out  +>.^$
-    $(out t.out, +>.^$ (apex `task`[%mess who i.out]))
+    ?~  OUT  +>.^$
+    $(OUT T.OUT, +>.^$ (APEX `TASK`[%MESS WHO I.OUT]))
   ::
-  ++  doze                                              ::  sleep until
-    |-  ^-  (unit @da)
-    ?~  pol  ~
-    ;:  (cury hunt lth)
-      $(pol l.pol)
-      $(pol r.pol)
-      ~(to-wait et p.n.pol q.n.pol)
+  ++  DOZE                                              ::  SLEEP UNTIL
+    |-  ^-  (UNIT @DA)
+    ?~  POL  ~
+    ;:  (CURY HUNT LTH)
+      $(POL L.POL)
+      $(POL R.POL)
+      ~(TO-WAIT ET P.N.POL Q.N.POL)
     ==
   ::                                                    ::
-  ++  etre                                              ::  old neighbor
-    |=  who/@p
-    ~(. et who (~(got by pol) who))
+  ++  ETRE                                              ::  OLD NEIGHBOR
+    |=  WHO/@P
+    ~(. ET WHO (~(GOT BY POL) WHO))
   ::                                                    ::
-  ++  et                                                ::  per neighbor
-    |_  $:  who/ship
-            bah/bath
+  ++  ET                                                ::  PER NEIGHBOR
+    |_  $:  WHO/SHIP
+            BAH/BATH
         ==
-    ++  abet  +>(pol (~(put by pol) who bah))           ::  resolve
-    ++  acme  |=(fic/gift +>(fex [fic fex]))            ::  effect
-    ++  blow                                            ::  register duct
-      |=  hen/duct
-      ^-  {bole _+>}
-      =+  kus=(~(get by q.zam.bah) hen)
-      ?^  kus  [u.kus +>.$]
-      :-  p.zam.bah
+    ++  ABET  +>(POL (~(PUT BY POL) WHO BAH))           ::  RESOLVE
+    ++  ACME  |=(FIC/GIFT +>(FEX [FIC FEX]))            ::  EFFECT
+    ++  BLOW                                            ::  REGISTER DUCT
+      |=  HEN/DUCT
+      ^-  {BOLE _+>}
+      =+  KUS=(~(GET BY Q.ZAM.BAH) HEN)
+      ?^  KUS  [U.KUS +>.$]
+      :-  P.ZAM.BAH
       %=  +>.$
-        p.zam.bah  (add 2 p.zam.bah)
-        q.zam.bah  (~(put by q.zam.bah) hen p.zam.bah)
-        r.zam.bah  (~(put by r.zam.bah) p.zam.bah hen)
+        P.ZAM.BAH  (ADD 2 P.ZAM.BAH)
+        Q.ZAM.BAH  (~(PUT BY Q.ZAM.BAH) HEN P.ZAM.BAH)
+        R.ZAM.BAH  (~(PUT BY R.ZAM.BAH) P.ZAM.BAH HEN)
       ==
     ::
-    ++  done
-      |=  {kos/bole cop/coop}
+    ++  DONE
+      |=  {KOS/BOLE COP/COOP}
       ^+  +>
-      (in-task %done +<)
+      (IN-TASK %DONE +<)
     ::                                                  ::
-    ++  have                                            ::  receive message
-      |=  {kos/bole cha/chan val/*}
+    ++  HAVE                                            ::  RECEIVE MESSAGE
+      |=  {KOS/BOLE CHA/CHAN VAL/*}
       ^+  +>
-      ?:  =(0 (end 0 1 kos))
-        =+  hen=(~(got by r.zam.bah) kos)
+      ?:  =(0 (END 0 1 KOS))
+        =+  HEN=(~(GOT BY R.ZAM.BAH) KOS)
         ::
-        ::  if the bole is even, this is a backward flow,
-        ::  like a subscription update; ack automatically.
+        ::  IF THE BOLE IS EVEN, THIS IS A BACKWARD FLOW,
+        ::  LIKE A SUBSCRIPTION UPDATE; ACK AUTOMATICALLY.
         ::
-        (acme:(in-task %done kos ~) %east hen who cha val)
+        (ACME:(IN-TASK %DONE KOS ~) %EAST HEN WHO CHA VAL)
       ::
-      ::  if the bole is odd, it's a forward flow.  we
-      ::  need to wait for the target to actively ack it.
+      ::  IF THE BOLE IS ODD, IT'S A FORWARD FLOW.  WE
+      ::  NEED TO WAIT FOR THE TARGET TO ACTIVELY ACK IT.
       ::
-      (acme %west who kos cha val)
+      (ACME %WEST WHO KOS CHA VAL)
     ::
-    ++  hear                                            ::
-      |=  {lyn/lane dam/flap syn/skin msg/@}            ::  hear packet
+    ++  HEAR                                            ::
+      |=  {LYN/LANE DAM/FLAP SYN/SKIN MSG/@}            ::  HEAR PACKET
       ^+  +>
-      (in-task %hear +<)
+      (IN-TASK %HEAR +<)
     ::                                                  ::
-    ++  mess                                            ::  send message
-      |=  {kos/bole cha/chan val/*}
+    ++  MESS                                            ::  SEND MESSAGE
+      |=  {KOS/BOLE CHA/CHAN VAL/*}
       ^+  +>
-      (to-task kos %mess cha val)
+      (TO-TASK KOS %MESS CHA VAL)
     ::                                                  ::
-    ++  sack                                            ::  send acknowledgment
-      |=  {kos/bole dam/flap cop/coop}
-      =+  ^=  yex
-          ((knit who lyf wyr det.bah) now eny [%back (mix kos 1) dam cop ~s0])
-      =.  +>.$  (to-gifs p.yex)
+    ++  SACK                                            ::  SEND ACKNOWLEDGMENT
+      |=  {KOS/BOLE DAM/FLAP COP/COOP}
+      =+  ^=  YEX
+          ((KNIT WHO LYF WYR DET.BAH) NOW ENY [%BACK (MIX KOS 1) DAM COP ~S0])
+      =.  +>.$  (TO-GIFS P.YEX)
       |-  ^+  +>.^$
-      ?~  q.yex  +>.^$
-      $(q.yex t.q.yex, +>.^$ (send ~ i.q.yex))
+      ?~  Q.YEX  +>.^$
+      $(Q.YEX T.Q.YEX, +>.^$ (SEND ~ I.Q.YEX))
     ::                                                  ::
-    ++  send                                            ::  send packet
-      |=  {urg/(unit lane) pac/rock}
+    ++  SEND                                            ::  SEND PACKET
+      |=  {URG/(UNIT LANE) PAC/ROCK}
       ^+  +>
-      ?:  =(our who)  (acme [%send *lane pac])
-      =+  zaw=sax.det.bah
+      ?:  =(OUR WHO)  (ACME [%SEND *LANE PAC])
+      =+  ZAW=SAX.DET.BAH
       |-  ^+  +>.^$
-      ?~  zaw  +>.^$
-      =+  ^=  lun  ^-  (unit lane)
-          ?:  (lth i.zaw 256)
+      ?~  ZAW  +>.^$
+      =+  ^=  LUN  ^-  (UNIT LANE)
+          ?:  (LTH I.ZAW 256)
             ::
-            ::  galaxies are mapped into reserved IP space,
-            ::  which the interpreter maps into a DNS request.
+            ::  GALAXIES ARE MAPPED INTO RESERVED IP SPACE,
+            ::  WHICH THE INTERPRETER MAPS INTO A DNS REQUEST.
             ::
-            [~ %if ~2000.1.1 31.337 (mix i.zaw .0.0.1.0)]
-          ?:  =(who i.zaw)  lun.bah
-          =+  hab=(~(get by pol) i.zaw)
-          ?~(hab ~ lun.u.hab)
-      ?~  lun
-        $(zaw t.zaw)
-      =.  pac  ?:  &(=(i.zaw who) =(~ urg))
-                 pac
+            [~ %IF ~2000.1.1 31.337 (MIX I.ZAW .0.0.1.0)]
+          ?:  =(WHO I.ZAW)  LUN.BAH
+          =+  HAB=(~(GET BY POL) I.ZAW)
+          ?~(HAB ~ LUN.U.HAB)
+      ?~  LUN
+        $(ZAW T.ZAW)
+      =.  PAC  ?:  &(=(I.ZAW WHO) =(~ URG))
+                 PAC
                ::
-               ::  forwarded packets are not signed/encrypted,
-               ::  because (a) we don't need to; (b) we don't
-               ::  want to turn one packet into two.  the wrapped
-               ::  packet may exceed 8192 bits, but it's unlikely
-               ::  to blow the MTU (IP MTU == 1500).
+               ::  FORWARDED PACKETS ARE NOT SIGNED/ENCRYPTED,
+               ::  BECAUSE (A) WE DON'T NEED TO; (B) WE DON'T
+               ::  WANT TO TURN ONE PACKET INTO TWO.  THE WRAPPED
+               ::  PACKET MAY EXCEED 8192 BITS, BUT IT'S UNLIKELY
+               ::  TO BLOW THE MTU (IP MTU == 1500).
                ::
-               (spit [our i.zaw] %none (jam `meal`[%fore who urg pac]))
-      =.  +>.^$  (acme %send u.lun pac)
+               (SPIT [OUR I.ZAW] %NONE (JAM `MEAL`[%FORE WHO URG PAC]))
+      =.  +>.^$  (ACME %SEND U.LUN PAC)
       ::
-      ::  stop if we have an %if (direct) address;
-      ::  continue if we only have %ix (forwarded).
+      ::  STOP IF WE HAVE AN %IF (DIRECT) ADDRESS;
+      ::  CONTINUE IF WE ONLY HAVE %IX (FORWARDED).
       ::
-      ?:(?=($if -.u.lun) +>.^$ $(zaw t.zaw))
+      ?:(?=($IF -.U.LUN) +>.^$ $(ZAW T.ZAW))
     ::
-    ++  in-gift
-      |=  hox/gift:hose
+    ++  IN-GIFT
+      |=  HOX/GIFT:HOSE
       ^+  +>
-      ?-    -.hox
-          $fore
-        ?:  =(our her.hox)
-          (acme %home org.hox pac.hox)
-        (send(who her.hox) [~ org.hox] pac.hox)
+      ?-    -.HOX
+          $FORE
+        ?:  =(OUR HER.HOX)
+          (ACME %HOME ORG.HOX PAC.HOX)
+        (SEND(WHO HER.HOX) [~ ORG.HOX] PAC.HOX)
       ::
-          $have  (have +.hox)
-          $link  (acme %link who exp.hox key.hox)
-          $meet  (acme hox)
-          $rack  (to-task kos.hox %back dam.hox cop.hox ~s0)
-          $rout  +>(lun.bah `lyn.hox)
-          $sack  (sack +.hox)
+          $HAVE  (HAVE +.HOX)
+          $LINK  (ACME %LINK WHO EXP.HOX KEY.HOX)
+          $MEET  (ACME HOX)
+          $RACK  (TO-TASK KOS.HOX %BACK DAM.HOX COP.HOX ~S0)
+          $ROUT  +>(LUN.BAH `LYN.HOX)
+          $SACK  (SACK +.HOX)
       ==
     ::
-    ++  in-gifs
-      |=  hoz/(list gift:hose)
-      ?~  hoz  +>
-      $(hoz t.hoz, +> (in-gift i.hoz))
+    ++  IN-GIFS
+      |=  HOZ/(LIST GIFT:HOSE)
+      ?~  HOZ  +>
+      $(HOZ T.HOZ, +> (IN-GIFT I.HOZ))
     ::
-    ++  to-gift
-      |=  rax/gift:rail
-      ?-  -.rax
-        $line  (acme %line who ~2018.1.1 q.rax)
-        $mack  (acme %rest (~(got by r.zam.bah) p.rax) q.rax)
-        $send  (send ~ q.rax)
+    ++  TO-GIFT
+      |=  RAX/GIFT:RAIL
+      ?-  -.RAX
+        $LINE  (ACME %LINE WHO ~2018.1.1 Q.RAX)
+        $MACK  (ACME %REST (~(GOT BY R.ZAM.BAH) P.RAX) Q.RAX)
+        $SEND  (SEND ~ Q.RAX)
       ==
     ::
-    ++  to-gifs
-      |=  raz/(list gift:rail)
-      ?~  raz  +>
-      $(raz t.raz, +> (to-gift i.raz))
+    ++  TO-GIFS
+      |=  RAZ/(LIST GIFT:RAIL)
+      ?~  RAZ  +>
+      $(RAZ T.RAZ, +> (TO-GIFT I.RAZ))
     ::
-    ++  in-task
-      |=  kyz/task:hose
+    ++  IN-TASK
+      |=  KYZ/TASK:HOSE
       ^+  +>
-      =^  hoz  fon.bah  abet:(~(apex hose [who wyr det.bah] ~ fon.bah) kyz)
-      (in-gifs hoz)
+      =^  HOZ  FON.BAH  ABET:(~(APEX HOSE [WHO WYR DET.BAH] ~ FON.BAH) KYZ)
+      (IN-GIFS HOZ)
     ::
-    ++  to-task
-      |=  {kos/bole kyz/task:rail}
+    ++  TO-TASK
+      |=  {KOS/BOLE KYZ/TASK:RAIL}
       ^+  +>
-      =+  cot=((bond |.(zeal:rail)) (~(get by sal.bah) kos))
-      =^  raz  cot  abet:(work:(to-rail kos cot) kyz)
-      (to-gifs raz)
+      =+  COT=((BOND |.(ZEAL:RAIL)) (~(GET BY SAL.BAH) KOS))
+      =^  RAZ  COT  ABET:(WORK:(TO-RAIL KOS COT) KYZ)
+      (TO-GIFS RAZ)
     ::
-    ++  to-rail
-      |=  {kos/bole cot/colt}
-      ~(. rail [[who lyf wyr det.bah] [now eny] kos (yawn:pump myn.cot) ~] cot)
+    ++  TO-RAIL
+      |=  {KOS/BOLE COT/COLT}
+      ~(. RAIL [[WHO LYF WYR DET.BAH] [NOW ENY] KOS (YAWN:PUMP MYN.COT) ~] COT)
     ::
-    ++  to-wait
-      |-  ^-  (unit @da)
-      ?~  sal.bah  ~
-      ;:  (cury hunt lth)
-        $(sal.bah l.sal.bah)
-        $(sal.bah r.sal.bah)
-        wait:(to-rail p.n.sal.bah q.n.sal.bah)
+    ++  TO-WAIT
+      |-  ^-  (UNIT @DA)
+      ?~  SAL.BAH  ~
+      ;:  (CURY HUNT LTH)
+        $(SAL.BAH L.SAL.BAH)
+        $(SAL.BAH R.SAL.BAH)
+        WAIT:(TO-RAIL P.N.SAL.BAH Q.N.SAL.BAH)
       ==
     ::
-    ++  to-wake
+    ++  TO-WAKE
       |-  ^+  +.$
-      ?~  sal.bah  +.$
-      =+  lef=$(sal.bah l.sal.bah)
-      =+  ryt=$(sal.bah r.sal.bah, fex fex.lef)
-      =+  top=(work:(to-rail(fex fex.ryt) p.n.sal.bah q.n.sal.bah) %wake ~)
-      +.$(fex fex.ryt, sal.bah [[kos cot]:top sal.bah.lef sal.bah.ryt])
+      ?~  SAL.BAH  +.$
+      =+  LEF=$(SAL.BAH L.SAL.BAH)
+      =+  RYT=$(SAL.BAH R.SAL.BAH, FEX FEX.LEF)
+      =+  TOP=(WORK:(TO-RAIL(FEX FEX.RYT) P.N.SAL.BAH Q.N.SAL.BAH) %WAKE ~)
+      +.$(FEX FEX.RYT, SAL.BAH [[KOS COT]:TOP SAL.BAH.LEF SAL.BAH.RYT])
     --
   --
   ::
-  ::::  inbound cores
+  ::::  INBOUND CORES
     ::
 ::                                                      ::
-::::  bite                                              ::::  packet format
+::::  BITE                                              ::::  PACKET FORMAT
   ::                                                    ::
-++  bite                                                ::  packet to cake
-  |=  pac/rock  ^-  cake
-  =+  [mag=(end 5 1 pac) bod=(rsh 5 1 pac)]
-  =+  :*  vez=(end 0 3 mag)                             ::  protocol version
-          chk=(cut 0 [3 20] mag)                        ::  checksum
-          wix=(bex +((cut 0 [23 2] mag)))               ::  width of receiver
-          vix=(bex +((cut 0 [25 2] mag)))               ::  width of sender
-          tay=(cut 0 [27 5] mag)                        ::  message type
+++  BITE                                                ::  PACKET TO CAKE
+  |=  PAC/ROCK  ^-  CAKE
+  =+  [MAG=(END 5 1 PAC) BOD=(RSH 5 1 PAC)]
+  =+  :*  VEZ=(END 0 3 MAG)                             ::  PROTOCOL VERSION
+          CHK=(CUT 0 [3 20] MAG)                        ::  CHECKSUM
+          WIX=(BEX +((CUT 0 [23 2] MAG)))               ::  WIDTH OF RECEIVER
+          VIX=(BEX +((CUT 0 [25 2] MAG)))               ::  WIDTH OF SENDER
+          TAY=(CUT 0 [27 5] MAG)                        ::  MESSAGE TYPE
       ==
-  ?>  =(7 vez)
-  ?>  =(chk (end 0 20 (mug bod)))
-  :+  [(end 3 wix bod) (cut 3 [wix vix] bod)]
-    (kins tay)
-  (rsh 3 (add wix vix) bod)
+  ?>  =(7 VEZ)
+  ?>  =(CHK (END 0 20 (MUG BOD)))
+  :+  [(END 3 WIX BOD) (CUT 3 [WIX VIX] BOD)]
+    (KINS TAY)
+  (RSH 3 (ADD WIX VIX) BOD)
 ::
-++  kins  |=(tay/@ (snag tay `(list skin)`[%none %open %fast %full ~]))
-++  ksin  |=(sin/skin `@`?-(sin $none 0, $open 1, $fast 2, $full 3))
+++  KINS  |=(TAY/@ (SNAG TAY `(LIST SKIN)`[%NONE %OPEN %FAST %FULL ~]))
+++  KSIN  |=(SIN/SKIN `@`?-(SIN $NONE 0, $OPEN 1, $FAST 2, $FULL 3))
 ::
-++  spit                                                ::  cake to packet
-  |=  kec/cake  ^-  @
-  =+  wim=(met 3 p.p.kec)
-  =+  dum=(met 3 q.p.kec)
-  =+  yax=?:((lte wim 2) 0 ?:((lte wim 4) 1 ?:((lte wim 8) 2 3)))
-  =+  qax=?:((lte dum 2) 0 ?:((lte dum 4) 1 ?:((lte dum 8) 2 3)))
-  =+  wix=(bex +(yax))
-  =+  vix=(bex +(qax))
-  =+  bod=:(mix p.p.kec (lsh 3 wix q.p.kec) (lsh 3 (add wix vix) r.kec))
-  =+  tay=(ksin q.kec)
-  %+  mix
-    %+  can  0
+++  SPIT                                                ::  CAKE TO PACKET
+  |=  KEC/CAKE  ^-  @
+  =+  WIM=(MET 3 P.P.KEC)
+  =+  DUM=(MET 3 Q.P.KEC)
+  =+  YAX=?:((LTE WIM 2) 0 ?:((LTE WIM 4) 1 ?:((LTE WIM 8) 2 3)))
+  =+  QAX=?:((LTE DUM 2) 0 ?:((LTE DUM 4) 1 ?:((LTE DUM 8) 2 3)))
+  =+  WIX=(BEX +(YAX))
+  =+  VIX=(BEX +(QAX))
+  =+  BOD=:(MIX P.P.KEC (LSH 3 WIX Q.P.KEC) (LSH 3 (ADD WIX VIX) R.KEC))
+  =+  TAY=(KSIN Q.KEC)
+  %+  MIX
+    %+  CAN  0
     :~  [3 7]
-        [20 (mug bod)]
-        [2 yax]
-        [2 qax]
-        [5 tay]
+        [20 (MUG BOD)]
+        [2 YAX]
+        [2 QAX]
+        [5 TAY]
     ==
-  (lsh 5 1 bod)
+  (LSH 5 1 BOD)
 ::                                                      ::
-::::  nose                                              ::::  packet decoder
+::::  NOSE                                              ::::  PACKET DECODER
   ::                                                    ::
-++  nose  !:
+++  NOSE  !:
   =>  |%
-      ++  gift                                          ::  side effect
-        $%  {$link exp/@da key/code}                    ::  learn symmetric key
-            {$meet doy/gree}                            ::  learn public key(s)
+      ++  GIFT                                          ::  SIDE EFFECT
+        $%  {$LINK EXP/@DA KEY/CODE}                    ::  LEARN SYMMETRIC KEY
+            {$MEET DOY/GREE}                            ::  LEARN PUBLIC KEY(S)
         ==                                              ::
       --
-  |=  $:  him/@p
-          wyr/(map life ring)
-          det/pipe
+  |=  $:  HIM/@P
+          WYR/(MAP LIFE RING)
+          DET/PIPE
       ==
-  |=  {syn/skin msg/@}
-  ^-  (pair (list gift) {aut/? ham/meal})
-  |^  ?-    syn
-          $none  [~ | (maul msg)]
-          $fast
-        =+  [mag=`hand`(end 7 1 msg) bod=(rsh 7 1 msg)]
-        =+  key=q:(~(got by inn.det) mag)
-        =+  clr=(need (de:crub:crypto key bod))
-        [~ & (maul clr)]
+  |=  {SYN/SKIN MSG/@}
+  ^-  (PAIR (LIST GIFT) {AUT/? HAM/MEAL})
+  |^  ?-    SYN
+          $NONE  [~ | (MAUL MSG)]
+          $FAST
+        =+  [MAG=`HAND`(END 7 1 MSG) BOD=(RSH 7 1 MSG)]
+        =+  KEY=Q:(~(GOT BY INN.DET) MAG)
+        =+  CLR=(NEED (DE:CRUB:CRYPTO KEY BOD))
+        [~ & (MAUL CLR)]
       ::
-          $full
-        =+  mex=((hard {p/{p/life q/life} q/gree r/@}) (cue msg))
-        =+  rig=(~(got by wyr) p.p.mex)
-        =+  pas=(whom q.p.mex q.mex)
-        =+  mes=(need (tear:as:(nol:nu:crub:crypto rig) pas r.mex))
-        =+  [key out]=((hard (pair @ux @ux)) (cue mes))
-        :-  :~  [%link ~2018.1.1 key]
-                [%meet q.mex]
+          $FULL
+        =+  MEX=((HARD {P/{P/LIFE Q/LIFE} Q/GREE R/@}) (CUE MSG))
+        =+  RIG=(~(GOT BY WYR) P.P.MEX)
+        =+  PAS=(WHOM Q.P.MEX Q.MEX)
+        =+  MES=(NEED (TEAR:AS:(NOL:NU:CRUB:CRYPTO RIG) PAS R.MEX))
+        =+  [KEY OUT]=((HARD (PAIR @UX @UX)) (CUE MES))
+        :-  :~  [%LINK ~2018.1.1 KEY]
+                [%MEET Q.MEX]
             ==
-        [& (maul out)]
+        [& (MAUL OUT)]
       ::
-          $open
-        =+  mex=((hard {p/{$~ q/life} q/gree r/@}) (cue msg))
-        =+  pas=(whom q.p.mex q.mex)
-        =+  out=(need (sure:as:(com:nu:crub:crypto pas) r.mex))
-        [[%meet q.mex]~ & (maul r.mex)]
+          $OPEN
+        =+  MEX=((HARD {P/{$~ Q/LIFE} Q/GREE R/@}) (CUE MSG))
+        =+  PAS=(WHOM Q.P.MEX Q.MEX)
+        =+  OUT=(NEED (SURE:AS:(COM:NU:CRUB:CRYPTO PAS) R.MEX))
+        [[%MEET Q.MEX]~ & (MAUL R.MEX)]
       ==
-  ++  maul  |=(@ `meal`((hard meal) (cue +<)))          ::  unpack message
-  ++  whom                                              ::  select public key
-    |=  {lyf/life gyr/gree}
-    ^-  pass
+  ++  MAUL  |=(@ `MEAL`((HARD MEAL) (CUE +<)))          ::  UNPACK MESSAGE
+  ++  WHOM                                              ::  SELECT PUBLIC KEY
+    |=  {LYF/LIFE GYR/GREE}
+    ^-  PASS
     ::
-    ::  if we have the public key for this life, use it.
-    ::  otherwise, use the key the sender sent, without
-    ::  without checking its validity.  invalid public-key
-    ::  data will crash the packet when we install it.
+    ::  IF WE HAVE THE PUBLIC KEY FOR THIS LIFE, USE IT.
+    ::  OTHERWISE, USE THE KEY THE SENDER SENT, WITHOUT
+    ::  WITHOUT CHECKING ITS VALIDITY.  INVALID PUBLIC-KEY
+    ::  DATA WILL CRASH THE PACKET WHEN WE INSTALL IT.
     ::
-    %-  (bond |.(pub.dat:(~(got by (~(got by gyr) lyf)) him)))
-    (bind (~(get by pub.det) lyf) |=(cert:pki:jael pub.dat))
+    %-  (BOND |.(PUB.DAT:(~(GOT BY (~(GOT BY GYR) LYF)) HIM)))
+    (BIND (~(GET BY PUB.DET) LYF) |=(CERT:PKI:JAEL PUB.DAT))
   --
 ::                                                      ::
-::::  hose                                              ::
+::::  HOSE                                              ::
   ::                                                    ::
-++  hose                                                ::  input decoder
+++  HOSE                                                ::  INPUT DECODER
   =>  |%                                                ::
-      ++  gift                                          ::  action
-        $%  {$fore her/ship org/lane pac/rock}          ::  send forward
-            {$have kos/bole cha/chan val/*}             ::  report message
-            {$link exp/@da key/code}                    ::  learn symmetric key
-            {$meet doy/gree}                            ::  learn public key
-            {$rack kos/bole dam/flap cop/coop}          ::  report ack
-            {$rout lyn/lane}                            ::  learn route
-            {$sack kos/bole dam/flap cop/coop}          ::  send ack
+      ++  GIFT                                          ::  ACTION
+        $%  {$FORE HER/SHIP ORG/LANE PAC/ROCK}          ::  SEND FORWARD
+            {$HAVE KOS/BOLE CHA/CHAN VAL/*}             ::  REPORT MESSAGE
+            {$LINK EXP/@DA KEY/CODE}                    ::  LEARN SYMMETRIC KEY
+            {$MEET DOY/GREE}                            ::  LEARN PUBLIC KEY
+            {$RACK KOS/BOLE DAM/FLAP COP/COOP}          ::  REPORT ACK
+            {$ROUT LYN/LANE}                            ::  LEARN ROUTE
+            {$SACK KOS/BOLE DAM/FLAP COP/COOP}          ::  SEND ACK
         ==                                              ::
-      ++  task                                          ::  event
-        $%  {$done kos/bole cop/coop}                   ::  commit message
-            {$hear lyn/lane dam/flap syn/skin msg/@}    ::  raw packet
+      ++  TASK                                          ::  EVENT
+        $%  {$DONE KOS/BOLE COP/COOP}                   ::  COMMIT MESSAGE
+            {$HEAR LYN/LANE DAM/FLAP SYN/SKIN MSG/@}    ::  RAW PACKET
         ==                                              ::
       --                                                ::
-  =|  $:  $:  him/ship                                  ::
-              wyr/(map life ring)                       ::
-              det/pipe                                  ::
+  =|  $:  $:  HIM/SHIP                                  ::
+              WYR/(MAP LIFE RING)                       ::
+              DET/PIPE                                  ::
           ==                                            ::
-          fex/(list gift)                               ::
-          fon/(map bole lock)                           ::
+          FEX/(LIST GIFT)                               ::
+          FON/(MAP BOLE LOCK)                           ::
       ==
   |%                                                    ::
-  ++  abet  [(flop fex) fon]                            ::  resolve
-  ++  acme  |=(fic/gift +>(fex [fic fex]))              ::  effect
-  ++  acts                                              ::  effects
-    |=(fix/(list gift) +>(fex (weld (flop fix) fex)))   ::
+  ++  ABET  [(FLOP FEX) FON]                            ::  RESOLVE
+  ++  ACME  |=(FIC/GIFT +>(FEX [FIC FEX]))              ::  EFFECT
+  ++  ACTS                                              ::  EFFECTS
+    |=(FIX/(LIST GIFT) +>(FEX (WELD (FLOP FIX) FEX)))   ::
   ::                                                    ::
-  ++  apex                                              ::  input
-    |=  job/task
+  ++  APEX                                              ::  INPUT
+    |=  JOB/TASK
     ^+  +>
-    ?-    -.job
-        $done
-      =+  loc=(~(got by fon) kos.job)
-      ?>  ?=(^ laz.loc)
-      =<  hy-abet
-      (~(hy-done hy [kos.job p.u.laz.loc] [& [q r]:u.laz.loc] loc) cop.job)
+    ?-    -.JOB
+        $DONE
+      =+  LOC=(~(GOT BY FON) KOS.JOB)
+      ?>  ?=(^ LAZ.LOC)
+      =<  HY-ABET
+      (~(HY-DONE HY [KOS.JOB P.U.LAZ.LOC] [& [Q R]:U.LAZ.LOC] LOC) COP.JOB)
     ::
-        $hear
-      =+  pet=((nose him wyr det) syn.job msg.job)
-      =.  +>.$  (acts p.pet)
-      ::  if packet is authenticated, use its routing info
-      =.  +>.$  ?.(aut.q.pet +>.$ (acme %rout lyn.job))
-      ?-    -.ham.q.pet
-          $back
-        ~|  %unsecured-back
-        ?>(aut.q.pet (acme %rack [p q r]:ham.q.pet))
+        $HEAR
+      =+  PET=((NOSE HIM WYR DET) SYN.JOB MSG.JOB)
+      =.  +>.$  (ACTS P.PET)
+      ::  IF PACKET IS AUTHENTICATED, USE ITS ROUTING INFO
+      =.  +>.$  ?.(AUT.Q.PET +>.$ (ACME %ROUT LYN.JOB))
+      ?-    -.HAM.Q.PET
+          $BACK
+        ~|  %UNSECURED-BACK
+        ?>(AUT.Q.PET (ACME %RACK [P Q R]:HAM.Q.PET))
       ::
-          $bond
-        =+  loc=((bond |.(*lock)) (~(get by fon) p.p.ham.q.pet))
-        =<  hy-abet
-        %.  [q r]:ham.q.pet
-        ~(hy-bond hy p.ham.q.pet [aut.q.pet [dam lyn]:job] loc)
+          $BOND
+        =+  LOC=((BOND |.(*LOCK)) (~(GET BY FON) P.P.HAM.Q.PET))
+        =<  HY-ABET
+        %.  [Q R]:HAM.Q.PET
+        ~(HY-BOND HY P.HAM.Q.PET [AUT.Q.PET [DAM LYN]:JOB] LOC)
       ::
-          $carp
-        =+  loc=((bond |.(*lock)) (~(get by fon) kos.p.ham.q.pet))
-        =<  hy-abet
-        %.  [(kins syn.p.ham.q.pet) cnt.p.ham.q.pet q.ham.q.pet]
-        ~(hy-carp hy [kos liq]:p.ham.q.pet [aut.q.pet [dam lyn]:job] loc)
+          $CARP
+        =+  LOC=((BOND |.(*LOCK)) (~(GET BY FON) KOS.P.HAM.Q.PET))
+        =<  HY-ABET
+        %.  [(KINS SYN.P.HAM.Q.PET) CNT.P.HAM.Q.PET Q.HAM.Q.PET]
+        ~(HY-CARP HY [KOS LIQ]:P.HAM.Q.PET [AUT.Q.PET [DAM LYN]:JOB] LOC)
       ::
-          $fore
-        (acme %fore p.ham.q.pet (born lyn.job q.ham.q.pet) r.ham.q.pet)
+          $FORE
+        (ACME %FORE P.HAM.Q.PET (BORN LYN.JOB Q.HAM.Q.PET) R.HAM.Q.PET)
       ==
     ==
   ::                                                    ::
-  ++  born                                              ::  set forward origin
-    |=  {lyn/lane urg/(unit lane)}
-    ^-  lane
-    ::  a forwarded packet contains its origin address,
-    ::  but only after the first hop.  if the address
-    ::  field is empty, we fill it in with the address
-    ::  we received the packet from.  but we replace
-    ::  %if with %ix, to show that the ultimate receiver
-    ::  may not be able to send back to the origin
-    ::  (due to non-full-cone NAT).
-    ?~  urg  lyn
-    ?.  ?=($if -.u.urg)
-      u.urg
-    [%ix +.u.urg]
+  ++  BORN                                              ::  SET FORWARD ORIGIN
+    |=  {LYN/LANE URG/(UNIT LANE)}
+    ^-  LANE
+    ::  A FORWARDED PACKET CONTAINS ITS ORIGIN ADDRESS,
+    ::  BUT ONLY AFTER THE FIRST HOP.  IF THE ADDRESS
+    ::  FIELD IS EMPTY, WE FILL IT IN WITH THE ADDRESS
+    ::  WE RECEIVED THE PACKET FROM.  BUT WE REPLACE
+    ::  %IF WITH %IX, TO SHOW THAT THE ULTIMATE RECEIVER
+    ::  MAY NOT BE ABLE TO SEND BACK TO THE ORIGIN
+    ::  (DUE TO NON-FULL-CONE NAT).
+    ?~  URG  LYN
+    ?.  ?=($IF -.U.URG)
+      U.URG
+    [%IX +.U.URG]
   ::
-  ++  hy                                                ::  message assembler
-    =|  $:  $:  kos/bole                                ::  sender
-                liq/tick                                ::  message number
+  ++  HY                                                ::  MESSAGE ASSEMBLER
+    =|  $:  $:  KOS/BOLE                                ::  SENDER
+                LIQ/TICK                                ::  MESSAGE NUMBER
             ==
-            $:  aut/?                                   ::  authenticated
-                dam/flap                                ::  critical flap
-                lyn/lane                                ::  origin address
+            $:  AUT/?                                   ::  AUTHENTICATED
+                DAM/FLAP                                ::  CRITICAL FLAP
+                LYN/LANE                                ::  ORIGIN ADDRESS
             ==
-            lock
+            LOCK
         ==
-    =*  loq  ->+
+    =*  LOQ  ->+
     |%                                                  ::
-    ++  hy-abet  ..hy(fon (~(put by fon) kos loq))      ::  resolve
-    ++  hy-acme  |=(fic/gift +>(+> (acme fic)))         ::  effect
-    ++  hy-acts  |=(fix/(list gift) +>(+> (acts fix)))  ::  effects
-    ++  hy-bond                                         ::  full message
-      |=   {cha/chan val/*}
+    ++  HY-ABET  ..HY(FON (~(PUT BY FON) KOS LOQ))      ::  RESOLVE
+    ++  HY-ACME  |=(FIC/GIFT +>(+> (ACME FIC)))         ::  EFFECT
+    ++  HY-ACTS  |=(FIX/(LIST GIFT) +>(+> (ACTS FIX)))  ::  EFFECTS
+    ++  HY-BOND                                         ::  FULL MESSAGE
+      |=   {CHA/CHAN VAL/*}
       ^+  +>
-      ?:  (lth liq laq)
-        ::  we already acked this msg; ack it again
-        ::  ~&  [%hi-bond-low [kos liq] laq]
-        hy-cong
-      ?:  (gth liq laq)
-        ::  later than the next msg; ignore
-        ~&  [%hy-bond-after [kos liq] laq]
+      ?:  (LTH LIQ LAQ)
+        ::  WE ALREADY ACKED THIS MSG; ACK IT AGAIN
+        ::  ~&  [%HI-BOND-LOW [KOS LIQ] LAQ]
+        HY-CONG
+      ?:  (GTH LIQ LAQ)
+        ::  LATER THAN THE NEXT MSG; IGNORE
+        ~&  [%HY-BOND-AFTER [KOS LIQ] LAQ]
         +>
-      ?:  !=(~ laz)
-        ::  this msg is already being processed; ignore
-        ~&  [%hy-bond-during [kos liq] laq]
+      ?:  !=(~ LAZ)
+        ::  THIS MSG IS ALREADY BEING PROCESSED; IGNORE
+        ~&  [%HY-BOND-DURING [KOS LIQ] LAQ]
         +>
-      ::  report completed message
-      %.  [%have kos cha val]
-      %=  hy-acme
-        ::  delete partial message
-        nys  (~(del by nys) liq)
-        ::  record message in application processing
-        laz  `[liq dam lyn]
+      ::  REPORT COMPLETED MESSAGE
+      %.  [%HAVE KOS CHA VAL]
+      %=  HY-ACME
+        ::  DELETE PARTIAL MESSAGE
+        NYS  (~(DEL BY NYS) LIQ)
+        ::  RECORD MESSAGE IN APPLICATION PROCESSING
+        LAZ  `[LIQ DAM LYN]
       ==
     ::                                                  ::
-    ++  hy-done                                         ::  message completed
-      |=  cop/coop
+    ++  HY-DONE                                         ::  MESSAGE COMPLETED
+      |=  COP/COOP
       ^+  +>
-      (hy-cone(laq +(laq), laz ~) cop)
+      (HY-CONE(LAQ +(LAQ), LAZ ~) COP)
     ::                                                  ::
-    ++  hy-carp                                         ::  process fragment
-      |=  {syn/skin cnt/@ud far/(pair @ud @)}
+    ++  HY-CARP                                         ::  PROCESS FRAGMENT
+      |=  {SYN/SKIN CNT/@UD FAR/(PAIR @UD @)}
       ^+  +>
-      ::  ~&  [%carp fap/`@p`(mug fap) syn/syn cnt/cnt far/p.far]
-      ?:  (lth liq laq)
-        ::  fragment of a message we've already acknowledged - ack it again.
-        ::  ~&  [%hy-carp-late liq laq]
-        hy-cong
-      ?:  (gth liq laq)
-        ::  fragment of a message after the next we expect - drop it.
-        ::  ~&  [%hy-carp-early liq laq]
+      ::  ~&  [%CARP FAP/`@P`(MUG FAP) SYN/SYN CNT/CNT FAR/P.FAR]
+      ?:  (LTH LIQ LAQ)
+        ::  FRAGMENT OF A MESSAGE WE'VE ALREADY ACKNOWLEDGED - ACK IT AGAIN.
+        ::  ~&  [%HY-CARP-LATE LIQ LAQ]
+        HY-CONG
+      ?:  (GTH LIQ LAQ)
+        ::  FRAGMENT OF A MESSAGE AFTER THE NEXT WE EXPECT - DROP IT.
+        ::  ~&  [%HY-CARP-EARLY LIQ LAQ]
         +>
-      ::  neb: current incomplete message
-      =+  neb=`bait`(fall (~(get by nys) liq) [syn 0 [cnt ~]])
-      ::  all fragments must agree on the message parameters
-      ?>  &(=(p.neb syn) (gth p.r.neb p.far) =(p.r.neb cnt))
-      =+  doy=(~(get by q.r.neb) p.far)
-      ?^  doy
-        ::  we've already heard this fragment
-        (hy-conk ~)
-      ::  install fragment
-      =:  q.r.neb  (~(put by q.r.neb) p.far q.far)
-          q.neb    +(q.neb)
+      ::  NEB: CURRENT INCOMPLETE MESSAGE
+      =+  NEB=`BAIT`(FALL (~(GET BY NYS) LIQ) [SYN 0 [CNT ~]])
+      ::  ALL FRAGMENTS MUST AGREE ON THE MESSAGE PARAMETERS
+      ?>  &(=(P.NEB SYN) (GTH P.R.NEB P.FAR) =(P.R.NEB CNT))
+      =+  DOY=(~(GET BY Q.R.NEB) P.FAR)
+      ?^  DOY
+        ::  WE'VE ALREADY HEARD THIS FRAGMENT
+        (HY-CONK ~)
+      ::  INSTALL FRAGMENT
+      =:  Q.R.NEB  (~(PUT BY Q.R.NEB) P.FAR Q.FAR)
+          Q.NEB    +(Q.NEB)
         ==
-      ?.  =(q.neb p.r.neb)
-        ::  message not yet complete, reinstall incomplete
-        (hy-conk(nys (~(put by nys) liq neb)) ~)
-      ::  decode complete message
-      =+  pet=((nose him wyr det) syn (hy-golf r.neb))
-      ::  record decoder effects
-      =.  +>.$  (hy-acts p.pet)
-      =.  aut  |(aut aut.q.pet)
-      ?-  -.ham.q.pet
-        $back  ~|(%unsecured-back ?>(aut (hy-acme %rack kos [q r]:ham.q.pet)))
-        $carp  ~|(%meta-carp !!)
-        $fore  (hy-acme %fore p.ham.q.pet (born lyn q.ham.q.pet) r.ham.q.pet)
-        $bond  ~|  %bogus-assembly
-               ?>  &(aut =([kos liq] p.ham.q.pet))
-               (hy-bond [q r]:ham.q.pet)
+      ?.  =(Q.NEB P.R.NEB)
+        ::  MESSAGE NOT YET COMPLETE, REINSTALL INCOMPLETE
+        (HY-CONK(NYS (~(PUT BY NYS) LIQ NEB)) ~)
+      ::  DECODE COMPLETE MESSAGE
+      =+  PET=((NOSE HIM WYR DET) SYN (HY-GOLF R.NEB))
+      ::  RECORD DECODER EFFECTS
+      =.  +>.$  (HY-ACTS P.PET)
+      =.  AUT  |(AUT AUT.Q.PET)
+      ?-  -.HAM.Q.PET
+        $BACK  ~|(%UNSECURED-BACK ?>(AUT (HY-ACME %RACK KOS [Q R]:HAM.Q.PET)))
+        $CARP  ~|(%META-CARP !!)
+        $FORE  (HY-ACME %FORE P.HAM.Q.PET (BORN LYN Q.HAM.Q.PET) R.HAM.Q.PET)
+        $BOND  ~|  %BOGUS-ASSEMBLY
+               ?>  &(AUT =([KOS LIQ] P.HAM.Q.PET))
+               (HY-BOND [Q R]:HAM.Q.PET)
       ==
     ::
-    ++  hy-cong  (hy-conk (~(get by exc) liq))          ::  duplicate ack
-    ++  hy-conk                                         ::  ack current
-      |=(cop/coop (hy-acme %sack kos dam cop))
-    ++  hy-cone                                         ::  record ack
-      |=  cop/coop
-      =>  ?~(cop . .(exc (~(put by exc) liq u.cop)))
-      (hy-conk cop)
+    ++  HY-CONG  (HY-CONK (~(GET BY EXC) LIQ))          ::  DUPLICATE ACK
+    ++  HY-CONK                                         ::  ACK CURRENT
+      |=(COP/COOP (HY-ACME %SACK KOS DAM COP))
+    ++  HY-CONE                                         ::  RECORD ACK
+      |=  COP/COOP
+      =>  ?~(COP . .(EXC (~(PUT BY EXC) LIQ U.COP)))
+      (HY-CONK COP)
     ::                                                  ::
-    ++  hy-golf                                         ::  assemble fragments
-      |=  duv/dove
-      =+  [nix=0 rax=*(list @)]
+    ++  HY-GOLF                                         ::  ASSEMBLE FRAGMENTS
+      |=  DUV/DOVE
+      =+  [NIX=0 RAX=*(LIST @)]
       |-  ^-  @
-      ?:  =(p.duv nix)
-        (can 13 (turn (flop rax) |=(a/@ [1 a])))
-      $(nix +(nix), rax [(need (~(get by q.duv) nix)) rax])
+      ?:  =(P.DUV NIX)
+        (CAN 13 (TURN (FLOP RAX) |=(A/@ [1 A])))
+      $(NIX +(NIX), RAX [(NEED (~(GET BY Q.DUV) NIX)) RAX])
     --
   --
 ::                                                      ::
-::::  outbound cores                                    ::::
+::::  OUTBOUND CORES                                    ::::
   ::                                                    ::
 ::
-::::  packet pump
+::::  PACKET PUMP
   ::
-++  pump                                                ::  packet pump
+++  PUMP                                                ::  PACKET PUMP
   =>  |%                                                ::
-      ++  gift                                          ::  effect
-        $%  {$good p/flap q/part r/@dr s/coop}          ::  logical ack
-            {$send p/flap q/part r/rock}                ::  release packet
+      ++  GIFT                                          ::  EFFECT
+        $%  {$GOOD P/FLAP Q/PART R/@DR S/COOP}          ::  LOGICAL ACK
+            {$SEND P/FLAP Q/PART R/ROCK}                ::  RELEASE PACKET
         ==                                              ::
-      ++  task                                          ::  event
-        $%  {$back p/flap q/coop r/@dr}                 ::  raw ack
-            {$cull p/tick}                              ::  cancel message
-            {$pack p/(list clue)}                       ::  submit packets
-            {$wake $~}                                  ::  random wakeup
+      ++  TASK                                          ::  EVENT
+        $%  {$BACK P/FLAP Q/COOP R/@DR}                 ::  RAW ACK
+            {$CULL P/TICK}                              ::  CANCEL MESSAGE
+            {$PACK P/(LIST CLUE)}                       ::  SUBMIT PACKETS
+            {$WAKE $~}                                  ::  RANDOM WAKEUP
         ==                                              ::
       --
   |%
-  ++  yawn                                              ::
-    |=  myn/mini                                        ::
-    ^+  zu
-    ~(. zu ~ myn)                                       ::
+  ++  YAWN                                              ::
+    |=  MYN/MINI                                        ::
+    ^+  ZU
+    ~(. ZU ~ MYN)                                       ::
   ::
-  ++  zu                                                ::  state machine
-    |_  $:  fex/(list gift)                             ::  effects
-            mini                                        ::  state
+  ++  ZU                                                ::  STATE MACHINE
+    |_  $:  FEX/(LIST GIFT)                             ::  EFFECTS
+            MINI                                        ::  STATE
         ==
     ::                                                  ::
-    ++  abba                                            ::  a older than b
-      |=  {a/part b/part}
-      |((lth q.a q.b) &(=(q.a q.b) (lth p.a p.b)))
+    ++  ABBA                                            ::  A OLDER THAN B
+      |=  {A/PART B/PART}
+      |((LTH Q.A Q.B) &(=(Q.A Q.B) (LTH P.A P.B)))
     ::                                                  ::
-    ++  abet                                            ::  resolve
-      ^-  {(list gift:pump) mini}
-      ::  =.  .  aver
-      [(flop fex) +<+]
+    ++  ABET                                            ::  RESOLVE
+      ^-  {(LIST GIFT:PUMP) MINI}
+      ::  =.  .  AVER
+      [(FLOP FEX) +<+]
     ::                                                  ::
-    ++  aver                                            ::  verify
-      ?>  (lte cur.saw max.saw)
-      ?>  !=(0 max.saw)
-      ?.  =(cur.saw (lent ~(tap to liv)))
-        ~&  [%aver-cur cur.saw (lent ~(tap to liv))]
+    ++  AVER                                            ::  VERIFY
+      ?>  (LTE CUR.SAW MAX.SAW)
+      ?>  !=(0 MAX.SAW)
+      ?.  =(CUR.SAW (LENT ~(TAP TO LIV)))
+        ~&  [%AVER-CUR CUR.SAW (LENT ~(TAP TO LIV))]
         !!
-      ?>  =(rey.saw (lent ~(tap to lop)))
-      ?>  =+  |=  {a/coal b/coal}
-              &((lth out.a out.b) (lth lod.a lod.b))
-          |-  ?|  ?=($~ liv)
-                  ?&  ?|  ?=($~ r.liv)
-                          ?&  (+< n.r.liv n.liv)
-                              $(liv r.liv)
+      ?>  =(REY.SAW (LENT ~(TAP TO LOP)))
+      ?>  =+  |=  {A/COAL B/COAL}
+              &((LTH OUT.A OUT.B) (LTH LOD.A LOD.B))
+          |-  ?|  ?=($~ LIV)
+                  ?&  ?|  ?=($~ R.LIV)
+                          ?&  (+< N.R.LIV N.LIV)
+                              $(LIV R.LIV)
                       ==  ==
-                      ?|  ?=($~ l.liv)
-                          ?&  (+< n.liv n.l.liv)
-                              $(liv l.liv)
+                      ?|  ?=($~ L.LIV)
+                          ?&  (+< N.LIV N.L.LIV)
+                              $(LIV L.LIV)
                       ==  ==
                   ==
               ==
-      ?>  =+  |=  {a/part b/part}
-              |((lth q.a q.b) &(=(q.a q.b) (lth p.a p.b)))
-          |-  ?|  ?=($~ lop)
-                  ?&  ?|  ?=($~ r.lop)
-                          ?&  (+< tel.n.r.lop tel.n.lop)
-                              $(lop r.lop)
+      ?>  =+  |=  {A/PART B/PART}
+              |((LTH Q.A Q.B) &(=(Q.A Q.B) (LTH P.A P.B)))
+          |-  ?|  ?=($~ LOP)
+                  ?&  ?|  ?=($~ R.LOP)
+                          ?&  (+< TEL.N.R.LOP TEL.N.LOP)
+                              $(LOP R.LOP)
                       ==  ==
-                      ?|  ?=($~ l.lop)
-                          ?&  (+< tel.n.lop tel.n.l.lop)
-                              $(lop l.lop)
+                      ?|  ?=($~ L.LOP)
+                          ?&  (+< TEL.N.LOP TEL.N.L.LOP)
+                              $(LOP L.LOP)
                       ==  ==
                   ==
               ==
       .
     ::                                                  ::
-    ++  back                                            ::  process raw ack
-      |=  {now/@da dam/flap cop/coop lag/@dr}
+    ++  BACK                                            ::  PROCESS RAW ACK
+      |=  {NOW/@DA DAM/FLAP COP/COOP LAG/@DR}
       ^+  +>
-      =-  =/  rtt  ?~(ack ~s0 (sub now out.u.ack))
-          =.  rtt  ?:((gth rtt lag) (sub rtt lag) rtt)
-          (done:(lose(liv lov) ded) ack dam cop rtt)
-      |-  ^-  $:  ack/(unit coal)
-                  ded/(list coal)
-                  lov/(qeu coal)
+      =-  =/  RTT  ?~(ACK ~S0 (SUB NOW OUT.U.ACK))
+          =.  RTT  ?:((GTH RTT LAG) (SUB RTT LAG) RTT)
+          (DONE:(LOSE(LIV LOV) DED) ACK DAM COP RTT)
+      |-  ^-  $:  ACK/(UNIT COAL)
+                  DED/(LIST COAL)
+                  LOV/(QEU COAL)
               ==
-      ?~  liv  [~ ~ ~]
-      =+  ryt=$(liv r.liv)
-      ?^  ack.ryt
+      ?~  LIV  [~ ~ ~]
+      =+  RYT=$(LIV R.LIV)
+      ?^  ACK.RYT
         ::
-        ::  found in front, no need to search back.
+        ::  FOUND IN FRONT, NO NEED TO SEARCH BACK.
         ::
-        [ack.ryt ded.ryt [n.liv l.liv lov.ryt]]
+        [ACK.RYT DED.RYT [N.LIV L.LIV LOV.RYT]]
       ::
-      ::  lose unacked packets sent before an acked virgin.
+      ::  LOSE UNACKED PACKETS SENT BEFORE AN ACKED VIRGIN.
       ::
-      =+  ^-  $:  top/?
-                  ack/(unit coal)
-                  ded/(list coal)
-                  lov/(qeu coal)
+      =+  ^-  $:  TOP/?
+                  ACK/(UNIT COAL)
+                  DED/(LIST COAL)
+                  LOV/(QEU COAL)
               ==
-          ?:  =(dam fap.clu.n.liv)
-            [| `n.liv ~ l.liv]
-          [& $(liv l.liv)]
-      ?~  ack  [~ ~ liv]
-      =.  ded  ?:(top [n.liv ded] ded)
-      =?  ded  vig.clu.u.ack  (weld ~(tap to r.liv) ded)
-      =.  lov  ?:(top [n.liv lov ~] lov)
-      [ack ded lov]
+          ?:  =(DAM FAP.CLU.N.LIV)
+            [| `N.LIV ~ L.LIV]
+          [& $(LIV L.LIV)]
+      ?~  ACK  [~ ~ LIV]
+      =.  DED  ?:(TOP [N.LIV DED] DED)
+      =?  DED  VIG.CLU.U.ACK  (WELD ~(TAP TO R.LIV) DED)
+      =.  LOV  ?:(TOP [N.LIV LOV ~] LOV)
+      [ACK DED LOV]
     ::                                                  ::
-    ++  clap                                            ::  ordered enqueue
+    ++  CLAP                                            ::  ORDERED ENQUEUE
       ::
-      ::  the `lop` queue isn't really a queue in case of
-      ::  resent packets; packets from older messages
-      ::  need to be sent first.  unfortunately hoon.hoon
-      ::  lacks a general sorted/balanced heap right now.
-      ::  so we implement a balanced queue insert by hand.
+      ::  THE `LOP` QUEUE ISN'T REALLY A QUEUE IN CASE OF
+      ::  RESENT PACKETS; PACKETS FROM OLDER MESSAGES
+      ::  NEED TO BE SENT FIRST.  UNFORTUNATELY HOON.HOON
+      ::  LACKS A GENERAL SORTED/BALANCED HEAP RIGHT NOW.
+      ::  SO WE IMPLEMENT A BALANCED QUEUE INSERT BY HAND.
       ::
-      |=  clu/clue
+      |=  CLU/CLUE
       %_    +>
-          lop
-        |-  ^+  lop
-        ?~  lop  [clu ~ ~]
-        ?:  ?|  (abba tel.clu tel.n.lop)
-                ?&  =(tel.clu tel.n.lop)
-                    (lth fap.clu fap.n.lop)
+          LOP
+        |-  ^+  LOP
+        ?~  LOP  [CLU ~ ~]
+        ?:  ?|  (ABBA TEL.CLU TEL.N.LOP)
+                ?&  =(TEL.CLU TEL.N.LOP)
+                    (LTH FAP.CLU FAP.N.LOP)
             ==  ==
-          [n.lop l.lop $(lop r.lop)]
-        [n.lop $(lop l.lop) r.lop]
+          [N.LOP L.LOP $(LOP R.LOP)]
+        [N.LOP $(LOP L.LOP) R.LOP]
       ==
     ::                                                  ::
-    ++  cull                                            ::  clear message
-      |=  tiq/tick
+    ++  CULL                                            ::  CLEAR MESSAGE
+      |=  TIQ/TICK
       %_    +>
-          liv
-        |-  ^+  liv
-        ?~  liv  ~
-        =+  vil=[n.liv $(liv l.liv) $(liv r.liv)]
-        ?.  =(tiq q.tel.clu.n.liv)  vil
-        ~(nip to `(qeu coal)`vil)
+          LIV
+        |-  ^+  LIV
+        ?~  LIV  ~
+        =+  VIL=[N.LIV $(LIV L.LIV) $(LIV R.LIV)]
+        ?.  =(TIQ Q.TEL.CLU.N.LIV)  VIL
+        ~(NIP TO `(QEU COAL)`VIL)
       ::
-          lop
-        |-  ^+  lop
-        ?~  lop  ~
-        =+  pol=[n.lop $(lop l.lop) $(lop r.lop)]
-        ?:  =(tiq q.tel.n.lop)  pol
-        ~(nip to `(qeu clue)`pol)
+          LOP
+        |-  ^+  LOP
+        ?~  LOP  ~
+        =+  POL=[N.LOP $(LOP L.LOP) $(LOP R.LOP)]
+        ?:  =(TIQ Q.TEL.N.LOP)  POL
+        ~(NIP TO `(QEU CLUE)`POL)
       ==
     ::                                                  ::
-    ++  done                                            ::  process cooked ack
-      |=  {lyd/(unit coal) dam/flap cop/coop rtt/@dr}
+    ++  DONE                                            ::  PROCESS COOKED ACK
+      |=  {LYD/(UNIT COAL) DAM/FLAP COP/COOP RTT/@DR}
       ^+  +>
-      ?~  lyd  +>
+      ?~  LYD  +>
       %_  +>
-        cur.saw  (dec cur.saw)
-        fex      [[%good dam tel.clu.u.lyd rtt cop] fex]
+        CUR.SAW  (DEC CUR.SAW)
+        FEX      [[%GOOD DAM TEL.CLU.U.LYD RTT COP] FEX]
       ==
     ::                                                  ::
-    ++  fire                                            ::  send a packet
-      |=  {now/@da clu/clue}
+    ++  FIRE                                            ::  SEND A PACKET
+      |=  {NOW/@DA CLU/CLUE}
       ^+  +>
-      ?>  (lth cur.saw max.saw)
-      =+  out=?:((lte now las.saw) +(las.saw) now)
-      =+  lod=(add now (mul 2 rtt.saw))
-      =.  lod  ?:((gth lod lad.saw) lod +(lad.saw))
-      ::  ~&  [%fire (flam fap.clu) `@da`out `@da`lod]
+      ?>  (LTH CUR.SAW MAX.SAW)
+      =+  OUT=?:((LTE NOW LAS.SAW) +(LAS.SAW) NOW)
+      =+  LOD=(ADD NOW (MUL 2 RTT.SAW))
+      =.  LOD  ?:((GTH LOD LAD.SAW) LOD +(LAD.SAW))
+      ::  ~&  [%FIRE (FLAM FAP.CLU) `@DA`OUT `@DA`LOD]
       %=  +>.$
-        fex      [[%send fap.clu tel.clu dat.clu] fex]
-        las.saw  out
-        lad.saw  lod
-        cur.saw  +(cur.saw)
-        liv      (~(put to liv) [out lod clu])
+        FEX      [[%SEND FAP.CLU TEL.CLU DAT.CLU] FEX]
+        LAS.SAW  OUT
+        LAD.SAW  LOD
+        CUR.SAW  +(CUR.SAW)
+        LIV      (~(PUT TO LIV) [OUT LOD CLU])
       ==
     ::                                                  ::
-    ++  flay                                            ::  time out packets
-      |=  now/@da
+    ++  FLAY                                            ::  TIME OUT PACKETS
+      |=  NOW/@DA
       ^+  +>
-      =-  (lose(liv q.ole) p.ole)
-      ^=  ole
-      =|  ded/(list coal)
-      |-  ^+  [p=ded q=liv]
-      ?~  liv  [ded ~]
-      ?:  (gte now lod.n.liv)
+      =-  (LOSE(LIV Q.OLE) P.OLE)
+      ^=  OLE
+      =|  DED/(LIST COAL)
+      |-  ^+  [P=DED Q=LIV]
+      ?~  LIV  [DED ~]
+      ?:  (GTE NOW LOD.N.LIV)
         ::
-        ::  everything in front of a dead packet is dead
+        ::  EVERYTHING IN FRONT OF A DEAD PACKET IS DEAD
         ::
-        $(liv l.liv, ded (welp ~(tap to r.liv) [n.liv ded]))
-      =+  ryt=$(liv r.liv)
-      [p.ryt [n.liv l.liv q.ryt]]
+        $(LIV L.LIV, DED (WELP ~(TAP TO R.LIV) [N.LIV DED]))
+      =+  RYT=$(LIV R.LIV)
+      [P.RYT [N.LIV L.LIV Q.RYT]]
     ::                                                  ::
-    ++  lose                                            ::  abandon packets
-      |=  cud/(list coal)
+    ++  LOSE                                            ::  ABANDON PACKETS
+      |=  CUD/(LIST COAL)
       ^+  +>
-      ?~  cud  +>
-      =.  +>  (clap clu.i.cud)
+      ?~  CUD  +>
+      =.  +>  (CLAP CLU.I.CUD)
       %=    $
-        cud      t.cud
-        cur.saw  (dec cur.saw)
-        rey.saw  +(rey.saw)
+        CUD      T.CUD
+        CUR.SAW  (DEC CUR.SAW)
+        REY.SAW  +(REY.SAW)
       ==
     ::                                                  ::
-    ++  ship                                            ::  send packets
-      |=  {now/@da cly/(list clue)}
+    ++  SHIP                                            ::  SEND PACKETS
+      |=  {NOW/@DA CLY/(LIST CLUE)}
       ^+  +>
-      ?:  (gte cur.saw max.saw)  +>
-      ?:  =(0 rey.saw)
-        ?~  cly  +>
-        $(cly t.cly, +> (fire now i.cly))
-      =^  clu  lop  ~(get to lop)
-      $(+> (fire(rey.saw (dec rey.saw)) now clu))
+      ?:  (GTE CUR.SAW MAX.SAW)  +>
+      ?:  =(0 REY.SAW)
+        ?~  CLY  +>
+        $(CLY T.CLY, +> (FIRE NOW I.CLY))
+      =^  CLU  LOP  ~(GET TO LOP)
+      $(+> (FIRE(REY.SAW (DEC REY.SAW)) NOW CLU))
     ::                                                  ::
-    ++  wait                                            ::  next wakeup
-      ^-  (unit @da)
-      =+  tup=`(unit coal)`~(top to liv)
-      ?~(tup ~ `lod.u.tup)
+    ++  WAIT                                            ::  NEXT WAKEUP
+      ^-  (UNIT @DA)
+      =+  TUP=`(UNIT COAL)`~(TOP TO LIV)
+      ?~(TUP ~ `LOD.U.TUP)
     ::                                                  ::
-    ++  want                                            ::  window space
-      ^-  @ud
-      ?:  (gte cur.saw max.saw)  0
-      =+  gap=(sub max.saw cur.saw)
-      ?:  (gte rey.saw gap)  0
-      (sub gap rey.saw)
+    ++  WANT                                            ::  WINDOW SPACE
+      ^-  @UD
+      ?:  (GTE CUR.SAW MAX.SAW)  0
+      =+  GAP=(SUB MAX.SAW CUR.SAW)
+      ?:  (GTE REY.SAW GAP)  0
+      (SUB GAP REY.SAW)
     ::
-    ++  work                                            ::
-      |=  {now/@da job/task}                            ::  perform
+    ++  WORK                                            ::
+      |=  {NOW/@DA JOB/TASK}                            ::  PERFORM
       ^+  +>
-      ?-  -.job
-        $back  (back now [p q r]:job)
-        $cull  (cull p.job)
-        $pack  (ship now p.job)
-        $wake  (flay now)
+      ?-  -.JOB
+        $BACK  (BACK NOW [P Q R]:JOB)
+        $CULL  (CULL P.JOB)
+        $PACK  (SHIP NOW P.JOB)
+        $WAKE  (FLAY NOW)
       ==
     --
   --
 ::                                                      ::
-::::  knit                                              ::::  message encoder
+::::  KNIT                                              ::::  MESSAGE ENCODER
   ::                                                    ::
-++  knit
+++  KNIT
   =>  |%
-      ++  gift                                          ::  side effect
-        $%  {$line exp/@da key/code}                    ::  set symmetric key
+      ++  GIFT                                          ::  SIDE EFFECT
+        $%  {$LINE EXP/@DA KEY/CODE}                    ::  SET SYMMETRIC KEY
         ==                                              ::
       --
-  |=  {her/@p lyf/life wyr/(map life ring) det/pipe}
-  |=  {now/@da eny/@ ham/meal}
-  =+  hom=(jam ham)
-  ^-  (pair (list gift) (list rock))
-  =<  weft
+  |=  {HER/@P LYF/LIFE WYR/(MAP LIFE RING) DET/PIPE}
+  |=  {NOW/@DA ENY/@ HAM/MEAL}
+  =+  HOM=(JAM HAM)
+  ^-  (PAIR (LIST GIFT) (LIST ROCK))
+  =<  WEFT
   |%
-  ++  wain                                              ::  message identity
-    ^-  flea
-    ?+  -.ham  [0 0]
-      $bond  p.ham
-      $carp  [kos liq]:p.ham
+  ++  WAIN                                              ::  MESSAGE IDENTITY
+    ^-  FLEA
+    ?+  -.HAM  [0 0]
+      $BOND  P.HAM
+      $CARP  [KOS LIQ]:P.HAM
     ==
   ::
-  ++  wasp  ^-({p/skin q/@} [%none hom])                ::  null security
-  ++  weft                                              ::  fragment message
-    ^-  (pair (list gift) (list rock))
-    =+  gum=wisp
-    :-  p.gum
-    =+  wit=(met 13 q.q.gum)
-    ?:  =(1 wit)
-      ::  message fits in one packet, don't fragment
-      [(spit [our her] p.q.gum q.q.gum) ~]
-    =+  ruv=(rip 13 q.q.gum)
-    =+  inx=0
-    |-  ^-  (list rock)
-    ?~  ruv  ~
-    :_  $(ruv t.ruv, inx +(inx))
-    %+  spit
-      [our her]
-    wasp(ham [%carp [wain (ksin p.q.gum) wit] inx i.ruv])
+  ++  WASP  ^-({P/SKIN Q/@} [%NONE HOM])                ::  NULL SECURITY
+  ++  WEFT                                              ::  FRAGMENT MESSAGE
+    ^-  (PAIR (LIST GIFT) (LIST ROCK))
+    =+  GUM=WISP
+    :-  P.GUM
+    =+  WIT=(MET 13 Q.Q.GUM)
+    ?:  =(1 WIT)
+      ::  MESSAGE FITS IN ONE PACKET, DON'T FRAGMENT
+      [(SPIT [OUR HER] P.Q.GUM Q.Q.GUM) ~]
+    =+  RUV=(RIP 13 Q.Q.GUM)
+    =+  INX=0
+    |-  ^-  (LIST ROCK)
+    ?~  RUV  ~
+    :_  $(RUV T.RUV, INX +(INX))
+    %+  SPIT
+      [OUR HER]
+    WASP(HAM [%CARP [WAIN (KSIN P.Q.GUM) WIT] INX I.RUV])
   ::
-  ++  wisp                                              ::  generate message
-    ^-  (pair (list gift) (pair skin @))
-    ?:  =(%carp -.ham)
-      [~ wasp]
-    ?^  out.det
+  ++  WISP                                              ::  GENERATE MESSAGE
+    ^-  (PAIR (LIST GIFT) (PAIR SKIN @))
+    ?:  =(%CARP -.HAM)
+      [~ WASP]
+    ?^  OUT.DET
       :-  ~
-      :-  %fast
-      %^  cat  7
-        p.u.out.det
-      (en:crub:crypto q.q.u.out.det hom)
-    =+  cry=(nol:nu:crub:crypto (~(got by wyr) lyf))
-    ?~  cur.det
+      :-  %FAST
+      %^  CAT  7
+        P.U.OUT.DET
+      (EN:CRUB:CRYPTO Q.Q.U.OUT.DET HOM)
+    =+  CRY=(NOL:NU:CRUB:CRYPTO (~(GOT BY WYR) LYF))
+    ?~  CUR.DET
       :-  ~
-      :-  %open
-      %^    jam
-          [~ lyf]
-        `gree`!!
-      (sign:as:cry hom)
-    =+  key=(shaz :(mix (mug ham) now eny))
-    :-  [%line ~2018.1.1 key]~
-    :-  %full
-    %^    jam
-        [u.cur.det lyf]
-      `gree`!!
-    (seal:as:cry pub.dat:(~(got by pub.det) u.cur.det) (jam key hom))
+      :-  %OPEN
+      %^    JAM
+          [~ LYF]
+        `GREE`!!
+      (SIGN:AS:CRY HOM)
+    =+  KEY=(SHAZ :(MIX (MUG HAM) NOW ENY))
+    :-  [%LINE ~2018.1.1 KEY]~
+    :-  %FULL
+    %^    JAM
+        [U.CUR.DET LYF]
+      `GREE`!!
+    (SEAL:AS:CRY PUB.DAT:(~(GOT BY PUB.DET) U.CUR.DET) (JAM KEY HOM))
   --
 ::                                                      ::
-::::  rail                                              ::::  message manager
+::::  RAIL                                              ::::  MESSAGE MANAGER
   ::                                                    ::
-++  rail                                                ::
+++  RAIL                                                ::
   =>  |%                                                ::
-      ++  gift                                          ::
-        $%  {$line p/@da q/code}                        ::  sent key
-            {$mack p/bole q/coop}                       ::  message ack
-            {$send p/flap q/rock}                       ::  release packet
+      ++  GIFT                                          ::
+        $%  {$LINE P/@DA Q/CODE}                        ::  SENT KEY
+            {$MACK P/BOLE Q/COOP}                       ::  MESSAGE ACK
+            {$SEND P/FLAP Q/ROCK}                       ::  RELEASE PACKET
         ==                                              ::
-      ++  task                                          ::
-        $%  {$back p/flap q/coop r/@dr}                 ::  raw ack
-            {$mess p/chan q/*}                          ::  send message
-            {$wake $~}                                  ::  random wakeup
+      ++  TASK                                          ::
+        $%  {$BACK P/FLAP Q/COOP R/@DR}                 ::  RAW ACK
+            {$MESS P/CHAN Q/*}                          ::  SEND MESSAGE
+            {$WAKE $~}                                  ::  RANDOM WAKEUP
         ==                                              ::
       --                                                ::
-  =|  $:  $:  $:  her/ship
-                  lyf/life
-                  wyr/(map life ring)
-                  det/pipe
+  =|  $:  $:  $:  HER/SHIP
+                  LYF/LIFE
+                  WYR/(MAP LIFE RING)
+                  DET/PIPE
               ==
-              $:  now/@da
-                  eny/@
+              $:  NOW/@DA
+                  ENY/@
               ==
-              kos/bole
-              mup/_(yawn:pump)
-              fex/(list gift)
+              KOS/BOLE
+              MUP/_(YAWN:PUMP)
+              FEX/(LIST GIFT)
           ==
-          colt
+          COLT
       ==
-  =*  cot  ->
+  =*  COT  ->
   |%                                                    ::
-  ++  abet  [(flop fex) `colt`cot]                      ::  resolve
-  ++  view                                              ::  inspect
+  ++  ABET  [(FLOP FEX) `COLT`COT]                      ::  RESOLVE
+  ++  VIEW                                              ::  INSPECT
     |%                                                  ::
-    ++  bulk                                            ::  queue count
-      ^-  @ud
-      |-(?~(cob 0 :(add 1 $(cob l.cob) $(cob r.cob))))
+    ++  BULK                                            ::  QUEUE COUNT
+      ^-  @UD
+      |-(?~(COB 0 :(ADD 1 $(COB L.COB) $(COB R.COB))))
     ::                                                  ::
-    ++  wait                                            ::  next wakeup
-      ^-  (unit @da)
-      wait:mup
+    ++  WAIT                                            ::  NEXT WAKEUP
+      ^-  (UNIT @DA)
+      WAIT:MUP
     --
   ::
-  ++  work                                              ::
-    |=  job/task                                        ::  compute
+  ++  WORK                                              ::
+    |=  JOB/TASK                                        ::  COMPUTE
     ^+  +>
-    =<  +>:wy-abet:wy-work
+    =<  +>:WY-ABET:WY-WORK
     |%                                                  ::
-    ++  wy-abet  +:wy-able                              ::  resolve
-    ++  wy-able  wy-tire:wy-ably:wy-feed:wy-ably        ::  converge
-    ++  wy-ably                                         ::  drain
+    ++  WY-ABET  +:WY-ABLE                              ::  RESOLVE
+    ++  WY-ABLE  WY-TIRE:WY-ABLY:WY-FEED:WY-ABLY        ::  CONVERGE
+    ++  WY-ABLY                                         ::  DRAIN
       ^+  .
-      =^  fix  myn  abet:mup
-      =.  mup  (yawn:pump myn)
+      =^  FIX  MYN  ABET:MUP
+      =.  MUP  (YAWN:PUMP MYN)
       |-  ^+  +>.$
-      ?~  fix  +>.$
-      $(fix t.fix, +>.$ (wy-abut i.fix))
+      ?~  FIX  +>.$
+      $(FIX T.FIX, +>.$ (WY-ABUT I.FIX))
     ::                                                  ::
-    ++  wy-abut                                         ::  pump effect
-      |=  fic/gift:pump
+    ++  WY-ABUT                                         ::  PUMP EFFECT
+      |=  FIC/GIFT:PUMP
       ^+  +>
-      ?-    -.fic
-          $good
-        ~&  [%ok her `@p`(mug p.fic) r.fic]
-        (wy-good q.fic s.fic)
+      ?-    -.FIC
+          $GOOD
+        ~&  [%OK HER `@P`(MUG P.FIC) R.FIC]
+        (WY-GOOD Q.FIC S.FIC)
       ::
-          $send
-        ~&  [%go her `@p`(mug p.fic) q.fic]
-        +>(fex [[%send p.fic r.fic] fex])
+          $SEND
+        ~&  [%GO HER `@P`(MUG P.FIC) Q.FIC]
+        +>(FEX [[%SEND P.FIC R.FIC] FEX])
       ==
     ::                                                  ::
-    ++  wy-back                                         ::  hear an ack
-      |=  {dam/flap cop/coop lag/@dr}
-      ~&  [%wy-back (flam dam) cop lag]
-      +>(mup (work:mup now %back dam cop lag))
+    ++  WY-BACK                                         ::  HEAR AN ACK
+      |=  {DAM/FLAP COP/COOP LAG/@DR}
+      ~&  [%WY-BACK (FLAM DAM) COP LAG]
+      +>(MUP (WORK:MUP NOW %BACK DAM COP LAG))
     ::                                                  ::
-    ++  wy-feed                                         ::  feed pump
+    ++  WY-FEED                                         ::  FEED PUMP
       ^+  .
-      =^  cly  .  (wy-find want.mup)
-      ~&  [%wy-feed want.mup (lent cly)]
-      +(mup (work:mup now %pack cly))
+      =^  CLY  .  (WY-FIND WANT.MUP)
+      ~&  [%WY-FEED WANT.MUP (LENT CLY)]
+      +(MUP (WORK:MUP NOW %PACK CLY))
     ::                                                  ::
-    ++  wy-find                                         ::  collect packets
-      |=  may/@ud
-      ^-  {(list clue) _+>}
-      =-  [(flop -<) ->]
-      =+  [inx=lac hav=*(list clue)]
-      |-  ^-  {(list clue) _+>.^$}
-      ?:  |(=(0 may) =(inx seq))  [hav +>.^$]
-      =^  hey  +>.^$  (wy-flow inx may hav)
-      $(inx +(inx), may p.hey, hav q.hey)
+    ++  WY-FIND                                         ::  COLLECT PACKETS
+      |=  MAY/@UD
+      ^-  {(LIST CLUE) _+>}
+      =-  [(FLOP -<) ->]
+      =+  [INX=LAC HAV=*(LIST CLUE)]
+      |-  ^-  {(LIST CLUE) _+>.^$}
+      ?:  |(=(0 MAY) =(INX SEQ))  [HAV +>.^$]
+      =^  HEY  +>.^$  (WY-FLOW INX MAY HAV)
+      $(INX +(INX), MAY P.HEY, HAV Q.HEY)
     ::                                                  ::
-    ++  wy-flow                                         ::  collect by message
-      |=  {tiq/tick may/@ud hav/(list clue)}
-      =+  mob=(~(got by cob) tiq)
-      |-  ^-  {(pair @ud (list clue)) _+>.^$}
-      ?:  |(=(0 may) ?=($~ cly.mob))
-        [[may hav] +>.^$(cob (~(put by cob) tiq mob))]
+    ++  WY-FLOW                                         ::  COLLECT BY MESSAGE
+      |=  {TIQ/TICK MAY/@UD HAV/(LIST CLUE)}
+      =+  MOB=(~(GOT BY COB) TIQ)
+      |-  ^-  {(PAIR @UD (LIST CLUE)) _+>.^$}
+      ?:  |(=(0 MAY) ?=($~ CLY.MOB))
+        [[MAY HAV] +>.^$(COB (~(PUT BY COB) TIQ MOB))]
       %=  $
-        may      (dec may)
-        hav      [i.cly.mob hav]
-        cly.mob  t.cly.mob
+        MAY      (DEC MAY)
+        HAV      [I.CLY.MOB HAV]
+        CLY.MOB  T.CLY.MOB
       ==
     ::                                                  ::
-    ++  wy-good                                         ::  message ack
-      |=  {paz/part cop/coop}
+    ++  WY-GOOD                                         ::  MESSAGE ACK
+      |=  {PAZ/PART COP/COOP}
       ^+  +>
-      =+  bum=(~(get by cob) q.paz)
-      ?:  |(?=($~ bum) =(~ cly.u.bum))
-        ~&  [%wy-good-ignore paz ?=($~ cop)]
+      =+  BUM=(~(GET BY COB) Q.PAZ)
+      ?:  |(?=($~ BUM) =(~ CLY.U.BUM))
+        ~&  [%WY-GOOD-IGNORE PAZ ?=($~ COP)]
         +>.$
-      ?^  cop
+      ?^  COP
         ::
-        ::  a failure; save this nack, clear the message
+        ::  A FAILURE; SAVE THIS NACK, CLEAR THE MESSAGE
         ::
-        ~&  [%wy-good-fail q.paz]
+        ~&  [%WY-GOOD-FAIL Q.PAZ]
         %_  +>.$
-          mup  (work:mup now %cull q.paz)
-          cob  (~(put by cob) q.paz u.bum(cly ~, cup `cop))
+          MUP  (WORK:MUP NOW %CULL Q.PAZ)
+          COB  (~(PUT BY COB) Q.PAZ U.BUM(CLY ~, CUP `COP))
         ==
-      ?>  (lth ack.u.bum num.u.bum)
-      =.  ack.u.bum  +(ack.u.bum)
-      =.  cup.u.bum  ?.(=(ack.u.bum num.u.bum) ~ [~ ~])
-      +>.$(cob (~(put by cob) q.paz u.bum))
+      ?>  (LTH ACK.U.BUM NUM.U.BUM)
+      =.  ACK.U.BUM  +(ACK.U.BUM)
+      =.  CUP.U.BUM  ?.(=(ACK.U.BUM NUM.U.BUM) ~ [~ ~])
+      +>.$(COB (~(PUT BY COB) Q.PAZ U.BUM))
     ::                                                  ::
-    ++  wy-mess                                         ::  send
-      |=  {cha/chan val/*}
+    ++  WY-MESS                                         ::  SEND
+      |=  {CHA/CHAN VAL/*}
       ^+  +>
-      =+  yex=((knit her lyf wyr det) now eny [%bond [(mix kos 1) seq] cha val])
-      =.  fex  (weld (flop p.yex) fex)
-      ~&  [?:(=(0 (end 0 1 kos)) %tx %bx) her kos seq cha (lent fex)]
+      =+  YEX=((KNIT HER LYF WYR DET) NOW ENY [%BOND [(MIX KOS 1) SEQ] CHA VAL])
+      =.  FEX  (WELD (FLOP P.YEX) FEX)
+      ~&  [?:(=(0 (END 0 1 KOS)) %TX %BX) HER KOS SEQ CHA (LENT FEX)]
       %_    +>.$
-          seq  +(seq)
-          cob
-        %+  ~(put by cob)
-          seq
-        ^-  comb
+          SEQ  +(SEQ)
+          COB
+        %+  ~(PUT BY COB)
+          SEQ
+        ^-  COMB
         :*  ~
-            cha
-            (lent q.yex)
+            CHA
+            (LENT Q.YEX)
             0
-            =+  inx=0
-            |-  ?~  q.yex  ~
-                :_  $(q.yex +.q.yex, inx +(inx))
-                [& [inx seq] (shaf %flap i.q.yex) i.q.yex]
+            =+  INX=0
+            |-  ?~  Q.YEX  ~
+                :_  $(Q.YEX +.Q.YEX, INX +(INX))
+                [& [INX SEQ] (SHAF %FLAP I.Q.YEX) I.Q.YEX]
         ==
       ==
     ::                                                  ::
-    ++  wy-tire                                         ::  report results
+    ++  WY-TIRE                                         ::  REPORT RESULTS
       |-  ^+  +
-      =+  zup=(~(get by cob) lac)
-      ?~  zup  +.$
-      ?~  cup.u.zup  +.$
-      ~&  [?:(=(0 (end 0 1 kos)) %ta %ba) her kos lac]
+      =+  ZUP=(~(GET BY COB) LAC)
+      ?~  ZUP  +.$
+      ?~  CUP.U.ZUP  +.$
+      ~&  [?:(=(0 (END 0 1 KOS)) %TA %BA) HER KOS LAC]
       %=  $
-        lac  +(lac)
-        cob  (~(del by cob) lac)
-        fex  :_(fex [%mack kos `coop`u.cup.u.zup])
+        LAC  +(LAC)
+        COB  (~(DEL BY COB) LAC)
+        FEX  :_(FEX [%MACK KOS `COOP`U.CUP.U.ZUP])
       ==
     ::                                                  ::
-    ++  wy-wake                                         ::  timeout
+    ++  WY-WAKE                                         ::  TIMEOUT
       ^+  .
-      .(mup (work:mup now %wake ~))
+      .(MUP (WORK:MUP NOW %WAKE ~))
     ::
-    ++  wy-work
+    ++  WY-WORK
       ^+  .
-      ?-  -.job
-        $back  (wy-back +.job)
-        $mess  (wy-mess +.job)
-        $wake  wy-wake
+      ?-  -.JOB
+        $BACK  (WY-BACK +.JOB)
+        $MESS  (WY-MESS +.JOB)
+        $WAKE  WY-WAKE
       ==
     --
   ::                                                    ::
-  ++  zeal                                              ::  default state
-    ^-  colt
-    :*  0     ::  seq/tick
-        0     ::  lac/tick
-        ~     ::  cob/(map tick comb)
-        ^-  mini
-        :*  ^-  stat
-            :*  :*  0               :: cur/@ud
-                    2               :: max/@ud
-                    0               :: rey/@ud
+  ++  ZEAL                                              ::  DEFAULT STATE
+    ^-  COLT
+    :*  0     ::  SEQ/TICK
+        0     ::  LAC/TICK
+        ~     ::  COB/(MAP TICK COMB)
+        ^-  MINI
+        :*  ^-  STAT
+            :*  :*  0               :: CUR/@UD
+                    2               :: MAX/@UD
+                    0               :: REY/@UD
                 ==
-                :*  ~s5             :: rtt/@dr
-                    ~2010.1.1       :: las/@da
-                    ~2010.1.1       :: lad/@da
+                :*  ~S5             :: RTT/@DR
+                    ~2010.1.1       :: LAS/@DA
+                    ~2010.1.1       :: LAD/@DA
             ==  ==
           ~
           ~
@@ -1162,144 +1162,144 @@
 --
   .  ==
 ::                                                      ::
-::::                                                    ::::  kernel interface
+::::                                                    ::::  KERNEL INTERFACE
   ::                                                    ::
-=|  $:  syl/silo                                        ::  kernel state
+=|  $:  SYL/SILO                                        ::  KERNEL STATE
     ==                                                  ::
-|=  {now/@da eny/@ ski/sley}                            ::  current invocation
+|=  {NOW/@DA ENY/@ SKI/SLEY}                            ::  CURRENT INVOCATION
 =>  |%
-    ++  love  ~(. loft [now eny] syl ~)                 ::  create loft
-    ++  lung                                            ::  gift to move
-      |=  gax/gift:loft
-      ^-  move
-      ?-    -.gax
-          $east  [p.gax %give [%east s.gax]]
-          $home  [~ %give gax]
-          $link  [~ %pass ~ %j gax]
-          $line  [~ %pass ~ %j gax]
-          $meet  [~ %pass ~ %j gax]
-          $rest  [p.gax %give %rest q.gax]
-          $send  [~ %give gax]
-          $veil  [~ %pass /det/(scot %p p.gax) %j gax]
-          $west
-        =+  pax=/msg/(scot %p p.gax)/(scot %ud q.gax)
-        =+  cad=[%west p.gax +.r.gax s.gax]
-        =+  dat=?+(-.r.gax !! $c [%c cad], $e [%e cad], $g [%g cad])
-        [~ %pass pax dat]
+    ++  LOVE  ~(. LOFT [NOW ENY] SYL ~)                 ::  CREATE LOFT
+    ++  LUNG                                            ::  GIFT TO MOVE
+      |=  GAX/GIFT:LOFT
+      ^-  MOVE
+      ?-    -.GAX
+          $EAST  [P.GAX %GIVE [%EAST S.GAX]]
+          $HOME  [~ %GIVE GAX]
+          $LINK  [~ %PASS ~ %J GAX]
+          $LINE  [~ %PASS ~ %J GAX]
+          $MEET  [~ %PASS ~ %J GAX]
+          $REST  [P.GAX %GIVE %REST Q.GAX]
+          $SEND  [~ %GIVE GAX]
+          $VEIL  [~ %PASS /DET/(SCOT %P P.GAX) %J GAX]
+          $WEST
+        =+  PAX=/MSG/(SCOT %P P.GAX)/(SCOT %UD Q.GAX)
+        =+  CAD=[%WEST P.GAX +.R.GAX S.GAX]
+        =+  DAT=?+(-.R.GAX !! $C [%C CAD], $E [%E CAD], $G [%G CAD])
+        [~ %PASS PAX DAT]
       ==
     ::
-    ++  work
-      |=  job/task:loft
-      ^-  {(list move) q/_..^$}
-      =^  fex  syl  abet:(apex:love job)
-      [(turn fex lung) ..^$]
+    ++  WORK
+      |=  JOB/TASK:LOFT
+      ^-  {(LIST MOVE) Q/_..^$}
+      =^  FEX  SYL  ABET:(APEX:LOVE JOB)
+      [(TURN FEX LUNG) ..^$]
     --
-|%                                                    ::  vane interface
-++  neon
-  |=  our/ship
-  ^-  (vane task:able gift:able sign:able note:able silo silo)
-  =|  syl/silo
+|%                                                    ::  VANE INTERFACE
+++  NEON
+  |=  OUR/SHIP
+  ^-  (VANE TASK:ABLE GIFT:ABLE SIGN:ABLE NOTE:ABLE SILO SILO)
+  =|  SYL/SILO
   |%
-  ++  load  |=(silo +>)
-  ++  stay  syl
-  ++  plow
-    =|  $:  now/@da
-            eny/@e
-            sky/roof
+  ++  LOAD  |=(SILO +>)
+  ++  STAY  SYL
+  ++  PLOW
+    =|  $:  NOW/@DA
+            ENY/@E
+            SKY/ROOF
         ==
     |%
-    ++  doze  ~
-    ++  peek
-      |=  $:  lyc/(unit (set ship))
-              car/term
-              bem/beam
+    ++  DOZE  ~
+    ++  PEEK
+      |=  $:  LYC/(UNIT (SET SHIP))
+              CAR/TERM
+              BEM/BEAM
           ==
-      ^-  (unit (unit (cask vase)))
+      ^-  (UNIT (UNIT (CASK VASE)))
       ~
     ::
-    ++  spin
-      =|  $:  hen/duct
-              moz/(list move)
+    ++  SPIN
+      =|  $:  HEN/DUCT
+              MOZ/(LIST MOVE)
           ==
       |%
-      ++  call
-        |=  tac/task:able
+      ++  CALL
+        |=  TAC/TASK:ABLE
         ^+  +>
-        =*  job  ^-  task:loft
-            ?-  -.tac
-              $hear  tac
-              $mess  [%mess p.tac hen q.tac r.tac]
-              $wake  tac
+        =*  JOB  ^-  TASK:LOFT
+            ?-  -.TAC
+              $HEAR  TAC
+              $MESS  [%MESS P.TAC HEN Q.TAC R.TAC]
+              $WAKE  TAC
             ==
-        =^  fex  syl  abet:(apex:love job)
-        +>.$(moz (weld (turn fex lung) moz))
+        =^  FEX  SYL  ABET:(APEX:LOVE JOB)
+        +>.$(MOZ (WELD (TURN FEX LUNG) MOZ))
       ::
-      ++  take
-        |=  {tea/wire hin/sign:able}
-        =*  job  ^-  task:loft
-          ?+    -.tea  !!
-              $msg
-            ?>  ?=({@ @ $~} +.tea)
-            =+  [who kos]=[(slav %p i.t.tea) (slav %ud i.t.t.tea)]
-            ?-  +<.hin
-                $rend
-              [%rend who kos p.+.hin q.+.hin]
-                $mack
-              [%done who kos ?~(p.+.hin ~ `coop`[~ `[%fail u.p.+.hin]])]
+      ++  TAKE
+        |=  {TEA/WIRE HIN/SIGN:ABLE}
+        =*  JOB  ^-  TASK:LOFT
+          ?+    -.TEA  !!
+              $MSG
+            ?>  ?=({@ @ $~} +.TEA)
+            =+  [WHO KOS]=[(SLAV %P I.T.TEA) (SLAV %UD I.T.T.TEA)]
+            ?-  +<.HIN
+                $REND
+              [%REND WHO KOS P.+.HIN Q.+.HIN]
+                $MACK
+              [%DONE WHO KOS ?~(P.+.HIN ~ `COOP`[~ `[%FAIL U.P.+.HIN]])]
             ==
           ==
-        =^  fex  syl  abet:(apex:love job)
-        +>.$(moz (weld (turn fex lung) moz))
+        =^  FEX  SYL  ABET:(APEX:LOVE JOB)
+        +>.$(MOZ (WELD (TURN FEX LUNG) MOZ))
       --
     --
   --
-++  call                                              ::  handle request
-  |=  $:  hen/duct
-          hic/(hypo task:able:xmas)
+++  CALL                                              ::  HANDLE REQUEST
+  |=  $:  HEN/DUCT
+          HIC/(HYPO TASK:ABLE:XMAS)
       ==
-  ^-  {p/(list move) q/_..^$}
-  %-  work
-  ^-  task:loft
-  ?-  -.q.hic
-    $hear  q.hic
-    $mess  [%mess p.q.hic hen q.q.hic r.q.hic]
-    $wake  q.hic
+  ^-  {P/(LIST MOVE) Q/_..^$}
+  %-  WORK
+  ^-  TASK:LOFT
+  ?-  -.Q.HIC
+    $HEAR  Q.HIC
+    $MESS  [%MESS P.Q.HIC HEN Q.Q.HIC R.Q.HIC]
+    $WAKE  Q.HIC
   ==
 ::
-++  doze
-  |=  {now/@da hen/duct}
-  ^-  (unit @da)
-  doze:love
+++  DOZE
+  |=  {NOW/@DA HEN/DUCT}
+  ^-  (UNIT @DA)
+  DOZE:LOVE
 ::
-++  load
-  |=  old/silo
+++  LOAD
+  |=  OLD/SILO
   ^+  ..^$
-  ..^$(syl old)
+  ..^$(SYL OLD)
 ::
-++  scry
-  |=  {fur/(unit (set monk)) ren/@tas why/shop syd/desk lot/coin tyl/path}
-  ^-  (unit (unit cage))
+++  SCRY
+  |=  {FUR/(UNIT (SET MONK)) REN/@TAS WHY/SHOP SYD/DESK LOT/COIN TYL/PATH}
+  ^-  (UNIT (UNIT CAGE))
   ~
 ::
-++  stay  syl
-++  take                                            ::  accept response
-  |=  {tea/wire hen/duct hin/(hypo sign-arvo)}
-  ^-  {p/(list move) q/_..^$}
-  %-  work
-  ?+    -.tea  !!
-      $msg
-    ?>  ?=({@ @ $~} +.tea)
-    =+  [who kos]=[(slav %p i.t.tea) (slav %ud i.t.t.tea)]
-    ?>  ?=(?($rend $mack) +<.q.hin)
-    ?-  +<.q.hin
-      $rend  [%rend who kos p.+.q.hin q.+.q.hin]
-      $mack  [%done who kos ?~(p.+.q.hin ~ `coop`[~ `[%fail u.p.+.q.hin]])]
+++  STAY  SYL
+++  TAKE                                            ::  ACCEPT RESPONSE
+  |=  {TEA/WIRE HEN/DUCT HIN/(HYPO SIGN-ARVO)}
+  ^-  {P/(LIST MOVE) Q/_..^$}
+  %-  WORK
+  ?+    -.TEA  !!
+      $MSG
+    ?>  ?=({@ @ $~} +.TEA)
+    =+  [WHO KOS]=[(SLAV %P I.T.TEA) (SLAV %UD I.T.T.TEA)]
+    ?>  ?=(?($REND $MACK) +<.Q.HIN)
+    ?-  +<.Q.HIN
+      $REND  [%REND WHO KOS P.+.Q.HIN Q.+.Q.HIN]
+      $MACK  [%DONE WHO KOS ?~(P.+.Q.HIN ~ `COOP`[~ `[%FAIL U.P.+.Q.HIN]])]
     ==
   ::
-      $det
-    ?>  ?=({@ $~} +.tea)
-    =+  who=(slav %p i.t.tea)
-    ?>  ?=($veil +<.q.hin)
-    [%clue who p.+.q.hin]
+      $DET
+    ?>  ?=({@ $~} +.TEA)
+    =+  WHO=(SLAV %P I.T.TEA)
+    ?>  ?=($VEIL +<.Q.HIN)
+    [%CLUE WHO P.+.Q.HIN]
   ==
 --

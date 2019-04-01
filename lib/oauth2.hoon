@@ -1,417 +1,417 @@
-::  OAuth 2.0 %authorization
+::  OAUTH 2.0 %AUTHORIZATION
 ::
-::::  /hoon/oauth2/lib
+::::  /HOON/OAUTH2/LIB
   ::
-/+    hep-to-cab, interpolate
-=,  eyre
-=,  mimes:html
-=,  html
-=,  format
+/+    HEP-TO-CAB, INTERPOLATE
+=,  EYRE
+=,  MIMES:HTML
+=,  HTML
+=,  FORMAT
 |%
-++  parse-url  parse-url:interpolate
-++  join
-  |=  {a/cord b/(list cord)}
-  ?~  b  ''
-  (rap 3 |-([i.b ?~(t.b ~ [a $(b t.b)])]))
+++  PARSE-URL  PARSE-URL:INTERPOLATE
+++  JOIN
+  |=  {A/CORD B/(LIST CORD)}
+  ?~  B  ''
+  (RAP 3 |-([I.B ?~(T.B ~ [A $(B T.B)])]))
 ::
-++  post-quay
-  |=  {a/purl b/quay}  ^-  hiss
-  =.  b  (quay:hep-to-cab b)
-  =-  [a %post - ?~(b ~ (some (as-octt +:(tail:en-purl b))))]
-  %^  my
-    :+  %accept
-      'application/json'
+++  POST-QUAY
+  |=  {A/PURL B/QUAY}  ^-  HISS
+  =.  B  (QUAY:HEP-TO-CAB B)
+  =-  [A %POST - ?~(B ~ (SOME (AS-OCTT +:(TAIL:EN-PURL B))))]
+  %^  MY
+    :+  %ACCEPT
+      'APPLICATION/JSON'
     ~
-    :+  %content-type
-      'application/x-www-form-urlencoded'
+    :+  %CONTENT-TYPE
+      'APPLICATION/X-WWW-FORM-URLENCODED'
     ~
     ~
 ::
-++  mean-wall  !.
-  |=  {a/term b/tape}  ^+  !!
-  =-  (mean (flop `tang`[>a< -]))
-  (turn (to-wain (crip b)) |=(c/cord leaf+(trip c)))
+++  MEAN-WALL  !.
+  |=  {A/TERM B/TAPE}  ^+  !!
+  =-  (MEAN (FLOP `TANG`[>A< -]))
+  (TURN (TO-WAIN (CRIP B)) |=(C/CORD LEAF+(TRIP C)))
 ::
-++  bad-response  |=(a/@u ?:(=(2 (div a 100)) | ~&(bad-httr+a &)))
-++  grab-json
-  |*  {a/httr b/fist:dejs-soft:format}
-  ~|  bad-json+r.a
-  ~|  (de-json q:(need r.a))
-  (need (;~(biff de-json b) q:(need r.a)))
+++  BAD-RESPONSE  |=(A/@U ?:(=(2 (DIV A 100)) | ~&(BAD-HTTR+A &)))
+++  GRAB-JSON
+  |*  {A/HTTR B/FIST:DEJS-SOFT:FORMAT}
+  ~|  BAD-JSON+R.A
+  ~|  (DE-JSON Q:(NEED R.A))
+  (NEED (;~(BIFF DE-JSON B) Q:(NEED R.A)))
 --
 ::
 ::::
   ::
-:: XX belongs back in zuse
+:: XX BELONGS BACK IN ZUSE
 |%
-++  pack                                                ::  light path encoding
-  |=  {a/term b/path}  ^-  knot
-  %+  rap  3  :-  (wack a)
-  (turn b |=(c/knot (cat 3 '_' (wack c))))
+++  PACK                                                ::  LIGHT PATH ENCODING
+  |=  {A/TERM B/PATH}  ^-  KNOT
+  %+  RAP  3  :-  (WACK A)
+  (TURN B |=(C/KNOT (CAT 3 '_' (WACK C))))
 ::
-++  pick                                                ::  light path decoding
-  =+  fel=(most cab (sear wick urt:ab))
-  |=(a/knot `(unit {p/term q/path})`(rush a fel))
+++  PICK                                                ::  LIGHT PATH DECODING
+  =+  FEL=(MOST CAB (SEAR WICK URT:AB))
+  |=(A/KNOT `(UNIT {P/TERM Q/PATH})`(RUSH A FEL))
 ::
 --
 ::
 ::::
   ::
 |%
-++  token  ?(~ @t)
-++  refresh  {tok/token expiry/@da pending/_`?`|}
-++  both-tokens  {token refresh}
-++  keys  cord:{cid/@t cis/@t}
+++  TOKEN  ?(~ @T)
+++  REFRESH  {TOK/TOKEN EXPIRY/@DA PENDING/_`?`|}
+++  BOTH-TOKENS  {TOKEN REFRESH}
+++  KEYS  CORD:{CID/@T CIS/@T}
 --
 ::
 ::::
   ::
-=+  state-usr=|
-|_  {(bale:eyre keys) tok/token}
-++  client-id      cid:decode-keys
-++  client-secret  cis:decode-keys
-++  decode-keys                       :: XX from bale:eyre w/ typed %jael
-  ^-  {cid/@t cis/@t ~}
-  ?.  =(~ `@`key)
-    ~|  %oauth-bad-keys
-    ((hard {cid/@t cis/@t ~}) (to-wain key))
-  %+  mean-wall  %oauth-no-keys
+=+  STATE-USR=|
+|_  {(BALE:EYRE KEYS) TOK/TOKEN}
+++  CLIENT-ID      CID:DECODE-KEYS
+++  CLIENT-SECRET  CIS:DECODE-KEYS
+++  DECODE-KEYS                       :: XX FROM BALE:EYRE W/ TYPED %JAEL
+  ^-  {CID/@T CIS/@T ~}
+  ?.  =(~ `@`KEY)
+    ~|  %OAUTH-BAD-KEYS
+    ((HARD {CID/@T CIS/@T ~}) (TO-WAIN KEY))
+  %+  MEAN-WALL  %OAUTH-NO-KEYS
   """
-  Run |init-oauth2 {<`path`dom>}
-  If necessary, obtain client keys configured for a redirect_uri of
-    {(trip redirect-uri)}
+  RUN |INIT-OAUTH2 {<`PATH`DOM>}
+  IF NECESSARY, OBTAIN CLIENT KEYS CONFIGURED FOR A REDIRECT_URI OF
+    {(TRIP REDIRECT-URI)}
   """
 ::
-++  auth-url
-  |=  {scopes/(list @t) url/$@(@t purl)}  ^-  purl
-  ~&  [%oauth-warning "Make sure this urbit ".
-                      "is running on {(en-purl our-host `~ ~)}"]
-  %+  add-query:interpolate  url
-  %-  quay:hep-to-cab
-  :~  state+?.(state-usr '' (pack usr /''))
-      client-id+client-id
-      redirect-uri+redirect-uri
-      scope+(join ' ' scopes)
+++  AUTH-URL
+  |=  {SCOPES/(LIST @T) URL/$@(@T PURL)}  ^-  PURL
+  ~&  [%OAUTH-WARNING "MAKE SURE THIS URBIT ".
+                      "IS RUNNING ON {(EN-PURL OUR-HOST `~ ~)}"]
+  %+  ADD-QUERY:INTERPOLATE  URL
+  %-  QUAY:HEP-TO-CAB
+  :~  STATE+?.(STATE-USR '' (PACK USR /''))
+      CLIENT-ID+CLIENT-ID
+      REDIRECT-URI+REDIRECT-URI
+      SCOPE+(JOIN ' ' SCOPES)
   ==
 ::
-::  XX duplicated from eyre
-++  pack                                                ::  light path encoding
-  |=  {a/term b/path}  ^-  knot
-  %+  rap  3  :-  (wack a)
-  (turn b |=(c/knot (cat 3 '_' (wack c))))
+::  XX DUPLICATED FROM EYRE
+++  PACK                                                ::  LIGHT PATH ENCODING
+  |=  {A/TERM B/PATH}  ^-  KNOT
+  %+  RAP  3  :-  (WACK A)
+  (TURN B |=(C/KNOT (CAT 3 '_' (WACK C))))
 ::
-++  our-host  .^(hart %e /(scot %p our)/host/real)
-++  redirect-uri
-  %-    crip    %-  en-purl
-  %^  into-url:interpolate  'https://our-host/~/ac/:domain/:user/in'
-    `our-host
-  :~  domain+(join '.' (flop dom))
-      user+?:(state-usr '_state' (scot %ta usr))
+++  OUR-HOST  .^(HART %E /(SCOT %P OUR)/HOST/REAL)
+++  REDIRECT-URI
+  %-    CRIP    %-  EN-PURL
+  %^  INTO-URL:INTERPOLATE  'HTTPS://OUR-HOST/~/AC/:DOMAIN/:USER/IN'
+    `OUR-HOST
+  :~  DOMAIN+(JOIN '.' (FLOP DOM))
+      USER+?:(STATE-USR '_STATE' (SCOT %TA USR))
   ==
 ::
 ::
-++  request-token
-  |=  {a/$@(@t purl) grant-type/cord quy/quay}  ^-  hiss
-  %+  post-quay  (parse-url a)
-  %-  quay:hep-to-cab
-  %+  welp  quy
-  :~  client-id+client-id
-      client-secret+client-secret
-      redirect-uri+redirect-uri
-      grant-type+grant-type
+++  REQUEST-TOKEN
+  |=  {A/$@(@T PURL) GRANT-TYPE/CORD QUY/QUAY}  ^-  HISS
+  %+  POST-QUAY  (PARSE-URL A)
+  %-  QUAY:HEP-TO-CAB
+  %+  WELP  QUY
+  :~  CLIENT-ID+CLIENT-ID
+      CLIENT-SECRET+CLIENT-SECRET
+      REDIRECT-URI+REDIRECT-URI
+      GRANT-TYPE+GRANT-TYPE
   ==
 ::
-++  request-token-by-code
-  |=({a/$@(@t purl) b/@t} (request-token a 'authorization_code' code+b ~))
+++  REQUEST-TOKEN-BY-CODE
+  |=({A/$@(@T PURL) B/@T} (REQUEST-TOKEN A 'AUTHORIZATION_CODE' CODE+B ~))
 ::
-++  grab-token
-  |=  a/httr  ^-  axs/@t
-  (grab-json a (ot 'access_token'^so ~):dejs-soft:format)
+++  GRAB-TOKEN
+  |=  A/HTTR  ^-  AXS/@T
+  (GRAB-JSON A (OT 'ACCESS_TOKEN'^SO ~):DEJS-SOFT:FORMAT)
 ::
-++  grab-expiring-token
-  |=  a/httr  ^-  {axs/@t exp/@u}
-  (grab-json a (ot 'access_token'^so 'expires_in'^ni ~):dejs-soft:format)
+++  GRAB-EXPIRING-TOKEN
+  |=  A/HTTR  ^-  {AXS/@T EXP/@U}
+  (GRAB-JSON A (OT 'ACCESS_TOKEN'^SO 'EXPIRES_IN'^NI ~):DEJS-SOFT:FORMAT)
 ::
-++  grab-both-tokens
-  |=  a/httr  ^-  {axs/@t exp/@u ref/@t}
-  %+  grab-json  a
-  =,  dejs-soft:format
-  (ot 'access_token'^so 'expires_in'^ni 'refresh_token'^so ~)
+++  GRAB-BOTH-TOKENS
+  |=  A/HTTR  ^-  {AXS/@T EXP/@U REF/@T}
+  %+  GRAB-JSON  A
+  =,  DEJS-SOFT:FORMAT
+  (OT 'ACCESS_TOKEN'^SO 'EXPIRES_IN'^NI 'REFRESH_TOKEN'^SO ~)
 ::
-++  auth
-  ?~  tok  ~|(%no-bearer-token !!)
+++  AUTH
+  ?~  TOK  ~|(%NO-BEARER-TOKEN !!)
   |%
-  ++  header  `cord`(cat 3 'Bearer ' `@t`tok)
-  ++  query   `cord`tok
+  ++  HEADER  `CORD`(CAT 3 'BEARER ' `@T`TOK)
+  ++  QUERY   `CORD`TOK
   --
 ::
-++  add-auth-header
-  |=  request/{url/purl meth hed/math (unit octs)}
-  ^+  request
-  ::  =.  p.url.request  [| `6.000 [%& /localhost]]       ::  for use with unix nc
-  ~&  add-auth-header+(en-purl url.request)
-  request(hed (~(add ja hed.request) %authorization header:auth))
+++  ADD-AUTH-HEADER
+  |=  REQUEST/{URL/PURL METH HED/MATH (UNIT OCTS)}
+  ^+  REQUEST
+  ::  =.  P.URL.REQUEST  [| `6.000 [%& /LOCALHOST]]       ::  FOR USE WITH UNIX NC
+  ~&  ADD-AUTH-HEADER+(EN-PURL URL.REQUEST)
+  REQUEST(HED (~(ADD JA HED.REQUEST) %AUTHORIZATION HEADER:AUTH))
 ::
-++  add-auth-query
-  |=  {token-name/cord request/{url/purl meth math (unit octs)}}
-  ^+  request
-  ::  =.  p.url.request  [| `6.000 [%& /localhost]]       ::  for use with unix nc
-  ~&  add-auth-query+(en-purl url.request)
-  request(r.url [[token-name query:auth] r.url.request])
+++  ADD-AUTH-QUERY
+  |=  {TOKEN-NAME/CORD REQUEST/{URL/PURL METH MATH (UNIT OCTS)}}
+  ^+  REQUEST
+  ::  =.  P.URL.REQUEST  [| `6.000 [%& /LOCALHOST]]       ::  FOR USE WITH UNIX NC
+  ~&  ADD-AUTH-QUERY+(EN-PURL URL.REQUEST)
+  REQUEST(R.URL [[TOKEN-NAME QUERY:AUTH] R.URL.REQUEST])
 ::
-++  re
-  |_  ref/refresh
-  ++  needs-refresh  ?~(tok.ref | is-expired)
-  ++  is-expired  (lth expiry.ref (add now ~m5))
-  ++  update
-    |=  exp/@u  ^+  ref
-    ref(pending |, expiry (add now (mul ~s1 exp)))
+++  RE
+  |_  REF/REFRESH
+  ++  NEEDS-REFRESH  ?~(TOK.REF | IS-EXPIRED)
+  ++  IS-EXPIRED  (LTH EXPIRY.REF (ADD NOW ~M5))
+  ++  UPDATE
+    |=  EXP/@U  ^+  REF
+    REF(PENDING |, EXPIRY (ADD NOW (MUL ~S1 EXP)))
   ::
-  ++  update-if-needed
-    |=  exchange-url/$@(@t purl)
-    ^-  {(unit hiss) refresh}
-    ?~  tok.ref  `ref
-    ?.  is-expired  `ref
-    :_  ref(pending &)
-    `(request-token exchange-url 'refresh_token' refresh-token+tok.ref ~)
+  ++  UPDATE-IF-NEEDED
+    |=  EXCHANGE-URL/$@(@T PURL)
+    ^-  {(UNIT HISS) REFRESH}
+    ?~  TOK.REF  `REF
+    ?.  IS-EXPIRED  `REF
+    :_  REF(PENDING &)
+    `(REQUEST-TOKEN EXCHANGE-URL 'REFRESH_TOKEN' REFRESH-TOKEN+TOK.REF ~)
   --
 ::
-::  expected semantics, to be copied and modified if anything doesn't work
-++  standard
-  |*  {done/* save/$-(token *)}
+::  EXPECTED SEMANTICS, TO BE COPIED AND MODIFIED IF ANYTHING DOESN'T WORK
+++  STANDARD
+  |*  {DONE/* SAVE/$-(TOKEN *)}
   |%
-  ++  save  ^-($-(token _done) ^save)                   ::  shadow(type canary)
-  ++  core-move  $^({sec-move _done} sec-move)          ::  stateful
+  ++  SAVE  ^-($-(TOKEN _DONE) ^SAVE)                   ::  SHADOW(TYPE CANARY)
+  ++  CORE-MOVE  $^({SEC-MOVE _DONE} SEC-MOVE)          ::  STATEFUL
   ::
-  ::  Insert token into query string. expects:
-  ::    ++  in   (in-code-to-token 'http://...')        ::  handle callback
-  ++  out-add-query-param
-    |=  {token-name/knot scopes/(list cord) dialog/$@(@t purl)}
+  ::  INSERT TOKEN INTO QUERY STRING. EXPECTS:
+  ::    ++  IN   (IN-CODE-TO-TOKEN 'HTTP://...')        ::  HANDLE CALLBACK
+  ++  OUT-ADD-QUERY-PARAM
+    |=  {TOKEN-NAME/KNOT SCOPES/(LIST CORD) DIALOG/$@(@T PURL)}
     ::
-    |=  a/hiss  ^-  $%({$send hiss} {$show purl})
-    ?~  tok  [%show (auth-url scopes dialog)]
-    [%send (add-auth-query token-name a)]
+    |=  A/HISS  ^-  $%({$SEND HISS} {$SHOW PURL})
+    ?~  TOK  [%SHOW (AUTH-URL SCOPES DIALOG)]
+    [%SEND (ADD-AUTH-QUERY TOKEN-NAME A)]
   ::
-  ::  Add token as a header. expects:
-  ::    ++  in   (in-code-to-token 'http://...')        ::  handle callback
-  ++  out-add-header
-    |=  {scopes/(list cord) dialog/$@(@t purl)}
+  ::  ADD TOKEN AS A HEADER. EXPECTS:
+  ::    ++  IN   (IN-CODE-TO-TOKEN 'HTTP://...')        ::  HANDLE CALLBACK
+  ++  OUT-ADD-HEADER
+    |=  {SCOPES/(LIST CORD) DIALOG/$@(@T PURL)}
     ::
-    |=  a/hiss  ^-  sec-move
-    ?~  tok  [%show (auth-url scopes dialog)]
-    [%send (add-auth-header a)]
+    |=  A/HISS  ^-  SEC-MOVE
+    ?~  TOK  [%SHOW (AUTH-URL SCOPES DIALOG)]
+    [%SEND (ADD-AUTH-HEADER A)]
   ::
-  ::  Exchange code in query string for access token. expects:
-  ::    ++  bak  bak-save-token                         :: save access token
-  ++  in-code-to-token
-    |=  exchange-url/$@(@t purl)
+  ::  EXCHANGE CODE IN QUERY STRING FOR ACCESS TOKEN. EXPECTS:
+  ::    ++  BAK  BAK-SAVE-TOKEN                         :: SAVE ACCESS TOKEN
+  ++  IN-CODE-TO-TOKEN
+    |=  EXCHANGE-URL/$@(@T PURL)
     ::
-    |=  a/quay  ^-  sec-move
-    =+  code=~|(%no-code (~(got by (malt a)) %code))
-    [%send (request-token-by-code exchange-url code)]
+    |=  A/QUAY  ^-  SEC-MOVE
+    =+  CODE=~|(%NO-CODE (~(GOT BY (MALT A)) %CODE))
+    [%SEND (REQUEST-TOKEN-BY-CODE EXCHANGE-URL CODE)]
   ::
-  ::  If an access token has been returned, save it
-  ++  bak-save-token
-    |=  a/httr  ^-  core-move
-    ?:  (bad-response p.a)
-      [%give a]  :: [%redo ~]  ::  handle 4xx?
-    [[%redo ~] (save `token`(grab-token a))]
+  ::  IF AN ACCESS TOKEN HAS BEEN RETURNED, SAVE IT
+  ++  BAK-SAVE-TOKEN
+    |=  A/HTTR  ^-  CORE-MOVE
+    ?:  (BAD-RESPONSE P.A)
+      [%GIVE A]  :: [%REDO ~]  ::  HANDLE 4XX?
+    [[%REDO ~] (SAVE `TOKEN`(GRAB-TOKEN A))]
   --
 ::
-++  standard-refreshing
-  |*  {done/* ref/refresh save/$-({token refresh} *)}
-  =+  s=(standard done |=(tok/token (save tok ref)))
+++  STANDARD-REFRESHING
+  |*  {DONE/* REF/REFRESH SAVE/$-({TOKEN REFRESH} *)}
+  =+  S=(STANDARD DONE |=(TOK/TOKEN (SAVE TOK REF)))
   |%
-  ++  save  ^-($-(both-tokens _done) ^save)             ::  shadow(type canary)
-  ++  core-move  $^({sec-move _done} sec-move)          ::  stateful
+  ++  SAVE  ^-($-(BOTH-TOKENS _DONE) ^SAVE)             ::  SHADOW(TYPE CANARY)
+  ++  CORE-MOVE  $^({SEC-MOVE _DONE} SEC-MOVE)          ::  STATEFUL
   ::
-  ::  See ++out-add-query-param:standard
-  ::  Refresh token if we have an expired one, ask for authentication if none is present,
-  ::  insert auth token into the query string if it's valid. expects:
-  ::    ++  in   (in-code-to-token 'http://...')        ::  handle callback
-  ::    ++  res  res-save-after-refresh
-  ++  out-refresh-or-add-query-param
-    |=  {exchange/$@(@t purl) s-args/{knot (list cord) $@(@t purl)}}
+  ::  SEE ++OUT-ADD-QUERY-PARAM:STANDARD
+  ::  REFRESH TOKEN IF WE HAVE AN EXPIRED ONE, ASK FOR AUTHENTICATION IF NONE IS PRESENT,
+  ::  INSERT AUTH TOKEN INTO THE QUERY STRING IF IT'S VALID. EXPECTS:
+  ::    ++  IN   (IN-CODE-TO-TOKEN 'HTTP://...')        ::  HANDLE CALLBACK
+  ::    ++  RES  RES-SAVE-AFTER-REFRESH
+  ++  OUT-REFRESH-OR-ADD-QUERY-PARAM
+    |=  {EXCHANGE/$@(@T PURL) S-ARGS/{KNOT (LIST CORD) $@(@T PURL)}}
     ::
-    |=  a/hiss  ^-  core-move
-    =^  upd  ref  (~(update-if-needed re ref) exchange)
-    ?^  upd  [[%send u.upd] (save tok ref)]
-    %.(a (out-add-query-param.s s-args))
+    |=  A/HISS  ^-  CORE-MOVE
+    =^  UPD  REF  (~(UPDATE-IF-NEEDED RE REF) EXCHANGE)
+    ?^  UPD  [[%SEND U.UPD] (SAVE TOK REF)]
+    %.(A (OUT-ADD-QUERY-PARAM.S S-ARGS))
   ::
-  ::  See ++out-add-header:standard
-  ::  Refresh token if we have an expired one, ask for authentication if none is present,
-  ::  add token as a header if it's valid. expects:
-  ::    ++  in   (in-code-to-token 'http://...')        ::  handle callback
-  ::    ++  res  res-save-after-refresh
-  ++  out-refresh-or-add-header
-    |=  {exchange/$@(@t purl) s-args/{(list cord) dialog/$@(@t purl)}}
+  ::  SEE ++OUT-ADD-HEADER:STANDARD
+  ::  REFRESH TOKEN IF WE HAVE AN EXPIRED ONE, ASK FOR AUTHENTICATION IF NONE IS PRESENT,
+  ::  ADD TOKEN AS A HEADER IF IT'S VALID. EXPECTS:
+  ::    ++  IN   (IN-CODE-TO-TOKEN 'HTTP://...')        ::  HANDLE CALLBACK
+  ::    ++  RES  RES-SAVE-AFTER-REFRESH
+  ++  OUT-REFRESH-OR-ADD-HEADER
+    |=  {EXCHANGE/$@(@T PURL) S-ARGS/{(LIST CORD) DIALOG/$@(@T PURL)}}
     ::
-    |=  a/hiss  ^-  core-move
-    =^  upd  ref  (~(update-if-needed re ref) exchange)
-    ?^  upd  [[%send u.upd] (save tok ref)]
-    %.(a (out-add-header.s s-args))
+    |=  A/HISS  ^-  CORE-MOVE
+    =^  UPD  REF  (~(UPDATE-IF-NEEDED RE REF) EXCHANGE)
+    ?^  UPD  [[%SEND U.UPD] (SAVE TOK REF)]
+    %.(A (OUT-ADD-HEADER.S S-ARGS))
   ::
-  ::  If the last request refreshed the access token, save it.
-  ++  res-save-after-refresh
-    |=  a/httr  ^-  core-move
-    ?.  pending.ref  [%give a]
-    =+  `{axs/token exp/@u}`(grab-expiring-token a)
-    =.  ref  (~(update re ref) exp)
-    [[%redo ~] (save axs ref)]
+  ::  IF THE LAST REQUEST REFRESHED THE ACCESS TOKEN, SAVE IT.
+  ++  RES-SAVE-AFTER-REFRESH
+    |=  A/HTTR  ^-  CORE-MOVE
+    ?.  PENDING.REF  [%GIVE A]
+    =+  `{AXS/TOKEN EXP/@U}`(GRAB-EXPIRING-TOKEN A)
+    =.  REF  (~(UPDATE RE REF) EXP)
+    [[%REDO ~] (SAVE AXS REF)]
   ::
-  ::  Exchange code in query string for access and refresh tokens. expects:
-  ::    ++  bak  bak-save-both-tokens                   :: save access token
-  ++  in-code-to-token  in-code-to-token.s
+  ::  EXCHANGE CODE IN QUERY STRING FOR ACCESS AND REFRESH TOKENS. EXPECTS:
+  ::    ++  BAK  BAK-SAVE-BOTH-TOKENS                   :: SAVE ACCESS TOKEN
+  ++  IN-CODE-TO-TOKEN  IN-CODE-TO-TOKEN.S
   ::
-  ::  If valid access and refresh tokens have been returned, save them
-  ++  bak-save-both-tokens
-    |=  a/httr  ^-  core-move
-    =+  `{axs/token exp/@u ref-new/token}`(grab-both-tokens a)
-    =.  tok.ref  ref-new
-    =.  ref  (~(update re ref) exp)
-    [[%redo ~] (save axs ref)]
+  ::  IF VALID ACCESS AND REFRESH TOKENS HAVE BEEN RETURNED, SAVE THEM
+  ++  BAK-SAVE-BOTH-TOKENS
+    |=  A/HTTR  ^-  CORE-MOVE
+    =+  `{AXS/TOKEN EXP/@U REF-NEW/TOKEN}`(GRAB-BOTH-TOKENS A)
+    =.  TOK.REF  REF-NEW
+    =.  REF  (~(UPDATE RE REF) EXP)
+    [[%REDO ~] (SAVE AXS REF)]
   --
 --
 ::
-::  XX move-me
+::  XX MOVE-ME
 ::
 ::
-::::  Example "standard" sec/ core:
+::::  EXAMPLE "STANDARD" SEC/ CORE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth2
+::  /+    OAUTH2
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale:eyre keys:oauth2) tok/token:oauth2}
-::  ++  aut  (~(standard oauth2 bal tok) . |=(tok/token:oauth2 +>(tok tok)))
-::  ++  out
-::    %+  out-add-header:aut  scope=/full
-::    oauth-dialog='https://my-api.com/authorize'
+::  |_  {BAL/(BALE:EYRE KEYS:OAUTH2) TOK/TOKEN:OAUTH2}
+::  ++  AUT  (~(STANDARD OAUTH2 BAL TOK) . |=(TOK/TOKEN:OAUTH2 +>(TOK TOK)))
+::  ++  OUT
+::    %+  OUT-ADD-HEADER:AUT  SCOPE=/FULL
+::    OAUTH-DIALOG='HTTPS://MY-API.COM/AUTHORIZE'
 ::  ::
-::  ++  in
-::    %-  in-code-to-token:aut
-::    exchange-url='https://my-api.com/access_token'
+::  ++  IN
+::    %-  IN-CODE-TO-TOKEN:AUT
+::    EXCHANGE-URL='HTTPS://MY-API.COM/ACCESS_TOKEN'
 ::  ::
-::  ++  bak  bak-save-token:aut
+::  ++  BAK  BAK-SAVE-TOKEN:AUT
 ::  --
 ::
 ::
-::::  Equivalent imperative code:
+::::  EQUIVALENT IMPERATIVE CODE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth2
+::  /+    OAUTH2
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale:eyre keys:oauth2) tok/token:oauth2}
-::  ++  aut  ~(. oauth2 bal tok)
-::  ++  out  ::  add header
-::    =+  aut
-::    |=  req/hiss  ^-  $%({$send hiss} {$show purl})
-::    ?~  tok
-::      [%show (auth-url scope=/full 'https://my-api.com/authorize')]
-::    [%send (add-auth-header req)]
+::  |_  {BAL/(BALE:EYRE KEYS:OAUTH2) TOK/TOKEN:OAUTH2}
+::  ++  AUT  ~(. OAUTH2 BAL TOK)
+::  ++  OUT  ::  ADD HEADER
+::    =+  AUT
+::    |=  REQ/HISS  ^-  $%({$SEND HISS} {$SHOW PURL})
+::    ?~  TOK
+::      [%SHOW (AUTH-URL SCOPE=/FULL 'HTTPS://MY-API.COM/AUTHORIZE')]
+::    [%SEND (ADD-AUTH-HEADER REQ)]
 ::  ::
-::  ++  in  :: code to token
-::    =+  aut
-::    |=  inp/quay  ^-  {$send hiss}
-::    =+  code=~|(%no-code (~(got by (malt inp)) %code))
-::    [%send (request-token-by-code 'https://my-api.com/access_token' code)]
+::  ++  IN  :: CODE TO TOKEN
+::    =+  AUT
+::    |=  INP/QUAY  ^-  {$SEND HISS}
+::    =+  CODE=~|(%NO-CODE (~(GOT BY (MALT INP)) %CODE))
+::    [%SEND (REQUEST-TOKEN-BY-CODE 'HTTPS://MY-API.COM/ACCESS_TOKEN' CODE)]
 ::  ::
-::  ++  bak  ::  save token
-::    =+  aut
-::    |=  bak/httr  ^-  $%({{$redo ~} _..bak} {$give httr})
-::    ?:  (bad-response bak)  [%give bak]
-::    =.  tok  (grab-token bak)
-::    [[%redo ~] ..bak]
+::  ++  BAK  ::  SAVE TOKEN
+::    =+  AUT
+::    |=  BAK/HTTR  ^-  $%({{$REDO ~} _..BAK} {$GIVE HTTR})
+::    ?:  (BAD-RESPONSE BAK)  [%GIVE BAK]
+::    =.  TOK  (GRAB-TOKEN BAK)
+::    [[%REDO ~] ..BAK]
 ::  --
 ::
 :::   :::
   ::::: ::
 :::   :::
 ::
-::::  Example "standard-refreshing" sec/ core:
+::::  EXAMPLE "STANDARD-REFRESHING" SEC/ CORE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth2
+::  /+    OAUTH2
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale:eyre keys:oauth2) tok/token:oauth2 ref/refresh:oauth2}
-::  ++  aut
-::    %^  ~(standard-refreshing oauth2 bal tok)  .  ref
-::    |=({tok/token ref/refresh}:oauth2 +>(tok tok, ref ref))
+::  |_  {BAL/(BALE:EYRE KEYS:OAUTH2) TOK/TOKEN:OAUTH2 REF/REFRESH:OAUTH2}
+::  ++  AUT
+::    %^  ~(STANDARD-REFRESHING OAUTH2 BAL TOK)  .  REF
+::    |=({TOK/TOKEN REF/REFRESH}:OAUTH2 +>(TOK TOK, REF REF))
 ::  ::
-::  ++  exchange-url  'https://my-api.com/access_token'
-::  ++  out
-::    %^  out-refresh-or-add-header:aut  exchange-url
-::      scope=/full
-::    oauth-dialog='https://my-api.com/authorize'
+::  ++  EXCHANGE-URL  'HTTPS://MY-API.COM/ACCESS_TOKEN'
+::  ++  OUT
+::    %^  OUT-REFRESH-OR-ADD-HEADER:AUT  EXCHANGE-URL
+::      SCOPE=/FULL
+::    OAUTH-DIALOG='HTTPS://MY-API.COM/AUTHORIZE'
 ::  ::
-::  ++  res  res-save-after-refresh:aut
-::  ++  in  (in-code-to-token:aut exchange-url)
-::  ++  bak  bak-save-both-tokens:aut
+::  ++  RES  RES-SAVE-AFTER-REFRESH:AUT
+::  ++  IN  (IN-CODE-TO-TOKEN:AUT EXCHANGE-URL)
+::  ++  BAK  BAK-SAVE-BOTH-TOKENS:AUT
 ::  --
 ::
 ::
-::::  Equivalent imperative code:
+::::  EQUIVALENT IMPERATIVE CODE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth2
+::  /+    OAUTH2
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale:eyre keys:oauth2) axs/token:oauth2 ref/refresh:oauth2}
-::  ++  aut  ~(. oauth2 bal axs)
-::  ++  exchange-url  'https://my-api.com/access_token'
-::  ++  out  :: refresh or add header
-::    =+  aut
-::    |=  req/hiss  ^-  $^({{$send hiss} _..out} $%({$send hiss} {$show purl}))
-::    ?~  axs
-::      [%show (auth-url scope=/full 'https://my-api.com/authorize')]
-::    =^  upd  ref  (~(update-if-needed re ref) exchange-url)
-::    ?^  upd  [[%send u.upd] ..out]
-::    [%send (add-auth-header req)]
+::  |_  {BAL/(BALE:EYRE KEYS:OAUTH2) AXS/TOKEN:OAUTH2 REF/REFRESH:OAUTH2}
+::  ++  AUT  ~(. OAUTH2 BAL AXS)
+::  ++  EXCHANGE-URL  'HTTPS://MY-API.COM/ACCESS_TOKEN'
+::  ++  OUT  :: REFRESH OR ADD HEADER
+::    =+  AUT
+::    |=  REQ/HISS  ^-  $^({{$SEND HISS} _..OUT} $%({$SEND HISS} {$SHOW PURL}))
+::    ?~  AXS
+::      [%SHOW (AUTH-URL SCOPE=/FULL 'HTTPS://MY-API.COM/AUTHORIZE')]
+::    =^  UPD  REF  (~(UPDATE-IF-NEEDED RE REF) EXCHANGE-URL)
+::    ?^  UPD  [[%SEND U.UPD] ..OUT]
+::    [%SEND (ADD-AUTH-HEADER REQ)]
 ::   ::
-::  ++  res  :: save after refresh
-::    =+  aut
-::    |=  a/httr  ^-  $^({{$redo ~} _..res} {$give httr})
-::    ?.  pending.ref  [%give a]
-::    =+  `{axs/token exp/@u}`(grab-expiring-token a)
-::    [[%redo ~] ..out(axs axs, ref (~(update re ref) exp))]
+::  ++  RES  :: SAVE AFTER REFRESH
+::    =+  AUT
+::    |=  A/HTTR  ^-  $^({{$REDO ~} _..RES} {$GIVE HTTR})
+::    ?.  PENDING.REF  [%GIVE A]
+::    =+  `{AXS/TOKEN EXP/@U}`(GRAB-EXPIRING-TOKEN A)
+::    [[%REDO ~] ..OUT(AXS AXS, REF (~(UPDATE RE REF) EXP))]
 ::  ::
-::  ++  in  :: exchange token
-::    =+  aut
-::    |=  inp/quay  ^-  {$send hiss}
-::    =+  code=~|(%no-code (~(got by (malt inp)) %code))
-::    [%send (request-token-by-code exchange-url code)]
+::  ++  IN  :: EXCHANGE TOKEN
+::    =+  AUT
+::    |=  INP/QUAY  ^-  {$SEND HISS}
+::    =+  CODE=~|(%NO-CODE (~(GOT BY (MALT INP)) %CODE))
+::    [%SEND (REQUEST-TOKEN-BY-CODE EXCHANGE-URL CODE)]
 ::
-::   ++  bak  :: save both tokens
-::     =+  aut
-::     |=  a/httr  ^-  {{$redo ~} _..res}
-::     =+  `{axs/token exp/@u ref-new/token}`(grab-both-tokens a)
-::     =.  tok.ref  ref-new
-::     [[%redo ~] ..bak(axs axs, ref (~(update re ref) exp))]
+::   ++  BAK  :: SAVE BOTH TOKENS
+::     =+  AUT
+::     |=  A/HTTR  ^-  {{$REDO ~} _..RES}
+::     =+  `{AXS/TOKEN EXP/@U REF-NEW/TOKEN}`(GRAB-BOTH-TOKENS A)
+::     =.  TOK.REF  REF-NEW
+::     [[%REDO ~] ..BAK(AXS AXS, REF (~(UPDATE RE REF) EXP))]
 ::  ::
 ::  ::
-::  ++  bak
-::    =+  aut
-::    |=  bak/httr  ^-  $%({{$redo ~} _..bak} {$give httr})
-::    ?:  (bad-response bak)  [%give bak]
-::    =.  tok  (grab-token bak)
-::    [[%redo ~] ..bak]
+::  ++  BAK
+::    =+  AUT
+::    |=  BAK/HTTR  ^-  $%({{$REDO ~} _..BAK} {$GIVE HTTR})
+::    ?:  (BAD-RESPONSE BAK)  [%GIVE BAK]
+::    =.  TOK  (GRAB-TOKEN BAK)
+::    [[%REDO ~] ..BAK]
 ::  --
 ::

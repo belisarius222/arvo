@@ -1,4 +1,4 @@
 ::
-::::  /hoon/404/web
+::::  /HOON/404/WEB
   ::
-;div.urb-404-page: 404
+;DIV.URB-404-PAGE: 404

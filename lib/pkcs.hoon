@@ -1,391 +1,391 @@
-/-  asn1
-/+  primitive-rsa, der, base64
-=*  rsa  primitive-rsa
-::::  %/lib/pkcs
+/-  ASN1
+/+  PRIMITIVE-RSA, DER, BASE64
+=*  RSA  PRIMITIVE-RSA
+::::  %/LIB/PKCS
 |%
-::  +join: join list of cords with separator
+::  +JOIN: JOIN LIST OF CORDS WITH SEPARATOR
 ::
-::   XX move to zuse?
+::   XX MOVE TO ZUSE?
 ::
-++  join
-  |=  [sep=@t hot=(list @t)]
-  ^-  @t
-  =|  out=(list @t)
-  ?>  ?=(^ hot)
-  |-  ^-  @t
-  ?~  t.hot
-    (rap 3 [i.hot out])
-  $(out [sep i.hot out], hot t.hot)
+++  JOIN
+  |=  [SEP=@T HOT=(LIST @T)]
+  ^-  @T
+  =|  OUT=(LIST @T)
+  ?>  ?=(^ HOT)
+  |-  ^-  @T
+  ?~  T.HOT
+    (RAP 3 [I.HOT OUT])
+  $(OUT [SEP I.HOT OUT], HOT T.HOT)
 ::
-::  +rs256: RSA signatures over a sha-256 digest
+::  +RS256: RSA SIGNATURES OVER A SHA-256 DIGEST
 ::
-++  rs256
-  |_  k=key:rsa
-  ::  +emsa:rs256: message digest
+++  RS256
+  |_  K=KEY:RSA
+  ::  +EMSA:RS256: MESSAGE DIGEST
   ::
-  ::    Padded, DER encoded sha-256 hash (EMSA-PKCS1-v1_5).
+  ::    PADDED, DER ENCODED SHA-256 HASH (EMSA-PKCS1-V1_5).
   ::
-  ++  emsa
-    |=  m=byts
-    =/  emlen  (met 3 n.pub.k)
-    =/  pec=spec:asn1
-      :~  %seq
-          [%seq [%obj sha-256:obj:asn1] [%nul ~] ~]
-          [%oct 32 (shay wid.m dat.m)]
+  ++  EMSA
+    |=  M=BYTS
+    =/  EMLEN  (MET 3 N.PUB.K)
+    =/  PEC=SPEC:ASN1
+      :~  %SEQ
+          [%SEQ [%OBJ SHA-256:OBJ:ASN1] [%NUL ~] ~]
+          [%OCT 32 (SHAY WID.M DAT.M)]
       ==
-    ::  note: this asn.1 digest is rendered raw here, as we require
-    ::  big-endian bytes, and the product of +en:der is little-endian
+    ::  NOTE: THIS ASN.1 DIGEST IS RENDERED RAW HERE, AS WE REQUIRE
+    ::  BIG-ENDIAN BYTES, AND THE PRODUCT OF +EN:DER IS LITTLE-ENDIAN
     ::
-    =/  t=(list @D)  ~(ren raw:en:der pec)
-    =/  tlen=@ud  (lent t)
-    ?:  (lth emlen (add 11 tlen))
-      ~|(%emsa-too-short !!)
-    =/  ps=(list @D)
-      (reap (sub emlen (add 3 tlen)) 0xff)
-    (rep 3 (flop (weld [0x0 0x1 ps] [0x0 t])))
-  ::  +sign:rs256: sign message
+    =/  T=(LIST @D)  ~(REN RAW:EN:DER PEC)
+    =/  TLEN=@UD  (LENT T)
+    ?:  (LTH EMLEN (ADD 11 TLEN))
+      ~|(%EMSA-TOO-SHORT !!)
+    =/  PS=(LIST @D)
+      (REAP (SUB EMLEN (ADD 3 TLEN)) 0XFF)
+    (REP 3 (FLOP (WELD [0X0 0X1 PS] [0X0 T])))
+  ::  +SIGN:RS256: SIGN MESSAGE
   ::
-  ::    An RSA signature is the primitive decryption of the message hash.
+  ::    AN RSA SIGNATURE IS THE PRIMITIVE DECRYPTION OF THE MESSAGE HASH.
   ::
-  ++  sign
-    |=(m=byts (de:rsa (emsa m) k))
-  ::  +verify:rs256: verify signature
+  ++  SIGN
+    |=(M=BYTS (DE:RSA (EMSA M) K))
+  ::  +VERIFY:RS256: VERIFY SIGNATURE
   ::
-  ::    RSA signature verification confirms that the primitive encryption
-  ::    of the signature matches the message hash.
+  ::    RSA SIGNATURE VERIFICATION CONFIRMS THAT THE PRIMITIVE ENCRYPTION
+  ::    OF THE SIGNATURE MATCHES THE MESSAGE HASH.
   ::
-  ++  verify
-    |=  [s=@ m=byts]
-    =((emsa m) (en:rsa s k))
+  ++  VERIFY
+    |=  [S=@ M=BYTS]
+    =((EMSA M) (EN:RSA S K))
   --
-::  |pem: generic PEM implementation (rfc7468)
+::  |PEM: GENERIC PEM IMPLEMENTATION (RFC7468)
 ::
-::    PEM is the base64 encoding of DER encoded data, with BEGIN and
-::    END labels indicating some type.
+::    PEM IS THE BASE64 ENCODING OF DER ENCODED DATA, WITH BEGIN AND
+::    END LABELS INDICATING SOME TYPE.
 ::
-++  pem
+++  PEM
   |%
-  ::  +en:pem: PEM encode
+  ::  +EN:PEM: PEM ENCODE
   ::
-  ++  en
-    |=  [lab=@t len=@ud der=@ux]
-    ^-  wain
-    :: XX validate label?
-    :-  (rap 3 ['-----BEGIN ' lab '-----' ~])
-    =/  a  (en:base64 len `@`der)
-    |-  ^-  wain
-    ?~  a
-      [(rap 3 ['-----END ' lab '-----' ~]) ~]
-    [(end 3 64 a) $(a (rsh 3 64 a))]
-  ::  +de:pem: PEM decode
+  ++  EN
+    |=  [LAB=@T LEN=@UD DER=@UX]
+    ^-  WAIN
+    :: XX VALIDATE LABEL?
+    :-  (RAP 3 ['-----BEGIN ' LAB '-----' ~])
+    =/  A  (EN:BASE64 LEN `@`DER)
+    |-  ^-  WAIN
+    ?~  A
+      [(RAP 3 ['-----END ' LAB '-----' ~]) ~]
+    [(END 3 64 A) $(A (RSH 3 64 A))]
+  ::  +DE:PEM: PEM DECODE
   ::
-  ++  de
-    |=  [lab=@t mep=wain]
-    ^-  (unit [len=@ud der=@ux])
-    =/  a  (sub (lent mep) 2)
-    ?~  mep  ~
-    :: XX validate label?
-    ?.  =((rap 3 ['-----BEGIN ' lab '-----' ~]) i.mep)  ~
-    ?.  =((rap 3 ['-----END ' lab '-----' ~]) (snag a t.mep))  ~
-    ^-  (unit [@ @])
-    (de:base64 (rap 3 (scag a t.mep)))
+  ++  DE
+    |=  [LAB=@T MEP=WAIN]
+    ^-  (UNIT [LEN=@UD DER=@UX])
+    =/  A  (SUB (LENT MEP) 2)
+    ?~  MEP  ~
+    :: XX VALIDATE LABEL?
+    ?.  =((RAP 3 ['-----BEGIN ' LAB '-----' ~]) I.MEP)  ~
+    ?.  =((RAP 3 ['-----END ' LAB '-----' ~]) (SNAG A T.MEP))  ~
+    ^-  (UNIT [@ @])
+    (DE:BASE64 (RAP 3 (SCAG A T.MEP)))
   --
-::  |pkcs1: RSA asymmetric cryptography (rfc3447)
+::  |PKCS1: RSA ASYMMETRIC CRYPTOGRAPHY (RFC3447)
 ::
-++  pkcs1
+++  PKCS1
   |%
-  ::  |spec:pkcs1: ASN.1 specs for RSA keys
+  ::  |SPEC:PKCS1: ASN.1 SPECS FOR RSA KEYS
   ::
-  ++  spec
+  ++  SPEC
     |%
-    ::  |en:spec:pkcs1: ASN.1 encoding for RSA keys
+    ::  |EN:SPEC:PKCS1: ASN.1 ENCODING FOR RSA KEYS
     ::
-    ++  en
+    ++  EN
       |%
-      ::  +pass:en:spec:pkcs1: encode public key to ASN.1
+      ::  +PASS:EN:SPEC:PKCS1: ENCODE PUBLIC KEY TO ASN.1
       ::
-      ++  pass
-        |=  k=key:rsa
-        ^-  spec:asn1
-        [%seq [%int n.pub.k] [%int e.pub.k] ~]
-      ::  +ring:en:spec:pkcs1: encode private key to ASN.1
+      ++  PASS
+        |=  K=KEY:RSA
+        ^-  SPEC:ASN1
+        [%SEQ [%INT N.PUB.K] [%INT E.PUB.K] ~]
+      ::  +RING:EN:SPEC:PKCS1: ENCODE PRIVATE KEY TO ASN.1
       ::
-      ++  ring
-        |=  k=key:rsa
-        ^-  spec:asn1
-        ~|  %rsa-need-ring
-        ?>  ?=(^ sek.k)
-        :~  %seq
-            [%int 0]
-            [%int n.pub.k]
-            [%int e.pub.k]
-            [%int d.u.sek.k]
-            [%int p.u.sek.k]
-            [%int q.u.sek.k]
-            [%int (mod d.u.sek.k (dec p.u.sek.k))]
-            [%int (mod d.u.sek.k (dec q.u.sek.k))]
-            [%int (~(inv fo p.u.sek.k) q.u.sek.k)]
+      ++  RING
+        |=  K=KEY:RSA
+        ^-  SPEC:ASN1
+        ~|  %RSA-NEED-RING
+        ?>  ?=(^ SEK.K)
+        :~  %SEQ
+            [%INT 0]
+            [%INT N.PUB.K]
+            [%INT E.PUB.K]
+            [%INT D.U.SEK.K]
+            [%INT P.U.SEK.K]
+            [%INT Q.U.SEK.K]
+            [%INT (MOD D.U.SEK.K (DEC P.U.SEK.K))]
+            [%INT (MOD D.U.SEK.K (DEC Q.U.SEK.K))]
+            [%INT (~(INV FO P.U.SEK.K) Q.U.SEK.K)]
         ==
       --
-    ::  |de:spec:pkcs1: ASN.1 decoding for RSA keys
+    ::  |DE:SPEC:PKCS1: ASN.1 DECODING FOR RSA KEYS
     ::
-    ++  de
+    ++  DE
       |%
-      ::  +pass:de:spec:pkcs1: decode ASN.1 public key
+      ::  +PASS:DE:SPEC:PKCS1: DECODE ASN.1 PUBLIC KEY
       ::
-      ++  pass
-        |=  a=spec:asn1
-        ^-  (unit key:rsa)
-        ?.  ?=([%seq [%int *] [%int *] ~] a)
+      ++  PASS
+        |=  A=SPEC:ASN1
+        ^-  (UNIT KEY:RSA)
+        ?.  ?=([%SEQ [%INT *] [%INT *] ~] A)
           ~
-        =*  n  int.i.seq.a
-        =*  e  int.i.t.seq.a
-        `[[n e] ~]
-      ::  +ring:de:spec:pkcs1: decode ASN.1 private key
+        =*  N  INT.I.SEQ.A
+        =*  E  INT.I.T.SEQ.A
+        `[[N E] ~]
+      ::  +RING:DE:SPEC:PKCS1: DECODE ASN.1 PRIVATE KEY
       ::
-      ++  ring
-        |=  a=spec:asn1
-        ^-  (unit key:rsa)
-        ?.  ?=([%seq *] a)  ~
-        ?.  ?=  $:  [%int %0]
-                    [%int *]
-                    [%int *]
-                    [%int *]
-                    [%int *]
-                    [%int *]
+      ++  RING
+        |=  A=SPEC:ASN1
+        ^-  (UNIT KEY:RSA)
+        ?.  ?=([%SEQ *] A)  ~
+        ?.  ?=  $:  [%INT %0]
+                    [%INT *]
+                    [%INT *]
+                    [%INT *]
+                    [%INT *]
+                    [%INT *]
                     *
                 ==
-            seq.a
+            SEQ.A
           ~
-        =*  n  int.i.t.seq.a
-        =*  e  int.i.t.t.seq.a
-        =*  d  int.i.t.t.t.seq.a
-        =*  p  int.i.t.t.t.t.seq.a
-        =*  q  int.i.t.t.t.t.t.seq.a
-        `[[n e] `[d p q]]
+        =*  N  INT.I.T.SEQ.A
+        =*  E  INT.I.T.T.SEQ.A
+        =*  D  INT.I.T.T.T.SEQ.A
+        =*  P  INT.I.T.T.T.T.SEQ.A
+        =*  Q  INT.I.T.T.T.T.T.SEQ.A
+        `[[N E] `[D P Q]]
       --
     --
-  ::  |der:pkcs1: DER encoding for RSA keys
+  ::  |DER:PKCS1: DER ENCODING FOR RSA KEYS
   ::
-  ::    En(coding) and de(coding) for public (pass) and private (ring) keys.
+  ::    EN(CODING) AND DE(CODING) FOR PUBLIC (PASS) AND PRIVATE (RING) KEYS.
   ::
-  ++  der
+  ++  DER
     |%
-    ++  en
+    ++  EN
       |%
-      ++  pass  |=(k=key:rsa (en:^der (pass:en:spec k)))
-      ++  ring  |=(k=key:rsa (en:^der (ring:en:spec k)))
+      ++  PASS  |=(K=KEY:RSA (EN:^DER (PASS:EN:SPEC K)))
+      ++  RING  |=(K=KEY:RSA (EN:^DER (RING:EN:SPEC K)))
       --
-    ++  de
+    ++  DE
       |%
-      ++  pass  |=([len=@ud dat=@ux] `(unit key:rsa)`(biff (de:^der len dat) pass:de:spec))
-      ++  ring  |=([len=@ud dat=@ux] `(unit key:rsa)`(biff (de:^der len dat) ring:de:spec))
+      ++  PASS  |=([LEN=@UD DAT=@UX] `(UNIT KEY:RSA)`(BIFF (DE:^DER LEN DAT) PASS:DE:SPEC))
+      ++  RING  |=([LEN=@UD DAT=@UX] `(UNIT KEY:RSA)`(BIFF (DE:^DER LEN DAT) RING:DE:SPEC))
       --
     --
-  ::  |pem:pkcs1: PEM encoding for RSA keys
+  ::  |PEM:PKCS1: PEM ENCODING FOR RSA KEYS
   ::
-  ::    En(coding) and de(coding) for public (pass) and private (ring) keys.
+  ::    EN(CODING) AND DE(CODING) FOR PUBLIC (PASS) AND PRIVATE (RING) KEYS.
   ::
-  ++  pem
+  ++  PEM
     |%
-    ++  en
+    ++  EN
       |%
-      ++  pass  |=(k=key:rsa (en:^pem 'RSA PUBLIC KEY' (pass:en:der k)))
-      ++  ring  |=(k=key:rsa (en:^pem 'RSA PRIVATE KEY' (ring:en:der k)))
+      ++  PASS  |=(K=KEY:RSA (EN:^PEM 'RSA PUBLIC KEY' (PASS:EN:DER K)))
+      ++  RING  |=(K=KEY:RSA (EN:^PEM 'RSA PRIVATE KEY' (RING:EN:DER K)))
       --
-    ++  de
+    ++  DE
       |%
-      ++  pass  |=(mep=wain (biff (de:^pem 'RSA PUBLIC KEY' mep) pass:de:der))
-      ++  ring  |=(mep=wain (biff (de:^pem 'RSA PRIVATE KEY' mep) ring:de:der))
+      ++  PASS  |=(MEP=WAIN (BIFF (DE:^PEM 'RSA PUBLIC KEY' MEP) PASS:DE:DER))
+      ++  RING  |=(MEP=WAIN (BIFF (DE:^PEM 'RSA PRIVATE KEY' MEP) RING:DE:DER))
       --
     --
   --
-::  |pkcs8: asymmetric cryptography (rfc5208, rfc5958)
+::  |PKCS8: ASYMMETRIC CRYPTOGRAPHY (RFC5208, RFC5958)
 ::
-::    RSA-only for now.
+::    RSA-ONLY FOR NOW.
 ::
-++  pkcs8
+++  PKCS8
   |%
-  ::  |spec:pkcs8: ASN.1 specs for asymmetric keys
+  ::  |SPEC:PKCS8: ASN.1 SPECS FOR ASYMMETRIC KEYS
   ::
-  ++  spec
+  ++  SPEC
     |%
-    ++  en
+    ++  EN
       |%
-      ::  +pass:spec:pkcs8: public key ASN.1
+      ::  +PASS:SPEC:PKCS8: PUBLIC KEY ASN.1
       ::
-      ::    Technically not part of pkcs8, but standardized later in
-      ::    the superseding RFC. Included here for symmetry.
+      ::    TECHNICALLY NOT PART OF PKCS8, BUT STANDARDIZED LATER IN
+      ::    THE SUPERSEDING RFC. INCLUDED HERE FOR SYMMETRY.
       ::
-      ++  pass
-        |=  k=key:rsa
-        ^-  spec:asn1
-        :~  %seq
-            [%seq [[%obj rsa:obj:asn1] [%nul ~] ~]]
-            =/  a=[len=@ud dat=@ux]
-              (pass:en:der:pkcs1 k)
-            [%bit (mul 8 len.a) dat.a]
+      ++  PASS
+        |=  K=KEY:RSA
+        ^-  SPEC:ASN1
+        :~  %SEQ
+            [%SEQ [[%OBJ RSA:OBJ:ASN1] [%NUL ~] ~]]
+            =/  A=[LEN=@UD DAT=@UX]
+              (PASS:EN:DER:PKCS1 K)
+            [%BIT (MUL 8 LEN.A) DAT.A]
         ==
-      ::  +ring:spec:pkcs8: private key ASN.1
+      ::  +RING:SPEC:PKCS8: PRIVATE KEY ASN.1
       ::
-      ++  ring
-        |=  k=key:rsa
-        ^-  spec:asn1
-        :~  %seq
-            [%int 0]
-            [%seq [[%obj rsa:obj:asn1] [%nul ~] ~]]
-            [%oct (ring:en:der:pkcs1 k)]
+      ++  RING
+        |=  K=KEY:RSA
+        ^-  SPEC:ASN1
+        :~  %SEQ
+            [%INT 0]
+            [%SEQ [[%OBJ RSA:OBJ:ASN1] [%NUL ~] ~]]
+            [%OCT (RING:EN:DER:PKCS1 K)]
         ==
       --
-    ::  |de:spec:pkcs8: ASN.1 decoding for asymmetric keys
+    ::  |DE:SPEC:PKCS8: ASN.1 DECODING FOR ASYMMETRIC KEYS
     ::
-    ++  de
+    ++  DE
       |%
-      ::  +pass:de:spec:pkcs8: decode public key ASN.1
+      ::  +PASS:DE:SPEC:PKCS8: DECODE PUBLIC KEY ASN.1
       ::
-      ++  pass
-        |=  a=spec:asn1
-        ^-  (unit key:rsa)
-        ?.  ?=([%seq [%seq *] [%bit *] ~] a)
+      ++  PASS
+        |=  A=SPEC:ASN1
+        ^-  (UNIT KEY:RSA)
+        ?.  ?=([%SEQ [%SEQ *] [%BIT *] ~] A)
           ~
-        ?.  ?&  ?=([[%obj *] [%nul ~] ~] seq.i.seq.a)
-                =(rsa:obj:asn1 obj.i.seq.i.seq.a)
+        ?.  ?&  ?=([[%OBJ *] [%NUL ~] ~] SEQ.I.SEQ.A)
+                =(RSA:OBJ:ASN1 OBJ.I.SEQ.I.SEQ.A)
             ==
           ~
-        (pass:de:der:pkcs1 (div len.i.t.seq.a 8) bit.i.t.seq.a)
-      ::  +ring:de:spec:pkcs8: decode private key ASN.1
+        (PASS:DE:DER:PKCS1 (DIV LEN.I.T.SEQ.A 8) BIT.I.T.SEQ.A)
+      ::  +RING:DE:SPEC:PKCS8: DECODE PRIVATE KEY ASN.1
       ::
-      ++  ring
-        |=  a=spec:asn1
-        ^-  (unit key:rsa)
-        ?.  ?=([%seq [%int %0] [%seq *] [%oct *] ~] a)
+      ++  RING
+        |=  A=SPEC:ASN1
+        ^-  (UNIT KEY:RSA)
+        ?.  ?=([%SEQ [%INT %0] [%SEQ *] [%OCT *] ~] A)
           ~
-        ?.  ?&  ?=([[%obj *] [%nul ~] ~] seq.i.t.seq.a)
-                =(rsa:obj:asn1 obj.i.seq.i.t.seq.a)
+        ?.  ?&  ?=([[%OBJ *] [%NUL ~] ~] SEQ.I.T.SEQ.A)
+                =(RSA:OBJ:ASN1 OBJ.I.SEQ.I.T.SEQ.A)
             ==
           ~
-        (ring:de:der:pkcs1 [len oct]:i.t.t.seq.a)
+        (RING:DE:DER:PKCS1 [LEN OCT]:I.T.T.SEQ.A)
       --
     --
-  ::  |der:pkcs8: DER encoding for asymmetric keys
+  ::  |DER:PKCS8: DER ENCODING FOR ASYMMETRIC KEYS
   ::
-  ::    En(coding) and de(coding) for public (pass) and private (ring) keys.
-  ::    RSA-only for now.
+  ::    EN(CODING) AND DE(CODING) FOR PUBLIC (PASS) AND PRIVATE (RING) KEYS.
+  ::    RSA-ONLY FOR NOW.
   ::
-  ++  der
+  ++  DER
     |%
-    ++  en
+    ++  EN
       |%
-      ++  pass  |=(k=key:rsa `[len=@ud dat=@ux]`(en:^der (pass:en:spec k)))
-      ++  ring  |=(k=key:rsa `[len=@ud dat=@ux]`(en:^der (ring:en:spec k)))
+      ++  PASS  |=(K=KEY:RSA `[LEN=@UD DAT=@UX]`(EN:^DER (PASS:EN:SPEC K)))
+      ++  RING  |=(K=KEY:RSA `[LEN=@UD DAT=@UX]`(EN:^DER (RING:EN:SPEC K)))
       --
-    ++  de
+    ++  DE
       |%
-      ++  pass  |=([len=@ud dat=@ux] `(unit key:rsa)`(biff (de:^der len dat) pass:de:spec))
-      ++  ring  |=([len=@ud dat=@ux] `(unit key:rsa)`(biff (de:^der len dat) ring:de:spec))
+      ++  PASS  |=([LEN=@UD DAT=@UX] `(UNIT KEY:RSA)`(BIFF (DE:^DER LEN DAT) PASS:DE:SPEC))
+      ++  RING  |=([LEN=@UD DAT=@UX] `(UNIT KEY:RSA)`(BIFF (DE:^DER LEN DAT) RING:DE:SPEC))
       --
     --
-  ::  |pem:pkcs8: PEM encoding for asymmetric keys
+  ::  |PEM:PKCS8: PEM ENCODING FOR ASYMMETRIC KEYS
   ::
-  ::    En(coding) and de(coding) for public (pass) and private (ring) keys.
-  ::    RSA-only for now.
+  ::    EN(CODING) AND DE(CODING) FOR PUBLIC (PASS) AND PRIVATE (RING) KEYS.
+  ::    RSA-ONLY FOR NOW.
   ::
-  ++  pem
+  ++  PEM
     |%
-    ++  en
+    ++  EN
       |%
-      ++  pass  |=(k=key:rsa (en:^pem 'PUBLIC KEY' (pass:en:der k)))
-      ++  ring  |=(k=key:rsa (en:^pem 'PRIVATE KEY' (ring:en:der k)))
+      ++  PASS  |=(K=KEY:RSA (EN:^PEM 'PUBLIC KEY' (PASS:EN:DER K)))
+      ++  RING  |=(K=KEY:RSA (EN:^PEM 'PRIVATE KEY' (RING:EN:DER K)))
       --
-    ++  de
+    ++  DE
       |%
-      ++  pass  |=(mep=wain (biff (de:^pem 'PUBLIC KEY' mep) pass:de:der))
-      ++  ring  |=(mep=wain (biff (de:^pem 'PRIVATE KEY' mep) ring:de:der))
+      ++  PASS  |=(MEP=WAIN (BIFF (DE:^PEM 'PUBLIC KEY' MEP) PASS:DE:DER))
+      ++  RING  |=(MEP=WAIN (BIFF (DE:^PEM 'PRIVATE KEY' MEP) RING:DE:DER))
       --
     --
   --
-::  |pkcs10: certificate signing requests (rfc2986)
+::  |PKCS10: CERTIFICATE SIGNING REQUESTS (RFC2986)
 ::
-::    Only implemented for RSA keys with subject-alternate names.
+::    ONLY IMPLEMENTED FOR RSA KEYS WITH SUBJECT-ALTERNATE NAMES.
 ::
-++  pkcs10
+++  PKCS10
   =>  |%
-      ::  +csr:pkcs10: certificate request
+      ::  +CSR:PKCS10: CERTIFICATE REQUEST
       ::
-      +=  csr  [key=key:rsa hot=(list (list @t))]
+      +=  CSR  [KEY=KEY:RSA HOT=(LIST (LIST @T))]
       --
   |%
-  ::  |spec:pkcs10: ASN.1 specs for certificate signing requests
+  ::  |SPEC:PKCS10: ASN.1 SPECS FOR CERTIFICATE SIGNING REQUESTS
   ::
-  ++  spec
+  ++  SPEC
     |%
-    ::  +en:spec:pkcs10: ASN.1 encoding for certificate signing requests
+    ::  +EN:SPEC:PKCS10: ASN.1 ENCODING FOR CERTIFICATE SIGNING REQUESTS
     ::
-    ++  en
-      |=  csr
-      ^-  spec:asn1
-      |^  =/  dat=spec:asn1  (info key hot)
-          :~  %seq
-              dat
-              [%seq [[%obj rsa-sha-256:obj:asn1] [%nul ~] ~]]
-              :: big-endian signature bits
+    ++  EN
+      |=  CSR
+      ^-  SPEC:ASN1
+      |^  =/  DAT=SPEC:ASN1  (INFO KEY HOT)
+          :~  %SEQ
+              DAT
+              [%SEQ [[%OBJ RSA-SHA-256:OBJ:ASN1] [%NUL ~] ~]]
+              :: BIG-ENDIAN SIGNATURE BITS
               ::
-              ::   the signature bitwidth is definitionally the key length
+              ::   THE SIGNATURE BITWIDTH IS DEFINITIONALLY THE KEY LENGTH
               ::
-              :+  %bit
-                (met 0 n.pub.key)
-              (swp 3 (~(sign rs256 key) (en:^der dat)))
+              :+  %BIT
+                (MET 0 N.PUB.KEY)
+              (SWP 3 (~(SIGN RS256 KEY) (EN:^DER DAT)))
           ==
-      ::  +info:en:spec:pkcs10: certificate request info
+      ::  +INFO:EN:SPEC:PKCS10: CERTIFICATE REQUEST INFO
       ::
-      ++  info
-        |=  csr
-        ^-  spec:asn1
-        :~  %seq
-            [%int 0]
-            [%seq ~]
-            (pass:en:spec:pkcs8 key)
-            :: explicit, context-specific tag #0 (extensions)
+      ++  INFO
+        |=  CSR
+        ^-  SPEC:ASN1
+        :~  %SEQ
+            [%INT 0]
+            [%SEQ ~]
+            (PASS:EN:SPEC:PKCS8 KEY)
+            :: EXPLICIT, CONTEXT-SPECIFIC TAG #0 (EXTENSIONS)
             ::
-            :+  %con
-              `bespoke:asn1`[| 0]
-            %~  ren
-              raw:en:^der
-            :~  %seq
-                [%obj csr-ext:obj:asn1]
-                :~  %set
-                    :~  %seq
-                        :~  %seq
-                            [%obj sub-alt:obj:asn1]
-                            [%oct (en:^der (san hot))]
+            :+  %CON
+              `BESPOKE:ASN1`[| 0]
+            %~  REN
+              RAW:EN:^DER
+            :~  %SEQ
+                [%OBJ CSR-EXT:OBJ:ASN1]
+                :~  %SET
+                    :~  %SEQ
+                        :~  %SEQ
+                            [%OBJ SUB-ALT:OBJ:ASN1]
+                            [%OCT (EN:^DER (SAN HOT))]
         ==  ==  ==  ==  ==
-      ::  +san:en:spec:pkcs10: subject-alternate-names
+      ::  +SAN:EN:SPEC:PKCS10: SUBJECT-ALTERNATE-NAMES
       ::
-      ++  san
-        |=  hot=(list (list @t))
-        ^-  spec:asn1
-        :-  %seq
-        %+  turn  hot
-        :: implicit, context-specific tag #2 (IA5String)
-        :: XX sanitize string?
-        |=(h=(list @t) [%con `bespoke:asn1`[& 2] (rip 3 (join '.' h))])
+      ++  SAN
+        |=  HOT=(LIST (LIST @T))
+        ^-  SPEC:ASN1
+        :-  %SEQ
+        %+  TURN  HOT
+        :: IMPLICIT, CONTEXT-SPECIFIC TAG #2 (IA5STRING)
+        :: XX SANITIZE STRING?
+        |=(H=(LIST @T) [%CON `BESPOKE:ASN1`[& 2] (RIP 3 (JOIN '.' H))])
       --
-    ::  |de:spec:pkcs10: ASN.1 decoding for certificate signing requests
-    ++  de  !!
+    ::  |DE:SPEC:PKCS10: ASN.1 DECODING FOR CERTIFICATE SIGNING REQUESTS
+    ++  DE  !!
     --
-  ::  |der:pkcs10: DER encoding for certificate signing requests
+  ::  |DER:PKCS10: DER ENCODING FOR CERTIFICATE SIGNING REQUESTS
   ::
-  ++  der
+  ++  DER
     |%
-    ++  en  |=(a=csr `[len=@ud der=@ux]`(en:^der (en:spec a)))
-    ++  de  !! ::|=(a=@ `(unit csr)`(biff (de:^der a) de:spec))
+    ++  EN  |=(A=CSR `[LEN=@UD DER=@UX]`(EN:^DER (EN:SPEC A)))
+    ++  DE  !! ::|=(A=@ `(UNIT CSR)`(BIFF (DE:^DER A) DE:SPEC))
     --
-  ::  |pem:pkcs10: PEM encoding for certificate signing requests
+  ::  |PEM:PKCS10: PEM ENCODING FOR CERTIFICATE SIGNING REQUESTS
   ::
-  ++  pem
+  ++  PEM
     |%
-    ++  en  |=(a=csr (en:^pem 'CERTIFICATE REQUEST' (en:der a)))
-    ++  de  !! ::|=(mep=wain (biff (de:^pem 'CERTIFICATE REQUEST' mep) de:der))
+    ++  EN  |=(A=CSR (EN:^PEM 'CERTIFICATE REQUEST' (EN:DER A)))
+    ++  DE  !! ::|=(MEP=WAIN (BIFF (DE:^PEM 'CERTIFICATE REQUEST' MEP) DE:DER))
     --
   --
 --

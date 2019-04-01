@@ -1,136 +1,136 @@
-::  |base64: flexible base64 encoding for little-endian atoms
+::  |BASE64: FLEXIBLE BASE64 ENCODING FOR LITTLE-ENDIAN ATOMS
 ::
-::  pad: include padding when encoding, require when decoding
-::  url: use url-safe characters '-' for '+' and '_' for '/'
+::  PAD: INCLUDE PADDING WHEN ENCODING, REQUIRE WHEN DECODING
+::  URL: USE URL-SAFE CHARACTERS '-' FOR '+' AND '_' FOR '/'
 ::
-=+  [pad=& url=|]
+=+  [PAD=& URL=|]
 |%
 ::
-+$  byte    @D
-+$  word24  @
++$  BYTE    @D
++$  WORD24  @
 ::
-++  div-ceil
-  ::  divide, rounding up.
-  |=  [x=@ y=@]  ^-  @
-  ?:  =(0 (mod x y))
-    (div x y)
-  +((div x y))
+++  DIV-CEIL
+  ::  DIVIDE, ROUNDING UP.
+  |=  [X=@ Y=@]  ^-  @
+  ?:  =(0 (MOD X Y))
+    (DIV X Y)
+  +((DIV X Y))
 ::
-++  explode-bytes
-  ::  Explode a bytestring into list of bytes. Result is in LSB order.
-  |=  =octs  ^-  (list byte)
-  =/  atom-byte-width  (met 3 q.octs)
-  =/  leading-zeros    (sub p.octs atom-byte-width)
-  (weld (reap leading-zeros 0) (rip 3 q.octs))
+++  EXPLODE-BYTES
+  ::  EXPLODE A BYTESTRING INTO LIST OF BYTES. RESULT IS IN LSB ORDER.
+  |=  =OCTS  ^-  (LIST BYTE)
+  =/  ATOM-BYTE-WIDTH  (MET 3 Q.OCTS)
+  =/  LEADING-ZEROS    (SUB P.OCTS ATOM-BYTE-WIDTH)
+  (WELD (REAP LEADING-ZEROS 0) (RIP 3 Q.OCTS))
 ::
-++  explode-words
-  ::  Explode a bytestring to words of bit-width `wid`. Result is in LSW order.
-  |=  [wid=@ =octs]
-  ^-  (list @)
-  =/  atom-bit-width   (met 0 q.octs)
-  =/  octs-bit-width   (mul 8 p.octs)
-  =/  atom-word-width  (div-ceil atom-bit-width wid)
-  =/  rslt-word-width  (div-ceil octs-bit-width wid)
-  =/  pad              (sub rslt-word-width atom-word-width)
-  =/  x  (ripn wid q.octs)
-  %+  weld  x
-  (reap pad 0)
+++  EXPLODE-WORDS
+  ::  EXPLODE A BYTESTRING TO WORDS OF BIT-WIDTH `WID`. RESULT IS IN LSW ORDER.
+  |=  [WID=@ =OCTS]
+  ^-  (LIST @)
+  =/  ATOM-BIT-WIDTH   (MET 0 Q.OCTS)
+  =/  OCTS-BIT-WIDTH   (MUL 8 P.OCTS)
+  =/  ATOM-WORD-WIDTH  (DIV-CEIL ATOM-BIT-WIDTH WID)
+  =/  RSLT-WORD-WIDTH  (DIV-CEIL OCTS-BIT-WIDTH WID)
+  =/  PAD              (SUB RSLT-WORD-WIDTH ATOM-WORD-WIDTH)
+  =/  X  (RIPN WID Q.OCTS)
+  %+  WELD  X
+  (REAP PAD 0)
 ::
-::  +en:base64: encode +octs to base64 cord
+::  +EN:BASE64: ENCODE +OCTS TO BASE64 CORD
 ::
-::  Encode an `octs` into a base64 string.
+::  ENCODE AN `OCTS` INTO A BASE64 STRING.
 ::
-::  First, we break up the input into a list of 24-bit words. The input
-::  might not be a multiple of 24-bits, so we add 0-2 padding bytes at
-::  the end (to the least-significant side, with a left-shift).
+::  FIRST, WE BREAK UP THE INPUT INTO A LIST OF 24-BIT WORDS. THE INPUT
+::  MIGHT NOT BE A MULTIPLE OF 24-BITS, SO WE ADD 0-2 PADDING BYTES AT
+::  THE END (TO THE LEAST-SIGNIFICANT SIDE, WITH A LEFT-SHIFT).
 ::
-::  Then, we encode each block into four base64 characters.
+::  THEN, WE ENCODE EACH BLOCK INTO FOUR BASE64 CHARACTERS.
 ::
-::  Finally we remove the padding that we added at the beginning: for
-::  each byte that was added, we replace one character with an = (unless
-::  `pad` is false, in which case we just remove the extra characters).
+::  FINALLY WE REMOVE THE PADDING THAT WE ADDED AT THE BEGINNING: FOR
+::  EACH BYTE THAT WAS ADDED, WE REPLACE ONE CHARACTER WITH AN = (UNLESS
+::  `PAD` IS FALSE, IN WHICH CASE WE JUST REMOVE THE EXTRA CHARACTERS).
 ::
-++  en
-  ^-  $-(octs cord)
+++  EN
+  ^-  $-(OCTS CORD)
   ::
-  =/  cha
-    ?:  url
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  =/  CHA
+    ?:  URL
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/'
   ::
-  |^  |=  bs=octs  ^-  cord
-      =+  ^-  [padding=@ blocks=(list word24)]
-          (octs-to-blocks bs)
-      (crip (flop (unpad padding (encode-blocks blocks))))
+  |^  |=  BS=OCTS  ^-  CORD
+      =+  ^-  [PADDING=@ BLOCKS=(LIST WORD24)]
+          (OCTS-TO-BLOCKS BS)
+      (CRIP (FLOP (UNPAD PADDING (ENCODE-BLOCKS BLOCKS))))
   ::
-  ++  octs-to-blocks
-    |=  bs=octs  ^-  [padding=@ud (list word24)]
-    =/  padding=@ud  (~(dif fo 3) 0 p.bs)
-    =/  padded=octs  [(add padding p.bs) (lsh 3 padding (rev 3 bs))]
-    [padding (explode-words 24 padded)]
+  ++  OCTS-TO-BLOCKS
+    |=  BS=OCTS  ^-  [PADDING=@UD (LIST WORD24)]
+    =/  PADDING=@UD  (~(DIF FO 3) 0 P.BS)
+    =/  PADDED=OCTS  [(ADD PADDING P.BS) (LSH 3 PADDING (REV 3 BS))]
+    [PADDING (EXPLODE-WORDS 24 PADDED)]
   ::
-  ++  unpad
-    |=  [extra=@ t=tape]  ^-  tape
-    =/  without  (slag extra t)
-    ?.  pad  without
-    (weld (reap extra '=') without)
+  ++  UNPAD
+    |=  [EXTRA=@ T=TAPE]  ^-  TAPE
+    =/  WITHOUT  (SLAG EXTRA T)
+    ?.  PAD  WITHOUT
+    (WELD (REAP EXTRA '=') WITHOUT)
   ::
-  ++  encode-blocks
-    |=  ws=(list word24)  ^-  tape
-    (zing (turn ws encode-block))
+  ++  ENCODE-BLOCKS
+    |=  WS=(LIST WORD24)  ^-  TAPE
+    (ZING (TURN WS ENCODE-BLOCK))
   ::
-  ++  encode-block
-    |=  w=word24  ^-  tape
-    =/  a  (cut 3 [(cut 0 [0 6] w) 1] cha)
-    =/  b  (cut 3 [(cut 0 [6 6] w) 1] cha)
-    =/  c  (cut 3 [(cut 0 [12 6] w) 1] cha)
-    =/  d  (cut 3 [(cut 0 [18 6] w) 1] cha)
-    ~[a b c d]
+  ++  ENCODE-BLOCK
+    |=  W=WORD24  ^-  TAPE
+    =/  A  (CUT 3 [(CUT 0 [0 6] W) 1] CHA)
+    =/  B  (CUT 3 [(CUT 0 [6 6] W) 1] CHA)
+    =/  C  (CUT 3 [(CUT 0 [12 6] W) 1] CHA)
+    =/  D  (CUT 3 [(CUT 0 [18 6] W) 1] CHA)
+    ~[A B C D]
   --
 ::
-::  +de:base64: decode base64 cord to (unit @)
+::  +DE:BASE64: DECODE BASE64 CORD TO (UNIT @)
 ::
-++  de
-  |=  a=cord
-  ^-  (unit octs)
-  (rush a parse)
-::  +parse:base64: parse base64 cord to +octs
+++  DE
+  |=  A=CORD
+  ^-  (UNIT OCTS)
+  (RUSH A PARSE)
+::  +PARSE:BASE64: PARSE BASE64 CORD TO +OCTS
 ::
-++  parse
-  =<  ^-  $-(nail (like octs))
-      %+  sear  reduce
-      ;~  plug
-        %-  plus  ;~  pose
-          (cook |=(a=@ (sub a 'A')) (shim 'A' 'Z'))
-          (cook |=(a=@ (sub a 'G')) (shim 'a' 'z'))
-          (cook |=(a=@ (add a 4)) (shim '0' '9'))
-          (cold 62 (just ?:(url '-' '+')))
-          (cold 63 (just ?:(url '_' '/')))
+++  PARSE
+  =<  ^-  $-(NAIL (LIKE OCTS))
+      %+  SEAR  REDUCE
+      ;~  PLUG
+        %-  PLUS  ;~  POSE
+          (COOK |=(A=@ (SUB A 'A')) (SHIM 'A' 'Z'))
+          (COOK |=(A=@ (SUB A 'G')) (SHIM 'A' 'Z'))
+          (COOK |=(A=@ (ADD A 4)) (SHIM '0' '9'))
+          (COLD 62 (JUST ?:(URL '-' '+')))
+          (COLD 63 (JUST ?:(URL '_' '/')))
         ==
-        (stun 0^2 (cold %0 tis))
+        (STUN 0^2 (COLD %0 TIS))
       ==
   |%
-  ::  +reduce:parse:base64: reduce, measure, and swap base64 digits
+  ::  +REDUCE:PARSE:BASE64: REDUCE, MEASURE, AND SWAP BASE64 DIGITS
   ::
-  ++  reduce
-    |=  [dat=(list @) dap=(list @)]
-    ^-  (unit octs)
-    =/  lat  (lent dat)
-    =/  lap  (lent dap)
-    =/  dif  (~(dif fo 4) 0 lat)
-    ?:  &(pad !=(dif lap))
-      ::  padding required and incorrect
-      ~&(%base-64-padding-err-one ~)
-    ?:  &(!pad !=(0 lap))
-      ::  padding not required but present
-      ~&(%base-64-padding-err-two ~)
-    =/  len  (sub (mul 3 (div (add lat dif) 4)) dif)
-    :+  ~  len
-    %+  swp  3
-    ::  %+  base  64
-    %+  roll
-      (weld dat (reap dif 0))
-    |=([p=@ q=@] (add p (mul 64 q)))
+  ++  REDUCE
+    |=  [DAT=(LIST @) DAP=(LIST @)]
+    ^-  (UNIT OCTS)
+    =/  LAT  (LENT DAT)
+    =/  LAP  (LENT DAP)
+    =/  DIF  (~(DIF FO 4) 0 LAT)
+    ?:  &(PAD !=(DIF LAP))
+      ::  PADDING REQUIRED AND INCORRECT
+      ~&(%BASE-64-PADDING-ERR-ONE ~)
+    ?:  &(!PAD !=(0 LAP))
+      ::  PADDING NOT REQUIRED BUT PRESENT
+      ~&(%BASE-64-PADDING-ERR-TWO ~)
+    =/  LEN  (SUB (MUL 3 (DIV (ADD LAT DIF) 4)) DIF)
+    :+  ~  LEN
+    %+  SWP  3
+    ::  %+  BASE  64
+    %+  ROLL
+      (WELD DAT (REAP DIF 0))
+    |=([P=@ Q=@] (ADD P (MUL 64 Q)))
   --
 --
 

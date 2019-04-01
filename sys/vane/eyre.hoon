@@ -1,286 +1,286 @@
-!:  ::  %eyre, http servant
+!:  ::  %EYRE, HTTP SERVANT
 !?  164
 ::::
-|=  pit/vase
-=,  eyre
-=,  wired
-=,  unity
-=,  format
-=,  mimes:html
-=,  html
+|=  PIT/VASE
+=,  EYRE
+=,  WIRED
+=,  UNITY
+=,  FORMAT
+=,  MIMES:HTML
+=,  HTML
 =>  =~
-|%                                                      ::  interfaces
-++  move  {p/duct q/(wind note gift:able)}              ::  local move
-++  note                                                ::  out request $->
-          $%  $:  $a                                    ::  to %ames
-          $%  {$want p/ship q/{path *}}                 ::
+|%                                                      ::  INTERFACES
+++  MOVE  {P/DUCT Q/(WIND NOTE GIFT:ABLE)}              ::  LOCAL MOVE
+++  NOTE                                                ::  OUT REQUEST $->
+          $%  $:  $A                                    ::  TO %AMES
+          $%  {$WANT P/SHIP Q/{PATH *}}                 ::
           ==  ==                                        ::
-              $:  $b                                    ::  to  %behn
-          $%  {$wait p/@da}                             ::
-              {$rest p/@da}                             ::
+              $:  $B                                    ::  TO  %BEHN
+          $%  {$WAIT P/@DA}                             ::
+              {$REST P/@DA}                             ::
           ==  ==                                        ::
-              $:  $d                                    ::  to %dill
-          $%  {$flog p/{$crud p/@tas q/(list tank)}}    ::
+              $:  $D                                    ::  TO %DILL
+          $%  {$FLOG P/{$CRUD P/@TAS Q/(LIST TANK)}}    ::
           ==  ==                                        ::
-              $:  $e                                    ::  to self
-          $%  {$thud ~}                                ::  proxied death
-              {$this p/? q/clip r/httq}                 ::  proxied request
-              {$meta vase}                              ::  type check
+              $:  $E                                    ::  TO SELF
+          $%  {$THUD ~}                                ::  PROXIED DEATH
+              {$THIS P/? Q/CLIP R/HTTQ}                 ::  PROXIED REQUEST
+              {$META VASE}                              ::  TYPE CHECK
           ==  ==                                        ::
-              $:  $f                                            ::
-          $%  [%build live=? schematic=schematic:ford]
-              [%kill ~]
+              $:  $F                                            ::
+          $%  [%BUILD LIVE=? SCHEMATIC=SCHEMATIC:FORD]
+              [%KILL ~]
           ==  ==
-              $:  $g                                    ::  to %gall
-          $%  {$deal p/sock q/cush:gall}               ::  full transmission
+              $:  $G                                    ::  TO %GALL
+          $%  {$DEAL P/SOCK Q/CUSH:GALL}               ::  FULL TRANSMISSION
           ==  ==                                        ::
-              $:  %j                                    ::  to %jael
-          $%  [%turf ~]                                 ::  view domains
+              $:  %J                                    ::  TO %JAEL
+          $%  [%TURF ~]                                 ::  VIEW DOMAINS
           ==  ==  ==                                    ::
-++  sign                                                ::  in result $<-
-          $%  $:  $a                                    ::  by %ames
-          $%  {$woot p/ship q/coop}                     ::  acknowledgment
+++  SIGN                                                ::  IN RESULT $<-
+          $%  $:  $A                                    ::  BY %AMES
+          $%  {$WOOT P/SHIP Q/COOP}                     ::  ACKNOWLEDGMENT
           ==  ==                                        ::
-              $:  $b                                    ::  by %behn
-          $%  {$wake ~}                                ::  timer activate
+              $:  $B                                    ::  BY %BEHN
+          $%  {$WAKE ~}                                ::  TIMER ACTIVATE
           ==  ==                                        ::
-              $:  $g                                    ::  by %gall
-          $%  {$unto p/cuft:gall}                      ::  within agent
+              $:  $G                                    ::  BY %GALL
+          $%  {$UNTO P/CUFT:GALL}                      ::  WITHIN AGENT
           ==  ==                                        ::
-              $:  $e                                    ::  by self
-          $%  {$thou p/httr}                            ::  response for proxy
+              $:  $E                                    ::  BY SELF
+          $%  {$THOU P/HTTR}                            ::  RESPONSE FOR PROXY
           ==  ==                                        ::
-              $:  $f
-          $%  [%made date=@da result=made-result:ford]  ::
+              $:  $F
+          $%  [%MADE DATE=@DA RESULT=MADE-RESULT:FORD]  ::
           ==  ==
-              $:  %j                                    ::  from %jael
-          $%  [%turf turf=(list turf)]                  ::  bind to domains
+              $:  %J                                    ::  FROM %JAEL
+          $%  [%TURF TURF=(LIST TURF)]                  ::  BIND TO DOMAINS
           ==  ==                                        ::
-              $:  @tas                                  ::  by any
-          $%  {$crud p/@tas q/(list tank)}              ::
+              $:  @TAS                                  ::  BY ANY
+          $%  {$CRUD P/@TAS Q/(LIST TANK)}              ::
           ==  ==  ==                                    ::
-++  ixor  @t                                            ::  oryx hash
-++  whir  $@  ~                                        ::  wire subset
-          $%  {$ac p/hole q/whir}                       ::  cookied
-              {$at p/hole q/whir}                       ::  authenticated
-              {$ay p/knot q/knot ~}     :: /ay/@p/@uvH ::  remote duct
-              {$ha p/path}               :: /ha/[beak]  ::  GET request
-              {$he p/whir}                              ::  HEAD request
-              {$hi p/knot q/mark ~}                    ::  outbound HTTP
-              {$se p/whir-se q/{user (list @t)}}        ::  outbound to domain
-              {$si ~}                                  ::  response done
-              {$of p/ixor q/$@(~ whir-of)}             ::  associated view
-              {$ow p/ixor ~}                           ::  dying view
-              {$on ~}                                  ::  dependency
+++  IXOR  @T                                            ::  ORYX HASH
+++  WHIR  $@  ~                                        ::  WIRE SUBSET
+          $%  {$AC P/HOLE Q/WHIR}                       ::  COOKIED
+              {$AT P/HOLE Q/WHIR}                       ::  AUTHENTICATED
+              {$AY P/KNOT Q/KNOT ~}     :: /AY/@P/@UVH ::  REMOTE DUCT
+              {$HA P/PATH}               :: /HA/[BEAK]  ::  GET REQUEST
+              {$HE P/WHIR}                              ::  HEAD REQUEST
+              {$HI P/KNOT Q/MARK ~}                    ::  OUTBOUND HTTP
+              {$SE P/WHIR-SE Q/{USER (LIST @T)}}        ::  OUTBOUND TO DOMAIN
+              {$SI ~}                                  ::  RESPONSE DONE
+              {$OF P/IXOR Q/$@(~ WHIR-OF)}             ::  ASSOCIATED VIEW
+              {$OW P/IXOR ~}                           ::  DYING VIEW
+              {$ON ~}                                  ::  DEPENDENCY
           ==                                            ::
-++  whir-of  {p/@taxp q/term r/?($mess $lens) s/wire}   ::  path in dock
-++  whir-se  ?($core vi-arm)                            ::  build/call
-++  vi-arm
-  $?  $filter-request                                   ::  ++out mod request
-      $filter-response                                  ::  ++res use result
-      $receive-auth-response                            ::  ++bak auth response
-      $receive-auth-query-string                        ::  ++in handle code
-      $out
-      $res
-      $bak
-      $in
+++  WHIR-OF  {P/@TAXP Q/TERM R/?($MESS $LENS) S/WIRE}   ::  PATH IN DOCK
+++  WHIR-SE  ?($CORE VI-ARM)                            ::  BUILD/CALL
+++  VI-ARM
+  $?  $FILTER-REQUEST                                   ::  ++OUT MOD REQUEST
+      $FILTER-RESPONSE                                  ::  ++RES USE RESULT
+      $RECEIVE-AUTH-RESPONSE                            ::  ++BAK AUTH RESPONSE
+      $RECEIVE-AUTH-QUERY-STRING                        ::  ++IN HANDLE CODE
+      $OUT
+      $RES
+      $BAK
+      $IN
   ==                                                    ::
 --                                                      ::
-|%                                                      ::  models
-++  bolo                                                ::  eyre state
-  $:  $1                                                ::  version
-      dom/(set (list @t))                               ::  domain names
-      fig/http-config                                   ::  config
-      por/{clr/@ud sek/(unit @ud)}                      ::  live ports
-      wel/wank                                          ::  .well-known
-      gub/@t                                            ::  random identity
-      top/beam                                          ::  ford serve prefix
-      ged/duct                                          ::  client interface
-      ded/(set duct)                                    ::  killed requests
-      lyv/(map duct live)                               ::  living requests
-      pox/(map @uvH duct)                               ::  proxied sessions
-      ask/{p/@ud q/(map @ud {p/duct q/hiss})}           ::  outgoing by number
-      kes/(map duct @ud)                                ::  outgoing by duct
-      ney/@uvI                                          ::  rolling entropy
-      dop/(map host ship)                               ::  host aliasing
-      liz/(jug @uvH (each duct ixor))                   ::  ford depsets
-      wup/(map hole cyst)                               ::  secure sessions
-      sop/(map hole {ship ?})                           ::  foreign sess names
-      wix/(map ixor stem)                               ::  open views
-      sec/(map {user (list @t)} driv)                   ::  security drivers
+|%                                                      ::  MODELS
+++  BOLO                                                ::  EYRE STATE
+  $:  $1                                                ::  VERSION
+      DOM/(SET (LIST @T))                               ::  DOMAIN NAMES
+      FIG/HTTP-CONFIG                                   ::  CONFIG
+      POR/{CLR/@UD SEK/(UNIT @UD)}                      ::  LIVE PORTS
+      WEL/WANK                                          ::  .WELL-KNOWN
+      GUB/@T                                            ::  RANDOM IDENTITY
+      TOP/BEAM                                          ::  FORD SERVE PREFIX
+      GED/DUCT                                          ::  CLIENT INTERFACE
+      DED/(SET DUCT)                                    ::  KILLED REQUESTS
+      LYV/(MAP DUCT LIVE)                               ::  LIVING REQUESTS
+      POX/(MAP @UVH DUCT)                               ::  PROXIED SESSIONS
+      ASK/{P/@UD Q/(MAP @UD {P/DUCT Q/HISS})}           ::  OUTGOING BY NUMBER
+      KES/(MAP DUCT @UD)                                ::  OUTGOING BY DUCT
+      NEY/@UVI                                          ::  ROLLING ENTROPY
+      DOP/(MAP HOST SHIP)                               ::  HOST ALIASING
+      LIZ/(JUG @UVH (EACH DUCT IXOR))                   ::  FORD DEPSETS
+      WUP/(MAP HOLE CYST)                               ::  SECURE SESSIONS
+      SOP/(MAP HOLE {SHIP ?})                           ::  FOREIGN SESS NAMES
+      WIX/(MAP IXOR STEM)                               ::  OPEN VIEWS
+      SEC/(MAP {USER (LIST @T)} DRIV)                   ::  SECURITY DRIVERS
   ==                                                    ::
 ::
-++  driv                                                ::  driver state
-  %+  pair  (unit $@(~ vase))                          ::  main core
-  {liv/? req/(qeu (trel duct mark vase:hiss))}          ::  waiting requests
+++  DRIV                                                ::  DRIVER STATE
+  %+  PAIR  (UNIT $@(~ VASE))                          ::  MAIN CORE
+  {LIV/? REQ/(QEU (TREL DUCT MARK VASE:HISS))}          ::  WAITING REQUESTS
 ::
-++  live                                                ::  in flight
-  $%  {$exec p/whir}                                    ::  ford build
-      {$wasp p/(list @uvH)}                             ::  ford deps
-      {$xeno p/ship}                                    ::  proxied request
-      {$poll p/ixor}                                    ::  session state
+++  LIVE                                                ::  IN FLIGHT
+  $%  {$EXEC P/WHIR}                                    ::  FORD BUILD
+      {$WASP P/(LIST @UVH)}                             ::  FORD DEPS
+      {$XENO P/SHIP}                                    ::  PROXIED REQUEST
+      {$POLL P/IXOR}                                    ::  SESSION STATE
   ==
-++  cyst                                                ::  client session
-  $:  ced/cred                                          ::  credential
-      {him/ship aut/(set ship)}                         ::  authenticated
-      cug/(list @t)                                     ::  unacked cookies
-      lax/@da                                           ::  last used
-      way/(map ship {purl duct})                        ::  waiting auth
-      vew/(set oryx)                                    ::  open views XX expire
+++  CYST                                                ::  CLIENT SESSION
+  $:  CED/CRED                                          ::  CREDENTIAL
+      {HIM/SHIP AUT/(SET SHIP)}                         ::  AUTHENTICATED
+      CUG/(LIST @T)                                     ::  UNACKED COOKIES
+      LAX/@DA                                           ::  LAST USED
+      WAY/(MAP SHIP {PURL DUCT})                        ::  WAITING AUTH
+      VEW/(SET ORYX)                                    ::  OPEN VIEWS XX EXPIRE
   ==                                                    ::
 ::
-++  stem                                                ::  client view
-  $:  him/ship                                          ::  static identity
-      ude/(unit {p/duct q/?})                           ::  stream long-poll?
-      era/@da                                           ::  next wake
-      die/@da                                           ::  collection date
-      sus/(set {dock $json wire path})                  ::  subscriptions
-      eve/{p/@u q/(map @u even)}                        ::  queued events
-      med/(qeu duct)                                    ::  waiting /~/to/
+++  STEM                                                ::  CLIENT VIEW
+  $:  HIM/SHIP                                          ::  STATIC IDENTITY
+      UDE/(UNIT {P/DUCT Q/?})                           ::  STREAM LONG-POLL?
+      ERA/@DA                                           ::  NEXT WAKE
+      DIE/@DA                                           ::  COLLECTION DATE
+      SUS/(SET {DOCK $JSON WIRE PATH})                  ::  SUBSCRIPTIONS
+      EVE/{P/@U Q/(MAP @U EVEN)}                        ::  QUEUED EVENTS
+      MED/(QEU DUCT)                                    ::  WAITING /~/TO/
   ==
-++  even                                                ::  client event
-  $%  {$news p/@uvH}
-      {$quit p/{dock path}}
-      {$rush p/{dock path} q/json}
-  ==
-::
-++  perk                                                ::  parsed request
-  $%  {$auth p/perk-auth}
-      {$away ~}
-      {$oath p/knot q/(list @t)}
-      {$bugs p/?($as $to) ~}
-      {$beam p/beam}
-      {$deps p/?($put $delt) q/@uvH}
-      {$mess p/dock q/mark r/wire s/json}
-      {$poll p/{i/@uvH t/(list @uvH)}}
-      {$spur p/spur}
-      {$subs p/?($put $delt) q/{dock $json wire path}}
-      {$view p/ixor q/{~ u/@ud}}
-      ::{$view p/ixor q/{~ u/@ud} r/(unit @dr)}
+++  EVEN                                                ::  CLIENT EVENT
+  $%  {$NEWS P/@UVH}
+      {$QUIT P/{DOCK PATH}}
+      {$RUSH P/{DOCK PATH} Q/JSON}
   ==
 ::
-++  perk-auth                                           ::  parsed auth
-  $%  {$at p/pork}                                      ::  inject auth
-      {$del p/(unit ship)}
-      {$get him/ship rem/pork}
-      {$js ~}
-      {$json ~}
-      {$try him/ship paz/(unit cord)}
-      {$xen ses/hole rem/pork}
+++  PERK                                                ::  PARSED REQUEST
+  $%  {$AUTH P/PERK-AUTH}
+      {$AWAY ~}
+      {$OATH P/KNOT Q/(LIST @T)}
+      {$BUGS P/?($AS $TO) ~}
+      {$BEAM P/BEAM}
+      {$DEPS P/?($PUT $DELT) Q/@UVH}
+      {$MESS P/DOCK Q/MARK R/WIRE S/JSON}
+      {$POLL P/{I/@UVH T/(LIST @UVH)}}
+      {$SPUR P/SPUR}
+      {$SUBS P/?($PUT $DELT) Q/{DOCK $JSON WIRE PATH}}
+      {$VIEW P/IXOR Q/{~ U/@UD}}
+      ::{$VIEW P/IXOR Q/{~ U/@UD} R/(UNIT @DR)}
   ==
 ::
-++  pest                                                ::  result
+++  PERK-AUTH                                           ::  PARSED AUTH
+  $%  {$AT P/PORK}                                      ::  INJECT AUTH
+      {$DEL P/(UNIT SHIP)}
+      {$GET HIM/SHIP REM/PORK}
+      {$JS ~}
+      {$JSON ~}
+      {$TRY HIM/SHIP PAZ/(UNIT CORD)}
+      {$XEN SES/HOLE REM/PORK}
+  ==
+::
+++  PEST                                                ::  RESULT
   $@  ~
-  $%  {$$ p/httr}                                       ::  direct response
-      {$red ~}                                         ::  parent redirect
-      {$bake p/whir q/mark r/coin s/beam}               ::  ford request
-      {$js p/@t}                                        ::  script
-      {$json p/json}                                    ::  data
-      {$html p/manx}                                    ::  successful page
-      {$htme p/manx}                                    ::  authentication fail
+  $%  {$$ P/HTTR}                                       ::  DIRECT RESPONSE
+      {$RED ~}                                         ::  PARENT REDIRECT
+      {$BAKE P/WHIR Q/MARK R/COIN S/BEAM}               ::  FORD REQUEST
+      {$JS P/@T}                                        ::  SCRIPT
+      {$JSON P/JSON}                                    ::  DATA
+      {$HTML P/MANX}                                    ::  SUCCESSFUL PAGE
+      {$HTME P/MANX}                                    ::  AUTHENTICATION FAIL
   ==
 ::
-++  wank                                                ::  .well-known ankh
+++  WANK                                                ::  .WELL-KNOWN ANKH
   $~  [~ ~]
-  {p/(unit mime) q/(map @ta wank)}
+  {P/(UNIT MIME) Q/(MAP @TA WANK)}
 --                                                      ::
 |%
-++  eat-headers
-  |=  hed/(list {p/@t q/@t})  ^-  math
-  %+  roll  hed
-  |=  {a/{p/cord q/cord} b/math}
-  =.  p.a  (crip (cass (trip p.a)))
-  (~(add ja b) p.a q.a)
+++  EAT-HEADERS
+  |=  HED/(LIST {P/@T Q/@T})  ^-  MATH
+  %+  ROLL  HED
+  |=  {A/{P/CORD Q/CORD} B/MATH}
+  =.  P.A  (CRIP (CASS (TRIP P.A)))
+  (~(ADD JA B) P.A Q.A)
 ::
-++  fcgi                                                ::  credential caboose
-  |=  {quy/quay ced/cred}  ^-  coin
-  :+  %many
-    [%blob ced]
-  |-  ^-  (list coin)
-  ?~  quy  [%$ %n ~]~
-  [[%$ %t p.i.quy] [%$ %t q.i.quy] $(quy t.quy)]
+++  FCGI                                                ::  CREDENTIAL CABOOSE
+  |=  {QUY/QUAY CED/CRED}  ^-  COIN
+  :+  %MANY
+    [%BLOB CED]
+  |-  ^-  (LIST COIN)
+  ?~  QUY  [%$ %N ~]~
+  [[%$ %T P.I.QUY] [%$ %T Q.I.QUY] $(QUY T.QUY)]
 ::
-++  gsig  |=({a/dock b/?($mess $lens) c/path} [(scot %p p.a) q.a b c])
-++  session-from-cookies
-  |=  {nam/@t maf/math}
-  ^-  (unit hole)
-  (from-cookies maf |=({k/@t v/@} &(=(nam k) !=('~' v))))
+++  GSIG  |=({A/DOCK B/?($MESS $LENS) C/PATH} [(SCOT %P P.A) Q.A B C])
+++  SESSION-FROM-COOKIES
+  |=  {NAM/@T MAF/MATH}
+  ^-  (UNIT HOLE)
+  (FROM-COOKIES MAF |=({K/@T V/@} &(=(NAM K) !=('~' V))))
 ::
-++  ship-from-cookies
-  |=  maf/math  ^-  (unit ship)
-  (biff (from-cookies maf |=({k/@ @} =(%ship k))) (slat %p))
+++  SHIP-FROM-COOKIES
+  |=  MAF/MATH  ^-  (UNIT SHIP)
+  (BIFF (FROM-COOKIES MAF |=({K/@ @} =(%SHIP K))) (SLAT %P))
 ::
-++  from-cookies
-  |=  {maf/math fil/$-({@t @t} ?)}
-  =+  `cot/(list @t)`(~(get ju maf) 'cookie')
-  =+  `cok/quay`(zing `(list quay)`(murn cot (curr rush cock:de-purl)))
-  |-  ^-  (unit cord)
-  ?~  cok  ~
-  ?:((fil i.cok) [~ q.i.cok] $(cok t.cok))
+++  FROM-COOKIES
+  |=  {MAF/MATH FIL/$-({@T @T} ?)}
+  =+  `COT/(LIST @T)`(~(GET JU MAF) 'COOKIE')
+  =+  `COK/QUAY`(ZING `(LIST QUAY)`(MURN COT (CURR RUSH COCK:DE-PURL)))
+  |-  ^-  (UNIT CORD)
+  ?~  COK  ~
+  ?:((FIL I.COK) [~ Q.I.COK] $(COK T.COK))
 ::
-++  pack                                                ::  light path encoding
-  |=  {a/term b/path}  ^-  knot
-  %+  rap  3  :-  (wack a)
-  (turn b |=(c/knot (cat 3 '_' (wack c))))
+++  PACK                                                ::  LIGHT PATH ENCODING
+  |=  {A/TERM B/PATH}  ^-  KNOT
+  %+  RAP  3  :-  (WACK A)
+  (TURN B |=(C/KNOT (CAT 3 '_' (WACK C))))
 ::
-++  pick                                                ::  light path decoding
-  =+  fel=(most cab (sear wick urt:ab))
-  |=(a/knot `(unit {p/term q/path})`(rush a fel))
+++  PICK                                                ::  LIGHT PATH DECODING
+  =+  FEL=(MOST CAB (SEAR WICK URT:AB))
+  |=(A/KNOT `(UNIT {P/TERM Q/PATH})`(RUSH A FEL))
 ::
-++  wush
-  |=  {wid/@u tan/tang}
-  ^-  wall
-  (zing (turn tan |=(a/tank (wash 0^wid a))))
+++  WUSH
+  |=  {WID/@U TAN/TANG}
+  ^-  WALL
+  (ZING (TURN TAN |=(A/TANK (WASH 0^WID A))))
 ::
-++  yank                                                ::  get .well-known
-  |=  [wel=wank pat=path]
-  ^-  (unit mime)
-  ?~  pat  p.wel
-  =/  wan  (~(get by q.wel) i.pat)
-  ?~  wan  ~
-  $(wel u.wan, pat t.pat)
+++  YANK                                                ::  GET .WELL-KNOWN
+  |=  [WEL=WANK PAT=PATH]
+  ^-  (UNIT MIME)
+  ?~  PAT  P.WEL
+  =/  WAN  (~(GET BY Q.WEL) I.PAT)
+  ?~  WAN  ~
+  $(WEL U.WAN, PAT T.PAT)
 ::
-++  dank                                                ::  put/del .well-known
-  |=  [wel=wank pat=path mim=(unit mime)]
-  ^-  wank
-  ?~  pat  wel(p mim)
-  =/  wan  (~(get by q.wel) i.pat)
-  ?:  &(?=(~ wan) ?=(~ mim))
-    wel
-  :-  p.wel
-  %+  ~(put by q.wel)
-    i.pat
-  $(wel ?~(wan *wank u.wan), pat t.pat)
+++  DANK                                                ::  PUT/DEL .WELL-KNOWN
+  |=  [WEL=WANK PAT=PATH MIM=(UNIT MIME)]
+  ^-  WANK
+  ?~  PAT  WEL(P MIM)
+  =/  WAN  (~(GET BY Q.WEL) I.PAT)
+  ?:  &(?=(~ WAN) ?=(~ MIM))
+    WEL
+  :-  P.WEL
+  %+  ~(PUT BY Q.WEL)
+    I.PAT
+  $(WEL ?~(WAN *WANK U.WAN), PAT T.PAT)
 ::
-++  add-cookies
-  |=  {cug/(list @t) hit/httr}  ^-  httr
-  ?~  cug  hit
-  =+  cuh=(turn `(list @t)`cug |=(a/@t set-cookie+a))
-  hit(q (weld cuh q.hit))
+++  ADD-COOKIES
+  |=  {CUG/(LIST @T) HIT/HTTR}  ^-  HTTR
+  ?~  CUG  HIT
+  =+  CUH=(TURN `(LIST @T)`CUG |=(A/@T SET-COOKIE+A))
+  HIT(Q (WELD CUH Q.HIT))
 ::
-++  add-json                                            ::  inject window.urb
-  |=  {urb/json jaz/cord}  ^-  cord
-  =-  (cat 3 (crip -) jaz)
+++  ADD-JSON                                            ::  INJECT WINDOW.URB
+  |=  {URB/JSON JAZ/CORD}  ^-  CORD
+  =-  (CAT 3 (CRIP -) JAZ)
   """
-  var _urb = {(en-json urb)};
-  window.urb = window.urb || \{}; for(k in _urb) window.urb[k] = _urb[k];
+  VAR _URB = {(EN-JSON URB)};
+  WINDOW.URB = WINDOW.URB || \{}; FOR(K IN _URB) WINDOW.URB[K] = _URB[K];
 
   """
 ::
-++  ares-to-json
-  |=  err/ares  ^-  json
-  =-  (pairs:enjs fail+s+typ mess+(tape:enjs mez) ~)
-  ^-  {typ/term mez/tape}
-  ?~  err  [%fail "Unknown Error"]
-  [p.u.err (of-wall (wush 160 q.u.err))]
+++  ARES-TO-JSON
+  |=  ERR/ARES  ^-  JSON
+  =-  (PAIRS:ENJS FAIL+S+TYP MESS+(TAPE:ENJS MEZ) ~)
+  ^-  {TYP/TERM MEZ/TAPE}
+  ?~  ERR  [%FAIL "UNKNOWN ERROR"]
+  [P.U.ERR (OF-WALL (WUSH 160 Q.U.ERR))]
 ::
-++  resp                                                ::  mimed response
-  |=  {sas/@uG mit/mite rez/@}  ^-  httr
-  ::  (weld (turn cug |=(a=@t ['set-cookie' a]))
-  [sas ~[content-type+(en-mite mit)] [~ (as-octs rez)]]
+++  RESP                                                ::  MIMED RESPONSE
+  |=  {SAS/@UG MIT/MITE REZ/@}  ^-  HTTR
+  ::  (WELD (TURN CUG |=(A=@T ['SET-COOKIE' A]))
+  [SAS ~[CONTENT-TYPE+(EN-MITE MIT)] [~ (AS-OCTS REZ)]]
 ::
-++  favi                                                ::  XX favicon
-  0w3.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+++  FAVI                                                ::  XX FAVICON
+  0W3.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
@@ -313,25 +313,25 @@
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~LX-.~~HW-.L~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.Rdjk~.VWuDL.-3wUf.~zEWe.~Yj4N.f~Y~f.P~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~-~LX.~~lBp.m~~nR.Zv~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.RZvn~.GqCF~.Qt7h~.Ya2wH.~0000.~M000.fY000.
-  3~0w8.2~Qx8.if~eP.IX~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~fP.Y~QB9.ivY00.03~k5.1g~Z~.vT~~~.~~~~~.~~~~~.~~~~~.FWuD~.
-  CpCp~.P8OcL.Y0003.~0000.~M000.fY000.3~000.0~M00.0fY00.03~00.00~Nk.l5v-W.KHH~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~-QJ.bj~00.
-  00~M0.00fY0.003~6.hAp~S.FGqL-.6xEr~.oC9y~.NUu7L.Y0003.~0000.~M000.fY000.3~000.
-  0~M00.0fY00.03~00.00~M0.00fY0.003~0.000~N.sn5~~.fPY~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~Z7.hQvYr.6NL~0.000~M.000fY.0003~.0000~.
-  M000f.Y0003.~0000.~M000.fY000.3~000.0~M00.0fYJb.iT~sT.dP~Vu.nB~ZZ.vnT~a.iAF~M.
-  000fY.0003~.0000~.VGqCL.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~Y.D9OvY.B9in~.0000~.M000f.Y0003.~0000.~M000.fY000.3~000.0~M41.
-  0vZ1g.k7~Ha.OI~~n.RZv~~.~~~~~.~~~~~.~~~~~.HW-L~.jAVe~.M000f.YNcj7.~YLbO.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.-byUL.
-  ZzoSf.~3MYf.~M000.fY000.3~000.0~MQd.3vZik.Bb~Kb.yU~~P.Y~f~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~IXeP.~ezEW.~WGGG.L~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~pSt.D~DFW.u~Uu7.x~-tD.
-  pT~RZ.vn~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~IXe.
+  ~~~~~.RDJK~.VWUDL.-3WUF.~ZEWE.~YJ4N.F~Y~F.P~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~-~LX.~~LBP.M~~NR.ZV~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.RZVN~.GQCF~.QT7H~.YA2WH.~0000.~M000.FY000.
+  3~0W8.2~QX8.IF~EP.IX~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~FP.Y~QB9.IVY00.03~K5.1G~Z~.VT~~~.~~~~~.~~~~~.~~~~~.FWUD~.
+  CPCP~.P8OCL.Y0003.~0000.~M000.FY000.3~000.0~M00.0FY00.03~00.00~NK.L5V-W.KHH~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~-QJ.BJ~00.
+  00~M0.00FY0.003~6.HAP~S.FGQL-.6XER~.OC9Y~.NUU7L.Y0003.~0000.~M000.FY000.3~000.
+  0~M00.0FY00.03~00.00~M0.00FY0.003~0.000~N.SN5~~.FPY~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~Z7.HQVYR.6NL~0.000~M.000FY.0003~.0000~.
+  M000F.Y0003.~0000.~M000.FY000.3~000.0~M00.0FYJB.IT~ST.DP~VU.NB~ZZ.VNT~A.IAF~M.
+  000FY.0003~.0000~.VGQCL.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~Y.D9OVY.B9IN~.0000~.M000F.Y0003.~0000.~M000.FY000.3~000.0~M41.
+  0VZ1G.K7~HA.OI~~N.RZV~~.~~~~~.~~~~~.~~~~~.HW-L~.JAVE~.M000F.YNCJ7.~YLBO.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.-BYUL.
+  ZZOSF.~3MYF.~M000.FY000.3~000.0~MQD.3VZIK.BB~KB.YU~~P.Y~F~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~IXEP.~EZEW.~WGGG.L~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~PST.D~DFW.U~UU7.X~-TD.
+  PT~RZ.VN~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~IXE.
   P~-LH.W~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
@@ -364,7 +364,7 @@
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~0000.00000.00000.00000.00000.50000.00002.000g0.00400.000w0.000a0.00000.
+  ~~~~~.~0000.00000.00000.00000.00000.50000.00002.000G0.00400.000W0.000A0.00000.
   00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.
   00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.
   00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.00000.
@@ -378,12 +378,12 @@
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~~~~.Rdjk~.~bOYL.~~~~~.~~~~~.~~TZ~.v-ZLr.T~r6N.I~Rtn.l~-rC.
-  VL~-~.LX~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.ZLrS~.OMIbf.Z2gAb.~JHqS.~V-vD.~Y-fz.
-  X~000.0~M00.0fY00.03~00.00~S1.wof~U.-fz~~.~~~~~.~~~~~.~~~~~.~~~~~.~DV-v.ZDpSv.
-  ~0000.~M000.fY000.3~000.0~Qp6.hL-FG.qD~LX.-~~Qt.7h~Yw.823~Y.LbO~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~~~~~.~~LX-.~WCFG.vZtnl.T~rmR.J~Yf3.M~~~~.~~~~~.~~~~~.~~~~J.XuT~N.
-  Yv7~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~~~~.RDJK~.~BOYL.~~~~~.~~~~~.~~TZ~.V-ZLR.T~R6N.I~RTN.L~-RC.
+  VL~-~.LX~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.ZLRS~.OMIBF.Z2GAB.~JHQS.~V-VD.~Y-FZ.
+  X~000.0~M00.0FY00.03~00.00~S1.WOF~U.-FZ~~.~~~~~.~~~~~.~~~~~.~~~~~.~DV-V.ZDPSV.
+  ~0000.~M000.FY000.3~000.0~QP6.HL-FG.QD~LX.-~~QT.7H~YW.823~Y.LBO~~.~~~~~.~~~~~.
+  ~~~~~.~~~~~.~~~~~.~~LX-.~WCFG.VZTNL.T~RMR.J~YF3.M~~~~.~~~~~.~~~~~.~~~~J.XUT~N.
+  YV7~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
@@ -391,2014 +391,2014 @@
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
   ~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.~~~~~.
-  ~~~~~.~~~~~.~0000.00000.00000.00000.00000.1g000.00002.000g0.00200.000g0.000a0.
-  001kU.001gE.02000.g0082.00000.C0005.a00w0.04001.0g008.00g00
-++  js                                                  ::  static javascript
+  ~~~~~.~~~~~.~0000.00000.00000.00000.00000.1G000.00002.000G0.00200.000G0.000A0.
+  001KU.001GE.02000.G0082.00000.C0005.A00W0.04001.0G008.00G00
+++  JS                                                  ::  STATIC JAVASCRIPT
   |%
-  ++  poll                                              :: dependency long-poll
+  ++  POLL                                              :: DEPENDENCY LONG-POLL
     '''
-    urb.tries = 0
-    urb.call = function() {
-      urb.wreq = new XMLHttpRequest()
-      urb.wreq.open('GET', "/~/on.json?"+urb.deps.join('&'), true)
-      urb.wreq.addEventListener('load', function() {
-        // if(~~(this.status / 100) == 4)
-        //   return document.write(this.responseText)
-        if(this.status === 200) {
-          var dep = JSON.parse(this.responseText)
-          urb.onupdate(dep)
-          urb.dewasp(dep)
+    URB.TRIES = 0
+    URB.CALL = FUNCTION() {
+      URB.WREQ = NEW XMLHTTPREQUEST()
+      URB.WREQ.OPEN('GET', "/~/ON.JSON?"+URB.DEPS.JOIN('&'), TRUE)
+      URB.WREQ.ADDEVENTLISTENER('LOAD', FUNCTION() {
+        // IF(~~(THIS.STATUS / 100) == 4)
+        //   RETURN DOCUMENT.WRITE(THIS.RESPONSETEXT)
+        IF(THIS.STATUS === 200) {
+          VAR DEP = JSON.PARSE(THIS.RESPONSETEXT)
+          URB.ONUPDATE(DEP)
+          URB.DEWASP(DEP)
         }
-        urb.keep()
+        URB.KEEP()
       })
-      urb.wreq.addEventListener('error', urb.keep)
-      urb.wreq.addEventListener('abort', urb.keep)
-      urb.wreq.send()
+      URB.WREQ.ADDEVENTLISTENER('ERROR', URB.KEEP)
+      URB.WREQ.ADDEVENTLISTENER('ABORT', URB.KEEP)
+      URB.WREQ.SEND()
     }
-    urb.keep = function() {
-      setTimeout(urb.call,1000*urb.tries)
-      urb.tries++
+    URB.KEEP = FUNCTION() {
+      SETTIMEOUT(URB.CALL,1000*URB.TRIES)
+      URB.TRIES++
     }
-    urb.onupdate = function(){document.location.reload()}
-    urb.call()
-    urb.wasp = function(deh){
-      if (!deh) return;
-      if (urb.deps.indexOf(deh) !== -1) return;
-      urb.deps.push(deh)
-      urb.wreq.abort() // trigger keep
+    URB.ONUPDATE = FUNCTION(){DOCUMENT.LOCATION.RELOAD()}
+    URB.CALL()
+    URB.WASP = FUNCTION(DEH){
+      IF (!DEH) RETURN;
+      IF (URB.DEPS.INDEXOF(DEH) !== -1) RETURN;
+      URB.DEPS.PUSH(DEH)
+      URB.WREQ.ABORT() // TRIGGER KEEP
     }
-    urb.dewasp = function(deh){
-      var index = urb.deps.indexOf(deh)
-      if (-1 !== index) {
-        urb.deps.splice(index,1)
-        urb.wreq.abort() // trigger keep
+    URB.DEWASP = FUNCTION(DEH){
+      VAR INDEX = URB.DEPS.INDEXOF(DEH)
+      IF (-1 !== INDEX) {
+        URB.DEPS.SPLICE(INDEX,1)
+        URB.WREQ.ABORT() // TRIGGER KEEP
       }
     }
 
     '''
   ::
-  ++  auth-redir
-    'document.location.pathname = "/~~"+document.location.pathname'
+  ++  AUTH-REDIR
+    'DOCUMENT.LOCATION.PATHNAME = "/~~"+DOCUMENT.LOCATION.PATHNAME'
   ::
-  ++  auth
+  ++  AUTH
     '''
-    var req = function(url,dat,cb){
-      var xhr = new XMLHttpRequest()
-      xhr.open('POST', url, true)
-      dat.oryx = urb.oryx
-      xhr.send(JSON.stringify(dat))
-      xhr.addEventListener('load', function(ev){
-        if(this.status !== 200)
-          return err.innerHTML = ":( " + Date.now() + "\n" + xhr.responseText
-        else if(cb) return cb(xhr.responseText,ev)
+    VAR REQ = FUNCTION(URL,DAT,CB){
+      VAR XHR = NEW XMLHTTPREQUEST()
+      XHR.OPEN('POST', URL, TRUE)
+      DAT.ORYX = URB.ORYX
+      XHR.SEND(JSON.STRINGIFY(DAT))
+      XHR.ADDEVENTLISTENER('LOAD', FUNCTION(EV){
+        IF(THIS.STATUS !== 200)
+          RETURN ERR.INNERHTML = ":( " + DATE.NOW() + "\N" + XHR.RESPONSETEXT
+        ELSE IF(CB) RETURN CB(XHR.RESPONSETEXT,EV)
       })
     }
 
-    urb.foreign = /^\/~\/am/.test(window.location.pathname)
-    urb.redirTo = function(url){
-      document.title = "Redirecting"
-      var mount = document.getElementById("pass") || document.body
-      mount.outerHTML = "Redirecting to <a href=\""+url+"\">"+url+"</a>"
-      document.location = url
+    URB.FOREIGN = /^\/~\/AM/.TEST(WINDOW.LOCATION.PATHNAME)
+    URB.REDIRTO = FUNCTION(URL){
+      DOCUMENT.TITLE = "REDIRECTING"
+      VAR MOUNT = DOCUMENT.GETELEMENTBYID("PASS") || DOCUMENT.BODY
+      MOUNT.OUTERHTML = "REDIRECTING TO <A HREF=\""+URL+"\">"+URL+"</A>"
+      DOCUMENT.LOCATION = URL
     }
-    urb.redir = function(ship){
-      if(ship){
-        var location = new URL(document.location)
-        location.pathname = location.pathname.replace(/^\/~~|\/~\/as\/any/,'/~/as/~'+ship)
-        urb.redirTo(location)
+    URB.REDIR = FUNCTION(SHIP){
+      IF(SHIP){
+        VAR LOCATION = NEW URL(DOCUMENT.LOCATION)
+        LOCATION.PATHNAME = LOCATION.PATHNAME.REPLACE(/^\/~~|\/~\/AS\/ANY/,'/~/AS/~'+SHIP)
+        URB.REDIRTO(LOCATION)
       }
-      else urb.redirTo(
-        document.location.hash.match(/#[^?]+/)[0].slice(1) +
-        document.location.pathname.replace(
-          /^\/~\/am\/[^/]+/,
-          '/~/as/~' + urb.ship) +
-        document.location.search
+      ELSE URB.REDIRTO(
+        DOCUMENT.LOCATION.HASH.MATCH(/#[^?]+/)[0].SLICE(1) +
+        DOCUMENT.LOCATION.PATHNAME.REPLACE(
+          /^\/~\/AM\/[^/]+/,
+          '/~/AS/~' + URB.SHIP) +
+        DOCUMENT.LOCATION.SEARCH
       )
     }
-    if(urb.foreign && urb.auth.indexOf(urb.ship) !== -1){
-      req("/~/auth.json?PUT",
-          {ship:urb.ship,code:null},
-          function(){urb.redir()})
+    IF(URB.FOREIGN && URB.AUTH.INDEXOF(URB.SHIP) !== -1){
+      REQ("/~/AUTH.JSON?PUT",
+          {SHIP:URB.SHIP,CODE:NULL},
+          FUNCTION(){URB.REDIR()})
     }
-    urb.is_me = function(ship) {
-      return (urb.ship === ship)
+    URB.IS_ME = FUNCTION(SHIP) {
+      RETURN (URB.SHIP === SHIP)
     }
-    urb.submit = function(ship,pass){
-      if(!urb.is_me(ship))
-        return urb.redir(ship)
-      req(
-        "/~/auth.json?PUT",
-        {ship:ship, code:pass},
-        function(){
-          if(urb.foreign) urb.redir()
-          else document.location.reload()
+    URB.SUBMIT = FUNCTION(SHIP,PASS){
+      IF(!URB.IS_ME(SHIP))
+        RETURN URB.REDIR(SHIP)
+      REQ(
+        "/~/AUTH.JSON?PUT",
+        {SHIP:SHIP, CODE:PASS},
+        FUNCTION(){
+          IF(URB.FOREIGN) URB.REDIR()
+          ELSE DOCUMENT.LOCATION.RELOAD()
       })
     }
-    urb.away = function(){req("/~/auth.json?DELETE", {},
-      function(){document.body.innerHTML = "" }
+    URB.AWAY = FUNCTION(){REQ("/~/AUTH.JSON?DELETE", {},
+      FUNCTION(){DOCUMENT.BODY.INNERHTML = "" }
     )}
     '''
   --
-++  xml
+++  XML
   |%
-  ++  exit
-    ;html
-      ;head:title:"Accepted"
-      ;body:"You may now close this window."
+  ++  EXIT
+    ;HTML
+      ;HEAD:TITLE:"ACCEPTED"
+      ;BODY:"YOU MAY NOW CLOSE THIS WINDOW."
     ==
   ::
-  ++  redir
-    |=  url/tape
-    ;html
-      ;head:title:"Redirecting..."
-      ;body
-        ;p: Redirecting to ;{a/"{url}" "{url}"}
-        ;script: setTimeout(function()\{document.location = {(en-json (tape:enjs url))}}, 3000)
+  ++  REDIR
+    |=  URL/TAPE
+    ;HTML
+      ;HEAD:TITLE:"REDIRECTING..."
+      ;BODY
+        ;P: REDIRECTING TO ;{A/"{URL}" "{URL}"}
+        ;SCRIPT: SETTIMEOUT(FUNCTION()\{DOCUMENT.LOCATION = {(EN-JSON (TAPE:ENJS URL))}}, 3000)
       ==
     ==
   ::
-  ++  login-page
-    %+  titl  'Login - Landscape'
+  ++  LOGIN-PAGE
+    %+  TITL  'LOGIN - LANDSCAPE'
     ;=
-    ;div.header-container.container
-      ;div.row
-        ;div.flex-col-x.header-breadcrumbs;
+    ;DIV.HEADER-CONTAINER.CONTAINER
+      ;DIV.ROW
+        ;DIV.FLEX-COL-X.HEADER-BREADCRUMBS;
       ==
-      ;div.row.align-center.header-mainrow
-        ;div.flex-col-2.justify-end;
-        ;h1.flex-col-x.header-title: Login
+      ;DIV.ROW.ALIGN-CENTER.HEADER-MAINROW
+        ;DIV.FLEX-COL-2.JUSTIFY-END;
+        ;H1.FLEX-COL-X.HEADER-TITLE: LOGIN
       ==
     ==
-    ;div.container
-      ;div.row
-        ;div.flex-col-2;
-        ;div.flex-col-x
-          ;div.row.mt-10
-            ;h3.col-md-12: Ship
+    ;DIV.CONTAINER
+      ;DIV.ROW
+        ;DIV.FLEX-COL-2;
+        ;DIV.FLEX-COL-X
+          ;DIV.ROW.MT-10
+            ;H3.COL-MD-12: SHIP
           ==
-          ;div.row
-            ;input#ship.col-md-10.h3.text-500.collection-title(placeholder "your-ship", contenteditable "");
+          ;DIV.ROW
+            ;INPUT#SHIP.COL-MD-10.H3.TEXT-500.COLLECTION-TITLE(PLACEHOLDER "YOUR-SHIP", CONTENTEDITABLE "");
           ==
-          ;div.row.mt-5
-            ;h3.col-md-12
-              ; Type
-              ;span.text-mono.mr-1: +code
-              ; in your terminal and press enter
+          ;DIV.ROW.MT-5
+            ;H3.COL-MD-12
+              ; TYPE
+              ;SPAN.TEXT-MONO.MR-1: +CODE
+              ; IN YOUR TERMINAL AND PRESS ENTER
             ==
           ==
-          ;div.row
-            ;input#pass.col-md-10.h3.mono.text-500.collection-title(type "password", placeholder "passcode");
+          ;DIV.ROW
+            ;INPUT#PASS.COL-MD-10.H3.MONO.TEXT-500.COLLECTION-TITLE(TYPE "PASSWORD", PLACEHOLDER "PASSCODE");
           ==
-          ;div.row.mt-5
-            ;button#login.btn-primary.btn(disabled "true"): Login
+          ;DIV.ROW.MT-5
+            ;BUTTON#LOGIN.BTN-PRIMARY.BTN(DISABLED "TRUE"): LOGIN
           ==
-          ;div.row.mt-5
-            ;pre#err;
+          ;DIV.ROW.MT-5
+            ;PRE#ERR;
           ==
         ==
       ==
     ==
-        ;script@"/~/at/~/auth.js";
-        ;script:'''
-                $(function() {
-                  $ship = $('#ship')
-                  $pass = $('#pass')
-                  $login = $('#login')
-                  $ship.on('keydown', function(e) {
-                    if(e.keyCode === 13 || e.keyCode === 9) {
-                      if(!urb.is_me($ship.val().toLowerCase()))
-                        urb.redir($ship.val().toLowerCase())
-                      $pass.show()
-                      $pass.focus()
-                      e.preventDefault()
+        ;SCRIPT@"/~/AT/~/AUTH.JS";
+        ;SCRIPT:'''
+                $(FUNCTION() {
+                  $SHIP = $('#SHIP')
+                  $PASS = $('#PASS')
+                  $LOGIN = $('#LOGIN')
+                  $SHIP.ON('KEYDOWN', FUNCTION(E) {
+                    IF(E.KEYCODE === 13 || E.KEYCODE === 9) {
+                      IF(!URB.IS_ME($SHIP.VAL().TOLOWERCASE()))
+                        URB.REDIR($SHIP.VAL().TOLOWERCASE())
+                      $PASS.SHOW()
+                      $PASS.FOCUS()
+                      E.PREVENTDEFAULT()
                     }
                   })
-                  $pass.on('keypress', function(e) {
-                    if($pass.val().length > -1) {
-                      $login.prop('disabled', false)
-                    } else {
-                      $login.prop('disabled', true)
+                  $PASS.ON('KEYPRESS', FUNCTION(E) {
+                    IF($PASS.VAL().LENGTH > -1) {
+                      $LOGIN.PROP('DISABLED', FALSE)
+                    } ELSE {
+                      $LOGIN.PROP('DISABLED', TRUE)
                     }
                   })
-                  $pass.on('paste', function(e) {
-                    if($pass.val().length > -1) {
-                      $login.prop('disabled', false)
-                    } else {
-                      $login.prop('disabled', true)
+                  $PASS.ON('PASTE', FUNCTION(E) {
+                    IF($PASS.VAL().LENGTH > -1) {
+                      $LOGIN.PROP('DISABLED', FALSE)
+                    } ELSE {
+                      $LOGIN.PROP('DISABLED', TRUE)
                     }
                   })
-                  $login.on('click', function(e) {
-                    urb.submit($ship.val().toLowerCase(),$pass.val())
+                  $LOGIN.ON('CLICK', FUNCTION(E) {
+                    URB.SUBMIT($SHIP.VAL().TOLOWERCASE(),$PASS.VAL())
                   })
-                  if(window.ship) {
-                    $ship.val(urb.ship)
-                    $pass.focus()
-                  } else {
-                    $pass.hide()
+                  IF(WINDOW.SHIP) {
+                    $SHIP.VAL(URB.SHIP)
+                    $PASS.FOCUS()
+                  } ELSE {
+                    $PASS.HIDE()
                   }
                 })
                 '''
     ==
   ::
-  ++  logout-page
-    %+  titl  'Log out'
-    ;=  ;div.container.top
-          ;div.row
-            ;div.col-md-10
-              ;h1.sign: Bye!
-              ;button#act(onclick "urb.away()"): Log out
-              ;pre:code#err;
-              ;script@"/~/at/~/auth.js";
+  ++  LOGOUT-PAGE
+    %+  TITL  'LOG OUT'
+    ;=  ;DIV.CONTAINER.TOP
+          ;DIV.ROW
+            ;DIV.COL-MD-10
+              ;H1.SIGN: BYE!
+              ;BUTTON#ACT(ONCLICK "URB.AWAY()"): LOG OUT
+              ;PRE:CODE#ERR;
+              ;SCRIPT@"/~/AT/~/AUTH.JS";
             ==
           ==
         ==
       ==
   ::
-  ++  poke-test
-    %+  titl  'Poke'
-    ;=  ;button(onclick "urb.testPoke('/~/to/hood/helm-hi.json')"): Hi anonymous
-        ;button(onclick "urb.testPoke('/~/as/own/~/to/hood/helm-hi.json')"): Hi
-        ;pre:code#err;
-        ;script@"/~/at/~/auth.js";
-        ;script:'''
-                show = function(t){err.innerText = ":) " + Date.now() + "\n" + t}
-                urb.testPoke = function(url){
-                  req(url,{wire:"/",xyro:'test'}, show)
+  ++  POKE-TEST
+    %+  TITL  'POKE'
+    ;=  ;BUTTON(ONCLICK "URB.TESTPOKE('/~/TO/HOOD/HELM-HI.JSON')"): HI ANONYMOUS
+        ;BUTTON(ONCLICK "URB.TESTPOKE('/~/AS/OWN/~/TO/HOOD/HELM-HI.JSON')"): HI
+        ;PRE:CODE#ERR;
+        ;SCRIPT@"/~/AT/~/AUTH.JS";
+        ;SCRIPT:'''
+                SHOW = FUNCTION(T){ERR.INNERTEXT = ":) " + DATE.NOW() + "\N" + T}
+                URB.TESTPOKE = FUNCTION(URL){
+                  REQ(URL,{WIRE:"/",XYRO:'TEST'}, SHOW)
                 }
                 '''
     ==
-  ++  titl
-    |=  {a/cord b/marl}
-    ;html
-      ;head
-        ;meta(charset "utf-8");
-        ;meta(name "viewport", content "width=device-width, ".
-        "height=device-height, initial-scale=1.0, user-scalable=0, ".
-        "minimum-scale=1.0, maximum-scale=1.0");
-        ;title:"{(trip a)}"
-        ;script(type "text/javascript", src "//cdnjs.cloudflare.com/ajax/".
-          "libs/jquery/2.1.1/jquery.min.js");
-        ;link(rel "stylesheet", href "/===/web/landscape/css/index.css");
+  ++  TITL
+    |=  {A/CORD B/MARL}
+    ;HTML
+      ;HEAD
+        ;META(CHARSET "UTF-8");
+        ;META(NAME "VIEWPORT", CONTENT "WIDTH=DEVICE-WIDTH, ".
+        "HEIGHT=DEVICE-HEIGHT, INITIAL-SCALE=1.0, USER-SCALABLE=0, ".
+        "MINIMUM-SCALE=1.0, MAXIMUM-SCALE=1.0");
+        ;TITLE:"{(TRIP A)}"
+        ;SCRIPT(TYPE "TEXT/JAVASCRIPT", SRC "//CDNJS.CLOUDFLARE.COM/AJAX/".
+          "LIBS/JQUERY/2.1.1/JQUERY.MIN.JS");
+        ;LINK(REL "STYLESHEET", HREF "/===/WEB/LANDSCAPE/CSS/INDEX.CSS");
       ==
-      ;body:"*{b}"
+      ;BODY:"*{B}"
     ==
   --
 --
-|%                                                      ::  functions
-++  ye                                                  ::  per event
-  =|  $:  $:  hen/duct                                  ::  event floor
-              $:  now/@da                               ::  event date
-                  eny/@                                 ::  unique entropy
-                  our/ship                              ::  current ship
-                  sky/$-({* *} (unit))                  ::  system namespace
+|%                                                      ::  FUNCTIONS
+++  YE                                                  ::  PER EVENT
+  =|  $:  $:  HEN/DUCT                                  ::  EVENT FLOOR
+              $:  NOW/@DA                               ::  EVENT DATE
+                  ENY/@                                 ::  UNIQUE ENTROPY
+                  OUR/SHIP                              ::  CURRENT SHIP
+                  SKY/$-({* *} (UNIT))                  ::  SYSTEM NAMESPACE
               ==                                        ::
-              mow/(list move)                           ::  pending actions
+              MOW/(LIST MOVE)                           ::  PENDING ACTIONS
           ==                                            ::
-          bolo                                          ::  all vane state
+          BOLO                                          ::  ALL VANE STATE
       ==                                                ::
-  =*  bol  ->
-  ~%  %eyre-y  ..is  ~
+  =*  BOL  ->
+  ~%  %EYRE-Y  ..IS  ~
   |%
-  ++  abet                                              ::  resolve moves
-    ^-  {(list move) bolo}
-    [(flop mow) bol]
+  ++  ABET                                              ::  RESOLVE MOVES
+    ^-  {(LIST MOVE) BOLO}
+    [(FLOP MOW) BOL]
   ::
-  ++  adit  .(ney (mix eny ney))                        ::  flip entropy
+  ++  ADIT  .(NEY (MIX ENY NEY))                        ::  FLIP ENTROPY
   ::
-  ++  anon  `@p`(add our ^~((bex 64)))                  ::  pseudo-sub
-  ++  apex                                              ::  accept request
-    |=  kyz/task:able
+  ++  ANON  `@P`(ADD OUR ^~((BEX 64)))                  ::  PSEUDO-SUB
+  ++  APEX                                              ::  ACCEPT REQUEST
+    |=  KYZ/TASK:ABLE
     ^+  +>
-    =.  p.top  our              ::  XX necessary?
-    ?-    -.kyz
-        ::  new unix process - learn of first boot or a restart.
+    =.  P.TOP  OUR              ::  XX NECESSARY?
+    ?-    -.KYZ
+        ::  NEW UNIX PROCESS - LEARN OF FIRST BOOT OR A RESTART.
         ::
-        $born
-      ::  save outgoing duct
+        $BORN
+      ::  SAVE OUTGOING DUCT
       ::
-      =.  ged  hen
-      ::  give %form to start servers
+      =.  GED  HEN
+      ::  GIVE %FORM TO START SERVERS
       ::
-      =.  mow  :_(mow [hen [%give %form fig]])
-      ::  kill active incoming requests
-      ::
-      =.  +>.$
-        =/  fok=(list duct)  ~(tap in ~(key by lyv))
-        |-  ^+   +>.^$
-        ?~  fok  +>.^$
-        %=  $
-          fok    t.fok
-          +>.^$  ^$(hen i.fok, kyz [%thud ~])
-        ==
-      ::  kill active outgoing requests
+      =.  MOW  :_(MOW [HEN [%GIVE %FORM FIG]])
+      ::  KILL ACTIVE INCOMING REQUESTS
       ::
       =.  +>.$
-        =/  fok=(list duct)  (turn ~(val by q.ask) head)
+        =/  FOK=(LIST DUCT)  ~(TAP IN ~(KEY BY LYV))
         |-  ^+   +>.^$
-        ?~  fok  +>.^$
+        ?~  FOK  +>.^$
         %=  $
-          fok    t.fok
-          +>.^$  ^$(hen i.fok, kyz [%them ~])
+          FOK    T.FOK
+          +>.^$  ^$(HEN I.FOK, KYZ [%THUD ~])
         ==
-      ::  if galaxy, request %ames domain from %jael
+      ::  KILL ACTIVE OUTGOING REQUESTS
       ::
-      ::    %jael response handled in $turf branch of +axon.
+      =.  +>.$
+        =/  FOK=(LIST DUCT)  (TURN ~(VAL BY Q.ASK) HEAD)
+        |-  ^+   +>.^$
+        ?~  FOK  +>.^$
+        %=  $
+          FOK    T.FOK
+          +>.^$  ^$(HEN I.FOK, KYZ [%THEM ~])
+        ==
+      ::  IF GALAXY, REQUEST %AMES DOMAIN FROM %JAEL
       ::
-      =?  mow  ?=(%czar (clan:title our))  :_(mow [hen %pass / %j %turf ~])
-      ::  learn externally known domain names
+      ::    %JAEL RESPONSE HANDLED IN $TURF BRANCH OF +AXON.
       ::
-      ::    If any are new, request certificate. XX currently unused. remove?
-      ::    XX %born card also includes locally-known IPs. use for DNS?
+      =?  MOW  ?=(%CZAR (CLAN:TITLE OUR))  :_(MOW [HEN %PASS / %J %TURF ~])
+      ::  LEARN EXTERNALLY KNOWN DOMAIN NAMES
+      ::
+      ::    IF ANY ARE NEW, REQUEST CERTIFICATE. XX CURRENTLY UNUSED. REMOVE?
+      ::    XX %BORN CARD ALSO INCLUDES LOCALLY-KNOWN IPS. USE FOR DNS?
       ::
       ::
-      =/  mod/(set turf)
-        %-  ~(gas in *(set turf))
-        %+  turn
-          (skim p.kyz |=(a=host ?=(%& -.a)))
-        |=(a=host ?>(?=(%& -.a) p.a))
-      =/  dif/(set (list @t))  (~(dif in mod) dom)
-      =?  dom  ?=(^ dif)  (~(uni in dom) mod)
-      =?  mow  ?=(^ dif)
-        =/  cmd  [%acme %poke `cage`[%acme-order !>(dom)]]
-        :_(mow [hen %pass /acme/order %g %deal [our our] cmd])
+      =/  MOD/(SET TURF)
+        %-  ~(GAS IN *(SET TURF))
+        %+  TURN
+          (SKIM P.KYZ |=(A=HOST ?=(%& -.A)))
+        |=(A=HOST ?>(?=(%& -.A) P.A))
+      =/  DIF/(SET (LIST @T))  (~(DIF IN MOD) DOM)
+      =?  DOM  ?=(^ DIF)  (~(UNI IN DOM) MOD)
+      =?  MOW  ?=(^ DIF)
+        =/  CMD  [%ACME %POKE `CAGE`[%ACME-ORDER !>(DOM)]]
+        :_(MOW [HEN %PASS /ACME/ORDER %G %DEAL [OUR OUR] CMD])
       +>.$
     ::
-        $live
-      +>.$(clr.por p.kyz, sek.por q.kyz)
+        $LIVE
+      +>.$(CLR.POR P.KYZ, SEK.POR Q.KYZ)
     ::
-        $rule
-      ?-  -.p.kyz
-          $cert
-        ?:  =(secure.fig p.p.kyz)  +>.$
-        =.  secure.fig  p.p.kyz
-        +>.$(mow :_(mow [ged [%give %form fig]]))
+        $RULE
+      ?-  -.P.KYZ
+          $CERT
+        ?:  =(SECURE.FIG P.P.KYZ)  +>.$
+        =.  SECURE.FIG  P.P.KYZ
+        +>.$(MOW :_(MOW [GED [%GIVE %FORM FIG]]))
       ::
-          $turf
-        =/  mod/(set turf)
-          ?:  ?=(%put p.p.kyz)
-            (~(put in dom) q.p.kyz)
-          (~(del in dom) q.p.kyz)
-        ?:  =(dom mod)  +>.$
-        =/  cmd  [%acme %poke `cage`[%acme-order !>(mod)]]
+          $TURF
+        =/  MOD/(SET TURF)
+          ?:  ?=(%PUT P.P.KYZ)
+            (~(PUT IN DOM) Q.P.KYZ)
+          (~(DEL IN DOM) Q.P.KYZ)
+        ?:  =(DOM MOD)  +>.$
+        =/  CMD  [%ACME %POKE `CAGE`[%ACME-ORDER !>(MOD)]]
         %=  +>.$
-          dom  mod
-          mow  :_(mow [hen %pass /acme/order %g %deal [our our] cmd])
+          DOM  MOD
+          MOW  :_(MOW [HEN %PASS /ACME/ORDER %G %DEAL [OUR OUR] CMD])
         ==
       ==
     ::
-        $serv
-      =<  ~&([%serving (en-beam top)] .)
-      ?^(p.kyz +>.$(top p.kyz) +>.$(q.top p.kyz))
+        $SERV
+      =<  ~&([%SERVING (EN-BEAM TOP)] .)
+      ?^(P.KYZ +>.$(TOP P.KYZ) +>.$(Q.TOP P.KYZ))
     ::
-        $crud
-      +>.$(mow [[hen %slip %d %flog kyz] mow])
+        $CRUD
+      +>.$(MOW [[HEN %SLIP %D %FLOG KYZ] MOW])
     ::
-        $init                                           ::  register ownership
+        $INIT                                           ::  REGISTER OWNERSHIP
       %=  +>.$
-        fig  [~ ?=(%king (clan:title our)) & &]
-        top  [[our %home ud+0] /web]
+        FIG  [~ ?=(%KING (CLAN:TITLE OUR)) & &]
+        TOP  [[OUR %HOME UD+0] /WEB]
       ==
     ::
-        $sunk  +>
+        $SUNK  +>
     ::
-        $vega  +>
+        $VEGA  +>
     ::
-        ?($chis $this)                                  ::  inbound request
-      %-  emule  |.  ^+  ..apex
-      =*  sec  p.kyz    ::  ?                           ::  https bit
-      =*  heq  r.kyz    ::  httq                        ::  request content
-      =/  ryp=quri
-        =+  (rush q.heq zest:de-purl)
-        ?^(- u.- ~|(eyre-parse-url-failed+q.heq !!))
-      =+  maf=(eat-headers r.heq)
-      =+  ^=  pul  ^-  purl
-          ?-  -.ryp
-            %&  ?>(=(sec p.p.p.ryp) p.ryp)
-            %|  =+  hot=(~(get ja maf) %host)
-                ?>  ?=({@ ~} hot)
-                [[sec (rash i.hot thor:de-purl)] p.ryp q.ryp]
+        ?($CHIS $THIS)                                  ::  INBOUND REQUEST
+      %-  EMULE  |.  ^+  ..APEX
+      =*  SEC  P.KYZ    ::  ?                           ::  HTTPS BIT
+      =*  HEQ  R.KYZ    ::  HTTQ                        ::  REQUEST CONTENT
+      =/  RYP=QURI
+        =+  (RUSH Q.HEQ ZEST:DE-PURL)
+        ?^(- U.- ~|(EYRE-PARSE-URL-FAILED+Q.HEQ !!))
+      =+  MAF=(EAT-HEADERS R.HEQ)
+      =+  ^=  PUL  ^-  PURL
+          ?-  -.RYP
+            %&  ?>(=(SEC P.P.P.RYP) P.RYP)
+            %|  =+  HOT=(~(GET JA MAF) %HOST)
+                ?>  ?=({@ ~} HOT)
+                [[SEC (RASH I.HOT THOR:DE-PURL)] P.RYP Q.RYP]
           ==
-      =.  p.p.pul  |(p.p.pul ?=(hoke r.p.pul))
-      ?:  ?=($chis -.kyz)                               :: IPC escape hatch
-        ~(lens handle pul [q.+.kyz |] [p.heq maf s.heq])
-      =+  her=(host-to-ship r.p.pul)
-      ?:  |(?=(~ her) =(our u.her))
-        ~(apex handle pul [q.+.kyz |] [p.heq maf s.heq])
-      =+  han=(sham hen)
-      =.  pox  (~(put by pox) han hen)
-      (ames-gram u.her %get han +.kyz)
+      =.  P.P.PUL  |(P.P.PUL ?=(HOKE R.P.PUL))
+      ?:  ?=($CHIS -.KYZ)                               :: IPC ESCAPE HATCH
+        ~(LENS HANDLE PUL [Q.+.KYZ |] [P.HEQ MAF S.HEQ])
+      =+  HER=(HOST-TO-SHIP R.P.PUL)
+      ?:  |(?=(~ HER) =(OUR U.HER))
+        ~(APEX HANDLE PUL [Q.+.KYZ |] [P.HEQ MAF S.HEQ])
+      =+  HAN=(SHAM HEN)
+      =.  POX  (~(PUT BY POX) HAN HEN)
+      (AMES-GRAM U.HER %GET HAN +.KYZ)
     ::
-        $them                                           ::  outbound request
-      ?~  p.kyz
-        ?~  sud=(~(get by kes) hen)
-          ::  delete an element from q.ask by traversing to prevent leakage
+        $THEM                                           ::  OUTBOUND REQUEST
+      ?~  P.KYZ
+        ?~  SUD=(~(GET BY KES) HEN)
+          ::  DELETE AN ELEMENT FROM Q.ASK BY TRAVERSING TO PREVENT LEAKAGE
           ::
-          =.  q.ask
-            =/  qas  ~(tap by q.ask)
-            |-  ^+  q.ask
-            ?~  qas
-              q.ask
-            ?:  =(hen p.q.i.qas)
-              (~(del by q.ask) p.i.qas)
-            $(qas t.qas)
+          =.  Q.ASK
+            =/  QAS  ~(TAP BY Q.ASK)
+            |-  ^+  Q.ASK
+            ?~  QAS
+              Q.ASK
+            ?:  =(HEN P.Q.I.QAS)
+              (~(DEL BY Q.ASK) P.I.QAS)
+            $(QAS T.QAS)
           ::
           +>.$
         ::
         =.  +>.$
           %_  +>.$
-            mow    :_(mow [ged [%give %thus u.sud ~]])
-            q.ask  (~(del by q.ask) u.sud)
-            kes    (~(del by kes) hen)
+            MOW    :_(MOW [GED [%GIVE %THUS U.SUD ~]])
+            Q.ASK  (~(DEL BY Q.ASK) U.SUD)
+            KES    (~(DEL BY KES) HEN)
           ==
         ::
-        =/  driver=(unit [key=[user (list @t)] val=driv])
-          =/  drivers  ~(tap by sec)
-          |-  ^-  (unit [key=[user (list @t)] val=driv])
-          ?~  drivers  ~
+        =/  DRIVER=(UNIT [KEY=[USER (LIST @T)] VAL=DRIV])
+          =/  DRIVERS  ~(TAP BY SEC)
+          |-  ^-  (UNIT [KEY=[USER (LIST @T)] VAL=DRIV])
+          ?~  DRIVERS  ~
           ::
-          ?~  q=req.q.q.i.drivers
-            $(drivers t.drivers)
+          ?~  Q=REQ.Q.Q.I.DRIVERS
+            $(DRIVERS T.DRIVERS)
           ::
-          ?~  tip=~(top to q)
-            $(drivers t.drivers)
+          ?~  TIP=~(TOP TO Q)
+            $(DRIVERS T.DRIVERS)
           ::
-          ?:  =(hen p.u.tip)
-            `i.drivers
-          $(drivers t.drivers)
+          ?:  =(HEN P.U.TIP)
+            `I.DRIVERS
+          $(DRIVERS T.DRIVERS)
         ::
-        ?^  driver
-          ~(cancel-request vi u.driver)
-        (give-sigh(hen (tail hen)) %| [leaf+"canceled on %born"]~)
-      ::  ~&  eyre-them+(en-purl p.u.p.kyz)
+        ?^  DRIVER
+          ~(CANCEL-REQUEST VI U.DRIVER)
+        (GIVE-SIGH(HEN (TAIL HEN)) %| [LEAF+"CANCELED ON %BORN"]~)
+      ::  ~&  EYRE-THEM+(EN-PURL P.U.P.KYZ)
       %=  +>.$
-        mow    :_(mow [ged [%give %thus p.ask p.kyz]])
-        p.ask  +(p.ask)
-        q.ask  (~(put by q.ask) p.ask hen u.p.kyz)
-        kes    (~(put by kes) hen p.ask)
+        MOW    :_(MOW [GED [%GIVE %THUS P.ASK P.KYZ]])
+        P.ASK  +(P.ASK)
+        Q.ASK  (~(PUT BY Q.ASK) P.ASK HEN U.P.KYZ)
+        KES    (~(PUT BY KES) HEN P.ASK)
       ==
     ::
-        $hiss                                           ::  outbound cage
-      ::?~  p.kyz                                       ::  XX cancel
-      ::  =+  sud=(need (~(get by kes) hen))
+        $HISS                                           ::  OUTBOUND CAGE
+      ::?~  P.KYZ                                       ::  XX CANCEL
+      ::  =+  SUD=(NEED (~(GET BY KES) HEN))
       ::  %=  +>.$
-      ::    mow    :_(mow [ged [%give %thus sud ~]])
-      ::    q.ask  (~(del by q.ask) sud)
-      ::    kes    (~(del by kes) hen)
+      ::    MOW    :_(MOW [GED [%GIVE %THUS SUD ~]])
+      ::    Q.ASK  (~(DEL BY Q.ASK) SUD)
+      ::    KES    (~(DEL BY KES) HEN)
       ::  ==
-      ::  ~&  eyre-them+(en-purl p.u.p.kyz)
-      =+  usr=?~(p.kyz '~' (scot %ta u.p.kyz))
-      (back-turbo hi+/[usr]/[q.kyz] %hiss r.kyz)
+      ::  ~&  EYRE-THEM+(EN-PURL P.U.P.KYZ)
+      =+  USR=?~(P.KYZ '~' (SCOT %TA U.P.KYZ))
+      (BACK-TURBO HI+/[USR]/[Q.KYZ] %HISS R.KYZ)
     ::
-        $they                                           ::  inbound response
-      =+  kas=(need (~(get by q.ask) p.kyz))
-      ::  ~&  >  eyre-they+[p.q.kyz (en-purl p.q.kas)]
+        $THEY                                           ::  INBOUND RESPONSE
+      =+  KAS=(NEED (~(GET BY Q.ASK) P.KYZ))
+      ::  ~&  >  EYRE-THEY+[P.Q.KYZ (EN-PURL P.Q.KAS)]
       %=  +>.$
-        mow    :_(mow [p.kas [%give %thou q.kyz]])
-        q.ask  (~(del by q.ask) p.kas)
+        MOW    :_(MOW [P.KAS [%GIVE %THOU Q.KYZ]])
+        Q.ASK  (~(DEL BY Q.ASK) P.KAS)
       ==
     ::
-        $thud                                           ::  cancel request
-      ?.  (~(has by lyv) hen)
-        ~&  dead-request+hen
-        +>.$(ded (~(put in ded) hen))                   ::  uncaught requests
-      =+  lid=(~(got by lyv) hen)
-      =.  lyv  (~(del by lyv) hen)
-      :: ~&  did-thud+[-.lid hen]
-      ?-  -.lid
-          $exec
-        (pass-note p.lid %f %kill ~)
+        $THUD                                           ::  CANCEL REQUEST
+      ?.  (~(HAS BY LYV) HEN)
+        ~&  DEAD-REQUEST+HEN
+        +>.$(DED (~(PUT IN DED) HEN))                   ::  UNCAUGHT REQUESTS
+      =+  LID=(~(GOT BY LYV) HEN)
+      =.  LYV  (~(DEL BY LYV) HEN)
+      :: ~&  DID-THUD+[-.LID HEN]
+      ?-  -.LID
+          $EXEC
+        (PASS-NOTE P.LID %F %KILL ~)
       ::
-          $poll
-        ?.  (~(has by wix) p.lid)
+          $POLL
+        ?.  (~(HAS BY WIX) P.LID)
          +>.$
-        poll-dead:(ire-ix p.lid)
+        POLL-DEAD:(IRE-IX P.LID)
       ::
-          $xeno
-        =+  han=(sham hen)
-        =.  pox  (~(del by pox) han hen)
-        (ames-gram p.lid %gib han)
+          $XENO
+        =+  HAN=(SHAM HEN)
+        =.  POX  (~(DEL BY POX) HAN HEN)
+        (AMES-GRAM P.LID %GIB HAN)
       ::
-          $wasp
+          $WASP
         |-  ^+  +>.^$
-        ?~  p.lid  +>.^$
-        (del-deps:$(p.lid t.p.lid) i.p.lid %& hen)
+        ?~  P.LID  +>.^$
+        (DEL-DEPS:$(P.LID T.P.LID) I.P.LID %& HEN)
       ==
     ::
-        $well
-      +>.$(wel (dank wel p.kyz q.kyz))
+        $WELL
+      +>.$(WEL (DANK WEL P.KYZ Q.KYZ))
     ::
-        $west                                           ::  remote request
-      =.  mow  :_(mow [hen %give %mack ~])
-      ::  TODO: make +gram and %west play nicely together
+        $WEST                                           ::  REMOTE REQUEST
+      =.  MOW  :_(MOW [HEN %GIVE %MACK ~])
+      ::  TODO: MAKE +GRAM AND %WEST PLAY NICELY TOGETHER
       ::
-      ::    %west passes paths around, where all the paths are actually single
-      ::    tags. The old version of +gram used [%tag ~] as tag types in its
-      ::    definition, which no longer works.
+      ::    %WEST PASSES PATHS AROUND, WHERE ALL THE PATHS ARE ACTUALLY SINGLE
+      ::    TAGS. THE OLD VERSION OF +GRAM USED [%TAG ~] AS TAG TYPES IN ITS
+      ::    DEFINITION, WHICH NO LONGER WORKS.
       ::
-      ::    Actually fixing this is a cross-ames-eyre surgery, for now hack it
-      ::    by molding the incoming thing into a gram shape before we try to
-      ::    soft it.
+      ::    ACTUALLY FIXING THIS IS A CROSS-AMES-EYRE SURGERY, FOR NOW HACK IT
+      ::    BY MOLDING THE INCOMING THING INTO A GRAM SHAPE BEFORE WE TRY TO
+      ::    SOFT IT.
       ::
-      =*  him  p.kyz
-      ?~  -.q.kyz
-        ~&  e+[%strange-west-wire him]
-        ~!(%strange-west-wire !!)
-      =+  mez=((soft gram) [i.-.q.kyz +.q.kyz])
-      ?~  mez
-        ~&  e+[%strange-west him]
-        ~|(%strange-west !!)
-      ?-  -.u.mez
-        $aut  abet:(logon:(ses-ya p.u.mez) him)
-        $hat  (foreign-hat:(ses-ya p.u.mez) him q.u.mez)
-        $gib  (pass-note ay+(dray p+uv+~ him p.u.mez) [%e %thud ~])
-        $get  (pass-note ay+(dray p+uv+~ him p.u.mez) [%e %this q.u.mez])
-        $got
-          ?.  (~(has by pox) p.u.mez)
-            ~&  lost-gram-thou+him^p.u.mez
+      =*  HIM  P.KYZ
+      ?~  -.Q.KYZ
+        ~&  E+[%STRANGE-WEST-WIRE HIM]
+        ~!(%STRANGE-WEST-WIRE !!)
+      =+  MEZ=((SOFT GRAM) [I.-.Q.KYZ +.Q.KYZ])
+      ?~  MEZ
+        ~&  E+[%STRANGE-WEST HIM]
+        ~|(%STRANGE-WEST !!)
+      ?-  -.U.MEZ
+        $AUT  ABET:(LOGON:(SES-YA P.U.MEZ) HIM)
+        $HAT  (FOREIGN-HAT:(SES-YA P.U.MEZ) HIM Q.U.MEZ)
+        $GIB  (PASS-NOTE AY+(DRAY P+UV+~ HIM P.U.MEZ) [%E %THUD ~])
+        $GET  (PASS-NOTE AY+(DRAY P+UV+~ HIM P.U.MEZ) [%E %THIS Q.U.MEZ])
+        $GOT
+          ?.  (~(HAS BY POX) P.U.MEZ)
+            ~&  LOST-GRAM-THOU+HIM^P.U.MEZ
             +>.$
-          =:  hen  (~(got by pox) p.u.mez)
-              pox  (~(del by pox) p.u.mez)
+          =:  HEN  (~(GOT BY POX) P.U.MEZ)
+              POX  (~(DEL BY POX) P.U.MEZ)
             ==
-          (give-thou q.u.mez)
+          (GIVE-THOU Q.U.MEZ)
       ::
-        $lon
-          ::  ~&  ses-ask+[p.u.mez sop (~(run by wup) ~)]
-          ?:  (ses-authed p.u.mez)
-            (ames-gram him %aut p.u.mez)
-          =.  sop  (~(put by sop) p.u.mez him |)
-          (ames-gram him %hat p.u.mez our-host)
+        $LON
+          ::  ~&  SES-ASK+[P.U.MEZ SOP (~(RUN BY WUP) ~)]
+          ?:  (SES-AUTHED P.U.MEZ)
+            (AMES-GRAM HIM %AUT P.U.MEZ)
+          =.  SOP  (~(PUT BY SOP) P.U.MEZ HIM |)
+          (AMES-GRAM HIM %HAT P.U.MEZ OUR-HOST)
       ::
-        $get-inner
-          %+  exec-turbo-live  ay+(dray p+uv+~ him p.u.mez)
-          [%bake q.u.mez r.u.mez [[p q] s]:s.u.mez]
+        $GET-INNER
+          %+  EXEC-TURBO-LIVE  AY+(DRAY P+UV+~ HIM P.U.MEZ)
+          [%BAKE Q.U.MEZ R.U.MEZ [[P Q] S]:S.U.MEZ]
       ::
-        $got-inner
-          ?.  (~(has by pox) p.u.mez)
-            ~&  lost-gram-inner+him^p.u.mez
+        $GOT-INNER
+          ?.  (~(HAS BY POX) P.U.MEZ)
+            ~&  LOST-GRAM-INNER+HIM^P.U.MEZ
             +>.$
-          =:  hen  (~(got by pox) p.u.mez)
-              pox  (~(del by pox) p.u.mez)
+          =:  HEN  (~(GOT BY POX) P.U.MEZ)
+              POX  (~(DEL BY POX) P.U.MEZ)
             ==
-          ?-    -.q.u.mez
+          ?-    -.Q.U.MEZ
               %|
-            =/  dep  0v0  ::XX remote dependency?
-            (fail 500 dep p.q.u.mez)
+            =/  DEP  0V0  ::XX REMOTE DEPENDENCY?
+            (FAIL 500 DEP P.Q.U.MEZ)
           ::
               %&
-            =/  res/(cask)  p.q.u.mez
-            =/  dep  0v0  ::XX remote dependency?
-            =/  bek  -.top  ::XX where is wrapper-renderer beak stored exactly
-            :: XX store request mark
-            =/  ext  (end 3 (sub (met 3 p.res) (met 3 '-elem')) p.res) :: %x-urb-elem -> %x-urb
-            =+  norm=(norm-beak bek)
+            =/  RES/(CASK)  P.Q.U.MEZ
+            =/  DEP  0V0  ::XX REMOTE DEPENDENCY?
+            =/  BEK  -.TOP  ::XX WHERE IS WRAPPER-RENDERER BEAK STORED EXACTLY
+            :: XX STORE REQUEST MARK
+            =/  EXT  (END 3 (SUB (MET 3 P.RES) (MET 3 '-ELEM')) P.RES) :: %X-URB-ELEM -> %X-URB
+            =+  NORM=(NORM-BEAK BEK)
             ::
-            %+  exec-turbo-live  ha+(en-beam bek ~)
-            :^  %cast  [p q]:norm  ext
-            :+  %call
-              [%core [p q]:norm /hoon/wrap/[ext]/ren]
-            [%vale [p q]:norm res]
+            %+  EXEC-TURBO-LIVE  HA+(EN-BEAM BEK ~)
+            :^  %CAST  [P Q]:NORM  EXT
+            :+  %CALL
+              [%CORE [P Q]:NORM /HOON/WRAP/[EXT]/REN]
+            [%VALE [P Q]:NORM RES]
           ==
       ::
-        $not  +>.$(mow :_(mow [ged [%give %that him p.u.mez]]))
+        $NOT  +>.$(MOW :_(MOW [GED [%GIVE %THAT HIM P.U.MEZ]]))
       ==
     ::
-      $wegh  !!                                         ::  handled elsewhere
+      $WEGH  !!                                         ::  HANDLED ELSEWHERE
     ::
-      $wise  (ames-gram p.kyz %not q.kyz)           ::  proxy notification
+      $WISE  (AMES-GRAM P.KYZ %NOT Q.KYZ)           ::  PROXY NOTIFICATION
     ==
   ::
-  ::++  axom                                              ::  old response
-  ::  |=  [tee=whir hon=honk]
+  ::++  AXOM                                              ::  OLD RESPONSE
+  ::  |=  [TEE=WHIR HON=HONK]
   ::  ^+  +>
-  ::  ?+  tee  !!
-  ::    ~          ?-(-.hon %nice (nice-json), %mean (mean-json 500 p.hon))
-  ::    [%of @ ^]  (get-ack:(ire-ix p.tee) q.tee hon)
+  ::  ?+  TEE  !!
+  ::    ~          ?-(-.HON %NICE (NICE-JSON), %MEAN (MEAN-JSON 500 P.HON))
+  ::    [%OF @ ^]  (GET-ACK:(IRE-IX P.TEE) Q.TEE HON)
   ::  ==
-  ++  axon                                              ::  accept response
-    |=  {tee/whir sih/sign}
+  ++  AXON                                              ::  ACCEPT RESPONSE
+    |=  {TEE/WHIR SIH/SIGN}
     ^+  +>
-    ?:  &(?=({?($of $ow) ^} tee) !(~(has by wix) p.tee))
-      ~&(dead-ire+[`whir`tee] +>)
-    ?-    &2.sih
-        $crud  +>.$(mow [[hen %slip %d %flog +.sih] mow])
-    ::  $dumb
-    ::    =.  +>  ?+(tee +> [%of ^] pop-duct:(ire-ix p.tee))
-    ::    (emule |.(~|(gall-dumb+tee !!)))
+    ?:  &(?=({?($OF $OW) ^} TEE) !(~(HAS BY WIX) P.TEE))
+      ~&(DEAD-IRE+[`WHIR`TEE] +>)
+    ?-    &2.SIH
+        $CRUD  +>.$(MOW [[HEN %SLIP %D %FLOG +.SIH] MOW])
+    ::  $DUMB
+    ::    =.  +>  ?+(TEE +> [%OF ^] POP-DUCT:(IRE-IX P.TEE))
+    ::    (EMULE |.(~|(GALL-DUMB+TEE !!)))
     ::
-        $woot  +>.$
+        $WOOT  +>.$
     ::
-        $thou
-      ?+    -.tee  !!
-        $ay  (ames-gram (slav %p p.tee) %got (slav %uv q.tee) |2.sih)
-        $hi  (cast-thou q.tee httr+!>(p.sih))
-        $se  (get-thou:(dom-vi q.tee) p.tee p.sih)
+        $THOU
+      ?+    -.TEE  !!
+        $AY  (AMES-GRAM (SLAV %P P.TEE) %GOT (SLAV %UV Q.TEE) |2.SIH)
+        $HI  (CAST-THOU Q.TEE HTTR+!>(P.SIH))
+        $SE  (GET-THOU:(DOM-VI Q.TEE) P.TEE P.SIH)
       ==
     ::
-        $turf
-      ?.  ?=(%czar (clan:title our))
-        ~&  %strange-turf
+        $TURF
+      ?.  ?=(%CZAR (CLAN:TITLE OUR))
+        ~&  %STRANGE-TURF
         +>.$
-      =/  mod/(set turf)
-        %-  ~(gas in dom)
-        %+  turn  turf.sih
-        |=(a=turf (weld a /(crip +:(scow %p our))))
-      ?:  =(dom mod)
+      =/  MOD/(SET TURF)
+        %-  ~(GAS IN DOM)
+        %+  TURN  TURF.SIH
+        |=(A=TURF (WELD A /(CRIP +:(SCOW %P OUR))))
+      ?:  =(DOM MOD)
         +>.$
-      =/  cmd  [%acme %poke `cage`[%acme-order !>(mod)]]
+      =/  CMD  [%ACME %POKE `CAGE`[%ACME-ORDER !>(MOD)]]
       %=  +>.$
-        dom  mod
-        mow  :_(mow [hen %pass /acme/order %g %deal [our our] cmd])
+        DOM  MOD
+        MOW  :_(MOW [HEN %PASS /ACME/ORDER %G %DEAL [OUR OUR] CMD])
       ==
     ::
-        $unto                                           ::  app response
-      ?>  ?=({$of @ ^} tee)
-      =+  cuf=`cuft:gall`+>.sih
-      ?-    -.cuf
-          ?($coup $reap)
-        ::  ~?  ?=($lens r.q.tee)  hen=hen^hcuf=-.cuf
-        (get-ack:(ire-ix p.tee) q.tee ?~(p.cuf ~ `[-.cuf u.p.cuf]))
+        $UNTO                                           ::  APP RESPONSE
+      ?>  ?=({$OF @ ^} TEE)
+      =+  CUF=`CUFT:GALL`+>.SIH
+      ?-    -.CUF
+          ?($COUP $REAP)
+        ::  ~?  ?=($LENS R.Q.TEE)  HEN=HEN^HCUF=-.CUF
+        (GET-ACK:(IRE-IX P.TEE) Q.TEE ?~(P.CUF ~ `[-.CUF U.P.CUF]))
       ::
-          $diff
-        ?.  ?=($json p.p.cuf)
-          :: ~>  %slog.`%*(. >[%backing p.p.cuf %q-p-cuf]< &3.+> (sell q.p.cuf))
-          (back-turbo tee %json p.cuf)
-        (get-rush:(ire-ix p.tee) q.tee (,json q.q.p.cuf))
+          $DIFF
+        ?.  ?=($JSON P.P.CUF)
+          :: ~>  %SLOG.`%*(. >[%BACKING P.P.CUF %Q-P-CUF]< &3.+> (SELL Q.P.CUF))
+          (BACK-TURBO TEE %JSON P.CUF)
+        (GET-RUSH:(IRE-IX P.TEE) Q.TEE (,JSON Q.Q.P.CUF))
       ::
-          $quit  (get-quit:(ire-ix p.tee) q.tee)
+          $QUIT  (GET-QUIT:(IRE-IX P.TEE) Q.TEE)
       ==
     ::
-        $wake
-      ?>  ?=({?($of $ow) @ ~} tee)
-      ?:  ?=($ow -.tee)
-        abut:(ire-ix p.tee)
-      =>  wake:(ire-ix p.tee)
-      (give-json 200 ~ (frond:enjs %beat %b &))
+        $WAKE
+      ?>  ?=({?($OF $OW) @ ~} TEE)
+      ?:  ?=($OW -.TEE)
+        ABUT:(IRE-IX P.TEE)
+      =>  WAKE:(IRE-IX P.TEE)
+      (GIVE-JSON 200 ~ (FROND:ENJS %BEAT %B &))
     ::
-        $made
-      =|  ses/(unit hole)
-      |-  ^+  ..axon
-      ?+    tee  ~&  [%tee tee]  !!
-          {$si $~}  (give-turbo-sigh result.sih)
-          {$se ^}   (get-made:(dom-vi q.tee) p.tee result:sih)
+        $MADE
+      =|  SES/(UNIT HOLE)
+      |-  ^+  ..AXON
+      ?+    TEE  ~&  [%TEE TEE]  !!
+          {$SI $~}  (GIVE-TURBO-SIGH RESULT.SIH)
+          {$SE ^}   (GET-MADE:(DOM-VI Q.TEE) P.TEE RESULT:SIH)
       ::
-          {$ay ^}
-        =/  res/(each (cask) tang)
-          ?:  ?=(%incomplete -.result.sih)
-            [%| tang.result.sih]
-          ?:  ?=([%complete %error *] result.sih)
-            [%| message.build-result.result.sih]
-          [%& [p q.q]:(result-to-cage:ford build-result.result.sih)]
-        (ames-gram (slav %p p.tee) %got-inner (slav %uv q.tee) res)
+          {$AY ^}
+        =/  RES/(EACH (CASK) TANG)
+          ?:  ?=(%INCOMPLETE -.RESULT.SIH)
+            [%| TANG.RESULT.SIH]
+          ?:  ?=([%COMPLETE %ERROR *] RESULT.SIH)
+            [%| MESSAGE.BUILD-RESULT.RESULT.SIH]
+          [%& [P Q.Q]:(RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT.SIH)]
+        (AMES-GRAM (SLAV %P P.TEE) %GOT-INNER (SLAV %UV Q.TEE) RES)
       ::
-          {$ha *}
-        %-  emule  |.  ^+  ..apex
-        ?:  ?=([%incomplete *] result.sih)
-          (fail-turbo 404 tang.result.sih)
-        ?:  ?=([%complete %error *] result.sih)
-          (fail-turbo 404 message.build-result.result.sih)
-        =/  cay=cage  (result-to-cage:ford build-result.result.sih)
-        ?:  ?=($red-quri p.cay)
-          =+  url=(apex:en-purl ((hard quri) q.q.cay))
-          (give-thou 307 [location+(crip url)]~ ~)
-          :: (give-html:abet 200 ~ (redir:xml url))
-        ?.  ?=($mime p.cay)
-          =+  bek=(norm-beak -:(need (de-beam p.tee)))
-          =+  tee-ses=?~(ses tee [%ac u.ses tee])
-          ::  TODO: Why cast here? Shouldn't the cast wrap the previous result?
+          {$HA *}
+        %-  EMULE  |.  ^+  ..APEX
+        ?:  ?=([%INCOMPLETE *] RESULT.SIH)
+          (FAIL-TURBO 404 TANG.RESULT.SIH)
+        ?:  ?=([%COMPLETE %ERROR *] RESULT.SIH)
+          (FAIL-TURBO 404 MESSAGE.BUILD-RESULT.RESULT.SIH)
+        =/  CAY=CAGE  (RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT.SIH)
+        ?:  ?=($RED-QURI P.CAY)
+          =+  URL=(APEX:EN-PURL ((HARD QURI) Q.Q.CAY))
+          (GIVE-THOU 307 [LOCATION+(CRIP URL)]~ ~)
+          :: (GIVE-HTML:ABET 200 ~ (REDIR:XML URL))
+        ?.  ?=($MIME P.CAY)
+          =+  BEK=(NORM-BEAK -:(NEED (DE-BEAM P.TEE)))
+          =+  TEE-SES=?~(SES TEE [%AC U.SES TEE])
+          ::  TODO: WHY CAST HERE? SHOULDN'T THE CAST WRAP THE PREVIOUS RESULT?
           ::
-          (exec-turbo-live tee-ses [%cast [p q]:bek %mime [%$ cay]])
-        =+  cug=?~(ses ~ cug:(~(got by wup) u.ses))
-        =+  ((hard {mit/mite rez/octs}) q.q.cay)
-        ::  TODO: This used to use dep for etag control.
+          (EXEC-TURBO-LIVE TEE-SES [%CAST [P Q]:BEK %MIME [%$ CAY]])
+        =+  CUG=?~(SES ~ CUG:(~(GOT BY WUP) U.SES))
+        =+  ((HARD {MIT/MITE REZ/OCTS}) Q.Q.CAY)
+        ::  TODO: THIS USED TO USE DEP FOR ETAG CONTROL.
         ::
-        ::  =+  dep=(crip "W/{(en-json %s (scot %uv p.sih))}")
-        =+  hit=[200 ~[content-type+(en-mite mit)] ~ rez]  :: etag+dep
-        (give-thou (add-cookies cug hit))
+        ::  =+  DEP=(CRIP "W/{(EN-JSON %S (SCOT %UV P.SIH))}")
+        =+  HIT=[200 ~[CONTENT-TYPE+(EN-MITE MIT)] ~ REZ]  :: ETAG+DEP
+        (GIVE-THOU (ADD-COOKIES CUG HIT))
       ::
-          {$hi ^}
-        ?.  ?=([%complete %success *] result.sih)
-          (give-turbo-sigh result.sih)
+          {$HI ^}
+        ?.  ?=([%COMPLETE %SUCCESS *] RESULT.SIH)
+          (GIVE-TURBO-SIGH RESULT.SIH)
         ::
-        =/  cay/cage  (result-to-cage:ford build-result.result.sih)
-        ?>  ?=($hiss p.cay)
-        ?:  =('~' p.tee)
-          (eyre-them tee q.cay)
-        =+  usr=(slav %ta p.tee)
-        =+  ((hard {pul/purl ^}) q.q.cay)
-        ?.  ?=(%& -.r.p.pul)
-          ~&  [%auth-lost usr (head:en-purl p.pul)]
-          (eyre-them tee q.cay)
-        (get-req:(dom-vi usr (scag 2 p.r.p.pul)) q.tee q.cay)
+        =/  CAY/CAGE  (RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT.SIH)
+        ?>  ?=($HISS P.CAY)
+        ?:  =('~' P.TEE)
+          (EYRE-THEM TEE Q.CAY)
+        =+  USR=(SLAV %TA P.TEE)
+        =+  ((HARD {PUL/PURL ^}) Q.Q.CAY)
+        ?.  ?=(%& -.R.P.PUL)
+          ~&  [%AUTH-LOST USR (HEAD:EN-PURL P.PUL)]
+          (EYRE-THEM TEE Q.CAY)
+        (GET-REQ:(DOM-VI USR (SCAG 2 P.R.P.PUL)) Q.TEE Q.CAY)
       ::
-          {$of @ ^}
-        ?:  ?=([%incomplete *] result.sih)
-          ((slog tang.result.sih) +>.^$)
-        ?:  ?=([%complete %error *] result.sih)
-          ((slog message.build-result.result.sih) +>.^$)
-        =/  cay=cage  (result-to-cage:ford build-result.result.sih)
-        %+  get-rush:(ire-ix p.tee)  q.tee
-        ?>  ?=($json p.cay)                    ::  XX others
-        (,json q.q.cay)
+          {$OF @ ^}
+        ?:  ?=([%INCOMPLETE *] RESULT.SIH)
+          ((SLOG TANG.RESULT.SIH) +>.^$)
+        ?:  ?=([%COMPLETE %ERROR *] RESULT.SIH)
+          ((SLOG MESSAGE.BUILD-RESULT.RESULT.SIH) +>.^$)
+        =/  CAY=CAGE  (RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT.SIH)
+        %+  GET-RUSH:(IRE-IX P.TEE)  Q.TEE
+        ?>  ?=($JSON P.CAY)                    ::  XX OTHERS
+        (,JSON Q.Q.CAY)
       ==
     ==
   ::
-  ++  norm-beak  |=(bek/beak ?+(r.bek bek {$ud $0} bek(r da+now)))
-  ++  emule
-    |=  a/_|?(..emule)  ^+  ..emule
-    ?:  [unsafe=|]
-      (a)
-    =+  mul=(mule a)
-    ?~  -.mul  p.mul
-    (fail 500 0v0 >%exit< p.mul)
+  ++  NORM-BEAK  |=(BEK/BEAK ?+(R.BEK BEK {$UD $0} BEK(R DA+NOW)))
+  ++  EMULE
+    |=  A/_|?(..EMULE)  ^+  ..EMULE
+    ?:  [UNSAFE=|]
+      (A)
+    =+  MUL=(MULE A)
+    ?~  -.MUL  P.MUL
+    (FAIL 500 0V0 >%EXIT< P.MUL)
   ::
-  ++  ire-ix  |=(ire/ixor ~(. ix ire (~(got by wix) ire)))
-  ++  dom-vi
-    |=  {usr/knot dom/path}  ^+  vi    :: XX default to initialized user?
-    ~(. vi [usr dom] (fall (~(get by sec) usr dom) *driv))
+  ++  IRE-IX  |=(IRE/IXOR ~(. IX IRE (~(GOT BY WIX) IRE)))
+  ++  DOM-VI
+    |=  {USR/KNOT DOM/PATH}  ^+  VI    :: XX DEFAULT TO INITIALIZED USER?
+    ~(. VI [USR DOM] (FALL (~(GET BY SEC) USR DOM) *DRIV))
   ::
-  ++  ses-authed
-    |=  ses/hole
-    =+  sap=(~(get by sop) ses)
-    ?:  ?=({~ @ %&} sap)  &
-    =+  cyz=(~(get by wup) ses)
-    ?~  cyz  |
-    (~(has in aut.u.cyz) our)
+  ++  SES-AUTHED
+    |=  SES/HOLE
+    =+  SAP=(~(GET BY SOP) SES)
+    ?:  ?=({~ @ %&} SAP)  &
+    =+  CYZ=(~(GET BY WUP) SES)
+    ?~  CYZ  |
+    (~(HAS IN AUT.U.CYZ) OUR)
   ::
-  ++  ses-ya  |=(ses/hole ~(. ya ses (~(got by wup) ses)))
-  ++  our-host
-    ^-  hart
-    ::  XX get actual -F flag value
-    ::  XX scry into %jael?
+  ++  SES-YA  |=(SES/HOLE ~(. YA SES (~(GOT BY WUP) SES)))
+  ++  OUR-HOST
+    ^-  HART
+    ::  XX GET ACTUAL -F FLAG VALUE
+    ::  XX SCRY INTO %JAEL?
     ::
-    ?:  [fake=|]  [| [~ 8.443] &+/localhost]
-    `hart`[& ~ %& /org/urbit/(rsh 3 1 (scot %p our))]
+    ?:  [FAKE=|]  [| [~ 8.443] &+/LOCALHOST]
+    `HART`[& ~ %& /ORG/URBIT/(RSH 3 1 (SCOT %P OUR))]
   ::
-  ++  eyre-them
-    |=  {tea/whir vax/vase}
-    (pass-note tea [%e %meta :(slop !>(%them) !>(~) vax)])
+  ++  EYRE-THEM
+    |=  {TEA/WHIR VAX/VASE}
+    (PASS-NOTE TEA [%E %META :(SLOP !>(%THEM) !>(~) VAX)])
   ::
-  ++  ames-gram
-    |=  [him=ship gam=gram]
-    ::  TODO: To make this work
+  ++  AMES-GRAM
+    |=  [HIM=SHIP GAM=GRAM]
+    ::  TODO: TO MAKE THIS WORK
     ::
-    ~!  -.gam
-    (pass-note ~ %a %want him [%e -.gam ~] +.gam)
+    ~!  -.GAM
+    (PASS-NOTE ~ %A %WANT HIM [%E -.GAM ~] +.GAM)
   ::
-  ++  back-turbo
-    |=  [tea=whir mar=mark cay=cage]
-    =/  disc  [p q]:(norm-beak -.top)
-    %^  execute-turbo  tea  live=%.n
-    ^-  schematic:ford
-    [%cast disc mar [%$ cay]]
+  ++  BACK-TURBO
+    |=  [TEA=WHIR MAR=MARK CAY=CAGE]
+    =/  DISC  [P Q]:(NORM-BEAK -.TOP)
+    %^  EXECUTE-TURBO  TEA  LIVE=%.N
+    ^-  SCHEMATIC:FORD
+    [%CAST DISC MAR [%$ CAY]]
   ::
-  ++  cast-thou  :: turbo
-    |=  [mar=mark cay=cage]
-    ?:  ?=($httr mar)
-      (give-sigh %& cay)
-    %^  execute-turbo  si+~  live=%.n
-    =/  =beak  (norm-beak -.top)
-    [%alts [%cast [p q]:beak mar $+cay] [%cast [p q]:beak %recoverable-error $+cay] ~]
+  ++  CAST-THOU  :: TURBO
+    |=  [MAR=MARK CAY=CAGE]
+    ?:  ?=($HTTR MAR)
+      (GIVE-SIGH %& CAY)
+    %^  EXECUTE-TURBO  SI+~  LIVE=%.N
+    =/  =BEAK  (NORM-BEAK -.TOP)
+    [%ALTS [%CAST [P Q]:BEAK MAR $+CAY] [%CAST [P Q]:BEAK %RECOVERABLE-ERROR $+CAY] ~]
   ::
-  ++  del-deps
-    |=  {a/@uvH b/(each duct ixor)}  ^+  +>.$
-    ?:  =(`@`0 a)  +>.$
-    =.  liz  (~(del ju liz) a b)
-    :: ~&  del-deps+[a (~(get ju liz) a)]
-    ?:  (~(has by liz) a)  +>.$
-    =-  -(hen hen.+)
-    ::  TODO: %wasp is no longer supported.
+  ++  DEL-DEPS
+    |=  {A/@UVH B/(EACH DUCT IXOR)}  ^+  +>.$
+    ?:  =(`@`0 A)  +>.$
+    =.  LIZ  (~(DEL JU LIZ) A B)
+    :: ~&  DEL-DEPS+[A (~(GET JU LIZ) A)]
+    ?:  (~(HAS BY LIZ) A)  +>.$
+    =-  -(HEN HEN.+)
+    ::  TODO: %WASP IS NO LONGER SUPPORTED.
     ::
-    ~&  %deprecated-del-deps
+    ~&  %DEPRECATED-DEL-DEPS
     +>.$
   ::
-  ++  new-deps
-    |=  {a/@uvH b/(each duct ixor)}  ^+  +>.$
-    :: ~&  new-deps+[a b]
-    ?:  =(`@`~ a)  +>.$
-    =+  had=(~(has by liz) a)
-    =.  liz  (~(put ju liz) a b)
-    ?:  had  +>.$
-    =-  -(hen hen.+)
-    ::  TODO: %wasp is no longer supported.
+  ++  NEW-DEPS
+    |=  {A/@UVH B/(EACH DUCT IXOR)}  ^+  +>.$
+    :: ~&  NEW-DEPS+[A B]
+    ?:  =(`@`~ A)  +>.$
+    =+  HAD=(~(HAS BY LIZ) A)
+    =.  LIZ  (~(PUT JU LIZ) A B)
+    ?:  HAD  +>.$
+    =-  -(HEN HEN.+)
+    ::  TODO: %WASP IS NO LONGER SUPPORTED.
     ::
-    ~&  %deprecated-new-deps
+    ~&  %DEPRECATED-NEW-DEPS
     +>.$
   ::
-  ++  exec-turbo-live
-    |=  [tea=whir req=schematic:ford]
-    =.  lyv  (~(put by lyv) hen [%exec tea])
-    (execute-turbo tea live=%.n req)
+  ++  EXEC-TURBO-LIVE
+    |=  [TEA=WHIR REQ=SCHEMATIC:FORD]
+    =.  LYV  (~(PUT BY LYV) HEN [%EXEC TEA])
+    (EXECUTE-TURBO TEA LIVE=%.N REQ)
   ::
-  ++  execute-turbo
-    ~/  %execute-turbo
-    |=  [tea=whir live=? request=schematic:ford]
-    %+  pass-note  tea
-    :*  %f  %build  live
-        [%dude [%leaf "eyre: execute {(spud tea)}"] request]
+  ++  EXECUTE-TURBO
+    ~/  %EXECUTE-TURBO
+    |=  [TEA=WHIR LIVE=? REQUEST=SCHEMATIC:FORD]
+    %+  PASS-NOTE  TEA
+    :*  %F  %BUILD  LIVE
+        [%DUDE [%LEAF "EYRE: EXECUTE {(SPUD TEA)}"] REQUEST]
     ==
   ::
-  ++  add-links                                           :: x-urbit:// urls
-    ~/  %add-links
-    |=  a/wall  ^-  marl
-    ?.  [x-urbit-links=&]  [;/((of-wall a))]~             :: default disable
-    |-  ^-  marl
-    ?~  a  ~
-    =^  pax  i.a  ::  parse path if any
-      ^-  {(unit path) tape}
-      =/  vex  (fel:stab [1 1] i.a)
-      ?~  q.vex  [~ i.a]
-      [`p q.q]:u.q.vex
-    ?~  pax  [;/("{i.a}\0a") $(a t.a)]
-    :-  ;a/"x-urbit:{(spud u.pax)}":"{(spud u.pax)}"
-    [;/("{i.a}\0a") $(a t.a)]
+  ++  ADD-LINKS                                           :: X-URBIT:// URLS
+    ~/  %ADD-LINKS
+    |=  A/WALL  ^-  MARL
+    ?.  [X-URBIT-LINKS=&]  [;/((OF-WALL A))]~             :: DEFAULT DISABLE
+    |-  ^-  MARL
+    ?~  A  ~
+    =^  PAX  I.A  ::  PARSE PATH IF ANY
+      ^-  {(UNIT PATH) TAPE}
+      =/  VEX  (FEL:STAB [1 1] I.A)
+      ?~  Q.VEX  [~ I.A]
+      [`P Q.Q]:U.Q.VEX
+    ?~  PAX  [;/("{I.A}\0A") $(A T.A)]
+    :-  ;A/"X-URBIT:{(SPUD U.PAX)}":"{(SPUD U.PAX)}"
+    [;/("{I.A}\0A") $(A T.A)]
   ::
-  ++  render-tang                                         ::  tanks to manx
-    ~/  %render-tang
-    |=  {dep/@uvH tan/tang}
-    ;html
-      ;head
-        ;link(rel "stylesheet", href "/lib/base.css");
-        ;title: server error
+  ++  RENDER-TANG                                         ::  TANKS TO MANX
+    ~/  %RENDER-TANG
+    |=  {DEP/@UVH TAN/TANG}
+    ;HTML
+      ;HEAD
+        ;LINK(REL "STYLESHEET", HREF "/LIB/BASE.CSS");
+        ;TITLE: SERVER ERROR
       ==
-      ;body:div#c.err:pre:code:"*{(add-links (wush 80 tan))}"
-      ;script@"/~/on/{<dep>}.js";
+      ;BODY:DIV#C.ERR:PRE:CODE:"*{(ADD-LINKS (WUSH 80 TAN))}"
+      ;SCRIPT@"/~/ON/{<DEP>}.JS";
     ==
   ::
-  ++  render-turbo-tang
-    ~/  %render-turbo-tang
-    |=  tan/tang
-    ;html
-      ;head
-        ;link(rel "stylesheet", href "/lib/base.css");
-        ;title: server error
+  ++  RENDER-TURBO-TANG
+    ~/  %RENDER-TURBO-TANG
+    |=  TAN/TANG
+    ;HTML
+      ;HEAD
+        ;LINK(REL "STYLESHEET", HREF "/LIB/BASE.CSS");
+        ;TITLE: SERVER ERROR
       ==
-      ;body:div#c.err:pre:code:"*{(add-links (wush 80 tan))}"
+      ;BODY:DIV#C.ERR:PRE:CODE:"*{(ADD-LINKS (WUSH 80 TAN))}"
     ==
   ::
-  ++  fail
-    |=  {sas/@ud dep/@uvH mez/tang}
+  ++  FAIL
+    |=  {SAS/@UD DEP/@UVH MEZ/TANG}
     ^+  +>
-    :: (back ha+~ dep %tang !>(mez))  ::tang->urb chain may be source of failure
-    (give-html sas ~ (render-tang dep mez))
+    :: (BACK HA+~ DEP %TANG !>(MEZ))  ::TANG->URB CHAIN MAY BE SOURCE OF FAILURE
+    (GIVE-HTML SAS ~ (RENDER-TANG DEP MEZ))
   ::
-  ++  fail-turbo                                        ::  failing faster
-    |=  [sas=@ud mez=tang]
+  ++  FAIL-TURBO                                        ::  FAILING FASTER
+    |=  [SAS=@UD MEZ=TANG]
     ^+  +>
-    :: (back ha+~ dep %tang !>(mez))  ::tang->urb chain may be source of failure
-    (give-html sas ~ (render-turbo-tang mez))
+    :: (BACK HA+~ DEP %TANG !>(MEZ))  ::TANG->URB CHAIN MAY BE SOURCE OF FAILURE
+    (GIVE-HTML SAS ~ (RENDER-TURBO-TANG MEZ))
   ::
-  ++  give-html
-    |=  {sas/@ud cug/(list @t) max/manx}
-    %-  give-thou
-    %+  add-cookies  cug
-    (resp sas text+/html (crip (en-xml max)))
+  ++  GIVE-HTML
+    |=  {SAS/@UD CUG/(LIST @T) MAX/MANX}
+    %-  GIVE-THOU
+    %+  ADD-COOKIES  CUG
+    (RESP SAS TEXT+/HTML (CRIP (EN-XML MAX)))
   ::
-  ++  give-json
-    |=  {sas/@uG cug/(list @t) jon/json}
-    %-  give-thou
-    %+  add-cookies  cug
-    (resp sas application+/json (crip (en-json jon)))
+  ++  GIVE-JSON
+    |=  {SAS/@UG CUG/(LIST @T) JON/JSON}
+    %-  GIVE-THOU
+    %+  ADD-COOKIES  CUG
+    (RESP SAS APPLICATION+/JSON (CRIP (EN-JSON JON)))
   ::
-  ++  give-thou                                       ::  done request
-    |=  hit/httr
-    ?:  (~(has in ded) hen)                           ::  request closed
-      +>(ded (~(del in ded) hen))
-    =.  lyv  (~(del by lyv) hen)
-    +>(mow :_(mow [hen %give %thou hit]))
+  ++  GIVE-THOU                                       ::  DONE REQUEST
+    |=  HIT/HTTR
+    ?:  (~(HAS IN DED) HEN)                           ::  REQUEST CLOSED
+      +>(DED (~(DEL IN DED) HEN))
+    =.  LYV  (~(DEL BY LYV) HEN)
+    +>(MOW :_(MOW [HEN %GIVE %THOU HIT]))
   ::
-  ++  give-sigh                                       ::  userspace done
-    |=  res/(each cage tang)
-    =-  +>.$(mow :_(mow [hen %give %sigh `cage`-]))
-    ?.  ?=(%| -.res)  p.res
-    [%tang !>(p.res)]
+  ++  GIVE-SIGH                                       ::  USERSPACE DONE
+    |=  RES/(EACH CAGE TANG)
+    =-  +>.$(MOW :_(MOW [HEN %GIVE %SIGH `CAGE`-]))
+    ?.  ?=(%| -.RES)  P.RES
+    [%TANG !>(P.RES)]
   ::
-  ++  give-turbo-sigh
-    |=  result=made-result:ford
-    =-  +>.$(mow :_(mow [hen %give %sigh `cage`-]))
-    ?:  ?=(%incomplete -.result)
-      [%tang !>(tang.result)]
-    (result-to-cage:ford build-result.result)
+  ++  GIVE-TURBO-SIGH
+    |=  RESULT=MADE-RESULT:FORD
+    =-  +>.$(MOW :_(MOW [HEN %GIVE %SIGH `CAGE`-]))
+    ?:  ?=(%INCOMPLETE -.RESULT)
+      [%TANG !>(TANG.RESULT)]
+    (RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT)
   ::
-  ++  mean-json  |=({sas/@uG err/ares} (give-json sas ~ (ares-to-json err)))
-  ++  nice-json  |=(* (give-json 200 ~ (frond:enjs %ok %b &)))
+  ++  MEAN-JSON  |=({SAS/@UG ERR/ARES} (GIVE-JSON SAS ~ (ARES-TO-JSON ERR)))
+  ++  NICE-JSON  |=(* (GIVE-JSON 200 ~ (FROND:ENJS %OK %B &)))
   ::
-  ++  pass-note  |=(noe/{whir note} +>(mow :_(mow [hen %pass noe])))
-  ++  host-to-ship                                              ::  host to ship
-    |=  hot/host
-    ^-  (unit ship)
-    :: =+  gow=(~(get by dop) hot)    ::  XX trust
-    :: ?^  gow  gow
-    ?.  ?=(%& -.hot)  ~
-    =+  dom=(flop p.hot)                                ::  domain name
-    ?~  dom  ~
-    (rush i.dom fed:ag)
+  ++  PASS-NOTE  |=(NOE/{WHIR NOTE} +>(MOW :_(MOW [HEN %PASS NOE])))
+  ++  HOST-TO-SHIP                                              ::  HOST TO SHIP
+    |=  HOT/HOST
+    ^-  (UNIT SHIP)
+    :: =+  GOW=(~(GET BY DOP) HOT)    ::  XX TRUST
+    :: ?^  GOW  GOW
+    ?.  ?=(%& -.HOT)  ~
+    =+  DOM=(FLOP P.HOT)                                ::  DOMAIN NAME
+    ?~  DOM  ~
+    (RUSH I.DOM FED:AG)
   ::
-  ++  load-secret
-    ^-  @ta
-    =+  pax=/(scot %p our)/code/(scot %da now)/(scot %p our)
-    %^  rsh  3  1
-    (scot %p (@ (need (sky [151 %noun] %j pax))))
+  ++  LOAD-SECRET
+    ^-  @TA
+    =+  PAX=/(SCOT %P OUR)/CODE/(SCOT %DA NOW)/(SCOT %P OUR)
+    %^  RSH  3  1
+    (SCOT %P (@ (NEED (SKY [151 %NOUN] %J PAX))))
   ::
   ::
-  ++  handle
-    ~%  %eyre-h  ..is  ~
-    |_  $:  {hat/hart pok/pork quy/quay}                ::  purl parsed url
-            {cip/clip aut/?}                            ::  client ip nonymous?
-            {mef/meth maf/math bod/(unit octs)}         ::  method+headers+body
+  ++  HANDLE
+    ~%  %EYRE-H  ..IS  ~
+    |_  $:  {HAT/HART POK/PORK QUY/QUAY}                ::  PURL PARSED URL
+            {CIP/CLIP AUT/?}                            ::  CLIENT IP NONYMOUS?
+            {MEF/METH MAF/MATH BOD/(UNIT OCTS)}         ::  METHOD+HEADERS+BODY
         ==
-    ++  abet  ..handle
-    ++  done  .
-    ++  teba  |*(a/$-(* _..handle) |*(b/* %_(done ..handle (a b))))
-    ++  del-deps  (teba ^del-deps)
-    ++  new-deps  (teba ^new-deps)
-    ++  ames-gram  (teba ^ames-gram)
-    ++  exec-turbo-live  (teba ^exec-turbo-live)
-    ++  give-html  (teba ^give-html)
-    ++  give-thou  (teba ^give-thou)
-    ++  give-json  (teba ^give-json)
-    ++  nice-json  (teba ^nice-json)
-    ++  pass-note  (teba ^pass-note)
+    ++  ABET  ..HANDLE
+    ++  DONE  .
+    ++  TEBA  |*(A/$-(* _..HANDLE) |*(B/* %_(DONE ..HANDLE (A B))))
+    ++  DEL-DEPS  (TEBA ^DEL-DEPS)
+    ++  NEW-DEPS  (TEBA ^NEW-DEPS)
+    ++  AMES-GRAM  (TEBA ^AMES-GRAM)
+    ++  EXEC-TURBO-LIVE  (TEBA ^EXEC-TURBO-LIVE)
+    ++  GIVE-HTML  (TEBA ^GIVE-HTML)
+    ++  GIVE-THOU  (TEBA ^GIVE-THOU)
+    ++  GIVE-JSON  (TEBA ^GIVE-JSON)
+    ++  NICE-JSON  (TEBA ^NICE-JSON)
+    ++  PASS-NOTE  (TEBA ^PASS-NOTE)
     ::
-    ++  fcgi-cred
-      ^-  cred
-      ?:  aut  fcgi-cred:for-client
-      %*(fcgi-cred for-client him anon)
+    ++  FCGI-CRED
+      ^-  CRED
+      ?:  AUT  FCGI-CRED:FOR-CLIENT
+      %*(FCGI-CRED FOR-CLIENT HIM ANON)
     ::
-    ++  apex
-      =<  abet
-      ^+  done
-      =+  pez=process
-      ?:  ?=(%| -.pez)  p.pez
-      (resolve ~ p.pez)
+    ++  APEX
+      =<  ABET
+      ^+  DONE
+      =+  PEZ=PROCESS
+      ?:  ?=(%| -.PEZ)  P.PEZ
+      (RESOLVE ~ P.PEZ)
     ::
-    ++  lens
-      =<  abet
-      ::  (process-parsed [%mess [our %dojo] %lens-command /lens (need grab-json)])
-      =^  orx  ..ya  new-view:(logon:for-client our)
-      =+  vew=(ire-ix (oryx-to-ixor orx))
-      ((teba new-lens.vew) grab-json)
+    ++  LENS
+      =<  ABET
+      ::  (PROCESS-PARSED [%MESS [OUR %DOJO] %LENS-COMMAND /LENS (NEED GRAB-JSON)])
+      =^  ORX  ..YA  NEW-VIEW:(LOGON:FOR-CLIENT OUR)
+      =+  VEW=(IRE-IX (ORYX-TO-IXOR ORX))
+      ((TEBA NEW-LENS.VEW) GRAB-JSON)
     ::
-    ++  resolve
-      |=  {cug/(list @t) pez/pest}  ^+  done
-      ?~  pez  done
-      ?-  -.pez
-          ~     (give-thou (add-cookies cug p.pez))
-          $js    $(pez [%$ (resp 200 text+/javascript p.pez)])
-          $json  (give-json 200 cug p.pez)
-          $html  (give-html 200 cug p.pez)
-          $htme  (give-html 401 cug p.pez)
-          $bake
-        %+  exec-turbo-live  p.pez
-        ^-  schematic:ford
-        :-  %alts  :~
-          ^-  schematic:ford
-          [%bake q.pez r.pez [[p q] s]:s.pez]
+    ++  RESOLVE
+      |=  {CUG/(LIST @T) PEZ/PEST}  ^+  DONE
+      ?~  PEZ  DONE
+      ?-  -.PEZ
+          ~     (GIVE-THOU (ADD-COOKIES CUG P.PEZ))
+          $JS    $(PEZ [%$ (RESP 200 TEXT+/JAVASCRIPT P.PEZ)])
+          $JSON  (GIVE-JSON 200 CUG P.PEZ)
+          $HTML  (GIVE-HTML 200 CUG P.PEZ)
+          $HTME  (GIVE-HTML 401 CUG P.PEZ)
+          $BAKE
+        %+  EXEC-TURBO-LIVE  P.PEZ
+        ^-  SCHEMATIC:FORD
+        :-  %ALTS  :~
+          ^-  SCHEMATIC:FORD
+          [%BAKE Q.PEZ R.PEZ [[P Q] S]:S.PEZ]
         ::
-          ^-  schematic:ford
-          [%bake %red-quri r.pez [[p q] s]:s.pez]
+          ^-  SCHEMATIC:FORD
+          [%BAKE %RED-QURI R.PEZ [[P Q] S]:S.PEZ]
         ==
       ::
-          $red
-        =+  url=(en-purl hat pok(p [~ %html]) quy)
-        ?+    p.pok  ~|(bad-redirect+[p.pok url] !!)
-            ::  ignore css
+          $RED
+        =+  URL=(EN-PURL HAT POK(P [~ %HTML]) QUY)
+        ?+    P.POK  ~|(BAD-REDIRECT+[P.POK URL] !!)
+            ::  IGNORE CSS
             ::
-            {~ $css}  !!
+            {~ $CSS}  !!
         ::
-            {~ $js}
-          $(pez [%js auth-redir:js])
+            {~ $JS}
+          $(PEZ [%JS AUTH-REDIR:JS])
         ::
-            {~ $json}
-          =/  red
-            (pairs:enjs ok+b+| red+(tape:enjs url) ~)
-          $(pez [%json red])
+            {~ $JSON}
+          =/  RED
+            (PAIRS:ENJS OK+B+| RED+(TAPE:ENJS URL) ~)
+          $(PEZ [%JSON RED])
         ==
       ==
     ::
     ::
-    ++  is-anon  =([~ ''] (~(get by (molt quy)) 'anon'))
-    ++  check-oryx                    ::  | if json with bad oryx
+    ++  IS-ANON  =([~ ''] (~(GET BY (MOLT QUY)) 'ANON'))
+    ++  CHECK-ORYX                    ::  | IF JSON WITH BAD ORYX
       ^-  ?
-      ?.  &(?=({~ $json} p.pok) ?=($post mef) ?=(^ bod) !is-anon)  &
-      =+  oxe=grab-oryx
-      ?~  oxe  |
-      ?:  (~(has in vew.cyz:for-client) u.oxe)
+      ?.  &(?=({~ $JSON} P.POK) ?=($POST MEF) ?=(^ BOD) !IS-ANON)  &
+      =+  OXE=GRAB-ORYX
+      ?~  OXE  |
+      ?:  (~(HAS IN VEW.CYZ:FOR-CLIENT) U.OXE)
         &
-      ~&(bad-oryx+[u.oxe vew.cyz:for-client] &)         ::  XX security
+      ~&(BAD-ORYX+[U.OXE VEW.CYZ:FOR-CLIENT] &)         ::  XX SECURITY
     ::
-    ++  grab-json
-      ^-  json
-      ?.  ?=(?($post $put $delt) mef)
-        ~|(bad-method+mef !!)
-      ?~  bod
-        ~|(%no-body !!)
-      (need (de-json q.u.bod))
+    ++  GRAB-JSON
+      ^-  JSON
+      ?.  ?=(?($POST $PUT $DELT) MEF)
+        ~|(BAD-METHOD+MEF !!)
+      ?~  BOD
+        ~|(%NO-BODY !!)
+      (NEED (DE-JSON Q.U.BOD))
     ::
-    ++  grab-json-soft
-      ^-  (unit json)
-      ?.  ?=(?($post $put $delt) mef)
+    ++  GRAB-JSON-SOFT
+      ^-  (UNIT JSON)
+      ?.  ?=(?($POST $PUT $DELT) MEF)
         ~
-      ?~(bod ~ (de-json q.u.bod))
+      ?~(BOD ~ (DE-JSON Q.U.BOD))
     ::
-    ++  grab-oryx
-      ^-  (unit oryx)
-      =+  oxe=(biff grab-json-soft =>(dejs-soft (ot oryx+so ~)))
-      ?^  oxe  oxe
-      (~(get by (molt quy)) %oryx)
+    ++  GRAB-ORYX
+      ^-  (UNIT ORYX)
+      =+  OXE=(BIFF GRAB-JSON-SOFT =>(DEJS-SOFT (OT ORYX+SO ~)))
+      ?^  OXE  OXE
+      (~(GET BY (MOLT QUY)) %ORYX)
     ::
     ::
-    ++  parse
-      ^-  (each perk httr)
-      |^  =+  hit=as-magic-filename
-          ?^  hit  [%| u.hit]
-          =+  hem=as-aux-request
-          ?^  hem
-            ?.  check-oryx
-              ~|(%bad-oryx ~|([grab-oryx vew.cyz:for-client] !!))
-            [%& u.hem]
-          =+  bem=as-beam
-          ?^  bem  [%& %beam u.bem]
-          ?:  is-spur
-            [%& %spur (flop q.pok)]
-          ~|(strange-path+q.pok !!)
+    ++  PARSE
+      ^-  (EACH PERK HTTR)
+      |^  =+  HIT=AS-MAGIC-FILENAME
+          ?^  HIT  [%| U.HIT]
+          =+  HEM=AS-AUX-REQUEST
+          ?^  HEM
+            ?.  CHECK-ORYX
+              ~|(%BAD-ORYX ~|([GRAB-ORYX VEW.CYZ:FOR-CLIENT] !!))
+            [%& U.HEM]
+          =+  BEM=AS-BEAM
+          ?^  BEM  [%& %BEAM U.BEM]
+          ?:  IS-SPUR
+            [%& %SPUR (FLOP Q.POK)]
+          ~|(STRANGE-PATH+Q.POK !!)
       ::
-      ++  as-magic-filename
-        ^-  (unit httr)
-        ?+    [(fall p.pok %$) q.pok]  ~
-            {?($ico $png) $favicon ~}
+      ++  AS-MAGIC-FILENAME
+        ^-  (UNIT HTTR)
+        ?+    [(FALL P.POK %$) Q.POK]  ~
+            {?($ICO $PNG) $FAVICON ~}
           :-  ~
-          %^  resp  200  image+/png
-          favi
+          %^  RESP  200  IMAGE+/PNG
+          FAVI
         ::
-            {$txt $robots ~}
+            {$TXT $ROBOTS ~}
           :-  ~
-          %^  resp  200  text+/plain
-          %-  of-wain:format
-          :~  'User-agent: *'
-              'Disallow: '
+          %^  RESP  200  TEXT+/PLAIN
+          %-  OF-WAIN:FORMAT
+          :~  'USER-AGENT: *'
+              'DISALLOW: '
           ==
         ::
-            {@tas $'.well-known' ^}  ::  XX file extension?
-          =/  mim  (yank wel (tail q.pok))
-          ?~  mim  ~
-          `(resp 200 p.u.mim q.q.u.mim)
+            {@TAS $'.WELL-KNOWN' ^}  ::  XX FILE EXTENSION?
+          =/  MIM  (YANK WEL (TAIL Q.POK))
+          ?~  MIM  ~
+          `(RESP 200 P.U.MIM Q.Q.U.MIM)
         ==
       ::
-      ++  is-spur  |(?~(q.pok & ((sane %ta) i.q.pok)))
-      ++  as-beam                                       :: /~sipnym/desk/3/...
-        ^-  (unit beam)
-        =+  =<  tyk=(drop-list (turn q.pok .))          :: a path whose elements
-            |=(a/knot `(unit tyke)`(rush a gasp:vast))  :: are in /=foo==/=bar
-        ?~  tyk  ~                                      :: syntax
-        =+  %-  posh:(vang & (en-beam top))             :: that the base path
-            [[~ (zing u.tyk)] ~]                        :: can interpolate into
+      ++  IS-SPUR  |(?~(Q.POK & ((SANE %TA) I.Q.POK)))
+      ++  AS-BEAM                                       :: /~SIPNYM/DESK/3/...
+        ^-  (UNIT BEAM)
+        =+  =<  TYK=(DROP-LIST (TURN Q.POK .))          :: A PATH WHOSE ELEMENTS
+            |=(A/KNOT `(UNIT TYKE)`(RUSH A GASP:VAST))  :: ARE IN /=FOO==/=BAR
+        ?~  TYK  ~                                      :: SYNTAX
+        =+  %-  POSH:(VANG & (EN-BEAM TOP))             :: THAT THE BASE PATH
+            [[~ (ZING U.TYK)] ~]                        :: CAN INTERPOLATE INTO
         ?~  -  ~                                        ::
-        =+  (plex:vast %clsg u)                         :: staticly, and make a
-        (biff - de-beam)                                   :: valid beam
+        =+  (PLEX:VAST %CLSG U)                         :: STATICLY, AND MAKE A
+        (BIFF - DE-BEAM)                                   :: VALID BEAM
       ::
-      ++  as-aux-request                                ::  /~/... req parser
-        ^-  (unit perk)
-        =.  mef
-          ?.  ?=($post mef)  mef
-          ?+    (skim quy |=({a/@t b/@t} &(=('' b) =(a (crip (cuss (trip a)))))))
-              ~|(bad-quy+[req='"?PUT" or "?DELETE"' quy] !!)
-            ~   mef
-            {{$'DELETE' ~} ~}  %delt
-            {{$'PUT' ~} ~}     %put
+      ++  AS-AUX-REQUEST                                ::  /~/... REQ PARSER
+        ^-  (UNIT PERK)
+        =.  MEF
+          ?.  ?=($POST MEF)  MEF
+          ?+    (SKIM QUY |=({A/@T B/@T} &(=('' B) =(A (CRIP (CUSS (TRIP A)))))))
+              ~|(BAD-QUY+[REQ='"?PUT" OR "?DELETE"' QUY] !!)
+            ~   MEF
+            {{$'DELETE' ~} ~}  %DELT
+            {{$'PUT' ~} ~}     %PUT
           ==
         |-
-        ?:  ?=({$'~~' *} q.pok)                            ::  auth shortcuts
-          $(q.pok ['~' %as %own t.q.pok])
-        ?.  ?=({$'~' @ *} q.pok)  ~
-        :-  ~  ^-  perk
-        =*  pef  i.t.q.pok
-        =+  but=t.t.q.pok                 ::  XX  =*
-        ?+    pef  ~|(pfix-lost+`path`/~/[pef] !!)
-            $debug  ((hard perk) [%bugs but])
-            $away  [%away ~]
-            $ac
-          ?~  but  ~|(no-host+`path`/~/[pef] !!)
-          =+  `dom/host`~|(bad-host+i.but (rash i.but thos:de-purl))
-          ?:  ?=(%| -.dom)  ~|(auth-ip+dom !!)
-          =-  [%oath - p.dom]
-          ~|  bad-user+`path`t.but
-          ?>  ?=({@ $in ~} t.but)
-          =+  in-quy=(rush i.t.but ;~(pfix cab fque:de-purl))
-          ?~  in-quy
-            (slav %ta i.t.but)
-          =+  src=~|(no+u.in-quy (~(got by (malt quy)) u.in-quy))
-          p:(need (pick src))  ::  allow state=usr_other-data
+        ?:  ?=({$'~~' *} Q.POK)                            ::  AUTH SHORTCUTS
+          $(Q.POK ['~' %AS %OWN T.Q.POK])
+        ?.  ?=({$'~' @ *} Q.POK)  ~
+        :-  ~  ^-  PERK
+        =*  PEF  I.T.Q.POK
+        =+  BUT=T.T.Q.POK                 ::  XX  =*
+        ?+    PEF  ~|(PFIX-LOST+`PATH`/~/[PEF] !!)
+            $DEBUG  ((HARD PERK) [%BUGS BUT])
+            $AWAY  [%AWAY ~]
+            $AC
+          ?~  BUT  ~|(NO-HOST+`PATH`/~/[PEF] !!)
+          =+  `DOM/HOST`~|(BAD-HOST+I.BUT (RASH I.BUT THOS:DE-PURL))
+          ?:  ?=(%| -.DOM)  ~|(AUTH-IP+DOM !!)
+          =-  [%OATH - P.DOM]
+          ~|  BAD-USER+`PATH`T.BUT
+          ?>  ?=({@ $IN ~} T.BUT)
+          =+  IN-QUY=(RUSH I.T.BUT ;~(PFIX CAB FQUE:DE-PURL))
+          ?~  IN-QUY
+            (SLAV %TA I.T.BUT)
+          =+  SRC=~|(NO+U.IN-QUY (~(GOT BY (MALT QUY)) U.IN-QUY))
+          P:(NEED (PICK SRC))  ::  ALLOW STATE=USR_OTHER-DATA
         ::
-            $at  [%auth %at pok(q but)]
-            $am  ?~(but !! [%auth %xen i.but pok(q t.but)])
-            $as
-          :+  %auth  %get
-          ~|  bad-ship+?~(but ~ i.but)
-          ?~  but  !!
-          :_  pok(q t.but)
-          ?+  i.but  (slav %p i.but)
-            $anon  anon
-            $own   our
+            $AT  [%AUTH %AT POK(Q BUT)]
+            $AM  ?~(BUT !! [%AUTH %XEN I.BUT POK(Q T.BUT)])
+            $AS
+          :+  %AUTH  %GET
+          ~|  BAD-SHIP+?~(BUT ~ I.BUT)
+          ?~  BUT  !!
+          :_  POK(Q T.BUT)
+          ?+  I.BUT  (SLAV %P I.BUT)
+            $ANON  ANON
+            $OWN   OUR
           ==
         ::
-            $on
-          :-  %poll
-          ?^  but  [(raid but %uv ~)]~
-          =+  dep=((hard (list {@ ~})) quy)
+            $ON
+          :-  %POLL
+          ?^  BUT  [(RAID BUT %UV ~)]~
+          =+  DEP=((HARD (LIST {@ ~})) QUY)
           =<  ?~(. !! .)
-          (turn dep |=({a/@tas ~} (slav %uv a)))
+          (TURN DEP |=({A/@TAS ~} (SLAV %UV A)))
         ::
-            $of
-          :+  %view  ?>(?=({@ ~} but) i.but)
-          ?>  ?=({{$poll @} ~} quy)
-::          :^  %view
-::          ?>  ?=({@ ~} but)
-::          i.but
-::          ?>  ?=({{$poll @} *} quy)     ::  XX eventsource
-          [~ (rash q.i.quy dem)]
-::          ?:  ?=({{$t @} ~} +.quy)
-::            =/  s  (rash q.i.t.quy dem)
-::            `(yule [0 0 0 s ~])
+            $OF
+          :+  %VIEW  ?>(?=({@ ~} BUT) I.BUT)
+          ?>  ?=({{$POLL @} ~} QUY)
+::          :^  %VIEW
+::          ?>  ?=({@ ~} BUT)
+::          I.BUT
+::          ?>  ?=({{$POLL @} *} QUY)     ::  XX EVENTSOURCE
+          [~ (RASH Q.I.QUY DEM)]
+::          ?:  ?=({{$T @} ~} +.QUY)
+::            =/  S  (RASH Q.I.T.QUY DEM)
+::            `(YULE [0 0 0 S ~])
 ::          ~
         ::
-            $to
-          =+  ^-  dir/{p/ship q/term r/mark}
-              ~|  bad-mess+but
-              ?+  but  !!
-                {@ @ ~}    [our (raid but %tas %tas ~)]
-                {@ @ @ ~}  (raid but %p %tas %tas ~)
+            $TO
+          =+  ^-  DIR/{P/SHIP Q/TERM R/MARK}
+              ~|  BAD-MESS+BUT
+              ?+  BUT  !!
+                {@ @ ~}    [OUR (RAID BUT %TAS %TAS ~)]
+                {@ @ @ ~}  (RAID BUT %P %TAS %TAS ~)
               ==
-          =;  x/{wir/wire mez/json}
-            [%mess [p q]:dir r.dir wir.x mez.x]
-          =+  wir=(~(get by (molt quy)) 'wire')
-          ?^  wir  [(stab u.wir) grab-json]          ::  XX distinguish
-          %.(grab-json =>(dejs (ot wire+(cu stab so) xyro+same ~)))
+          =;  X/{WIR/WIRE MEZ/JSON}
+            [%MESS [P Q]:DIR R.DIR WIR.X MEZ.X]
+          =+  WIR=(~(GET BY (MOLT QUY)) 'WIRE')
+          ?^  WIR  [(STAB U.WIR) GRAB-JSON]          ::  XX DISTINGUISH
+          %.(GRAB-JSON =>(DEJS (OT WIRE+(CU STAB SO) XYRO+SAME ~)))
         ::
-            $in
-          ~|  expect+[%post 'application+json' /'@uv' '?PUT/DELETE']
-          ?>  &(?=(?($delt $put) mef) ?=($@(~ {~ $json}) p.pok))
-          [%deps mef (raid but %uv ~)]
+            $IN
+          ~|  EXPECT+[%POST 'APPLICATION+JSON' /'@UV' '?PUT/DELETE']
+          ?>  &(?=(?($DELT $PUT) MEF) ?=($@(~ {~ $JSON}) P.POK))
+          [%DEPS MEF (RAID BUT %UV ~)]
         ::
-            $is
-          ?~  but
-            ~|(no-app+but=but !!)
-          |-  ^-  perk
-          ?~  p.pok  $(p.pok [~ %json])
-          ?.  ?=($json u.p.pok)
-            ~|(is+stub+u.p.pok !!)      ::  XX marks
-          ?:  ((sane %tas) i.but)
-            $(but [(scot %p our) but])
-          ?>  ?=(?($delt $put) mef)
-          =+  :-  hap=[(slav %p i.but) (slav %tas -.t.but)]
-              wir=%.(grab-json =>(dejs (ot wire+(cu stab so) ~)))
-          [%subs mef hap u.p.pok wir +.t.but]
+            $IS
+          ?~  BUT
+            ~|(NO-APP+BUT=BUT !!)
+          |-  ^-  PERK
+          ?~  P.POK  $(P.POK [~ %JSON])
+          ?.  ?=($JSON U.P.POK)
+            ~|(IS+STUB+U.P.POK !!)      ::  XX MARKS
+          ?:  ((SANE %TAS) I.BUT)
+            $(BUT [(SCOT %P OUR) BUT])
+          ?>  ?=(?($DELT $PUT) MEF)
+          =+  :-  HAP=[(SLAV %P I.BUT) (SLAV %TAS -.T.BUT)]
+              WIR=%.(GRAB-JSON =>(DEJS (OT WIRE+(CU STAB SO) ~)))
+          [%SUBS MEF HAP U.P.POK WIR +.T.BUT]
         ::
-            $auth
-          :-  %auth
-          |-  ^-  perk-auth
-          ?+    p.pok  !!
-              ~         $(p.pok [~ %json])
-              {~ $js}    [%js ~]
-              {~ $json}
-            ?+    mef  ~|(bad-meth+mef !!)
-                $get   [%json ~]
-                $put
-              ~|  parsing+bod
-              :-  %try
-              %.(grab-json =>(dejs (ot ship+(su fed:ag) code+(mu so) ~)))
+            $AUTH
+          :-  %AUTH
+          |-  ^-  PERK-AUTH
+          ?+    P.POK  !!
+              ~         $(P.POK [~ %JSON])
+              {~ $JS}    [%JS ~]
+              {~ $JSON}
+            ?+    MEF  ~|(BAD-METH+MEF !!)
+                $GET   [%JSON ~]
+                $PUT
+              ~|  PARSING+BOD
+              :-  %TRY
+              %.(GRAB-JSON =>(DEJS (OT SHIP+(SU FED:AG) CODE+(MU SO) ~)))
             ::
-                $delt
-              ::  XX: restored old code to fix for redo
-              ::  ~|  parsing+bod
-              ::  :-  %del
-              ::  %.(grab-json =>(dejs-soft (ot ship+(su fed:ag))))
+                $DELT
+              ::  XX: RESTORED OLD CODE TO FIX FOR REDO
+              ::  ~|  PARSING+BOD
+              ::  :-  %DEL
+              ::  %.(GRAB-JSON =>(DEJS-SOFT (OT SHIP+(SU FED:AG))))
               ::
-              ~|  parsing+bod
-              =+  jon=(need (de-json q:(need bod)))
-              ?>  ?=($o -.jon)
-              =+  sip=(~(get by p.jon) %ship)
-              [%del ?~(sip ~ [~ ((su:dejs fed:ag) u.sip)])]
+              ~|  PARSING+BOD
+              =+  JON=(NEED (DE-JSON Q:(NEED BOD)))
+              ?>  ?=($O -.JON)
+              =+  SIP=(~(GET BY P.JON) %SHIP)
+              [%DEL ?~(SIP ~ [~ ((SU:DEJS FED:AG) U.SIP)])]
         ==  ==
         ==
       --
     ::
-    :: process-payload handles the translation of a payload for post.
-    :: currently this involves treating the payload as a urlencoded
-    :: request. In the future it's possible the payload could be
-    :: a specific mark instead.
+    :: PROCESS-PAYLOAD HANDLES THE TRANSLATION OF A PAYLOAD FOR POST.
+    :: CURRENTLY THIS INVOLVES TREATING THE PAYLOAD AS A URLENCODED
+    :: REQUEST. IN THE FUTURE IT'S POSSIBLE THE PAYLOAD COULD BE
+    :: A SPECIFIC MARK INSTEAD.
     ::
-    ++  process-payload
-      ^-  {quay meth}
-      ?+  mef  [quy mef]
-        $post  [`quay`(weld quy `quay`(rash q:(need bod) yquy:de-purl)) %get]
+    ++  PROCESS-PAYLOAD
+      ^-  {QUAY METH}
+      ?+  MEF  [QUY MEF]
+        $POST  [`QUAY`(WELD QUY `QUAY`(RASH Q:(NEED BOD) YQUY:DE-PURL)) %GET]
       ==
-    ++  process
-      ^-  (each pest _done)
-      =+  pet=parse
-      ?:  ?=(%| -.pet)
-        [%& %$ p.pet]
-      (process-parsed p.pet)
+    ++  PROCESS
+      ^-  (EACH PEST _DONE)
+      =+  PET=PARSE
+      ?:  ?=(%| -.PET)
+        [%& %$ P.PET]
+      (PROCESS-PARSED P.PET)
     ::
-    ++  process-parsed
-      |=  hem/perk  ^-  (each pest _done)
-      ?-    -.hem
-          $auth  (process-auth p.hem)
-          $away  [%& %html logout-page:xml]
-          ?($beam $spur)
-        =^  payload  mef  process-payload
-        =/  ext  %+  fall  p.pok
-          ?:  ?=(%spur -.hem)
-            %urb
-          ?:  =(our p.p.hem)
-            %urb
-          %x-urb
-        =+  bem=?-(-.hem $beam p.hem, $spur [-.top (weld p.hem s.top)])
-        ~|  bad-beam+q.bem
-        ?<  =([~ 0] (sky [151 %noun] %cw (en-beam bem(+ ~, r [%da now]))))
-        ?:  ::!=(our p.bem) ::TODO also if it is?
-            =('x-' (end 3 2 ext))
-          =.  ext  (cat 3 ext '-elem')
-          =.  -.bem  (norm-beak -.bem)
-          =/  han  (sham hen)
-          =.  pox  (~(put by pox) han hen)
-          =+  arg=(fcgi payload fcgi-cred)
-          [%| (ames-gram p.bem %get-inner han ext arg bem)]
-        =+  wir=`whir`[%ha (en-beam -.bem ~)]
-        =.  wir  ?+(mef !! $get wir, $head [%he wir])
-        =.  r.bem  ?+(r.bem r.bem {$ud $0} da+now)
-        =+  arg=(fcgi payload fcgi-cred)
-        =+  [%bake wir ext arg bem]
-        ?.(aut [%& `pest`-] [%| `_done`(resolve ~ -)])
+    ++  PROCESS-PARSED
+      |=  HEM/PERK  ^-  (EACH PEST _DONE)
+      ?-    -.HEM
+          $AUTH  (PROCESS-AUTH P.HEM)
+          $AWAY  [%& %HTML LOGOUT-PAGE:XML]
+          ?($BEAM $SPUR)
+        =^  PAYLOAD  MEF  PROCESS-PAYLOAD
+        =/  EXT  %+  FALL  P.POK
+          ?:  ?=(%SPUR -.HEM)
+            %URB
+          ?:  =(OUR P.P.HEM)
+            %URB
+          %X-URB
+        =+  BEM=?-(-.HEM $BEAM P.HEM, $SPUR [-.TOP (WELD P.HEM S.TOP)])
+        ~|  BAD-BEAM+Q.BEM
+        ?<  =([~ 0] (SKY [151 %NOUN] %CW (EN-BEAM BEM(+ ~, R [%DA NOW]))))
+        ?:  ::!=(OUR P.BEM) ::TODO ALSO IF IT IS?
+            =('X-' (END 3 2 EXT))
+          =.  EXT  (CAT 3 EXT '-ELEM')
+          =.  -.BEM  (NORM-BEAK -.BEM)
+          =/  HAN  (SHAM HEN)
+          =.  POX  (~(PUT BY POX) HAN HEN)
+          =+  ARG=(FCGI PAYLOAD FCGI-CRED)
+          [%| (AMES-GRAM P.BEM %GET-INNER HAN EXT ARG BEM)]
+        =+  WIR=`WHIR`[%HA (EN-BEAM -.BEM ~)]
+        =.  WIR  ?+(MEF !! $GET WIR, $HEAD [%HE WIR])
+        =.  R.BEM  ?+(R.BEM R.BEM {$UD $0} DA+NOW)
+        =+  ARG=(FCGI PAYLOAD FCGI-CRED)
+        =+  [%BAKE WIR EXT ARG BEM]
+        ?.(AUT [%& `PEST`-] [%| `_DONE`(RESOLVE ~ -)])
       ::
-          $bugs
-        ?-  p.hem
-          $as  (show-login-page)
-          $to  [%& %html poke-test:xml]
+          $BUGS
+        ?-  P.HEM
+          $AS  (SHOW-LOGIN-PAGE)
+          $TO  [%& %HTML POKE-TEST:XML]
         ==
       ::
-          $deps
-        =+  ire=need-ixor
-        ?>  (~(has by wix) ire)  ::  XX made redundant by oryx checking
-        =<  [%| (nice-json)]
-        ?-  p.hem
-          $put   (new-deps q.hem %| ire)
-          $delt  (del-deps q.hem %| ire)
+          $DEPS
+        =+  IRE=NEED-IXOR
+        ?>  (~(HAS BY WIX) IRE)  ::  XX MADE REDUNDANT BY ORYX CHECKING
+        =<  [%| (NICE-JSON)]
+        ?-  P.HEM
+          $PUT   (NEW-DEPS Q.HEM %| IRE)
+          $DELT  (DEL-DEPS Q.HEM %| IRE)
         ==
       ::
-          $mess
+          $MESS
         :-  %|
-        =^  orx  ..ya  ?:(is-anon new-view:for-client [(need grab-oryx) ..ya])
-        =+  vew=(ire-ix (oryx-to-ixor orx))
-        ((teba new-mess.vew) p.hem r.hem q.hem %json !>(`json`s.hem))
+        =^  ORX  ..YA  ?:(IS-ANON NEW-VIEW:FOR-CLIENT [(NEED GRAB-ORYX) ..YA])
+        =+  VEW=(IRE-IX (ORYX-TO-IXOR ORX))
+        ((TEBA NEW-MESS.VEW) P.HEM R.HEM Q.HEM %JSON !>(`JSON`S.HEM))
       ::
-          $oath
-        ?.  (~(has by sec) [p q]:hem)
-          ~|(no-driver+[p q]:hem !!)
-        [%| %.(quy (teba get-quay:(dom-vi [p q]:hem)))]
+          $OATH
+        ?.  (~(HAS BY SEC) [P Q]:HEM)
+          ~|(NO-DRIVER+[P Q]:HEM !!)
+        [%| %.(QUY (TEBA GET-QUAY:(DOM-VI [P Q]:HEM)))]
       ::
-          $poll
-        ?:  ?=({~ $js} p.pok)  ::  XX treat non-json cases?
-          =+  deps=[%a (turn `(list @uvH)`p.hem |=(a/@ s+(scot %uv a)))]
-          [%& %js (add-json (frond:enjs %deps deps) poll:js)]
-        =.  lyv  (~(put by lyv) hen %wasp p.hem)
+          $POLL
+        ?:  ?=({~ $JS} P.POK)  ::  XX TREAT NON-JSON CASES?
+          =+  DEPS=[%A (TURN `(LIST @UVH)`P.HEM |=(A/@ S+(SCOT %UV A)))]
+          [%& %JS (ADD-JSON (FROND:ENJS %DEPS DEPS) POLL:JS)]
+        =.  LYV  (~(PUT BY LYV) HEN %WASP P.HEM)
         |-
-          =.  done  (new-deps i.p.hem %& hen)
-          ?~  t.p.hem  [%| done]
-          $(p.hem t.p.hem)
+          =.  DONE  (NEW-DEPS I.P.HEM %& HEN)
+          ?~  T.P.HEM  [%| DONE]
+          $(P.HEM T.P.HEM)
       ::
-          $subs
-        ?-  p.hem
-          $put   [%| ((teba add-subs:for-view) q.hem)]
-          $delt  [%| ((teba del-subs:for-view) q.hem)]
+          $SUBS
+        ?-  P.HEM
+          $PUT   [%| ((TEBA ADD-SUBS:FOR-VIEW) Q.HEM)]
+          $DELT  [%| ((TEBA DEL-SUBS:FOR-VIEW) Q.HEM)]
         ==
       ::
-          $view
-        ~|  lost-ixor+p.hem
-::        [%| ((teba poll:(ire-ix p.hem)) u.q.hem r.hem)]
-        [%| ((teba poll:(ire-ix p.hem)) u.q.hem)]
+          $VIEW
+        ~|  LOST-IXOR+P.HEM
+::        [%| ((TEBA POLL:(IRE-IX P.HEM)) U.Q.HEM R.HEM)]
+        [%| ((TEBA POLL:(IRE-IX P.HEM)) U.Q.HEM)]
       ==
     ::
-    ++  process-auth
-      |=  ham/perk-auth  ^-  (each pest _done)
-      =+  yac=for-client
-      ?-    -.ham
-          $js    [%& %js auth:js]
-          $json  =^  jon  ..ya  stat-json.yac
-                 [%| (give-json 200 cug.yac jon)]
-          $xen   (show-login-page ~ ses.ham)
+    ++  PROCESS-AUTH
+      |=  HAM/PERK-AUTH  ^-  (EACH PEST _DONE)
+      =+  YAC=FOR-CLIENT
+      ?-    -.HAM
+          $JS    [%& %JS AUTH:JS]
+          $JSON  =^  JON  ..YA  STAT-JSON.YAC
+                 [%| (GIVE-JSON 200 CUG.YAC JON)]
+          $XEN   (SHOW-LOGIN-PAGE ~ SES.HAM)
       ::
-          $at
-        =.  ..ya  abet.yac
-        =+  pez=process(pok p.ham, aut |)
-        ?.  ?=(%& -.pez)  ~|(no-inject+p.ham !!)
-        ?~  p.pez  pez
-        ?+    -.p.pez  ~&(bad-inject+p.pez !!)
-            $red  pez
-            $bake
-          =.  ya  abet.yac
-          [%| (resolve ~ p.pez(p [%at ses.yac p.p.pez]))]
+          $AT
+        =.  ..YA  ABET.YAC
+        =+  PEZ=PROCESS(POK P.HAM, AUT |)
+        ?.  ?=(%& -.PEZ)  ~|(NO-INJECT+P.HAM !!)
+        ?~  P.PEZ  PEZ
+        ?+    -.P.PEZ  ~&(BAD-INJECT+P.PEZ !!)
+            $RED  PEZ
+            $BAKE
+          =.  YA  ABET.YAC
+          [%| (RESOLVE ~ P.PEZ(P [%AT SES.YAC P.P.PEZ]))]
         ::
-            $js
-          =^  jon  ..ya  stat-json.yac
-          [%| (resolve cug.yac p.pez(p (add-json jon p.p.pez)))]
+            $JS
+          =^  JON  ..YA  STAT-JSON.YAC
+          [%| (RESOLVE CUG.YAC P.PEZ(P (ADD-JSON JON P.P.PEZ)))]
         ==
       ::
-          $del
-        =.  ..ya  (logoff:yac p.ham)
-        =/  cug
-          :~  (set-cookie cookie-prefix '~')
-              (set-cookie %ship '~')
+          $DEL
+        =.  ..YA  (LOGOFF:YAC P.HAM)
+        =/  CUG
+          :~  (SET-COOKIE COOKIE-PREFIX '~')
+              (SET-COOKIE %SHIP '~')
           ==
-        [%| (give-json 200 cug (frond:enjs %ok %b &))]
+        [%| (GIVE-JSON 200 CUG (FROND:ENJS %OK %B &))]
       ::
-          $get
+          $GET
         |-
-        ~|  aute+ham
-        ?:  |(=(anon him.ham) (~(has in aut.yac) him.ham))
-          =.  ..ya  abet.yac(him him.ham)
-          =+  pez=process(pok rem.ham, aut &)
-          ?:  ?=(%| -.pez)  pez
-          [%| (resolve ~ p.pez)]
-        ?.  =(our him.ham)
-          [%| ((teba foreign-auth.yac) him.ham hat rem.ham quy)]
-        (show-login-page ~)
+        ~|  AUTE+HAM
+        ?:  |(=(ANON HIM.HAM) (~(HAS IN AUT.YAC) HIM.HAM))
+          =.  ..YA  ABET.YAC(HIM HIM.HAM)
+          =+  PEZ=PROCESS(POK REM.HAM, AUT &)
+          ?:  ?=(%| -.PEZ)  PEZ
+          [%| (RESOLVE ~ P.PEZ)]
+        ?.  =(OUR HIM.HAM)
+          [%| ((TEBA FOREIGN-AUTH.YAC) HIM.HAM HAT REM.HAM QUY)]
+        (SHOW-LOGIN-PAGE ~)
       ::
-          $try
+          $TRY
         :-  %|
-        ?.  =(our him.ham)
-          ~|(stub-foreign+him.ham !!)
-        ?.  ?|  (~(has in aut.yac) him.ham)
-                ?~(paz.ham | =(u.paz.ham load-secret))
+        ?.  =(OUR HIM.HAM)
+          ~|(STUB-FOREIGN+HIM.HAM !!)
+        ?.  ?|  (~(HAS IN AUT.YAC) HIM.HAM)
+                ?~(PAZ.HAM | =(U.PAZ.HAM LOAD-SECRET))
             ==
-          ~|(%auth-fail !!)
-        =^  jon  ..ya  stat-json:(logon:yac him.ham)
-        =.  cug.yac  :_(cug.yac (set-cookie %ship (scot %p him.ham)))
-        (give-json 200 cug.yac jon)
+          ~|(%AUTH-FAIL !!)
+        =^  JON  ..YA  STAT-JSON:(LOGON:YAC HIM.HAM)
+        =.  CUG.YAC  :_(CUG.YAC (SET-COOKIE %SHIP (SCOT %P HIM.HAM)))
+        (GIVE-JSON 200 CUG.YAC JON)
       ==
     ::
-    ++  show-login-page
-      |=  ses/(unit hole)  ^-  (each pest _done)
-      ?.  ?=($@(~ {~ $html}) p.pok)
-        [%& %red ~]
-      ?~  ses
-        [%& %htme login-page:xml]
-      ?:  (~(has by wup) u.ses)
-        [%& %htme login-page:xml]
-      =+  yac=(new-ya u.ses)
-      =+  =-  lon=?~(- | (~(has in aut.u.-) our))
-          (biff (session-from-cookies cookie-prefix maf) ~(get by wup))
-      =.  yac  ?.(lon yac (logon.yac our))
-      [%| (give-html(..ya abet.yac) 401 cug.yac login-page:xml)]
+    ++  SHOW-LOGIN-PAGE
+      |=  SES/(UNIT HOLE)  ^-  (EACH PEST _DONE)
+      ?.  ?=($@(~ {~ $HTML}) P.POK)
+        [%& %RED ~]
+      ?~  SES
+        [%& %HTME LOGIN-PAGE:XML]
+      ?:  (~(HAS BY WUP) U.SES)
+        [%& %HTME LOGIN-PAGE:XML]
+      =+  YAC=(NEW-YA U.SES)
+      =+  =-  LON=?~(- | (~(HAS IN AUT.U.-) OUR))
+          (BIFF (SESSION-FROM-COOKIES COOKIE-PREFIX MAF) ~(GET BY WUP))
+      =.  YAC  ?.(LON YAC (LOGON.YAC OUR))
+      [%| (GIVE-HTML(..YA ABET.YAC) 401 CUG.YAC LOGIN-PAGE:XML)]
     ::
-    ++  cookie-prefix  (rsh 3 1 (scot %p our))
-    ++  cookie-domain
-      ^-  cord
-      ?-  r.hat
-        {%| @}  (cat 3 '; Domain=' (rsh 3 1 (scot %if p.r.hat)))
-        {%& $org $urbit *}  '; Domain=.urbit.org'
-        {%& @ @ *}  =-  (rap 3 "; Domain={-}{i.p.r.hat ~}")
-                    (turn (flop `path`t.p.r.hat) |=(a/knot (cat 3 a '.')))
+    ++  COOKIE-PREFIX  (RSH 3 1 (SCOT %P OUR))
+    ++  COOKIE-DOMAIN
+      ^-  CORD
+      ?-  R.HAT
+        {%| @}  (CAT 3 '; DOMAIN=' (RSH 3 1 (SCOT %IF P.R.HAT)))
+        {%& $ORG $URBIT *}  '; DOMAIN=.URBIT.ORG'
+        {%& @ @ *}  =-  (RAP 3 "; DOMAIN={-}{I.P.R.HAT ~}")
+                    (TURN (FLOP `PATH`T.P.R.HAT) |=(A/KNOT (CAT 3 A '.')))
 
-        {%& *}  ''  ::  XX security?
+        {%& *}  ''  ::  XX SECURITY?
       ==
     ::
-    ++  set-cookie
-      |=  {key/@t val/@t}
-      %+  rap  3  :~
-        key  '='  val
-        ::  '; HttpOnly'  ?.(sec '' '; Secure')  ::  XX security
-        cookie-domain
-        '; Path=/; HttpOnly'
+    ++  SET-COOKIE
+      |=  {KEY/@T VAL/@T}
+      %+  RAP  3  :~
+        KEY  '='  VAL
+        ::  '; HTTPONLY'  ?.(SEC '' '; SECURE')  ::  XX SECURITY
+        COOKIE-DOMAIN
+        '; PATH=/; HTTPONLY'
       ==
-    ++  need-ixor  (oryx-to-ixor (need grab-oryx))
-    ++  for-view  ^+(ix (ire-ix need-ixor))
+    ++  NEED-IXOR  (ORYX-TO-IXOR (NEED GRAB-ORYX))
+    ++  FOR-VIEW  ^+(IX (IRE-IX NEED-IXOR))
     ::
-    ++  for-client                        ::  stateful per-session engine
-      ^+  ya
-      =+  pef=cookie-prefix
-      =+  lig=(session-from-cookies pef maf)
-      ?~  lig
-        (new-ya (rsh 3 1 (scot %p (end 6 1 ney))))
-      =+  cyz=(~(get by wup) u.lig)
-      ?~  cyz
-        ~&  bad-cookie+u.lig
-        (new-ya (rsh 3 1 (scot %p (end 6 1 ney))))
-      ~(. ya u.lig u.cyz(cug ~))
+    ++  FOR-CLIENT                        ::  STATEFUL PER-SESSION ENGINE
+      ^+  YA
+      =+  PEF=COOKIE-PREFIX
+      =+  LIG=(SESSION-FROM-COOKIES PEF MAF)
+      ?~  LIG
+        (NEW-YA (RSH 3 1 (SCOT %P (END 6 1 NEY))))
+      =+  CYZ=(~(GET BY WUP) U.LIG)
+      ?~  CYZ
+        ~&  BAD-COOKIE+U.LIG
+        (NEW-YA (RSH 3 1 (SCOT %P (END 6 1 NEY))))
+      ~(. YA U.LIG U.CYZ(CUG ~))
     ::
-    ++  new-ya  |=(ses/hole ~(. ya ses (new-cyst ses)))
-    ++  new-cyst
-      |=  ses/hole
-      =*  sec  p.hat
-      ^-  cyst
-      :*  ^-  cred
-          :*  hat(p sec)
+    ++  NEW-YA  |=(SES/HOLE ~(. YA SES (NEW-CYST SES)))
+    ++  NEW-CYST
+      |=  SES/HOLE
+      =*  SEC  P.HAT
+      ^-  CYST
+      :*  ^-  CRED
+          :*  HAT(P SEC)
               ~
-              'not-yet-implemented'
-              ::(rsh 3 1 (scot %p (end 6 1 (shaf %oryx ses))))
+              'NOT-YET-IMPLEMENTED'
+              ::(RSH 3 1 (SCOT %P (END 6 1 (SHAF %ORYX SES))))
           ::
-              =+  lag=(~(get by maf) %accept-language)
-              ?~(lag ~ ?~(u.lag ~ [~ i.u.lag]))
+              =+  LAG=(~(GET BY MAF) %ACCEPT-LANGUAGE)
+              ?~(LAG ~ ?~(U.LAG ~ [~ I.U.LAG]))
           ::
-              cip
+              CIP
               ~
           ==
-          [`@p`(mix anon (lsh 5 1 (rsh 5 1 (shaf %ship ses)))) ~]
+          [`@P`(MIX ANON (LSH 5 1 (RSH 5 1 (SHAF %SHIP SES)))) ~]
       ::
-          [(set-cookie cookie-prefix ses)]~
+          [(SET-COOKIE COOKIE-PREFIX SES)]~
       ::
-          now
+          NOW
           ~
           ~
         ::  [1 ~]
       ==
     --
   ::
-  ++  oryx-to-ixor  |=(a/oryx (rsh 3 1 (scot %p (end 6 1 (shas %ire a)))))
-  ++  ya                                                ::  session engine
-    ~%  %eyre-y  ..is  ~
-    =|  {ses/hole cyst}
-    =*  cyz  ->
+  ++  ORYX-TO-IXOR  |=(A/ORYX (RSH 3 1 (SCOT %P (END 6 1 (SHAS %IRE A)))))
+  ++  YA                                                ::  SESSION ENGINE
+    ~%  %EYRE-Y  ..IS  ~
+    =|  {SES/HOLE CYST}
+    =*  CYZ  ->
     |%
-    ++  abet  ..ya(wup (~(put by wup) ses cyz))
-    ++  abut  ..ya(wup (~(del by wup) ses))
-    ++  foreign-auth
-      |=  {him/ship pul/purl}  ^+  ..ya
-      =.  way  (~(put by way) him pul hen)
-      ~&  asking-foreign+him
-      (ames-gram:abet him [%lon ses])
+    ++  ABET  ..YA(WUP (~(PUT BY WUP) SES CYZ))
+    ++  ABUT  ..YA(WUP (~(DEL BY WUP) SES))
+    ++  FOREIGN-AUTH
+      |=  {HIM/SHIP PUL/PURL}  ^+  ..YA
+      =.  WAY  (~(PUT BY WAY) HIM PUL HEN)
+      ~&  ASKING-FOREIGN+HIM
+      (AMES-GRAM:ABET HIM [%LON SES])
     ::
-    ++  foreign-hat
-      |=  {him/ship hat/hart}  ^+  ..ya
-      ~|  way
-      ?.  (~(has by way) him)  :: XX crashes should be handled by ames
-        ~&(strange-auth+[way him hat] ..ya)
-      =^  pul  hen  (~(got by way) him)
-      =:  way       (~(del by way) him)
-          dop       (~(put by dop) r.hat him)
-          q.q.pul   ['~' %am ses q.q.pul]
+    ++  FOREIGN-HAT
+      |=  {HIM/SHIP HAT/HART}  ^+  ..YA
+      ~|  WAY
+      ?.  (~(HAS BY WAY) HIM)  :: XX CRASHES SHOULD BE HANDLED BY AMES
+        ~&(STRANGE-AUTH+[WAY HIM HAT] ..YA)
+      =^  PUL  HEN  (~(GOT BY WAY) HIM)
+      =:  WAY       (~(DEL BY WAY) HIM)
+          DOP       (~(PUT BY DOP) R.HAT HIM)
+          Q.Q.PUL   ['~' %AM SES Q.Q.PUL]
         ==
-      =+  url=(welp (en-purl pul(p hat)) '#' (head:en-purl p.pul))
-      %-  give-thou:abet
-      (add-cookies cug [307 [location+(crip url)]~ ~])
+      =+  URL=(WELP (EN-PURL PUL(P HAT)) '#' (HEAD:EN-PURL P.PUL))
+      %-  GIVE-THOU:ABET
+      (ADD-COOKIES CUG [307 [LOCATION+(CRIP URL)]~ ~])
     ::
-    ++  logon
-      |=  her/ship
+    ++  LOGON
+      |=  HER/SHIP
       %_  +>
-        him   her
-        aut   (~(put in aut) her)
-        ..ya
-          ::  ~&  logon+[our her ses]
-          ?.  =(our her)
-            ..ya
-          =+  sap=(~(get by sop) ses)
-          ::  ~&  sap+sap
-          ?.  ?=({~ @ %|} sap)
-            ..ya
-          (ames-gram -.u.sap %aut ses)
+        HIM   HER
+        AUT   (~(PUT IN AUT) HER)
+        ..YA
+          ::  ~&  LOGON+[OUR HER SES]
+          ?.  =(OUR HER)
+            ..YA
+          =+  SAP=(~(GET BY SOP) SES)
+          ::  ~&  SAP+SAP
+          ?.  ?=({~ @ %|} SAP)
+            ..YA
+          (AMES-GRAM -.U.SAP %AUT SES)
       ==
-    ++  logoff
-      |=  her/(unit ship)  ^+  ..ya
-      ?~  her  abut
-      =.  aut  (~(del in aut) u.her)
-      ?~  aut  abut
-      abet(him ?.(=(u.her him) him n.aut))
+    ++  LOGOFF
+      |=  HER/(UNIT SHIP)  ^+  ..YA
+      ?~  HER  ABUT
+      =.  AUT  (~(DEL IN AUT) U.HER)
+      ?~  AUT  ABUT
+      ABET(HIM ?.(=(U.HER HIM) HIM N.AUT))
     ::
-    ++  new-view
-      ^+  [*oryx ..ya]
-      =+  orx=`@t`(rsh 3 1 (scot %p (shaf %orx eny)))
-      =.  vew  (~(put in vew) orx)
-      =+  ire=(oryx-to-ixor orx)
-      =.  ..ix  ~(init ix ire %*(. *stem him him, p.eve 1))
-      ::  ~&  stat-ire+`@t`ire
-      [orx abet]
+    ++  NEW-VIEW
+      ^+  [*ORYX ..YA]
+      =+  ORX=`@T`(RSH 3 1 (SCOT %P (SHAF %ORX ENY)))
+      =.  VEW  (~(PUT IN VEW) ORX)
+      =+  IRE=(ORYX-TO-IXOR ORX)
+      =.  ..IX  ~(INIT IX IRE %*(. *STEM HIM HIM, P.EVE 1))
+      ::  ~&  STAT-IRE+`@T`IRE
+      [ORX ABET]
     ::
-    ++  fcgi-cred  %_(ced aut (~(put ju aut.ced) %$ (scot %p him)))
-    ::  XX move
+    ++  FCGI-CRED  %_(CED AUT (~(PUT JU AUT.CED) %$ (SCOT %P HIM)))
+    ::  XX MOVE
     ::
-    ++  sein
-      |=  who=ship
-      ;;  ship
-      (need (sky [[151 %noun] %j (en-beam [our %sein da+now] /(scot %p who))]))
+    ++  SEIN
+      |=  WHO=SHIP
+      ;;  SHIP
+      (NEED (SKY [[151 %NOUN] %J (EN-BEAM [OUR %SEIN DA+NOW] /(SCOT %P WHO))]))
     ::
-    ++  stat-json
-      ^+  [*json ..ya]
-      =^  orx  ..ya  new-view
-      :_  ..ya
-      =/  j  enjs
-      %-  pairs.j  :~
-        oryx+s+orx
-        ixor+s+(oryx-to-ixor orx)
-        sein+(ship.j (sein our))
-        ship+(ship.j our)
-        user+(ship.j him)
-        auth+a+(turn ~(tap in aut) ship.j)
+    ++  STAT-JSON
+      ^+  [*JSON ..YA]
+      =^  ORX  ..YA  NEW-VIEW
+      :_  ..YA
+      =/  J  ENJS
+      %-  PAIRS.J  :~
+        ORYX+S+ORX
+        IXOR+S+(ORYX-TO-IXOR ORX)
+        SEIN+(SHIP.J (SEIN OUR))
+        SHIP+(SHIP.J OUR)
+        USER+(SHIP.J HIM)
+        AUTH+A+(TURN ~(TAP IN AUT) SHIP.J)
       ==
     --
   ::
-  ++  ix
-    ~%  %eyre-x  ..is  ~
-    =|  {ire/ixor stem}
-    =*  sem  ->
+  ++  IX
+    ~%  %EYRE-X  ..IS  ~
+    =|  {IRE/IXOR STEM}
+    =*  SEM  ->
     |%
-    ++  done  .
-    ++  abet  ..ix(wix (~(put by wix) ire sem))
-    ++  abut
-      =+  sub=~(tap in sus)
-      |-  ^+  ..ix
-      ?^  sub  $(sub t.sub, ..ix (pul-subs i.sub))
-      =.  +>  poll-rest
-      ..ix(wix (~(del by wix) ire))
+    ++  DONE  .
+    ++  ABET  ..IX(WIX (~(PUT BY WIX) IRE SEM))
+    ++  ABUT
+      =+  SUB=~(TAP IN SUS)
+      |-  ^+  ..IX
+      ?^  SUB  $(SUB T.SUB, ..IX (PUL-SUBS I.SUB))
+      =.  +>  POLL-REST
+      ..IX(WIX (~(DEL BY WIX) IRE))
     ::
-    ++  teba  |*(a/$-(* _..ix) |*(b/* %_(done ..ix (a b))))
-    ++  give-json  (teba ^give-json)
-    ++  pass-note  (teba ^pass-note)
-    ++  hurl-note
-      |=  {a/{dock ?($mess $lens) path} b/note}  ^+  ..ix
-      =:  med  (~(put to med) hen)
-          hen  `~
+    ++  TEBA  |*(A/$-(* _..IX) |*(B/* %_(DONE ..IX (A B))))
+    ++  GIVE-JSON  (TEBA ^GIVE-JSON)
+    ++  PASS-NOTE  (TEBA ^PASS-NOTE)
+    ++  HURL-NOTE
+      |=  {A/{DOCK ?($MESS $LENS) PATH} B/NOTE}  ^+  ..IX
+      =:  MED  (~(PUT TO MED) HEN)
+          HEN  `~
         ==
-      :: ~&  >  hurl+[&2.b ire a]
-      (pass-note:abet [%of ire (gsig a)] b)
+      :: ~&  >  HURL+[&2.B IRE A]
+      (PASS-NOTE:ABET [%OF IRE (GSIG A)] B)
     ::
-    ++  init
-      =.  die  (add ~h2 now)
-      abet(mow :_(mow [`/ %pass ow+/[ire] [%b %wait die]]))
+    ++  INIT
+      =.  DIE  (ADD ~H2 NOW)
+      ABET(MOW :_(MOW [`/ %PASS OW+/[IRE] [%B %WAIT DIE]]))
     ::
-    ++  refresh
-      =.  mow  :_(mow [`/ %pass ow+/[ire] [%b %rest die]])
-      =.  die  (add ~h2 now)
-      done(mow :_(mow [`/ %pass ow+/[ire] [%b %wait die]]))
+    ++  REFRESH
+      =.  MOW  :_(MOW [`/ %PASS OW+/[IRE] [%B %REST DIE]])
+      =.  DIE  (ADD ~H2 NOW)
+      DONE(MOW :_(MOW [`/ %PASS OW+/[IRE] [%B %WAIT DIE]]))
     ::
-    ++  add-even
-      |=  a/even  ^+  eve
-      [+(p.eve) (~(put by q.eve) p.eve a)]
+    ++  ADD-EVEN
+      |=  A/EVEN  ^+  EVE
+      [+(P.EVE) (~(PUT BY Q.EVE) P.EVE A)]
     ::
-    ++  new-lens
-      |=  jon/json  ^+  ..ix
+    ++  NEW-LENS
+      |=  JON/JSON  ^+  ..IX
       =.  +>.$
-        %+  pass-note
-          [%of ire (gsig [our %dojo] lens+/)]
-        [%g %deal [him our] %dojo %peel %lens-json /sole]
+        %+  PASS-NOTE
+          [%OF IRE (GSIG [OUR %DOJO] LENS+/)]
+        [%G %DEAL [HIM OUR] %DOJO %PEEL %LENS-JSON /SOLE]
       =.  +>.$
-        %+  pass-note
-          [%of ire (gsig [our %dojo] lens+/)]
-        [%g %deal [him our] %dojo %punk %lens-command %json !>(`json`jon)]
-      abet
+        %+  PASS-NOTE
+          [%OF IRE (GSIG [OUR %DOJO] LENS+/)]
+        [%G %DEAL [HIM OUR] %DOJO %PUNK %LENS-COMMAND %JSON !>(`JSON`JON)]
+      ABET
     ::
-    ++  new-mess
-      |=  {a/dock b/wire c/mark d/cage}  ^+  ..ix
-      (hurl-note [a mess+b] [%g %deal [him -.a] +.a %punk c d])
+    ++  NEW-MESS
+      |=  {A/DOCK B/WIRE C/MARK D/CAGE}  ^+  ..IX
+      (HURL-NOTE [A MESS+B] [%G %DEAL [HIM -.A] +.A %PUNK C D])
     ::
-    ++  add-subs
-      |=  {a/dock $json b/wire c/path}  ^+  ..ix
-      ?:  (~(has in sus) +<)  ~|(duplicate+c !!)
-      =.  sus  (~(put in sus) +<)
-      (hurl-note [a mess+b] [%g %deal [him -.a] +.a %peel %json c])
+    ++  ADD-SUBS
+      |=  {A/DOCK $JSON B/WIRE C/PATH}  ^+  ..IX
+      ?:  (~(HAS IN SUS) +<)  ~|(DUPLICATE+C !!)
+      =.  SUS  (~(PUT IN SUS) +<)
+      (HURL-NOTE [A MESS+B] [%G %DEAL [HIM -.A] +.A %PEEL %JSON C])
     ::
-    ++  pul-subs
-      |=  {a/dock $json b/wire c/path}  ^+  ..ix
-      =.  sus  (~(del in sus) +<)
-      (hurl-note [a mess+b] [%g %deal [him -.a] +.a %pull ~])
+    ++  PUL-SUBS
+      |=  {A/DOCK $JSON B/WIRE C/PATH}  ^+  ..IX
+      =.  SUS  (~(DEL IN SUS) +<)
+      (HURL-NOTE [A MESS+B] [%G %DEAL [HIM -.A] +.A %PULL ~])
     ::
-    ++  del-subs                      ::  XX per path?
-      |=  {a/dock $json b/wire c/path}  ^+  ..ix
-      =.  ..ix  (pul-subs +<)
-      (nice-json:pop-duct:(ire-ix ire))          ::  XX gall ack
+    ++  DEL-SUBS                      ::  XX PER PATH?
+      |=  {A/DOCK $JSON B/WIRE C/PATH}  ^+  ..IX
+      =.  ..IX  (PUL-SUBS +<)
+      (NICE-JSON:POP-DUCT:(IRE-IX IRE))          ::  XX GALL ACK
     ::
-    ++  get-lens
-      |=  {a/whir-of fec/json}  ^+  ..ix
-      ?~  fec  ..ix                   ::  nulled event we don't care about
+    ++  GET-LENS
+      |=  {A/WHIR-OF FEC/JSON}  ^+  ..IX
+      ?~  FEC  ..IX                   ::  NULLED EVENT WE DON'T CARE ABOUT
       =.  +>.$
-        %+  pass-note
-          `whir`[%of ire (gsig [our %dojo] lens+/)]
-        `note`[%g %deal [him our] %dojo %pull ~]
-      abet:(give-json 200 ~ fec)
+        %+  PASS-NOTE
+          `WHIR`[%OF IRE (GSIG [OUR %DOJO] LENS+/)]
+        `NOTE`[%G %DEAL [HIM OUR] %DOJO %PULL ~]
+      ABET:(GIVE-JSON 200 ~ FEC)
     ::
-    ++  get-rush
-      |=  {a/whir-of b/json}  ^+  ..ix
-      ?:  ?=($lens r.a)
-        (get-lens a b)
-      (get-even [%rush [[(slav %p p.a) q.a] s.a] (frond:enjs %json b)])
+    ++  GET-RUSH
+      |=  {A/WHIR-OF B/JSON}  ^+  ..IX
+      ?:  ?=($LENS R.A)
+        (GET-LENS A B)
+      (GET-EVEN [%RUSH [[(SLAV %P P.A) Q.A] S.A] (FROND:ENJS %JSON B)])
     ::
-    ++  get-quit
-      |=  a/whir-of  ^+  ..ix
-      =/  doc=dock  [(slav %p p.a) q.a]
-      =.  sus  (~(del in sus) [doc %json s.a s.a])
-      (get-even [%quit [doc s.a]])
+    ++  GET-QUIT
+      |=  A/WHIR-OF  ^+  ..IX
+      =/  DOC=DOCK  [(SLAV %P P.A) Q.A]
+      =.  SUS  (~(DEL IN SUS) [DOC %JSON S.A S.A])
+      (GET-EVEN [%QUIT [DOC S.A]])
     ::
-    ++  get-ack
-      |=  {a/whir-of b/(unit {term tang})}  ^+  ..ix
-      ?:  ?=($lens r.a)
-        (ack-lens b)
-      ?:  =(~ med)  ~&  resp-lost+ire  ..ix
-      ?~  b  (nice-json:pop-duct)
-      (mean-json:pop-duct 500 b)
+    ++  GET-ACK
+      |=  {A/WHIR-OF B/(UNIT {TERM TANG})}  ^+  ..IX
+      ?:  ?=($LENS R.A)
+        (ACK-LENS B)
+      ?:  =(~ MED)  ~&  RESP-LOST+IRE  ..IX
+      ?~  B  (NICE-JSON:POP-DUCT)
+      (MEAN-JSON:POP-DUCT 500 B)
     ::
-    ++  ack-lens
-      |=  a/(unit (pair term tang))  ^+  ..ix
-      ?~  a
-        ..ix  :: (give-json 200 ~ (joba %okey-dokey %b &))
-      =+  tag=(flop `tang`[>[%eyre-lens-fail p.u.a]< q.u.a])
-      %-  (slog tag)
-      abet:(give-json 500 ~ (wall:enjs (wush 160 tag)))
+    ++  ACK-LENS
+      |=  A/(UNIT (PAIR TERM TANG))  ^+  ..IX
+      ?~  A
+        ..IX  :: (GIVE-JSON 200 ~ (JOBA %OKEY-DOKEY %B &))
+      =+  TAG=(FLOP `TANG`[>[%EYRE-LENS-FAIL P.U.A]< Q.U.A])
+      %-  (SLOG TAG)
+      ABET:(GIVE-JSON 500 ~ (WALL:ENJS (WUSH 160 TAG)))
     ::
-    ++  get-even
-      |=  ven/even  ^+  ..ix
-      =+  num=p.eve
-      =.  eve  (add-even ven)
-      =<  abet
-      ?~  ude  done
-      =.  hen  p.u.ude
-      (give-even:pass-rest(ude ~) q.u.ude num ven)
+    ++  GET-EVEN
+      |=  VEN/EVEN  ^+  ..IX
+      =+  NUM=P.EVE
+      =.  EVE  (ADD-EVEN VEN)
+      =<  ABET
+      ?~  UDE  DONE
+      =.  HEN  P.U.UDE
+      (GIVE-EVEN:PASS-REST(UDE ~) Q.U.UDE NUM VEN)
     ::
-    ++  give-even
-      |=  {pol/? num/@u ven/even}  ^+  done
-      =:  q.eve  (~(del by q.eve) (dec num))              ::  TODO ponder a-2
-          mow    ?.(?=($rush -.ven) mow mow:(pass-took [- %mess +]:p.ven))
+    ++  GIVE-EVEN
+      |=  {POL/? NUM/@U VEN/EVEN}  ^+  DONE
+      =:  Q.EVE  (~(DEL BY Q.EVE) (DEC NUM))              ::  TODO PONDER A-2
+          MOW    ?.(?=($RUSH -.VEN) MOW MOW:(PASS-TOOK [- %MESS +]:P.VEN))
         ==
-      ?>  pol                         ::  XX eventstream
-      %^  give-json  200  ~
-      %^  pairs:enjs  id+(numb:enjs num)  type+[%s -.ven]
-      ?-  -.ven
-        $news  ~[from+[%s (scot %uv p.ven)]]
-        $quit  ~[from+(subs-to-json p.ven)]
-        $rush  ~[from+(subs-to-json p.ven) data+q.ven]
+      ?>  POL                         ::  XX EVENTSTREAM
+      %^  GIVE-JSON  200  ~
+      %^  PAIRS:ENJS  ID+(NUMB:ENJS NUM)  TYPE+[%S -.VEN]
+      ?-  -.VEN
+        $NEWS  ~[FROM+[%S (SCOT %UV P.VEN)]]
+        $QUIT  ~[FROM+(SUBS-TO-JSON P.VEN)]
+        $RUSH  ~[FROM+(SUBS-TO-JSON P.VEN) DATA+Q.VEN]
       ==
     ::
-    ++  pass-wait  (pass-note of+/[ire] [%b %wait era])
-    ++  pass-rest
-      =.  lyv  (~(del by lyv) hen)
-      (pass-note of+/[ire] [%b %rest era])
+    ++  PASS-WAIT  (PASS-NOTE OF+/[IRE] [%B %WAIT ERA])
+    ++  PASS-REST
+      =.  LYV  (~(DEL BY LYV) HEN)
+      (PASS-NOTE OF+/[IRE] [%B %REST ERA])
     ::
-    ++  pass-took
-      |=  a/{p/dock ?($mess $lens) wire}
-      %+  pass-note(hen `~)
-        [%of ire (gsig a)]
-      [%g %deal [him -.p.a] +.p.a %pump ~]
+    ++  PASS-TOOK
+      |=  A/{P/DOCK ?($MESS $LENS) WIRE}
+      %+  PASS-NOTE(HEN `~)
+        [%OF IRE (GSIG A)]
+      [%G %DEAL [HIM -.P.A] +.P.A %PUMP ~]
     ::
-    ++  pop-duct  =^(ned med ~(get to med) abet(hen ned))
-    ++  poll
-      |=  a/@u  ^+  ..ix
-::      |=  [a/@u t=(unit @dr)]
-::      ^+  ..ix
-      =<  abet
-      =.  ..poll  refresh
-      ?:  =(a p.eve)
-        =.  ..poll  poll-rest
-        =.  era  (add ~s8 now)
-::          ?~  t  (add ~s30 now)
-::          (add u.t now)
-        =.  lyv  (~(put by lyv) hen [%poll ire])
-        pass-wait(ude [~ hen &])
-      ?:  (gth a p.eve)  ~|(seq-high+cur=p.eve !!)
-      =+  ven=~|(seq-low+cur=p.eve (~(got by q.eve) a))
-      (give-even & a ven)
+    ++  POP-DUCT  =^(NED MED ~(GET TO MED) ABET(HEN NED))
+    ++  POLL
+      |=  A/@U  ^+  ..IX
+::      |=  [A/@U T=(UNIT @DR)]
+::      ^+  ..IX
+      =<  ABET
+      =.  ..POLL  REFRESH
+      ?:  =(A P.EVE)
+        =.  ..POLL  POLL-REST
+        =.  ERA  (ADD ~S8 NOW)
+::          ?~  T  (ADD ~S30 NOW)
+::          (ADD U.T NOW)
+        =.  LYV  (~(PUT BY LYV) HEN [%POLL IRE])
+        PASS-WAIT(UDE [~ HEN &])
+      ?:  (GTH A P.EVE)  ~|(SEQ-HIGH+CUR=P.EVE !!)
+      =+  VEN=~|(SEQ-LOW+CUR=P.EVE (~(GOT BY Q.EVE) A))
+      (GIVE-EVEN & A VEN)
     ::
-    ++  poll-rest
-      ?~  ude  done
-      %*(. pass-rest(hen p.u.ude) hen hen)
+    ++  POLL-REST
+      ?~  UDE  DONE
+      %*(. PASS-REST(HEN P.U.UDE) HEN HEN)
     ::
-    ++  poll-dead
-      ^+  ..ix
-      =<  abet
-      ?.  =(ude [~ hen &])
-        done  :: old long poll
-      pass-rest(ude ~)
+    ++  POLL-DEAD
+      ^+  ..IX
+      =<  ABET
+      ?.  =(UDE [~ HEN &])
+        DONE  :: OLD LONG POLL
+      PASS-REST(UDE ~)
     ::
-    ++  subs-to-json
-      |=  {a/dock b/path}
-      %-  pairs:enjs  :~
-        ship+[%s (rsh 3 1 (scot %p p.a))]
-        appl+[%s q.a]
-        path+(tape:enjs (spud b))
+    ++  SUBS-TO-JSON
+      |=  {A/DOCK B/PATH}
+      %-  PAIRS:ENJS  :~
+        SHIP+[%S (RSH 3 1 (SCOT %P P.A))]
+        APPL+[%S Q.A]
+        PATH+(TAPE:ENJS (SPUD B))
       ==
-    ++  wake  ^+(..ix abet(ude ~))  ::  XX other effects?
-    ::  XX unused
-    ++  print-subs  |=({a/dock b/path} "{<p.a>}/{(trip q.a)}{(spud b)}")
+    ++  WAKE  ^+(..IX ABET(UDE ~))  ::  XX OTHER EFFECTS?
+    ::  XX UNUSED
+    ++  PRINT-SUBS  |=({A/DOCK B/PATH} "{<P.A>}/{(TRIP Q.A)}{(SPUD B)}")
     --
-  ++  vi                                                ::  auth engine
-    ~%  %eyre-v  ..is  ~
-    |_  $:  {usr/user dom/path}
-            cor/(unit $@(~ vase))
-            {liv/? req/(qeu {p/duct q/mark r/vase:hiss})}
+  ++  VI                                                ::  AUTH ENGINE
+    ~%  %EYRE-V  ..IS  ~
+    |_  $:  {USR/USER DOM/PATH}
+            COR/(UNIT $@(~ VASE))
+            {LIV/? REQ/(QEU {P/DUCT Q/MARK R/VASE:HISS})}
         ==
-    ++  self  .
-    ++  abet  +>(sec (~(put by sec) +<- +<+))
-    ++  execute-turbo
-      |=  [wir=whir-se live=? schematic=schematic:ford]
-      (execute-turbo:abet se+[wir usr dom] live schematic)
-    ++  dead-this  |=(a/tang (fail:abet 500 0v0 a))
-    ++  dead-hiss  |=(a/tang pump(req ~(nap to req), ..vi (give-sigh %| a)))
+    ++  SELF  .
+    ++  ABET  +>(SEC (~(PUT BY SEC) +<- +<+))
+    ++  EXECUTE-TURBO
+      |=  [WIR=WHIR-SE LIVE=? SCHEMATIC=SCHEMATIC:FORD]
+      (EXECUTE-TURBO:ABET SE+[WIR USR DOM] LIVE SCHEMATIC)
+    ++  DEAD-THIS  |=(A/TANG (FAIL:ABET 500 0V0 A))
+    ++  DEAD-HISS  |=(A/TANG PUMP(REQ ~(NAP TO REQ), ..VI (GIVE-SIGH %| A)))
     ::
-    ++  eyre-them
-      |=  [a=whir-se b=vase]
-      ::  block requests until we get a response to this request
+    ++  EYRE-THEM
+      |=  [A=WHIR-SE B=VASE]
+      ::  BLOCK REQUESTS UNTIL WE GET A RESPONSE TO THIS REQUEST
       ::
-      =.  liv  |
-      (eyre-them:abet se+[a usr dom] b)
+      =.  LIV  |
+      (EYRE-THEM:ABET SE+[A USR DOM] B)
     ::
-    ++  pass-note  |=({a/whir-se b/note} (pass-note:abet se+[a usr dom] b))
-    ::  XX block reqs until correct core checked in?
-    ++  warn  |=(a/tang ((slog (flop a)) abet))
-    ++  with  |*({a/vase b/$-(vase abet)} |=(c/vase (b (slam a c))))
-    ++  root-beak  `beak`[our %home da+now]
+    ++  PASS-NOTE  |=({A/WHIR-SE B/NOTE} (PASS-NOTE:ABET SE+[A USR DOM] B))
+    ::  XX BLOCK REQS UNTIL CORRECT CORE CHECKED IN?
+    ++  WARN  |=(A/TANG ((SLOG (FLOP A)) ABET))
+    ++  WITH  |*({A/VASE B/$-(VASE ABET)} |=(C/VASE (B (SLAM A C))))
+    ++  ROOT-BEAK  `BEAK`[OUR %HOME DA+NOW]
     ::
-    ::  Main
+    ::  MAIN
     ::
-    ++  cor-type  ?~(cor %void ?~(u.cor %void p.u.cor))
-    ++  has-arm  ~(has in (silt (sloe cor-type)))
-    ++  build
-      %^  execute-turbo  %core  live=%.y
-      ^-  schematic:ford
-      :+  %mute
-        ^-  schematic:ford
-        [%core [[our %home] [%hoon (flop %_(dom . sec+dom))]]]
-      ^-  (list (pair wing schematic:ford))
-      :*  [[%& 12]~ %$ bale+!>(*(bale @))]  :: XX specify on type?
-          ?~  cor  ~
-          ?~  u.cor  ~
-          ?:  (has-arm %discard-state)  ~
-          ?:  (has-arm %update)
-            [[%& 13]~ ride+[limb+%update prep-cor]]~
-          [[%& 13]~ %$ noun+(slot 13 u.cor)]~
+    ++  COR-TYPE  ?~(COR %VOID ?~(U.COR %VOID P.U.COR))
+    ++  HAS-ARM  ~(HAS IN (SILT (SLOE COR-TYPE)))
+    ++  BUILD
+      %^  EXECUTE-TURBO  %CORE  LIVE=%.Y
+      ^-  SCHEMATIC:FORD
+      :+  %MUTE
+        ^-  SCHEMATIC:FORD
+        [%CORE [[OUR %HOME] [%HOON (FLOP %_(DOM . SEC+DOM))]]]
+      ^-  (LIST (PAIR WING SCHEMATIC:FORD))
+      :*  [[%& 12]~ %$ BALE+!>(*(BALE @))]  :: XX SPECIFY ON TYPE?
+          ?~  COR  ~
+          ?~  U.COR  ~
+          ?:  (HAS-ARM %DISCARD-STATE)  ~
+          ?:  (HAS-ARM %UPDATE)
+            [[%& 13]~ RIDE+[LIMB+%UPDATE PREP-COR]]~
+          [[%& 13]~ %$ NOUN+(SLOT 13 U.COR)]~
       ==
     ::
-    ++  call
-      |=  {arm/vi-arm sam/cage}
-      %^  execute-turbo  arm  live=%.n
-      call+[ride+[limb+arm prep-cor] [%$ sam]]
+    ++  CALL
+      |=  {ARM/VI-ARM SAM/CAGE}
+      %^  EXECUTE-TURBO  ARM  LIVE=%.N
+      CALL+[RIDE+[LIMB+ARM PREP-COR] [%$ SAM]]
     ::
-    ++  prep-cor  ^-  schematic:ford
-      ?~  cor  ~|(%no-core !!)
-      ?~  u.cor  ~|(%nil-driver !!)
-      :+  %$  %core
-      %_    u.cor
-          +12.q
-        =+  ^=  ato
-            %-  sky
-            [[151 %noun] %cx (en-beam root-beak [%atom (flop %_(dom . sec+dom))])]
-        =+  key=?~(ato '' ;;(@t u.ato))  ::  XX jael
-        =.  key
-          ?~  key  ''
-          %-  (bond |.(~&(bad-key+[dom key] '')))
-          =+  (slaw %uw key)
-          ?~(- ~ (de:crub:crypto load-secret u))  :: XX clay permissions
-        `(bale)`[[our now (shas %bale eny) root-beak] [usr dom] key]
+    ++  PREP-COR  ^-  SCHEMATIC:FORD
+      ?~  COR  ~|(%NO-CORE !!)
+      ?~  U.COR  ~|(%NIL-DRIVER !!)
+      :+  %$  %CORE
+      %_    U.COR
+          +12.Q
+        =+  ^=  ATO
+            %-  SKY
+            [[151 %NOUN] %CX (EN-BEAM ROOT-BEAK [%ATOM (FLOP %_(DOM . SEC+DOM))])]
+        =+  KEY=?~(ATO '' ;;(@T U.ATO))  ::  XX JAEL
+        =.  KEY
+          ?~  KEY  ''
+          %-  (BOND |.(~&(BAD-KEY+[DOM KEY] '')))
+          =+  (SLAW %UW KEY)
+          ?~(- ~ (DE:CRUB:CRYPTO LOAD-SECRET U))  :: XX CLAY PERMISSIONS
+        `(BALE)`[[OUR NOW (SHAS %BALE ENY) ROOT-BEAK] [USR DOM] KEY]
       ==
     ::
-    ++  pump
-      ^+  abet
-      ?~  cor
-        build
-      ?.  liv
-        ~&  e+vi+pump-blocked+[dom ~(wyt in req)]
-        abet
-      =+  ole=~(top to req)
-      ?~  ole  abet
-      ::  process hiss
-      =.  hen  p.u.ole
-      ?~  u.cor  (eyre-them %filter-request r.u.ole)  :: don't process
-      (call %filter-request hiss+r.u.ole)
+    ++  PUMP
+      ^+  ABET
+      ?~  COR
+        BUILD
+      ?.  LIV
+        ~&  E+VI+PUMP-BLOCKED+[DOM ~(WYT IN REQ)]
+        ABET
+      =+  OLE=~(TOP TO REQ)
+      ?~  OLE  ABET
+      ::  PROCESS HISS
+      =.  HEN  P.U.OLE
+      ?~  U.COR  (EYRE-THEM %FILTER-REQUEST R.U.OLE)  :: DON'T PROCESS
+      (CALL %FILTER-REQUEST HISS+R.U.OLE)
     ::
-    ++  fin-httr
-      |=  vax/vase
-      =^  ole  req  ~|  %eyre-no-queue  ~(get to req)
-      =>  .(ole `{p/duct q/mark *}`ole)             :: XX types
-      =.  ..vi  (cast-thou(hen p.ole) q.ole httr+vax)    :: error?
-      pump
+    ++  FIN-HTTR
+      |=  VAX/VASE
+      =^  OLE  REQ  ~|  %EYRE-NO-QUEUE  ~(GET TO REQ)
+      =>  .(OLE `{P/DUCT Q/MARK *}`OLE)             :: XX TYPES
+      =.  ..VI  (CAST-THOU(HEN P.OLE) Q.OLE HTTR+VAX)    :: ERROR?
+      PUMP
     ::
-    ::  Interfaces
+    ::  INTERFACES
     ::
-    ++  get-quay  |=(quy/quay (call %receive-auth-query-string quay+!>(quy)))
-    ++  get-req   |=(a/{mark vase:hiss} pump(req (~(put to req) hen a)))
-    ++  get-thou
-      |=  {wir/whir-se hit/httr}
-      =.  liv  &
-      ?+  wir  !!
-        ?($receive-auth-query-string $in)  (call %receive-auth-response httr+!>(hit))
-        ?($filter-request $out)
-          ?.  (has-arm %filter-response)  (fin-httr !>(hit))
-          (call %filter-response httr+!>(hit))
+    ++  GET-QUAY  |=(QUY/QUAY (CALL %RECEIVE-AUTH-QUERY-STRING QUAY+!>(QUY)))
+    ++  GET-REQ   |=(A/{MARK VASE:HISS} PUMP(REQ (~(PUT TO REQ) HEN A)))
+    ++  GET-THOU
+      |=  {WIR/WHIR-SE HIT/HTTR}
+      =.  LIV  &
+      ?+  WIR  !!
+        ?($RECEIVE-AUTH-QUERY-STRING $IN)  (CALL %RECEIVE-AUTH-RESPONSE HTTR+!>(HIT))
+        ?($FILTER-REQUEST $OUT)
+          ?.  (HAS-ARM %FILTER-RESPONSE)  (FIN-HTTR !>(HIT))
+          (CALL %FILTER-RESPONSE HTTR+!>(HIT))
       ==
     ::
-    ++  get-made
-      |=  [wir/whir-se result=made-result:ford]  ^+  abet
-      ::  |=  {wir/whir-se dep/@uvH res/(each cage tang)}  ^+  abet
-      ?:  ?=($core wir)  (made-core result)
-      %.  result
-      ?-  wir
-        ?($filter-request $out)             made-filter-request
-        ?($filter-response $res)            made-filter-response
-        ?($receive-auth-response $bak)      made-receive-auth-response
-        ?($receive-auth-query-string $in)   made-receive-auth-query-string
+    ++  GET-MADE
+      |=  [WIR/WHIR-SE RESULT=MADE-RESULT:FORD]  ^+  ABET
+      ::  |=  {WIR/WHIR-SE DEP/@UVH RES/(EACH CAGE TANG)}  ^+  ABET
+      ?:  ?=($CORE WIR)  (MADE-CORE RESULT)
+      %.  RESULT
+      ?-  WIR
+        ?($FILTER-REQUEST $OUT)             MADE-FILTER-REQUEST
+        ?($FILTER-RESPONSE $RES)            MADE-FILTER-RESPONSE
+        ?($RECEIVE-AUTH-RESPONSE $BAK)      MADE-RECEIVE-AUTH-RESPONSE
+        ?($RECEIVE-AUTH-QUERY-STRING $IN)   MADE-RECEIVE-AUTH-QUERY-STRING
       ==
     ::
-    ++  made-core
-      |=  [result=made-result:ford]
-      ::  |=  {dep/@uvH gag/(each cage tang)}
-      :: ~&  got-update/dep
-      ::  =.  ..vi  (pass-note %core [%f [%wasp our dep &]])
-      ?:  ?=([%complete %success *] result)
-        =/  =cage  (result-to-cage:ford build-result.result)
-        pump(cor `q:cage)
-      ?:  &(=(~ cor) =(%$ usr))
-        =.  cor  `~
-        pump ::(cor `~)  :: userless %hiss defaults to "nop" driver
-      %-  warn
-      ?:  ?=(%incomplete -.result)
-        tang.result
-      ?>  ?=(%error -.build-result.result)
-      message.build-result.result
+    ++  MADE-CORE
+      |=  [RESULT=MADE-RESULT:FORD]
+      ::  |=  {DEP/@UVH GAG/(EACH CAGE TANG)}
+      :: ~&  GOT-UPDATE/DEP
+      ::  =.  ..VI  (PASS-NOTE %CORE [%F [%WASP OUR DEP &]])
+      ?:  ?=([%COMPLETE %SUCCESS *] RESULT)
+        =/  =CAGE  (RESULT-TO-CAGE:FORD BUILD-RESULT.RESULT)
+        PUMP(COR `Q:CAGE)
+      ?:  &(=(~ COR) =(%$ USR))
+        =.  COR  `~
+        PUMP ::(COR `~)  :: USERLESS %HISS DEFAULTS TO "NOP" DRIVER
+      %-  WARN
+      ?:  ?=(%INCOMPLETE -.RESULT)
+        TANG.RESULT
+      ?>  ?=(%ERROR -.BUILD-RESULT.RESULT)
+      MESSAGE.BUILD-RESULT.RESULT
     ::
-    ++  made-filter-request
-      %+  on-ford-fail  dead-hiss
-      %+  on-error  warn  |.
-      %-  handle-moves  :~
-        give+do-give
-        send+(do-send %filter-request)
-        show+do-show
+    ++  MADE-FILTER-REQUEST
+      %+  ON-FORD-FAIL  DEAD-HISS
+      %+  ON-ERROR  WARN  |.
+      %-  HANDLE-MOVES  :~
+        GIVE+DO-GIVE
+        SEND+(DO-SEND %FILTER-REQUEST)
+        SHOW+DO-SHOW
       ==
     ::
-    ++  made-filter-response
-      %+  on-error  dead-hiss  |.
-      %-  handle-moves  :~
-        give+do-give
-        send+(do-send %filter-request)
-        redo+_pump
+    ++  MADE-FILTER-RESPONSE
+      %+  ON-ERROR  DEAD-HISS  |.
+      %-  HANDLE-MOVES  :~
+        GIVE+DO-GIVE
+        SEND+(DO-SEND %FILTER-REQUEST)
+        REDO+_PUMP
       ==
     ::
-    ++  made-receive-auth-query-string
-      %+  on-error  dead-this  |.
-      (handle-moves send+(do-send %receive-auth-query-string) ~)
+    ++  MADE-RECEIVE-AUTH-QUERY-STRING
+      %+  ON-ERROR  DEAD-THIS  |.
+      (HANDLE-MOVES SEND+(DO-SEND %RECEIVE-AUTH-QUERY-STRING) ~)
     ::
-    ++  made-receive-auth-response
-      %+  on-error  dead-this  |.
-      %-  handle-moves  :~
-        give+do-give
-        send+(do-send %receive-auth-query-string)
-        redo+_pump(..vi (give-html 200 ~ exit:xml))
+    ++  MADE-RECEIVE-AUTH-RESPONSE
+      %+  ON-ERROR  DEAD-THIS  |.
+      %-  HANDLE-MOVES  :~
+        GIVE+DO-GIVE
+        SEND+(DO-SEND %RECEIVE-AUTH-QUERY-STRING)
+        REDO+_PUMP(..VI (GIVE-HTML 200 ~ EXIT:XML))
       ==
     ::
-    ::  Result handling
+    ::  RESULT HANDLING
     ::
-    ::    XX formal dill-blit %url via hood
-    ++  auth-print  |=({$show a/purl} (slog auth-tank leaf+(en-purl a) ~))
-    ++  auth-tank
-      =>  =-  ?~(usr - rose+["@" `~]^~[leaf+(trip usr) -])
-          rose+["." `~]^(turn (flop dom) |=(a/cord leaf+(trip a)))
-      rose+[" " `~]^~[leaf+"To authenticate" . leaf+"visit:"]
+    ::    XX FORMAL DILL-BLIT %URL VIA HOOD
+    ++  AUTH-PRINT  |=({$SHOW A/PURL} (SLOG AUTH-TANK LEAF+(EN-PURL A) ~))
+    ++  AUTH-TANK
+      =>  =-  ?~(USR - ROSE+["@" `~]^~[LEAF+(TRIP USR) -])
+          ROSE+["." `~]^(TURN (FLOP DOM) |=(A/CORD LEAF+(TRIP A)))
+      ROSE+[" " `~]^~[LEAF+"TO AUTHENTICATE" . LEAF+"VISIT:"]
     ::
-    ++  do-give  (with !>(|=({$give a/httr} a)) fin-httr)
-    ++  do-show  (with !>(auth-print) _abet)
-    ++  do-send
-      |=  wir/whir-se  ^-  $-(vase _abet)
-      |=  res/vase
-      (eyre-them wir (slam !>(|=({$send a/hiss} a)) res))
+    ++  DO-GIVE  (WITH !>(|=({$GIVE A/HTTR} A)) FIN-HTTR)
+    ++  DO-SHOW  (WITH !>(AUTH-PRINT) _ABET)
+    ++  DO-SEND
+      |=  WIR/WHIR-SE  ^-  $-(VASE _ABET)
+      |=  RES/VASE
+      (EYRE-THEM WIR (SLAM !>(|=({$SEND A/HISS} A)) RES))
     ::
-    ++  cancel-request  ~&  %cancel-request
-                        (dead-hiss(liv &) [leaf+"canceled"]~)
+    ++  CANCEL-REQUEST  ~&  %CANCEL-REQUEST
+                        (DEAD-HISS(LIV &) [LEAF+"CANCELED"]~)
     ::
-    ++  handle-moves
-      |=  a/(list {p/term q/$-(vase _abet)})
-      |=  b/vase
-      ~>  %nil.
-        ~|  %bad-sec-move  :: XX move ~| into ?> properly
-        ?>((~(nest ut p:!>(*sec-move)) %& p.b) ~)
-      =+  opt=|.((silt (turn a head)))
+    ++  HANDLE-MOVES
+      |=  A/(LIST {P/TERM Q/$-(VASE _ABET)})
+      |=  B/VASE
+      ~>  %NIL.
+        ~|  %BAD-SEC-MOVE  :: XX MOVE ~| INTO ?> PROPERLY
+        ?>((~(NEST UT P:!>(*SEC-MOVE)) %& P.B) ~)
+      =+  OPT=|.((SILT (TURN A HEAD)))
       |-
-      ?~  a  ~|(allowed=(opt) !!)
-      ?:  =(p.i.a -.q.b)
-        (q.i.a (sped b))
-      $(a t.a)
+      ?~  A  ~|(ALLOWED=(OPT) !!)
+      ?:  =(P.I.A -.Q.B)
+        (Q.I.A (SPED B))
+      $(A T.A)
     ::
-    ++  on-ford-fail
-      |=  {err/$-(tang _abet) try/$-(made-result:ford _abet)}
-      |=  a/made-result:ford  ^+  abet
-      ?:  ?=(%incomplete -.a)
-        (err tang.a)
-      ?:  ?=(%error -.build-result.a)
-        (err message.build-result.a)
-      (try a)
+    ++  ON-FORD-FAIL
+      |=  {ERR/$-(TANG _ABET) TRY/$-(MADE-RESULT:FORD _ABET)}
+      |=  A/MADE-RESULT:FORD  ^+  ABET
+      ?:  ?=(%INCOMPLETE -.A)
+        (ERR TANG.A)
+      ?:  ?=(%ERROR -.BUILD-RESULT.A)
+        (ERR MESSAGE.BUILD-RESULT.A)
+      (TRY A)
     ::
-    ++  on-error
-      |=  {err/$-(tang _abet) handle-move/_|.(|~(vase abet))}
-      |=  a=made-result:ford  ^+  abet
-      =+  try=(possibly-stateful |=(b/_self (handle-move(+ b))))  :: XX types
-      ?:  ?=(%incomplete -.a)
-        (err tang.a)
-      ?:  ?=(%error -.build-result.a)
-        (err message.build-result.a)
-      =/  =cage  (result-to-cage:ford build-result.a)
-      =-  ?-(-.- %& p.-, %| (err p.-))
-      (mule |.(~|(driver+dom ~|(bad-res+p.q.cage (try q.cage)))))
+    ++  ON-ERROR
+      |=  {ERR/$-(TANG _ABET) HANDLE-MOVE/_|.(|~(VASE ABET))}
+      |=  A=MADE-RESULT:FORD  ^+  ABET
+      =+  TRY=(POSSIBLY-STATEFUL |=(B/_SELF (HANDLE-MOVE(+ B))))  :: XX TYPES
+      ?:  ?=(%INCOMPLETE -.A)
+        (ERR TANG.A)
+      ?:  ?=(%ERROR -.BUILD-RESULT.A)
+        (ERR MESSAGE.BUILD-RESULT.A)
+      =/  =CAGE  (RESULT-TO-CAGE:FORD BUILD-RESULT.A)
+      =-  ?-(-.- %& P.-, %| (ERR P.-))
+      (MULE |.(~|(DRIVER+DOM ~|(BAD-RES+P.Q.CAGE (TRY Q.CAGE)))))
     ::
-    ++  possibly-stateful
-      |=  han/$-(_self $-(vase _abet))  :: XX |.(|+(vase abet))
-      |=  res/vase  ^+  abet
-      ?:  ?=({@ *} q.res)
-        =.  p.res  (~(fuse ut p.res) p:!>(*{@ *}))
-        ((han self) res)
-      ?.  ?=({{@ *} *} q.res)
-        ~|(%misshapen-result !!)
-      =.  p.res  (~(fuse ut p.res) p:!>(*{{@ *} *}))
-      =+  [mow=(slot 2 res) roc=(slot 3 res)]
-      =-  ((han self(cor (some roc))) mow):+  ::  XX better stateless asserts
-      =+  typ=cor-type
-      ~|  %core-mismatch
-      ?>((~(nest ut typ) & p.roc) ~)
+    ++  POSSIBLY-STATEFUL
+      |=  HAN/$-(_SELF $-(VASE _ABET))  :: XX |.(|+(VASE ABET))
+      |=  RES/VASE  ^+  ABET
+      ?:  ?=({@ *} Q.RES)
+        =.  P.RES  (~(FUSE UT P.RES) P:!>(*{@ *}))
+        ((HAN SELF) RES)
+      ?.  ?=({{@ *} *} Q.RES)
+        ~|(%MISSHAPEN-RESULT !!)
+      =.  P.RES  (~(FUSE UT P.RES) P:!>(*{{@ *} *}))
+      =+  [MOW=(SLOT 2 RES) ROC=(SLOT 3 RES)]
+      =-  ((HAN SELF(COR (SOME ROC))) MOW):+  ::  XX BETTER STATELESS ASSERTS
+      =+  TYP=COR-TYPE
+      ~|  %CORE-MISMATCH
+      ?>((~(NEST UT TYP) & P.ROC) ~)
 --  --
 --
 .   ==
-=|  bolo
-=*  bol  -
-|=  [our=ship now=@da eny=@uvJ ski=sley]                ::  current invocation
-^?                                                      ::  opaque core
+=|  BOLO
+=*  BOL  -
+|=  [OUR=SHIP NOW=@DA ENY=@UVJ SKI=SLEY]                ::  CURRENT INVOCATION
+^?                                                      ::  OPAQUE CORE
 |%                                                      ::
-++  call                                                ::  handle request
-  |=  $:  hen=duct
-          type=*
-          wrapped-task=(hobo task:able)
+++  CALL                                                ::  HANDLE REQUEST
+  |=  $:  HEN=DUCT
+          TYPE=*
+          WRAPPED-TASK=(HOBO TASK:ABLE)
       ==
   ::
-  =/  task=task:able
-    ?.  ?=(%soft -.wrapped-task)
-      wrapped-task
-    ((hard task:able) p.wrapped-task)
+  =/  TASK=TASK:ABLE
+    ?.  ?=(%SOFT -.WRAPPED-TASK)
+      WRAPPED-TASK
+    ((HARD TASK:ABLE) P.WRAPPED-TASK)
   ::
-  ^+  [*(list move) ..^$]
-  ?:  ?=($wegh -.task)
+  ^+  [*(LIST MOVE) ..^$]
+  ?:  ?=($WEGH -.TASK)
     :_  ..^$  :_  ~
-    :^  hen  %give  %mass
-    :+  %eyre  %|
-    :~  dependencies+&+liz
-        sessions+&+wup
-        views+&+wix
-        ducts+[%| ~[dead+&+ded proxy+&+pox outgoing+&+ask]]
-        hosts+&+dop
-        dot+&+bol
+    :^  HEN  %GIVE  %MASS
+    :+  %EYRE  %|
+    :~  DEPENDENCIES+&+LIZ
+        SESSIONS+&+WUP
+        VIEWS+&+WIX
+        DUCTS+[%| ~[DEAD+&+DED PROXY+&+POX OUTGOING+&+ASK]]
+        HOSTS+&+DOP
+        DOT+&+BOL
     ==
-  =+  ska=(sloy ski)
-  =+  sky=|=({* *} `(unit)`=+(a=(ska +<) ?~(a ~ ?~(u.a ~ [~ u.u.a]))))
-  =.  ney  (shax :(mix (shax now) +(eny) ney))          ::  XX!!  shd not need
-  ^+  [p=*(list move) q=..^$]
-  =.  gub  ?.(=(`@`0 gub) gub (cat 3 (rsh 3 1 (scot %p (end 6 1 eny))) '-'))
-  =^  mos  bol
-    abet:(apex:~(adit ye [hen [now eny our sky] ~] bol) task)
-  [mos ..^$]
+  =+  SKA=(SLOY SKI)
+  =+  SKY=|=({* *} `(UNIT)`=+(A=(SKA +<) ?~(A ~ ?~(U.A ~ [~ U.U.A]))))
+  =.  NEY  (SHAX :(MIX (SHAX NOW) +(ENY) NEY))          ::  XX!!  SHD NOT NEED
+  ^+  [P=*(LIST MOVE) Q=..^$]
+  =.  GUB  ?.(=(`@`0 GUB) GUB (CAT 3 (RSH 3 1 (SCOT %P (END 6 1 ENY))) '-'))
+  =^  MOS  BOL
+    ABET:(APEX:~(ADIT YE [HEN [NOW ENY OUR SKY] ~] BOL) TASK)
+  [MOS ..^$]
 ::
-++  load                                                ::  take previous state
-  |=  old/bolo
-  ..^$(+>- old)
+++  LOAD                                                ::  TAKE PREVIOUS STATE
+  |=  OLD/BOLO
+  ..^$(+>- OLD)
 ::
-++  scry
-  |=  {fur/(unit (set monk)) ren/@tas why/shop syd/desk lot/coin tyl/path}
-  ^-  (unit (unit cage))
-  ?.  ?=(%& -.why)  ~
-  =*  who  p.why
-  =+  ska=(sloy ski)
-  =+  sky=|=({* *} `(unit)`=+(a=(ska +<) ?~(a ~ ?~(u.a ~ [~ u.u.a]))))
-  ?.  ?=($$ ren)  [~ ~]
-  ?.  ?=($$ -.lot)  [~ ~]
-  ?+    syd  [~ ~]
-      $serv
-    ``[%path !>((en-beam top))]
+++  SCRY
+  |=  {FUR/(UNIT (SET MONK)) REN/@TAS WHY/SHOP SYD/DESK LOT/COIN TYL/PATH}
+  ^-  (UNIT (UNIT CAGE))
+  ?.  ?=(%& -.WHY)  ~
+  =*  WHO  P.WHY
+  =+  SKA=(SLOY SKI)
+  =+  SKY=|=({* *} `(UNIT)`=+(A=(SKA +<) ?~(A ~ ?~(U.A ~ [~ U.U.A]))))
+  ?.  ?=($$ REN)  [~ ~]
+  ?.  ?=($$ -.LOT)  [~ ~]
+  ?+    SYD  [~ ~]
+      $SERV
+    ``[%PATH !>((EN-BEAM TOP))]
   ::
-      $host
-    %-  (lift (lift |=(a/hart [%hart !>(a)])))
-    ^-  (unit (unit hart))
-    ?.  =(our who)
-      ?.  =([%da now] p.lot)  [~ ~]
-      ~&  [%e %scry-foreign-host who]
-      ~  :: XX add non-scry binding to $hat gram
-    =.  p.lot  ?.(=([%da now] p.lot) p.lot [%tas %real])
-    ?+  p.lot  [~ ~]
-      {$tas $fake}  ``[& [~ 8.443] %& /localhost]       :: XX from unix
-      {$tas $real}
-        =/  hot=host  [%& ?^(dom n.dom /localhost)]
-        =/  sek=?    &(?=(^ sek.por) !?=(hoke hot))
-        =/  por=(unit @ud)
-          ?.  sek
-            ?:(=(80 clr.por) ~ `clr.por)
-          ?>  ?=(^ sek.por)
-          ?:(=(443 u.sek.por) ~ sek.por)
-        ``[sek por hot]
+      $HOST
+    %-  (LIFT (LIFT |=(A/HART [%HART !>(A)])))
+    ^-  (UNIT (UNIT HART))
+    ?.  =(OUR WHO)
+      ?.  =([%DA NOW] P.LOT)  [~ ~]
+      ~&  [%E %SCRY-FOREIGN-HOST WHO]
+      ~  :: XX ADD NON-SCRY BINDING TO $HAT GRAM
+    =.  P.LOT  ?.(=([%DA NOW] P.LOT) P.LOT [%TAS %REAL])
+    ?+  P.LOT  [~ ~]
+      {$TAS $FAKE}  ``[& [~ 8.443] %& /LOCALHOST]       :: XX FROM UNIX
+      {$TAS $REAL}
+        =/  HOT=HOST  [%& ?^(DOM N.DOM /LOCALHOST)]
+        =/  SEK=?    &(?=(^ SEK.POR) !?=(HOKE HOT))
+        =/  POR=(UNIT @UD)
+          ?.  SEK
+            ?:(=(80 CLR.POR) ~ `CLR.POR)
+          ?>  ?=(^ SEK.POR)
+          ?:(=(443 U.SEK.POR) ~ SEK.POR)
+        ``[SEK POR HOT]
     ==
   ==
 ::
-++  stay  `bolo`+>-.$
-++  take                                                ::  accept response
-  |=  {tea/wire hen/duct hin/(hypo sign)}
-  ^+  [*(list move) ..^$]
-  =+  ska=(sloy ski)
-  =+  sky=|=({* *} `(unit)`=+(a=(ska +<) ?~(a ~ ?~(u.a ~ [~ u.u.a]))))
-  =.  ney  (shax :(mix (shax now) +(eny) ney))          ::  XX!!  shd not need
-  ^+  [p=*(list move) q=..^$]
-  =.  gub  ?.(=(`@`0 gub) gub (cat 3 (rsh 3 1 (scot %p (end 6 1 eny))) '-'))
-  =+  tee=((soft whir) tea)
-  ?~  tee  ~&  [%e %lost -.q.hin hen]  [~ ..^$]
-  =^  mos  bol
-    =<  abet
-    (axon:~(adit ye [hen [now eny our sky] ~] bol) u.tee q.hin)
-  [mos ..^$]
+++  STAY  `BOLO`+>-.$
+++  TAKE                                                ::  ACCEPT RESPONSE
+  |=  {TEA/WIRE HEN/DUCT HIN/(HYPO SIGN)}
+  ^+  [*(LIST MOVE) ..^$]
+  =+  SKA=(SLOY SKI)
+  =+  SKY=|=({* *} `(UNIT)`=+(A=(SKA +<) ?~(A ~ ?~(U.A ~ [~ U.U.A]))))
+  =.  NEY  (SHAX :(MIX (SHAX NOW) +(ENY) NEY))          ::  XX!!  SHD NOT NEED
+  ^+  [P=*(LIST MOVE) Q=..^$]
+  =.  GUB  ?.(=(`@`0 GUB) GUB (CAT 3 (RSH 3 1 (SCOT %P (END 6 1 ENY))) '-'))
+  =+  TEE=((SOFT WHIR) TEA)
+  ?~  TEE  ~&  [%E %LOST -.Q.HIN HEN]  [~ ..^$]
+  =^  MOS  BOL
+    =<  ABET
+    (AXON:~(ADIT YE [HEN [NOW ENY OUR SKY] ~] BOL) U.TEE Q.HIN)
+  [MOS ..^$]
 ::
 --

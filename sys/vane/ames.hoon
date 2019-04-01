@@ -1,1579 +1,1579 @@
-!:  ::  ames (4a), networking
+!:  ::  AMES (4A), NETWORKING
 ::
-  |=  pit=vase
+  |=  PIT=VASE
   =>  =~
-::  structures
-=,  ames
-::  this number needs to be below 8
+::  STRUCTURES
+=,  AMES
+::  THIS NUMBER NEEDS TO BE BELOW 8
 ::
-=+  protocol-version=2
+=+  PROTOCOL-VERSION=2
 |%
-+=  move  [p=duct q=(wind note:able gift:able)]         ::  local move
-::  |pact: internal packet structures
++=  MOVE  [P=DUCT Q=(WIND NOTE:ABLE GIFT:ABLE)]         ::  LOCAL MOVE
+::  |PACT: INTERNAL PACKET STRUCTURES
 ::
-++  pact
+++  PACT
   |%
-  +$  full  [lyf=[to=life from=life] law=(unit deed) txt=@]
-  +$  open  [lyf=[to=~ from=life] law=(unit deed) txt=@]
+  +$  FULL  [LYF=[TO=LIFE FROM=LIFE] LAW=(UNIT DEED) TXT=@]
+  +$  OPEN  [LYF=[TO=~ FROM=LIFE] LAW=(UNIT DEED) TXT=@]
   --
 --
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aA, identity logic           ::
-  ::              removed in favor of jael/ethereum     ::
+  ::              SECTION 4AA, IDENTITY LOGIC           ::
+  ::              REMOVED IN FAVOR OF JAEL/ETHEREUM     ::
   ::
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aB, packet format            ::
+  ::              SECTION 4AB, PACKET FORMAT            ::
   ::
   |%
-  ++  bite                                              ::  packet to cake
-    |=  pac=rock  ^-  cake
-    =+  [mag=(end 5 1 pac) bod=(rsh 5 1 pac)]
-    =+  :*  vez=(end 0 3 mag)                           ::  protocol version
-            chk=(cut 0 [3 20] mag)                      ::  checksum
-            wix=(bex +((cut 0 [23 2] mag)))             ::  width of receiver
-            vix=(bex +((cut 0 [25 2] mag)))             ::  width of sender
-            tay=(cut 0 [27 5] mag)                      ::  message type
+  ++  BITE                                              ::  PACKET TO CAKE
+    |=  PAC=ROCK  ^-  CAKE
+    =+  [MAG=(END 5 1 PAC) BOD=(RSH 5 1 PAC)]
+    =+  :*  VEZ=(END 0 3 MAG)                           ::  PROTOCOL VERSION
+            CHK=(CUT 0 [3 20] MAG)                      ::  CHECKSUM
+            WIX=(BEX +((CUT 0 [23 2] MAG)))             ::  WIDTH OF RECEIVER
+            VIX=(BEX +((CUT 0 [25 2] MAG)))             ::  WIDTH OF SENDER
+            TAY=(CUT 0 [27 5] MAG)                      ::  MESSAGE TYPE
         ==
-    ?>  =(protocol-version vez)
-    ?>  =(chk (end 0 20 (mug bod)))
-    :+  [(end 3 wix bod) (cut 3 [wix vix] bod)]
-      (kins tay)
-    (rsh 3 (add wix vix) bod)
+    ?>  =(PROTOCOL-VERSION VEZ)
+    ?>  =(CHK (END 0 20 (MUG BOD)))
+    :+  [(END 3 WIX BOD) (CUT 3 [WIX VIX] BOD)]
+      (KINS TAY)
+    (RSH 3 (ADD WIX VIX) BOD)
   ::
-  ++  kins  |=(tay=@ (snag tay `(list skin)`[%none %open %fast %full ~]))
-  ++  ksin  |=(sin=skin `@`?-(sin %none 0, %open 1, %fast 2, %full 3))
-  ++  spit                                              ::  cake to packet
-    |=  kec=cake  ^-  @
-    =+  wim=(met 3 p.p.kec)
-    =+  dum=(met 3 q.p.kec)
-    =+  yax=?:((lte wim 2) 0 ?:((lte wim 4) 1 ?:((lte wim 8) 2 3)))
-    =+  qax=?:((lte dum 2) 0 ?:((lte dum 4) 1 ?:((lte dum 8) 2 3)))
-    =+  wix=(bex +(yax))
-    =+  vix=(bex +(qax))
-    =+  bod=:(mix p.p.kec (lsh 3 wix q.p.kec) (lsh 3 (add wix vix) r.kec))
-    =+  tay=(ksin q.kec)
-    %+  mix
-      %+  can  0
-      :~  [3 protocol-version]
-          [20 (mug bod)]
-          [2 yax]
-          [2 qax]
-          [5 tay]
+  ++  KINS  |=(TAY=@ (SNAG TAY `(LIST SKIN)`[%NONE %OPEN %FAST %FULL ~]))
+  ++  KSIN  |=(SIN=SKIN `@`?-(SIN %NONE 0, %OPEN 1, %FAST 2, %FULL 3))
+  ++  SPIT                                              ::  CAKE TO PACKET
+    |=  KEC=CAKE  ^-  @
+    =+  WIM=(MET 3 P.P.KEC)
+    =+  DUM=(MET 3 Q.P.KEC)
+    =+  YAX=?:((LTE WIM 2) 0 ?:((LTE WIM 4) 1 ?:((LTE WIM 8) 2 3)))
+    =+  QAX=?:((LTE DUM 2) 0 ?:((LTE DUM 4) 1 ?:((LTE DUM 8) 2 3)))
+    =+  WIX=(BEX +(YAX))
+    =+  VIX=(BEX +(QAX))
+    =+  BOD=:(MIX P.P.KEC (LSH 3 WIX Q.P.KEC) (LSH 3 (ADD WIX VIX) R.KEC))
+    =+  TAY=(KSIN Q.KEC)
+    %+  MIX
+      %+  CAN  0
+      :~  [3 PROTOCOL-VERSION]
+          [20 (MUG BOD)]
+          [2 YAX]
+          [2 QAX]
+          [5 TAY]
       ==
-    (lsh 5 1 bod)
+    (LSH 5 1 BOD)
   --
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aC, PKI engine               ::
+  ::              SECTION 4AC, PKI ENGINE               ::
   ::
   |%
-  ++  go                                                ::    go
-    |_  ton=town                                        ::  ames state
-    ++  as                                              ::    as:go
-      |_  our=ship                                      ::  per server
-      ++  lax                                           ::    lax:as:go
-        |_  [her=ship dur=dore]                         ::  per client
-        ++  cluy                                        ::    cluy:lax:as:go
-          ^-  [lyf=life cub=acru]                       ::  client crypto
-          ?>  ?=(^ lew.wod.dur)
-          [life.u.lew.wod.dur (com:nu:crub:crypto pass.u.lew.wod.dur)]
+  ++  GO                                                ::    GO
+    |_  TON=TOWN                                        ::  AMES STATE
+    ++  AS                                              ::    AS:GO
+      |_  OUR=SHIP                                      ::  PER SERVER
+      ++  LAX                                           ::    LAX:AS:GO
+        |_  [HER=SHIP DUR=DORE]                         ::  PER CLIENT
+        ++  CLUY                                        ::    CLUY:LAX:AS:GO
+          ^-  [LYF=LIFE CUB=ACRU]                       ::  CLIENT CRYPTO
+          ?>  ?=(^ LEW.WOD.DUR)
+          [LIFE.U.LEW.WOD.DUR (COM:NU:CRUB:CRYPTO PASS.U.LEW.WOD.DUR)]
         ::
-        ++  clon
-          ^-  life
-          ::  if we don't have a +deed for :her, we guess 1
+        ++  CLON
+          ^-  LIFE
+          ::  IF WE DON'T HAVE A +DEED FOR :HER, WE GUESS 1
           ::
-          ?~(lew.wod.dur 1 life.u.lew.wod.dur)
+          ?~(LEW.WOD.DUR 1 LIFE.U.LEW.WOD.DUR)
         ::
-        ++  griz                                        ::    griz:lax:as:go
-          |=  now=@da                                   ::  generate key for
-          ^-  [p=code q=_+>]
-          =+  key=(shas %enty (mix now any.ton))
-          :-  key
+        ++  GRIZ                                        ::    GRIZ:LAX:AS:GO
+          |=  NOW=@DA                                   ::  GENERATE KEY FOR
+          ^-  [P=CODE Q=_+>]
+          =+  KEY=(SHAS %ENTY (MIX NOW ANY.TON))
+          :-  KEY
           %=  +>.$
-            any.ton      (shax (mix now any.ton))
-            heg.caq.dur  (~(put by heg.caq.dur) (shaf %hand key) key)
+            ANY.TON      (SHAX (MIX NOW ANY.TON))
+            HEG.CAQ.DUR  (~(PUT BY HEG.CAQ.DUR) (SHAF %HAND KEY) KEY)
           ==
         ::
-        ++  pode                                        ::    pode:lax:as:go
-          |=  now=@da                                   ::  timeout route
+        ++  PODE                                        ::    PODE:LAX:AS:GO
+          |=  NOW=@DA                                   ::  TIMEOUT ROUTE
           ^+  +>
-          ?:  (lth her 256)  +>(lun.wod.dur [~ %if ~2000.1.1 0 (mix her .0.0.1.0)])
-          +>(lun.wod.dur ~)
+          ?:  (LTH HER 256)  +>(LUN.WOD.DUR [~ %IF ~2000.1.1 0 (MIX HER .0.0.1.0)])
+          +>(LUN.WOD.DUR ~)
         ::
-        ++  kuch                                        ::    kuch:lax:as:go
-          |=  had=hand                                  ::  hear key tag
-          ^-  (unit [code _+>])
-          =+  wey=(~(get by heg.caq.dur) had)
-          ?^  wey
-            =+  key=u.wey
-            :+  ~  key
-            %=    ..kuch
-                yed.caq.dur  [~ had u.wey]
-                heg.caq.dur  (~(del by heg.caq.dur) had)
-                qim.caq.dur  (~(put by qim.caq.dur) had key)
+        ++  KUCH                                        ::    KUCH:LAX:AS:GO
+          |=  HAD=HAND                                  ::  HEAR KEY TAG
+          ^-  (UNIT [CODE _+>])
+          =+  WEY=(~(GET BY HEG.CAQ.DUR) HAD)
+          ?^  WEY
+            =+  KEY=U.WEY
+            :+  ~  KEY
+            %=    ..KUCH
+                YED.CAQ.DUR  [~ HAD U.WEY]
+                HEG.CAQ.DUR  (~(DEL BY HEG.CAQ.DUR) HAD)
+                QIM.CAQ.DUR  (~(PUT BY QIM.CAQ.DUR) HAD KEY)
             ==
-          =+  dyv=(~(get by qim.caq.dur) had)
-          ?~  dyv  ~
-          [~ u.dyv ..kuch]
+          =+  DYV=(~(GET BY QIM.CAQ.DUR) HAD)
+          ?~  DYV  ~
+          [~ U.DYV ..KUCH]
         ::
-        ++  wasc                                        ::    wasc:lax:as:go
-          |=  key=code                                  ::  hear foreign code
+        ++  WASC                                        ::    WASC:LAX:AS:GO
+          |=  KEY=CODE                                  ::  HEAR FOREIGN CODE
           ^+  +>
-          =+  had=(shaf %hand key)
-          %_  ..wasc
-            yed.caq.dur  [~ had key]
-            qim.caq.dur  (~(put by qim.caq.dur) had key)
+          =+  HAD=(SHAF %HAND KEY)
+          %_  ..WASC
+            YED.CAQ.DUR  [~ HAD KEY]
+            QIM.CAQ.DUR  (~(PUT BY QIM.CAQ.DUR) HAD KEY)
           ==
         ::
-        ++  wast                                        ::    wast:lax:as:go
-          |=  ryn=lane                                  ::  set route
+        ++  WAST                                        ::    WAST:LAX:AS:GO
+          |=  RYN=LANE                                  ::  SET ROUTE
           ^+  +>
           %=    +>
-              lun.wod.dur
-            ?:  ?=([%ix *] ryn)
-              ?:  ?|  ?=(~ lun.wod.dur)
-                      ?=([%ix *] u.lun.wod.dur)
-                      ?&  ?=([%if *] u.lun.wod.dur)
-                          (gth p.ryn (add ~s10 p.u.lun.wod.dur))
+              LUN.WOD.DUR
+            ?:  ?=([%IX *] RYN)
+              ?:  ?|  ?=(~ LUN.WOD.DUR)
+                      ?=([%IX *] U.LUN.WOD.DUR)
+                      ?&  ?=([%IF *] U.LUN.WOD.DUR)
+                          (GTH P.RYN (ADD ~S10 P.U.LUN.WOD.DUR))
                       ==
                   ==
-                [~ ryn]
-              lun.wod.dur
-            [~ ryn]
+                [~ RYN]
+              LUN.WOD.DUR
+            [~ RYN]
           ==
         ::
-        ++  wist                                        ::    wist:lax:as:go
-          |=  $:  now=@da                                ::  route via
-                  waz=(list @p)
-                  ryn=(unit lane)
-                  pac=rock
+        ++  WIST                                        ::    WIST:LAX:AS:GO
+          |=  $:  NOW=@DA                                ::  ROUTE VIA
+                  WAZ=(LIST @P)
+                  RYN=(UNIT LANE)
+                  PAC=ROCK
               ==
-          ^-  (list boon)
-          ?:  =(our her)  [[%ouzo *lane pac] ~]
-          ?~  waz  ~
-          =+  dyr=?:(=(her i.waz) dur (gur i.waz))
-          ?.  ?&  !=(our i.waz)
-                  ?=(^ lun.wod.dyr)
+          ^-  (LIST BOON)
+          ?:  =(OUR HER)  [[%OUZO *LANE PAC] ~]
+          ?~  WAZ  ~
+          =+  DYR=?:(=(HER I.WAZ) DUR (GUR I.WAZ))
+          ?.  ?&  !=(OUR I.WAZ)
+                  ?=(^ LUN.WOD.DYR)
               ==
-            $(waz t.waz)
-          :_  ?:  ?=(%ix -.u.lun.wod.dyr)
-                $(waz t.waz)
+            $(WAZ T.WAZ)
+          :_  ?:  ?=(%IX -.U.LUN.WOD.DYR)
+                $(WAZ T.WAZ)
               ~
-          :+  %ouzo  u.lun.wod.dyr
-          ?:  &(=(i.waz her) =(~ ryn))  pac
-          =+  mal=(jam `meal`[%fore her ryn pac])
-          %-  spit
-          ^-  cake
-          :*  [our i.waz]
-              ?~  yed.caq.dyr  [%none mal]
-              :-  %fast
-              %^  cat  7
-                p.u.yed.caq.dyr
-              (en:crub:crypto q.u.yed.caq.dyr mal)
+          :+  %OUZO  U.LUN.WOD.DYR
+          ?:  &(=(I.WAZ HER) =(~ RYN))  PAC
+          =+  MAL=(JAM `MEAL`[%FORE HER RYN PAC])
+          %-  SPIT
+          ^-  CAKE
+          :*  [OUR I.WAZ]
+              ?~  YED.CAQ.DYR  [%NONE MAL]
+              :-  %FAST
+              %^  CAT  7
+                P.U.YED.CAQ.DYR
+              (EN:CRUB:CRYPTO Q.U.YED.CAQ.DYR MAL)
           ==
         ::
-        ++  zuul                                        ::    zuul:lax:as:go
-          |=  [now=@da seg=ship ham=meal]               ::  encode message
-          ^-  [p=(list rock) q=_+>]
-          =<  weft
+        ++  ZUUL                                        ::    ZUUL:LAX:AS:GO
+          |=  [NOW=@DA SEG=SHIP HAM=MEAL]               ::  ENCODE MESSAGE
+          ^-  [P=(LIST ROCK) Q=_+>]
+          =<  WEFT
           |%
-          ++  wasp                                      ::  null security
-            ^-([p=skin q=@] [%none (jam ham)])
+          ++  WASP                                      ::  NULL SECURITY
+            ^-([P=SKIN Q=@] [%NONE (JAM HAM)])
           ::
-          ++  weft                                      ::  fragment message
-            ^-  [p=(list rock) q=_+>.$]
-            =^  gim  ..weft  wisp
+          ++  WEFT                                      ::  FRAGMENT MESSAGE
+            ^-  [P=(LIST ROCK) Q=_+>.$]
+            =^  GIM  ..WEFT  WISP
             :_  +>.$
-            ^-  (list rock)
-            =+  wit=(met 13 q.gim)
-            ?<  =(0 wit)
-            ?:  =(1 wit)
-              =+  yup=(spit [our her] p.gim q.gim)
-              [yup ~]
-            =+  ruv=(rip 13 q.gim)
-            =+  gom=(shaf %thug q.gim)
-            =+  inx=0
-            |-  ^-  (list rock)
-            ?~  ruv  ~
-            =+  ^=  vie
-                %+  spit
-                  [our her]
-                wasp(ham [%carp (ksin p.gim) inx wit gom i.ruv])
-            :-  vie
-            $(ruv t.ruv, inx +(inx))
+            ^-  (LIST ROCK)
+            =+  WIT=(MET 13 Q.GIM)
+            ?<  =(0 WIT)
+            ?:  =(1 WIT)
+              =+  YUP=(SPIT [OUR HER] P.GIM Q.GIM)
+              [YUP ~]
+            =+  RUV=(RIP 13 Q.GIM)
+            =+  GOM=(SHAF %THUG Q.GIM)
+            =+  INX=0
+            |-  ^-  (LIST ROCK)
+            ?~  RUV  ~
+            =+  ^=  VIE
+                %+  SPIT
+                  [OUR HER]
+                WASP(HAM [%CARP (KSIN P.GIM) INX WIT GOM I.RUV])
+            :-  VIE
+            $(RUV T.RUV, INX +(INX))
           ::
-          ++  wisp                                      ::  generate message
-            ^-  [[p=skin q=@] q=_..wisp]
-            ?:  =(%carp -.ham)
-              [wasp ..wisp]
-            ?:  !=(~ yed.caq.dur)
-              ?>  ?=(^ yed.caq.dur)
-              :_  ..wisp
-              :-  %fast
-              %^  cat  7
-                p.u.yed.caq.dur
-              (en:cub:cluy q.u.yed.caq.dur (jam ham))
-            ?:  &(=(~ lew.wod.dur) =(%back -.ham))
-              [wasp ..wisp]
-            ::  we include our deed in asymmetric skins (%open and %full)
-            ::  if we're a comet or moon, or if we're sponsoring her
+          ++  WISP                                      ::  GENERATE MESSAGE
+            ^-  [[P=SKIN Q=@] Q=_..WISP]
+            ?:  =(%CARP -.HAM)
+              [WASP ..WISP]
+            ?:  !=(~ YED.CAQ.DUR)
+              ?>  ?=(^ YED.CAQ.DUR)
+              :_  ..WISP
+              :-  %FAST
+              %^  CAT  7
+                P.U.YED.CAQ.DUR
+              (EN:CUB:CLUY Q.U.YED.CAQ.DUR (JAM HAM))
+            ?:  &(=(~ LEW.WOD.DUR) =(%BACK -.HAM))
+              [WASP ..WISP]
+            ::  WE INCLUDE OUR DEED IN ASYMMETRIC SKINS (%OPEN AND %FULL)
+            ::  IF WE'RE A COMET OR MOON, OR IF WE'RE SPONSORING HER
             ::
-            =/  bil=(unit deed)
-              =/  rac  (clan:title our)
-              ?.  ?|  ?=(?(%earl %pawn) rac)
-                      &(!?=(%czar rac) =(our seg))
+            =/  BIL=(UNIT DEED)
+              =/  RAC  (CLAN:TITLE OUR)
+              ?.  ?|  ?=(?(%EARL %PAWN) RAC)
+                      &(!?=(%CZAR RAC) =(OUR SEG))
                   ==
                 ~
-              `law.ton
-            =/  yig  sen
-            =/  hom  (jam ham)
-            ?:  =(~ lew.wod.dur)
-              :_  ..wisp
-              :-  %open
-              %-  jam
-              ^-  open:pact
-              :+  [~ lyf.yig]
-                bil
-              (sign:as:cub.yig hom)
-            =/  cay  cluy
-            :: :tuy: symmetric key proposal
+              `LAW.TON
+            =/  YIG  SEN
+            =/  HOM  (JAM HAM)
+            ?:  =(~ LEW.WOD.DUR)
+              :_  ..WISP
+              :-  %OPEN
+              %-  JAM
+              ^-  OPEN:PACT
+              :+  [~ LYF.YIG]
+                BIL
+              (SIGN:AS:CUB.YIG HOM)
+            =/  CAY  CLUY
+            :: :TUY: SYMMETRIC KEY PROPOSAL
             ::
-            =^  tuy  +>.$  (griz now)
-            :_  ..wisp
-            :-  %full
-            %-  jam
-            ^-  full:pact
-            :+  [lyf.cay lyf.yig]
-              bil
-            (seal:as:cub.yig pub:ex:cub.cay (jam tuy hom))
-          --                                            ::  --zuul:lax:as:go
-        --                                              ::  --lax:as:go
+            =^  TUY  +>.$  (GRIZ NOW)
+            :_  ..WISP
+            :-  %FULL
+            %-  JAM
+            ^-  FULL:PACT
+            :+  [LYF.CAY LYF.YIG]
+              BIL
+            (SEAL:AS:CUB.YIG PUB:EX:CUB.CAY (JAM TUY HOM))
+          --                                            ::  --ZUUL:LAX:AS:GO
+        --                                              ::  --LAX:AS:GO
       ::
-      ++  gur                                           ::  default dore
-        |=  her=ship
-        ^-  dore
-        =+  def=?.((lth her 256) ~ [~ %if ~2000.1.1 0 (mix her .0.0.1.0)])
-        [[~2100.1.1 def ~] *clot]
+      ++  GUR                                           ::  DEFAULT DORE
+        |=  HER=SHIP
+        ^-  DORE
+        =+  DEF=?.((LTH HER 256) ~ [~ %IF ~2000.1.1 0 (MIX HER .0.0.1.0)])
+        [[~2100.1.1 DEF ~] *CLOT]
       ::
-      ++  myx                                           ::  dore by ship
-        |=  her=ship
-        ^+  lax
-        =/  fod=dore
-          (fall (~(get by hoc.ton) her) (gur her))
-        ~(. lax [her fod])
+      ++  MYX                                           ::  DORE BY SHIP
+        |=  HER=SHIP
+        ^+  LAX
+        =/  FOD=DORE
+          (FALL (~(GET BY HOC.TON) HER) (GUR HER))
+        ~(. LAX [HER FOD])
       ::
-      ++  nux                                           ::  install dore
-        |=  new=_lax
+      ++  NUX                                           ::  INSTALL DORE
+        |=  NEW=_LAX
         ^+  +>
-        +>(hoc.ton (~(put by hoc.ton) her.new dur.new))
+        +>(HOC.TON (~(PUT BY HOC.TON) HER.NEW DUR.NEW))
       ::
-      ++  sen                                           ::  current crypto
-        ^-  [lyf=life cub=acru]
-        ?~(val.ton !! [p.i.val.ton r.i.val.ton])
+      ++  SEN                                           ::  CURRENT CRYPTO
+        ^-  [LYF=LIFE CUB=ACRU]
+        ?~(VAL.TON !! [P.I.VAL.TON R.I.VAL.TON])
       ::
-      ++  sev                                           ::  crypto by life
-        |=  mar=life
-        ^-  [p=? q=acru]
-        ?~  val.ton  !!
-        ?:  =(mar p.i.val.ton)
-          [& r.i.val.ton]
-        ?>  (lth mar p.i.val.ton)
+      ++  SEV                                           ::  CRYPTO BY LIFE
+        |=  MAR=LIFE
+        ^-  [P=? Q=ACRU]
+        ?~  VAL.TON  !!
+        ?:  =(MAR P.I.VAL.TON)
+          [& R.I.VAL.TON]
+        ?>  (LTH MAR P.I.VAL.TON)
         :-  |
-        |-  ^-  acru
-        ?>  ?=(^ t.val.ton)
-        ?:  =(mar p.i.t.val.ton)
-          r.i.t.val.ton
-        $(t.val.ton t.t.val.ton)
-      --                                                ::  --as:go
+        |-  ^-  ACRU
+        ?>  ?=(^ T.VAL.TON)
+        ?:  =(MAR P.I.T.VAL.TON)
+          R.I.T.VAL.TON
+        $(T.VAL.TON T.T.VAL.TON)
+      --                                                ::  --AS:GO
     ::
-    ++  su                                              ::  install safe
-      |=(new=_as `town`ton.new)
+    ++  SU                                              ::  INSTALL SAFE
+      |=(NEW=_AS `TOWN`TON.NEW)
     ::
-    ++  ti                                              ::  expire by time
-      |=  now=@da
-      ^-  town
+    ++  TI                                              ::  EXPIRE BY TIME
+      |=  NOW=@DA
+      ^-  TOWN
       !!
     ::
-    ++  us                                              ::  produce safe
-      |=(our=ship `_as`~(. as our))
-    --                                                ::  --go
+    ++  US                                              ::  PRODUCE SAFE
+      |=(OUR=SHIP `_AS`~(. AS OUR))
+    --                                                ::  --GO
   --
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aF, packet pump             ::
+  ::              SECTION 4AF, PACKET PUMP             ::
   |%
-  ++  pu                                                ::  packet pump
-    |_  shed
-    ++  abet  +<
-    ++  ahoy                                            ::    ahoy:pu
-      ^+  .                                             ::  initialize
+  ++  PU                                                ::  PACKET PUMP
+    |_  SHED
+    ++  ABET  +<
+    ++  AHOY                                            ::    AHOY:PU
+      ^+  .                                             ::  INITIALIZE
       %_    .
-          rtt  ~s1
-          rto  ~s4
-          rtn  ~
-          rue  ~
-          nus  0
-          nif  0
-          nep  0
-          caw  2
-          cag  64
-          diq  ~
-          pyz  ~
-          puq  ~
+          RTT  ~S1
+          RTO  ~S4
+          RTN  ~
+          RUE  ~
+          NUS  0
+          NIF  0
+          NEP  0
+          CAW  2
+          CAG  64
+          DIQ  ~
+          PYZ  ~
+          PUQ  ~
       ==
     ::
-    ++  bick                                            ::    bick:pu
-      |=  [now=@da fap=flap]                            ::  ack by hash
-      ^-  [[p=(unit soup) q=(list rock)] _+>]
-      =+  sun=(~(get by diq) fap)
-      ?~  sun
-        ::  ~&  [%bick-none `@p`(mug fap)]              ::  not a real error
+    ++  BICK                                            ::    BICK:PU
+      |=  [NOW=@DA FAP=FLAP]                            ::  ACK BY HASH
+      ^-  [[P=(UNIT SOUP) Q=(LIST ROCK)] _+>]
+      =+  SUN=(~(GET BY DIQ) FAP)
+      ?~  SUN
+        ::  ~&  [%BICK-NONE `@P`(MUG FAP)]              ::  NOT A REAL ERROR
         [[~ ~] +>.$]
-      ::  ~&  [%bick-good `@p`(mug fap) u.sun]
-      =.  diq  (~(del by diq) fap)
-      =^  gub  +>.$  (bock now u.sun)
-      =^  yop  +>.$  (harv now)
-      [[gub yop] +>.$]
+      ::  ~&  [%BICK-GOOD `@P`(MUG FAP) U.SUN]
+      =.  DIQ  (~(DEL BY DIQ) FAP)
+      =^  GUB  +>.$  (BOCK NOW U.SUN)
+      =^  YOP  +>.$  (HARV NOW)
+      [[GUB YOP] +>.$]
     ::
-    ++  bilk                                            ::    bilk:pu
-      |=  now=@da                                       ::  inbound packet
+    ++  BILK                                            ::    BILK:PU
+      |=  NOW=@DA                                       ::  INBOUND PACKET
       ^+  +>
-      =+  trt=(mul 2 rtt)
+      =+  TRT=(MUL 2 RTT)
       %=  +>.$
-        rue  [~ now]
-        rto  trt
-        rtn  ?~(puq ~ [~ (add now trt)])
+        RUE  [~ NOW]
+        RTO  TRT
+        RTN  ?~(PUQ ~ [~ (ADD NOW TRT)])
       ==
     ::
-    ++  boom                                            ::    boom:pu
-      |=  now=@da  ^-  ?                                ::  address timeout
-      |(?=(~ rue) (gte (sub now u.rue) ~m1))
+    ++  BOOM                                            ::    BOOM:PU
+      |=  NOW=@DA  ^-  ?                                ::  ADDRESS TIMEOUT
+      |(?=(~ RUE) (GTE (SUB NOW U.RUE) ~M1))
     ::
-    ++  bust                                            ::    bust:pu
-      ^-  ?                                             ::  not responding
-      &(?=(^ rtn) (gte rto ~s16))
+    ++  BUST                                            ::    BUST:PU
+      ^-  ?                                             ::  NOT RESPONDING
+      &(?=(^ RTN) (GTE RTO ~S16))
     ::
-    ++  bike                                            ::    bike:pu
-      ^+  .                                             ::  check stats
-      ?>  .=  nif
+    ++  BIKE                                            ::    BIKE:PU
+      ^+  .                                             ::  CHECK STATS
+      ?>  .=  NIF
           |-  ^-  @
-          ?~  puq  0
-          :(add !liv.q.n.puq $(puq l.puq) $(puq r.puq))
+          ?~  PUQ  0
+          :(ADD !LIV.Q.N.PUQ $(PUQ L.PUQ) $(PUQ R.PUQ))
       .
     ::
-    ++  beet                                            ::    beet:pu
-      ^+  .                                             ::  advance unacked
-      =-  +(nep ?~(foh nus u.foh))
-      ^=  foh
-      |-  ^-  (unit @ud)
-      ?~  puq  ~
-      ?:  (lte p.n.puq nep)  $(puq l.puq)
-      =+  rig=$(puq r.puq)
-      ?^(rig rig [~ p.n.puq])
+    ++  BEET                                            ::    BEET:PU
+      ^+  .                                             ::  ADVANCE UNACKED
+      =-  +(NEP ?~(FOH NUS U.FOH))
+      ^=  FOH
+      |-  ^-  (UNIT @UD)
+      ?~  PUQ  ~
+      ?:  (LTE P.N.PUQ NEP)  $(PUQ L.PUQ)
+      =+  RIG=$(PUQ R.PUQ)
+      ?^(RIG RIG [~ P.N.PUQ])
     ::
-    ++  bine                                            ::    bine:pu
-      |=  [now=@da num=@ud]                             ::  apply ack
-      ^-  [(unit soup) _+>]
-      ?~  puq  !!
-      ?.  =(num p.n.puq)
-        ?:  (gth num p.n.puq)
-          =+  lef=$(puq l.puq)
-          [-.lef +.lef(puq [n.puq puq.lef r.puq])]
-        =+  rig=$(puq r.puq)
-        [-.rig +.rig(puq [n.puq l.puq puq.rig])]
-      =:  rtt  ?.  &(liv.q.n.puq =(1 nux.q.n.puq))  rtt
-               =+  gap=(sub now lys.q.n.puq)
-               ::  ~&  [%bock-trip num (div gap (div ~s1 1.000))]
-               (div (add (mul 2 rtt) gap) 3)
-          nif  (sub nif !liv.q.n.puq)
+    ++  BINE                                            ::    BINE:PU
+      |=  [NOW=@DA NUM=@UD]                             ::  APPLY ACK
+      ^-  [(UNIT SOUP) _+>]
+      ?~  PUQ  !!
+      ?.  =(NUM P.N.PUQ)
+        ?:  (GTH NUM P.N.PUQ)
+          =+  LEF=$(PUQ L.PUQ)
+          [-.LEF +.LEF(PUQ [N.PUQ PUQ.LEF R.PUQ])]
+        =+  RIG=$(PUQ R.PUQ)
+        [-.RIG +.RIG(PUQ [N.PUQ L.PUQ PUQ.RIG])]
+      =:  RTT  ?.  &(LIV.Q.N.PUQ =(1 NUX.Q.N.PUQ))  RTT
+               =+  GAP=(SUB NOW LYS.Q.N.PUQ)
+               ::  ~&  [%BOCK-TRIP NUM (DIV GAP (DIV ~S1 1.000))]
+               (DIV (ADD (MUL 2 RTT) GAP) 3)
+          NIF  (SUB NIF !LIV.Q.N.PUQ)
         ==
-      =+  lez=(dec (need (~(get by pyz) gom.q.n.puq)))
-      =^  gub  pyz
-          ?:  =(0 lez)
-            [[~ gom.q.n.puq] (~(del by pyz) gom.q.n.puq)]
-          [~ (~(put by pyz) gom.q.n.puq lez)]
-      :-  gub
-      +>.$(puq ~(nap to puq))
+      =+  LEZ=(DEC (NEED (~(GET BY PYZ) GOM.Q.N.PUQ)))
+      =^  GUB  PYZ
+          ?:  =(0 LEZ)
+            [[~ GOM.Q.N.PUQ] (~(DEL BY PYZ) GOM.Q.N.PUQ)]
+          [~ (~(PUT BY PYZ) GOM.Q.N.PUQ LEZ)]
+      :-  GUB
+      +>.$(PUQ ~(NAP TO PUQ))
     ::
-    ++  bock                                            ::    bock:pu
-      |=  [now=@da num=@ud]                             ::  ack by sequence
-      ^-  [(unit soup) _+>]
-      =^  gym  +>  (bine now num)
-      :-  gym
-      ?:  (gth num nep)
-        =+  cam=(max 2 (div caw 2))
-        ::  ~&  [%bock-hole num nep cam]
-        beet:(wept(nep num, cag cam, caw cam) nep num)
-      =.  caw  ?:  (lth caw cag)  +(caw)
-               (add caw !=(0 (mod (mug now) caw)))
-      ?:  =(num nep)
-        ::  ~&  [%bock-fine num nif caw cag]
-        beet
-      ::  ~&  [%bock-fill num nif caw cag]
+    ++  BOCK                                            ::    BOCK:PU
+      |=  [NOW=@DA NUM=@UD]                             ::  ACK BY SEQUENCE
+      ^-  [(UNIT SOUP) _+>]
+      =^  GYM  +>  (BINE NOW NUM)
+      :-  GYM
+      ?:  (GTH NUM NEP)
+        =+  CAM=(MAX 2 (DIV CAW 2))
+        ::  ~&  [%BOCK-HOLE NUM NEP CAM]
+        BEET:(WEPT(NEP NUM, CAG CAM, CAW CAM) NEP NUM)
+      =.  CAW  ?:  (LTH CAW CAG)  +(CAW)
+               (ADD CAW !=(0 (MOD (MUG NOW) CAW)))
+      ?:  =(NUM NEP)
+        ::  ~&  [%BOCK-FINE NUM NIF CAW CAG]
+        BEET
+      ::  ~&  [%BOCK-FILL NUM NIF CAW CAG]
       +>.$
     ::
-    ++  harv                                            ::    harv:pu
-      |=  now=@da                                       ::  harvest queue
-      ^-  [(list rock) _+>]
-      ?:  =(~ puq)  [~ +>(rtn ~)]
-      ?.  (gth caw nif)  [~ +>]
-      =+  wid=(sub caw nif)
-      =|  rub=(list rock)
-      =<  abet  =<  apse
+    ++  HARV                                            ::    HARV:PU
+      |=  NOW=@DA                                       ::  HARVEST QUEUE
+      ^-  [(LIST ROCK) _+>]
+      ?:  =(~ PUQ)  [~ +>(RTN ~)]
+      ?.  (GTH CAW NIF)  [~ +>]
+      =+  WID=(SUB CAW NIF)
+      =|  RUB=(LIST ROCK)
+      =<  ABET  =<  APSE
       |%
-      ++  abet
-        ?~  rub  [~ +>.$]
-        [(flop rub) +>.$(rtn [~ (add rto now)])]
+      ++  ABET
+        ?~  RUB  [~ +>.$]
+        [(FLOP RUB) +>.$(RTN [~ (ADD RTO NOW)])]
       ::
-      ++  apse
+      ++  APSE
         ^+  .
-        ?~  puq  .
-        ?:  =(0 wid)  .
-        =>  rigt  =<  left
-        ?>  ?=(^ puq)
-        ?:  =(0 wid)  .
-        ?.  =(| liv.q.n.puq)  .
-        ::  ~&  [%harv nux.q.n.puq p.n.puq]
+        ?~  PUQ  .
+        ?:  =(0 WID)  .
+        =>  RIGT  =<  LEFT
+        ?>  ?=(^ PUQ)
+        ?:  =(0 WID)  .
+        ?.  =(| LIV.Q.N.PUQ)  .
+        ::  ~&  [%HARV NUX.Q.N.PUQ P.N.PUQ]
         %_    .
-          wid          (dec wid)
-          rub          [pac.q.n.puq rub]
-          nif          +(nif)
-          liv.q.n.puq  &
-          nux.q.n.puq  +(nux.q.n.puq)
-          lys.q.n.puq  now
+          WID          (DEC WID)
+          RUB          [PAC.Q.N.PUQ RUB]
+          NIF          +(NIF)
+          LIV.Q.N.PUQ  &
+          NUX.Q.N.PUQ  +(NUX.Q.N.PUQ)
+          LYS.Q.N.PUQ  NOW
         ==
       ::
-      ++  left
-        ?>  ?=(^ puq)
-        ^+(. =+(lef=apse(puq l.puq) lef(puq [n.puq puq.lef r.puq])))
-      ++  rigt
-        ?>  ?=(^ puq)
-        ^+(. =+(rig=apse(puq r.puq) rig(puq [n.puq l.puq puq.rig])))
+      ++  LEFT
+        ?>  ?=(^ PUQ)
+        ^+(. =+(LEF=APSE(PUQ L.PUQ) LEF(PUQ [N.PUQ PUQ.LEF R.PUQ])))
+      ++  RIGT
+        ?>  ?=(^ PUQ)
+        ^+(. =+(RIG=APSE(PUQ R.PUQ) RIG(PUQ [N.PUQ L.PUQ PUQ.RIG])))
       --
     ::
-    ++  wack                                            ::    wack:pu
-      |=  now=@da                                       ::  wakeup (timeout)
-      ^-  [(list rock) _+>]
-      ?.  &(!=(~ rtn) ?>(?=(^ rtn) (gte now u.rtn)))  [~ +>]
-      ::  ~&  [%slow (div rto (div ~s1 1.000))]
-      =.  +>  (wept 0 nus)
-      ?>  =(0 nif)
-      =:  caw  2
-          rto  ;:  min
-                 (mul 2 rto)
-                 ~m2
-                 (mul ~s16 ?~(rue 1 +((div (sub now u.rue) ~d1))))
+    ++  WACK                                            ::    WACK:PU
+      |=  NOW=@DA                                       ::  WAKEUP (TIMEOUT)
+      ^-  [(LIST ROCK) _+>]
+      ?.  &(!=(~ RTN) ?>(?=(^ RTN) (GTE NOW U.RTN)))  [~ +>]
+      ::  ~&  [%SLOW (DIV RTO (DIV ~S1 1.000))]
+      =.  +>  (WEPT 0 NUS)
+      ?>  =(0 NIF)
+      =:  CAW  2
+          RTO  ;:  MIN
+                 (MUL 2 RTO)
+                 ~M2
+                 (MUL ~S16 ?~(RUE 1 +((DIV (SUB NOW U.RUE) ~D1))))
                ==
         ==
-      (harv now)
+      (HARV NOW)
     ::
-    ++  wept                                            ::    wept:pu
-      |=  [fip=@ud lap=@ud]                             ::  fip thru lap-1
-      =<  abet  =<  apse
+    ++  WEPT                                            ::    WEPT:PU
+      |=  [FIP=@UD LAP=@UD]                             ::  FIP THRU LAP-1
+      =<  ABET  =<  APSE
       |%
-      ++  abet  +>.$
-      ++  apse
+      ++  ABET  +>.$
+      ++  APSE
         ^+  .
-        ?~  puq  .
-        ?:  (lth p.n.puq fip)  ?~(l.puq . left)
-        ?:  (gte p.n.puq lap)  ?~(r.puq . rigt)
-        =>  rigt  =<  left
-        ?>  ?=(^ puq)
-        ?.(liv.q.n.puq . .(nif (dec nif), liv.q.n.puq |))
+        ?~  PUQ  .
+        ?:  (LTH P.N.PUQ FIP)  ?~(L.PUQ . LEFT)
+        ?:  (GTE P.N.PUQ LAP)  ?~(R.PUQ . RIGT)
+        =>  RIGT  =<  LEFT
+        ?>  ?=(^ PUQ)
+        ?.(LIV.Q.N.PUQ . .(NIF (DEC NIF), LIV.Q.N.PUQ |))
       ::
-      ++  left
-        ?>  ?=(^ puq)
-        ^+(. =+(lef=apse(puq l.puq) lef(puq [n.puq puq.lef r.puq])))
-      ++  rigt
-        ?>  ?=(^ puq)
-        ^+(. =+(rig=apse(puq r.puq) rig(puq [n.puq l.puq puq.rig])))
+      ++  LEFT
+        ?>  ?=(^ PUQ)
+        ^+(. =+(LEF=APSE(PUQ L.PUQ) LEF(PUQ [N.PUQ PUQ.LEF R.PUQ])))
+      ++  RIGT
+        ?>  ?=(^ PUQ)
+        ^+(. =+(RIG=APSE(PUQ R.PUQ) RIG(PUQ [N.PUQ L.PUQ PUQ.RIG])))
       --
     ::
-    ++  whap                                            ::    whap:pu
-      |=  [now=@da gom=soup wyv=(list rock)]            ::  send a message
-      ^-  [(list rock) _+>]
-      =.  pyz  (~(put by pyz) gom (lent wyv))
+    ++  WHAP                                            ::    WHAP:PU
+      |=  [NOW=@DA GOM=SOUP WYV=(LIST ROCK)]            ::  SEND A MESSAGE
+      ^-  [(LIST ROCK) _+>]
+      =.  PYZ  (~(PUT BY PYZ) GOM (LENT WYV))
       =.  +>
         |-  ^+  +>.^$
-        ?~  wyv  +>.^$
+        ?~  WYV  +>.^$
         %=  $
-          wyv  t.wyv
-          nus  +(nus)
-          diq  (~(put by diq) (shaf %flap i.wyv) nus)
-          puq  (~(put to puq) [nus `soul`[gom 0 | ~2000.1.1 i.wyv]])
+          WYV  T.WYV
+          NUS  +(NUS)
+          DIQ  (~(PUT BY DIQ) (SHAF %FLAP I.WYV) NUS)
+          PUQ  (~(PUT TO PUQ) [NUS `SOUL`[GOM 0 | ~2000.1.1 I.WYV]])
         ==
-      (harv now)
+      (HARV NOW)
     --
   --
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aG, protocol engine          ::
+  ::              SECTION 4AG, PROTOCOL ENGINE          ::
   ::
   |%
-  ++  am                                                ::    am
-    ~%  %ames-am  ..is  ~
-    |_  [our=ship now=@da fox=fort ski=sley]            ::  protocol engine
-    ::  +deed-scry: for a +deed at a +life
+  ++  AM                                                ::    AM
+    ~%  %AMES-AM  ..IS  ~
+    |_  [OUR=SHIP NOW=@DA FOX=FORT SKI=SLEY]            ::  PROTOCOL ENGINE
+    ::  +DEED-SCRY: FOR A +DEED AT A +LIFE
     ::
-    ++  deed-scry
-      ~/  %deed-scry
-      |=  [who=ship lyf=life]
-      ^-  (unit deed)
-      =;  ded
-        ?~(ded ~ u.ded)
-      ;;  (unit (unit deed))
-      %-  (sloy-light ski)
-      =/  pur=spur
-        /(scot %ud lyf)/(scot %p who)
-      [[151 %noun] %j our %deed da+now pur]
-    ::  +life-scry: for a +life
+    ++  DEED-SCRY
+      ~/  %DEED-SCRY
+      |=  [WHO=SHIP LYF=LIFE]
+      ^-  (UNIT DEED)
+      =;  DED
+        ?~(DED ~ U.DED)
+      ;;  (UNIT (UNIT DEED))
+      %-  (SLOY-LIGHT SKI)
+      =/  PUR=SPUR
+        /(SCOT %UD LYF)/(SCOT %P WHO)
+      [[151 %NOUN] %J OUR %DEED DA+NOW PUR]
+    ::  +LIFE-SCRY: FOR A +LIFE
     ::
-    ++  life-scry
-      ~/  %life-scry
-      |=  who=ship
-      ^-  (unit life)
-      =;  lyf
-        ?~(lyf ~ u.lyf)
-      ;;  (unit (unit life))
-      %-  (sloy-light ski)
-      =/  pur=spur
-        /(scot %p who)
-      [[151 %noun] %j our %life da+now pur]
-    ::  +sein-scry: for sponsor
+    ++  LIFE-SCRY
+      ~/  %LIFE-SCRY
+      |=  WHO=SHIP
+      ^-  (UNIT LIFE)
+      =;  LYF
+        ?~(LYF ~ U.LYF)
+      ;;  (UNIT (UNIT LIFE))
+      %-  (SLOY-LIGHT SKI)
+      =/  PUR=SPUR
+        /(SCOT %P WHO)
+      [[151 %NOUN] %J OUR %LIFE DA+NOW PUR]
+    ::  +SEIN-SCRY: FOR SPONSOR
     ::
-    ++  sein-scry
-      ~/  %sein
-      |=  who=ship
-      ;;  ship
-      %-  need  %-  need
-      %-  (sloy-light ski)
-      [[151 %noun] %j our %sein da+now /(scot %p who)]
-    ::  +saxo-scry: for sponsorship chain
+    ++  SEIN-SCRY
+      ~/  %SEIN
+      |=  WHO=SHIP
+      ;;  SHIP
+      %-  NEED  %-  NEED
+      %-  (SLOY-LIGHT SKI)
+      [[151 %NOUN] %J OUR %SEIN DA+NOW /(SCOT %P WHO)]
+    ::  +SAXO-SCRY: FOR SPONSORSHIP CHAIN
     ::
-    ++  saxo-scry
-      ~/  %saxo
-      |=  who=ship
-      ;;  (list ship)
-      %-  need  %-  need
-      %-  (sloy-light ski)
-      [[151 %noun] %j our %saxo da+now /(scot %p who)]
+    ++  SAXO-SCRY
+      ~/  %SAXO
+      |=  WHO=SHIP
+      ;;  (LIST SHIP)
+      %-  NEED  %-  NEED
+      %-  (SLOY-LIGHT SKI)
+      [[151 %NOUN] %J OUR %SAXO DA+NOW /(SCOT %P WHO)]
     ::
-    ++  vein                                            ::    vein:am
-      ~/  %vein
-      |=  [=life vein=(map life ring)]                  ::  new private keys
-      ^-  fort
+    ++  VEIN                                            ::    VEIN:AM
+      ~/  %VEIN
+      |=  [=LIFE VEIN=(MAP LIFE RING)]                  ::  NEW PRIVATE KEYS
+      ^-  FORT
       ::
-      ?.  ?&  (~(has by vein) life)
-              =(life (roll ~(tap in ~(key by vein)) max))
+      ?.  ?&  (~(HAS BY VEIN) LIFE)
+              =(LIFE (ROLL ~(TAP IN ~(KEY BY VEIN)) MAX))
           ==
-        ~|  [%vein-mismatch +<]  !!
-      %=  fox
-          hoc.ton
-        ::  reset connections
+        ~|  [%VEIN-MISMATCH +<]  !!
+      %=  FOX
+          HOC.TON
+        ::  RESET CONNECTIONS
         ::
-        (~(run by hoc.ton.fox) |=(=dore dore(caq *clot)))
+        (~(RUN BY HOC.TON.FOX) |=(=DORE DORE(CAQ *CLOT)))
       ::
-          seh.ton
-        ::  reset symmetric key cache
+          SEH.TON
+        ::  RESET SYMMETRIC KEY CACHE
         ::
         ~
       ::
-      ::  save our secrets, ready for action
-          law.ton
-        ::  save our deed (for comet/moon communication)
+      ::  SAVE OUR SECRETS, READY FOR ACTION
+          LAW.TON
+        ::  SAVE OUR DEED (FOR COMET/MOON COMMUNICATION)
         ::
-        (need (deed-scry our life))
+        (NEED (DEED-SCRY OUR LIFE))
       ::
-          val.ton
-        ::  save our secrets, ready for action
+          VAL.TON
+        ::  SAVE OUR SECRETS, READY FOR ACTION
         ::
-        ^-  wund
-        %+  turn
-          %+  sort
-            ~(tap by vein)
-          |=  [a=[=^life =ring] b=[=^life =ring]]
-          (gth life.a life.b)
-        |=  [=^life =ring]
-        [life ring (nol:nu:crub:crypto ring)]
+        ^-  WUND
+        %+  TURN
+          %+  SORT
+            ~(TAP BY VEIN)
+          |=  [A=[=^LIFE =RING] B=[=^LIFE =RING]]
+          (GTH LIFE.A LIFE.B)
+        |=  [=^LIFE =RING]
+        [LIFE RING (NOL:NU:CRUB:CRYPTO RING)]
       ==
     ::
-    ++  gnaw                                            ::    gnaw:am
-      ~/  %gnaw
-      |=  [kay=cape ryn=lane pac=rock]                  ::  process packet
-      ^-  [p=(list boon) q=fort]
-      ?.  =(protocol-version (end 0 3 pac))  [~ fox]
-      =+  kec=(bite pac)
-      ?:  (goop p.p.kec)
-        [~ fox]
-      ?.  =(our q.p.kec)
-        [~ fox]
-      =;  zap=[p=(list boon) q=fort]
-        [(weld p.zap next) q.zap]
-      =<  zork
-      =<  zank
-      ::  ~&  [%hear p.p.kec ryn `@p`(mug (shaf %flap pac))]
-      %-  ~(chew la:(ho:um p.p.kec) kay ryn %none (shaf %flap pac))
-      [q.kec r.kec]
+    ++  GNAW                                            ::    GNAW:AM
+      ~/  %GNAW
+      |=  [KAY=CAPE RYN=LANE PAC=ROCK]                  ::  PROCESS PACKET
+      ^-  [P=(LIST BOON) Q=FORT]
+      ?.  =(PROTOCOL-VERSION (END 0 3 PAC))  [~ FOX]
+      =+  KEC=(BITE PAC)
+      ?:  (GOOP P.P.KEC)
+        [~ FOX]
+      ?.  =(OUR Q.P.KEC)
+        [~ FOX]
+      =;  ZAP=[P=(LIST BOON) Q=FORT]
+        [(WELD P.ZAP NEXT) Q.ZAP]
+      =<  ZORK
+      =<  ZANK
+      ::  ~&  [%HEAR P.P.KEC RYN `@P`(MUG (SHAF %FLAP PAC))]
+      %-  ~(CHEW LA:(HO:UM P.P.KEC) KAY RYN %NONE (SHAF %FLAP PAC))
+      [Q.KEC R.KEC]
     ::
-    ++  goop                                            ::  blacklist
-      |=  him=ship
+    ++  GOOP                                            ::  BLACKLIST
+      |=  HIM=SHIP
       |
     ::
-    ++  kick                                            ::    kick:am
-      |=  hen=duct                                      ::  refresh net
-      ^-  [p=(list boon) q=fort]
-      zork:(kick:um hen)
+    ++  KICK                                            ::    KICK:AM
+      |=  HEN=DUCT                                      ::  REFRESH NET
+      ^-  [P=(LIST BOON) Q=FORT]
+      ZORK:(KICK:UM HEN)
     ::
-    ++  next
-      ^-  (list boon)
-      =/  doz=(unit @da)  [~ (add now ~s32)]
-      =.  doz
-        |-  ^+  doz
-        ?~  wab.zac.fox  doz
-        =.  doz  $(wab.zac.fox l.wab.zac.fox)
-        =.  doz  $(wab.zac.fox r.wab.zac.fox)
-        =+  bah=q.n.wab.zac.fox
-        (hunt lth doz rtn.sop.bah)
-      =/  nex  (hunt lth doz tim.fox)
-      ?:  =(tim.fox nex)
+    ++  NEXT
+      ^-  (LIST BOON)
+      =/  DOZ=(UNIT @DA)  [~ (ADD NOW ~S32)]
+      =.  DOZ
+        |-  ^+  DOZ
+        ?~  WAB.ZAC.FOX  DOZ
+        =.  DOZ  $(WAB.ZAC.FOX L.WAB.ZAC.FOX)
+        =.  DOZ  $(WAB.ZAC.FOX R.WAB.ZAC.FOX)
+        =+  BAH=Q.N.WAB.ZAC.FOX
+        (HUNT LTH DOZ RTN.SOP.BAH)
+      =/  NEX  (HUNT LTH DOZ TIM.FOX)
+      ?:  =(TIM.FOX NEX)
         ~
-      [%pito (need nex)]~
+      [%PITO (NEED NEX)]~
     ::
-    ++  rack                                            ::    rack:am
-      ~/  %rack
-      |=  [her=ship cha=path cop=coop]                  ::  e2e ack
-      =/  oh  (ho:um her)
-      =^  gud  oh  (cook:oh cop cha ~)
-      ?.  gud  oh
-      (cans:oh cha)
+    ++  RACK                                            ::    RACK:AM
+      ~/  %RACK
+      |=  [HER=SHIP CHA=PATH COP=COOP]                  ::  E2E ACK
+      =/  OH  (HO:UM HER)
+      =^  GUD  OH  (COOK:OH COP CHA ~)
+      ?.  GUD  OH
+      (CANS:OH CHA)
     ::
-    ++  wake                                            ::    wake:am
-      ~/  %wake
-      |=  hen=duct                                      ::  harvest packets
-      ^-  [p=(list boon) q=fort]
-      =.  tim.fox  ~
-      =/  neb=(list ship)  ~(tap in ~(key by wab.zac.fox))
-      =|  bin=(list boon)
-      |-  ^-  [p=(list boon) q=fort]
-      ?~  neb
-        =^  ban  fox  (kick hen)
-        [:(weld bin p.ban next) fox]
-      =/  fro=(list ship)  (saxo-scry our)
-      =/  hoz  (ho:um i.neb)
-      =^  bun  fox  zork:zank:(thaw:hoz fro)
-      $(neb t.neb, bin (weld p.bun bin))
+    ++  WAKE                                            ::    WAKE:AM
+      ~/  %WAKE
+      |=  HEN=DUCT                                      ::  HARVEST PACKETS
+      ^-  [P=(LIST BOON) Q=FORT]
+      =.  TIM.FOX  ~
+      =/  NEB=(LIST SHIP)  ~(TAP IN ~(KEY BY WAB.ZAC.FOX))
+      =|  BIN=(LIST BOON)
+      |-  ^-  [P=(LIST BOON) Q=FORT]
+      ?~  NEB
+        =^  BAN  FOX  (KICK HEN)
+        [:(WELD BIN P.BAN NEXT) FOX]
+      =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+      =/  HOZ  (HO:UM I.NEB)
+      =^  BUN  FOX  ZORK:ZANK:(THAW:HOZ FRO)
+      $(NEB T.NEB, BIN (WELD P.BUN BIN))
     ::
-    ++  wise                                            ::    wise:am
-      |=  [hen=duct her=ship cha=path val=*]            ::  send a statement
-      ^-  [p=(list boon) q=fort]
-      =^  ban  fox  zork:zank:(wool:(ho:um her) hen cha val)
-      [(weld p.ban next) fox]
+    ++  WISE                                            ::    WISE:AM
+      |=  [HEN=DUCT HER=SHIP CHA=PATH VAL=*]            ::  SEND A STATEMENT
+      ^-  [P=(LIST BOON) Q=FORT]
+      =^  BAN  FOX  ZORK:ZANK:(WOOL:(HO:UM HER) HEN CHA VAL)
+      [(WELD P.BAN NEXT) FOX]
     ::
-    ++  um                                              ::  per server
-      =/  gus   (~(us go ton.fox) our)
-      =/  weg=corn  zac.fox
-      =|  bin=(list boon)
+    ++  UM                                              ::  PER SERVER
+      =/  GUS   (~(US GO TON.FOX) OUR)
+      =/  WEG=CORN  ZAC.FOX
+      =|  BIN=(LIST BOON)
       |%
-      ++  ho                                            ::    ho:um:am
-        |=  her=ship                                    ::  per friend
-        =+  diz=(myx:gus her)
-        =+  bah=(~(get by wab.weg) her)
-        =+  puz=?~(bah ahoy:pu %*(. pu +< sop.u.bah))
-        =>  .(bah `bath`?~(bah [abet:puz ~ ~] u.bah))
+      ++  HO                                            ::    HO:UM:AM
+        |=  HER=SHIP                                    ::  PER FRIEND
+        =+  DIZ=(MYX:GUS HER)
+        =+  BAH=(~(GET BY WAB.WEG) HER)
+        =+  PUZ=?~(BAH AHOY:PU %*(. PU +< SOP.U.BAH))
+        =>  .(BAH `BATH`?~(BAH [ABET:PUZ ~ ~] U.BAH))
         |%
-        ++  busk                                        ::    busk:ho:um:am
-          |=  [waz=(list ship) pax=(list rock)]         ::  send packets
+        ++  BUSK                                        ::    BUSK:HO:UM:AM
+          |=  [WAZ=(LIST SHIP) PAX=(LIST ROCK)]         ::  SEND PACKETS
           %_    +>
-              bin
-            |-  ^+  bin
-            ?~  pax  bin
-            $(pax t.pax, bin (weld (flop (wist:diz now waz ~ i.pax)) bin))
+              BIN
+            |-  ^+  BIN
+            ?~  PAX  BIN
+            $(PAX T.PAX, BIN (WELD (FLOP (WIST:DIZ NOW WAZ ~ I.PAX)) BIN))
           ==
         ::
-        ++  cans                                        ::    cans:ho:um:am
-          |=  cha=path
-          =+  rum=(need (~(get by raz.bah) cha))
-          =.  rum
-            %=  rum
-              did  +(did.rum)
-              mis  (~(del by mis.rum) did.rum)
+        ++  CANS                                        ::    CANS:HO:UM:AM
+          |=  CHA=PATH
+          =+  RUM=(NEED (~(GET BY RAZ.BAH) CHA))
+          =.  RUM
+            %=  RUM
+              DID  +(DID.RUM)
+              MIS  (~(DEL BY MIS.RUM) DID.RUM)
             ==
-          (coat cha rum)
+          (COAT CHA RUM)
         ::
-        ++  coat                                        ::    coat:ho:um:am
-          |=  [cha=path rum=race]                       ::  update input race
+        ++  COAT                                        ::    COAT:HO:UM:AM
+          |=  [CHA=PATH RUM=RACE]                       ::  UPDATE INPUT RACE
           ^+  +>
-          =+  cun=(~(get by mis.rum) did.rum)
-          ?:  |(!dod.rum ?=(~ cun))
+          =+  CUN=(~(GET BY MIS.RUM) DID.RUM)
+          ?:  |(!DOD.RUM ?=(~ CUN))
             ::
-            ::  if we have not yet received the current message,
-            ::  or if we are not idle, just wait.
+            ::  IF WE HAVE NOT YET RECEIVED THE CURRENT MESSAGE,
+            ::  OR IF WE ARE NOT IDLE, JUST WAIT.
             ::
-            +>.$(raz.bah (~(put by raz.bah) cha rum))
-          ?.  =(%good p.u.cun)
+            +>.$(RAZ.BAH (~(PUT BY RAZ.BAH) CHA RUM))
+          ?.  =(%GOOD P.U.CUN)
             ::
-            ::  if we are recording a failed message, acknowledge
-            ::  it now, since it obviously won't be processed.
+            ::  IF WE ARE RECORDING A FAILED MESSAGE, ACKNOWLEDGE
+            ::  IT NOW, SINCE IT OBVIOUSLY WON'T BE PROCESSED.
             ::
-            ~&  [%fail-ack did.rum]
-            =^  gud  +>.$
-              (cook ``[%dead-message ~] cha `[q.u.cun r.u.cun])
-            ?.  gud  +>.$
+            ~&  [%FAIL-ACK DID.RUM]
+            =^  GUD  +>.$
+              (COOK ``[%DEAD-MESSAGE ~] CHA `[Q.U.CUN R.U.CUN])
+            ?.  GUD  +>.$
             %=    +>.$
-                raz.bah
-              %+  ~(put by raz.bah)  cha
-              %=  rum
-                did  +(did.rum)
-                mis  (~(del by mis.rum) did.rum)
+                RAZ.BAH
+              %+  ~(PUT BY RAZ.BAH)  CHA
+              %=  RUM
+                DID  +(DID.RUM)
+                MIS  (~(DEL BY MIS.RUM) DID.RUM)
               ==
             ==
           ::
-          ::  the message is good.  send it to be processed.
+          ::  THE MESSAGE IS GOOD.  SEND IT TO BE PROCESSED.
           ::
-          ?>  ?=(^ s.u.cun)
+          ?>  ?=(^ S.U.CUN)
           %=    +>.$
-              raz.bah  (~(put by raz.bah) cha rum(dod |))
-              bin
-            :_  bin
-            :^    %milk
-                her
-              `soap`[[lyf:sen:gus clon:diz] cha did.rum]
-            u.s.u.cun
+              RAZ.BAH  (~(PUT BY RAZ.BAH) CHA RUM(DOD |))
+              BIN
+            :_  BIN
+            :^    %MILK
+                HER
+              `SOAP`[[LYF:SEN:GUS CLON:DIZ] CHA DID.RUM]
+            U.S.U.CUN
           ==
         ::
-        ++  cook                                        ::    cook:ho:um:am
-          |=  [cop=coop cha=path ram=(unit [ryn=lane dam=flap])]
-          ^-  [gud=? con=_+>]                        ::  acknowledgment
-          ::  ~&  [%ames-cook cop cha ram]
-          =+  rum=(need (~(get by raz.bah) cha))
-          =+  lat=(~(get by mis.rum) did.rum)
-          ?:  &(?=(~ lat) ?=(~ ram))
-            ~&  %ack-late-or-redundant
+        ++  COOK                                        ::    COOK:HO:UM:AM
+          |=  [COP=COOP CHA=PATH RAM=(UNIT [RYN=LANE DAM=FLAP])]
+          ^-  [GUD=? CON=_+>]                        ::  ACKNOWLEDGMENT
+          ::  ~&  [%AMES-COOK COP CHA RAM]
+          =+  RUM=(NEED (~(GET BY RAZ.BAH) CHA))
+          =+  LAT=(~(GET BY MIS.RUM) DID.RUM)
+          ?:  &(?=(~ LAT) ?=(~ RAM))
+            ~&  %ACK-LATE-OR-REDUNDANT
             [%| +>.$]
           :-  %&
-          =+  ^-  [ryn=lane dam=flap]
-              ?^  ram  [ryn.u.ram dam.u.ram]
-              ?<  ?=(~ lat)
-              [q r]:u.lat
-          =.  raz.bah
-            ?^  ram  raz.bah
-            %+  ~(put by raz.bah)  cha
-            rum(dod &, bum ?~(cop bum.rum (~(put by bum.rum) did.rum u.cop)))
-          =/  seg  (sein-scry her)
-          =^  roc  diz  (zuul:diz now seg [%back cop dam ~s0])
-          =/  fro=(list ship)  (saxo-scry our)
-          (busk(diz (wast:diz ryn)) (xong fro) roc)
-        ::  XX move this logic into %zuse, namespaced under %jael?
+          =+  ^-  [RYN=LANE DAM=FLAP]
+              ?^  RAM  [RYN.U.RAM DAM.U.RAM]
+              ?<  ?=(~ LAT)
+              [Q R]:U.LAT
+          =.  RAZ.BAH
+            ?^  RAM  RAZ.BAH
+            %+  ~(PUT BY RAZ.BAH)  CHA
+            RUM(DOD &, BUM ?~(COP BUM.RUM (~(PUT BY BUM.RUM) DID.RUM U.COP)))
+          =/  SEG  (SEIN-SCRY HER)
+          =^  ROC  DIZ  (ZUUL:DIZ NOW SEG [%BACK COP DAM ~S0])
+          =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+          (BUSK(DIZ (WAST:DIZ RYN)) (XONG FRO) ROC)
+        ::  XX MOVE THIS LOGIC INTO %ZUSE, NAMESPACED UNDER %JAEL?
         ::
-        ++  deng                                        ::    deng:ho:um:am
-          |=  law=(unit deed)                           ::  accept inline deed
-          ^+  diz
-          ?:  |(=(~ law) =(lew.wod.dur.diz law))
-            diz
-          ~|  [%deng-fail her]
-          ?>  ?=(^ law)
-          =*  wed  u.law
+        ++  DENG                                        ::    DENG:HO:UM:AM
+          |=  LAW=(UNIT DEED)                           ::  ACCEPT INLINE DEED
+          ^+  DIZ
+          ?:  |(=(~ LAW) =(LEW.WOD.DUR.DIZ LAW))
+            DIZ
+          ~|  [%DENG-FAIL HER]
+          ?>  ?=(^ LAW)
+          =*  WED  U.LAW
           ?>  ^-  ?
-              ?-    (clan:title her)
-                  %earl
-                ::  signed by parent
+              ?-    (CLAN:TITLE HER)
+                  %EARL
+                ::  SIGNED BY PARENT
                 ::
-                =/  seg  (^sein:title her)
-                =/  yig
-                  ?:  =(our seg)
-                    sen:gus
-                  cluy:(myx:gus seg)
-                ?&  =(lyf.yig life.wed)
-                    ?=(^ oath.wed)
-                    .=  (need (sure:as:cub.yig u.oath.wed))
-                    (shaf %earl (sham [her life.wed pass.wed]))
+                =/  SEG  (^SEIN:TITLE HER)
+                =/  YIG
+                  ?:  =(OUR SEG)
+                    SEN:GUS
+                  CLUY:(MYX:GUS SEG)
+                ?&  =(LYF.YIG LIFE.WED)
+                    ?=(^ OATH.WED)
+                    .=  (NEED (SURE:AS:CUB.YIG U.OATH.WED))
+                    (SHAF %EARL (SHAM [HER LIFE.WED PASS.WED]))
                 ==
               ::
-                  %pawn
-                ::  self-signed, life 1, address is fingerprint
+                  %PAWN
+                ::  SELF-SIGNED, LIFE 1, ADDRESS IS FINGERPRINT
                 ::
-                =/  cub=acru  (com:nu:crub:crypto pass.wed)
-                ?&  =(`@`fig:ex:cub her)
-                    ?=(%1 life.wed)
-                    ?=(^ oath.wed)
-                    ::  XX do we care about this signature at all?
+                =/  CUB=ACRU  (COM:NU:CRUB:CRYPTO PASS.WED)
+                ?&  =(`@`FIG:EX:CUB HER)
+                    ?=(%1 LIFE.WED)
+                    ?=(^ OATH.WED)
+                    ::  XX DO WE CARE ABOUT THIS SIGNATURE AT ALL?
                     ::
-                    .=  (need (sure:as:cub u.oath.wed))
-                    (shaf %self (sham [her life.wed pass.wed]))
+                    .=  (NEED (SURE:AS:CUB U.OATH.WED))
+                    (SHAF %SELF (SHAM [HER LIFE.WED PASS.WED]))
                 ==
               ::
                   *
-                ::  our sponsor
+                ::  OUR SPONSOR
                 ::
-                ?&  !?=(%czar (clan:title our))
-                    =(her (sein-scry our))
+                ?&  !?=(%CZAR (CLAN:TITLE OUR))
+                    =(HER (SEIN-SCRY OUR))
                 ==
               ==
-          diz(lew.wod.dur law)
+          DIZ(LEW.WOD.DUR LAW)
         ::
-        ++  done                                        ::    done:ho:um:am
-          |=  [cha=path num=@ud]                        ::  complete outgoing
-          ^-  [(unit duct) _+>]
-          ::  ~&  [%ames-done cha num]
-          =+  rol=(need (~(get by ryl.bah) cha))
-          =+  rix=(~(get by san.rol) num)
-          ?~  rix  [~ +>.$]
-          :-  rix
+        ++  DONE                                        ::    DONE:HO:UM:AM
+          |=  [CHA=PATH NUM=@UD]                        ::  COMPLETE OUTGOING
+          ^-  [(UNIT DUCT) _+>]
+          ::  ~&  [%AMES-DONE CHA NUM]
+          =+  ROL=(NEED (~(GET BY RYL.BAH) CHA))
+          =+  RIX=(~(GET BY SAN.ROL) NUM)
+          ?~  RIX  [~ +>.$]
+          :-  RIX
           %_    +>.$
-              ryl.bah
-            (~(put by ryl.bah) cha rol(san (~(del by san.rol) num)))
+              RYL.BAH
+            (~(PUT BY RYL.BAH) CHA ROL(SAN (~(DEL BY SAN.ROL) NUM)))
           ==
         ::
-        ++  la                                          ::    la:ho:um:am
-          |_  [kay=cape ryn=lane aut=skin dam=flap]     ::  per packet
+        ++  LA                                          ::    LA:HO:UM:AM
+          |_  [KAY=CAPE RYN=LANE AUT=SKIN DAM=FLAP]     ::  PER PACKET
           ::
-          ++  chew                                      ::    chew:la:ho:um:am
-            |=  [sin=skin msg=@]                        ::  receive
+          ++  CHEW                                      ::    CHEW:LA:HO:UM:AM
+            |=  [SIN=SKIN MSG=@]                        ::  RECEIVE
             ^+  +>
-            =<  abed
+            =<  ABED
             |%
-            ::  +abed: check that we have the keys to communicate with :her
+            ::  +ABED: CHECK THAT WE HAVE THE KEYS TO COMMUNICATE WITH :HER
             ::
-            ++  abed
+            ++  ABED
               ^+  +>.$
-              ::  if we don't have a deed, subscribe for public key updates
+              ::  IF WE DON'T HAVE A DEED, SUBSCRIBE FOR PUBLIC KEY UPDATES
               ::
-              ::    XX update state so we only ask once?
+              ::    XX UPDATE STATE SO WE ONLY ASK ONCE?
               ::
-              =?  +>.$  ?=(~ lew.wod.dur.diz)
-                (emit %beer her)
-              ::  if we don't have a deed, scry for it
-              ::  (to avoid dropping the packet, if possible).
+              =?  +>.$  ?=(~ LEW.WOD.DUR.DIZ)
+                (EMIT %BEER HER)
+              ::  IF WE DON'T HAVE A DEED, SCRY FOR IT
+              ::  (TO AVOID DROPPING THE PACKET, IF POSSIBLE).
               ::
-              =?  lew.wod.dur.diz  ?=(~ lew.wod.dur.diz)
-                =/  life  (life-scry her)
-                ?~(life ~ (deed-scry her u.life))
-              ::  if we have a deed, proceed
+              =?  LEW.WOD.DUR.DIZ  ?=(~ LEW.WOD.DUR.DIZ)
+                =/  LIFE  (LIFE-SCRY HER)
+                ?~(LIFE ~ (DEED-SCRY HER U.LIFE))
+              ::  IF WE HAVE A DEED, PROCEED
               ::
-              ?^  lew.wod.dur.diz
-                apse
-              ::  if :her is our initial sponsor, proceed (TOFU)
+              ?^  LEW.WOD.DUR.DIZ
+                APSE
+              ::  IF :HER IS OUR INITIAL SPONSOR, PROCEED (TOFU)
               ::
-              ::    XX TOFU is unnecessary if we include keys
-              ::    for the full sponsorship chain in the boot event
+              ::    XX TOFU IS UNNECESSARY IF WE INCLUDE KEYS
+              ::    FOR THE FULL SPONSORSHIP CHAIN IN THE BOOT EVENT
               ::
-              ?:  =(her (sein-scry our))
-                apse
-              ::  if :her is a comet, or a moon of a known ship, proceed
+              ?:  =(HER (SEIN-SCRY OUR))
+                APSE
+              ::  IF :HER IS A COMET, OR A MOON OF A KNOWN SHIP, PROCEED
               ::
-              =/  =rank:title  (clan:title her)
-              ?:  ?|  ?=(%pawn rank)
-                      ?&  ?=(%earl rank)
-                          !=(~ lew.wod.dur:(myx:gus (sein-scry her)))
+              =/  =RANK:TITLE  (CLAN:TITLE HER)
+              ?:  ?|  ?=(%PAWN RANK)
+                      ?&  ?=(%EARL RANK)
+                          !=(~ LEW.WOD.DUR:(MYX:GUS (SEIN-SCRY HER)))
                   ==  ==
-                apse
-              ::  otherwise, drop the packet
+                APSE
+              ::  OTHERWISE, DROP THE PACKET
               ::
               +>.$
-            ::  +apse: process the packet, notify if :her status changed
+            ::  +APSE: PROCESS THE PACKET, NOTIFY IF :HER STATUS CHANGED
             ::
-            ++  apse
+            ++  APSE
               ^+  +>.$
-              =/  oub  bust:puz
-              =/  neg  =(~ yed.caq.dur.diz)
-              =.  +>.$  east
-              =/  eng  =(~ yed.caq.dur.diz)
-              =/  bou  bust:puz
-              =?  +>.$  &(oub !bou)
-                (emit [%wine her " is ok"])
-              ::  the presence of a symmetric key indicates neighboring
-              ::  XX use deed instead?
+              =/  OUB  BUST:PUZ
+              =/  NEG  =(~ YED.CAQ.DUR.DIZ)
+              =.  +>.$  EAST
+              =/  ENG  =(~ YED.CAQ.DUR.DIZ)
+              =/  BOU  BUST:PUZ
+              =?  +>.$  &(OUB !BOU)
+                (EMIT [%WINE HER " IS OK"])
+              ::  THE PRESENCE OF A SYMMETRIC KEY INDICATES NEIGHBORING
+              ::  XX USE DEED INSTEAD?
               ::
-              =?  +>.$  &(neg !eng)
-                %-  emir  :~
-                  [%wine her " is your neighbor"]
-                  ?>  ?=(^ lew.wod.dur.diz)
-                  [%raki her [life pass]:u.lew.wod.dur.diz]
+              =?  +>.$  &(NEG !ENG)
+                %-  EMIR  :~
+                  [%WINE HER " IS YOUR NEIGHBOR"]
+                  ?>  ?=(^ LEW.WOD.DUR.DIZ)
+                  [%RAKI HER [LIFE PASS]:U.LEW.WOD.DUR.DIZ]
                 ==
               +>.$
             ::
-            ++  east
+            ++  EAST
               ^+  +>.$
-              ?-    sin
-                  %none
-                ::  ~&  %chew-none
-                =.  puz  (bilk:puz now)
-                (chow ((hard meal) (cue msg)))
+              ?-    SIN
+                  %NONE
+                ::  ~&  %CHEW-NONE
+                =.  PUZ  (BILK:PUZ NOW)
+                (CHOW ((HARD MEAL) (CUE MSG)))
               ::
-                  %fast
-                ::  ~&  %chew-fast
-                =+  [mag=`hand`(end 7 1 msg) bod=(rsh 7 1 msg)]
-                =/  dey  (kuch:diz mag)
-                ::  ignore unknown key
+                  %FAST
+                ::  ~&  %CHEW-FAST
+                =+  [MAG=`HAND`(END 7 1 MSG) BOD=(RSH 7 1 MSG)]
+                =/  DEY  (KUCH:DIZ MAG)
+                ::  IGNORE UNKNOWN KEY
                 ::
-                ?~  dey  +>.$
-                =.  puz  (bilk:puz now)
-                =^  key  diz  u.dey
-                (chow(aut sin) ((hard meal) (cue (dy:cub:sen:gus key bod))))
+                ?~  DEY  +>.$
+                =.  PUZ  (BILK:PUZ NOW)
+                =^  KEY  DIZ  U.DEY
+                (CHOW(AUT SIN) ((HARD MEAL) (CUE (DY:CUB:SEN:GUS KEY BOD))))
               ::
-                  %full
-                ::  ~&  %chew-full
-                =/  mex  ((hard full:pact) (cue msg))
-                =.  diz  (deng law.mex)
-                =/  wug  cluy:diz
-                ?>  =(lyf.wug from.lyf.mex)
-                =/  gey  (sev:gus to.lyf.mex)
-                =/  sem  (need (tear:as:q.gey pub:ex:cub.wug txt.mex))
-                =/  mes  ((hard (pair @ @)) (cue sem))
-                =.  diz  (wasc:diz p.mes)
-                =.  puz  (bilk:puz now)
-                (west(msg q.mes))
+                  %FULL
+                ::  ~&  %CHEW-FULL
+                =/  MEX  ((HARD FULL:PACT) (CUE MSG))
+                =.  DIZ  (DENG LAW.MEX)
+                =/  WUG  CLUY:DIZ
+                ?>  =(LYF.WUG FROM.LYF.MEX)
+                =/  GEY  (SEV:GUS TO.LYF.MEX)
+                =/  SEM  (NEED (TEAR:AS:Q.GEY PUB:EX:CUB.WUG TXT.MEX))
+                =/  MES  ((HARD (PAIR @ @)) (CUE SEM))
+                =.  DIZ  (WASC:DIZ P.MES)
+                =.  PUZ  (BILK:PUZ NOW)
+                (WEST(MSG Q.MES))
               ::
-                  %open
-                ::  ~&  %chew-open
-                =/  mex  ((hard open:pact) (cue msg))
-                =.  diz  (deng law.mex)
-                =/  wug  cluy:diz
-                ?>  =(lyf.wug from.lyf.mex)
-                =/  mes  (need (sure:as:cub.wug txt.mex))
-                =.  puz  (bilk:puz now)
-                (west(msg mes))
+                  %OPEN
+                ::  ~&  %CHEW-OPEN
+                =/  MEX  ((HARD OPEN:PACT) (CUE MSG))
+                =.  DIZ  (DENG LAW.MEX)
+                =/  WUG  CLUY:DIZ
+                ?>  =(LYF.WUG FROM.LYF.MEX)
+                =/  MES  (NEED (SURE:AS:CUB.WUG TXT.MEX))
+                =.  PUZ  (BILK:PUZ NOW)
+                (WEST(MSG MES))
               ==
-            ++  west
+            ++  WEST
               |=  ~
-              =+  vib=(cue msg)
-              =+  mal=(meal vib)
-              ?.  =(mal vib)
-                ~&  [%bad-meal her]
+              =+  VIB=(CUE MSG)
+              =+  MAL=(MEAL VIB)
+              ?.  =(MAL VIB)
+                ~&  [%BAD-MEAL HER]
                 +>.^$
-              (chow(aut sin) mal)
+              (CHOW(AUT SIN) MAL)
             --
           ::
-          ++  chow                                      ::    chow:la:ho:um:am
-            |=  fud=meal                                ::  interpret meal
+          ++  CHOW                                      ::    CHOW:LA:HO:UM:AM
+            |=  FUD=MEAL                                ::  INTERPRET MEAL
             ^+  +>
-            =.  diz  ?:(=(%none aut) diz (wast:diz ryn))
-            (dine fud)
+            =.  DIZ  ?:(=(%NONE AUT) DIZ (WAST:DIZ RYN))
+            (DINE FUD)
           ::
-          ++  cock                                      ::    cock:la:ho:um:am
-            ^+  .                                       ::  send new ack
-            ::  ~&  [%back kay dam]
-            =*  cop  `coop`?:(=(%good kay) ~ ``[%dead-packet ~])
-            =/  seg  (sein-scry her)
-            =^  pax  diz  (zuul:diz now seg [%back cop dam ~s0])
-            =/  fro=(list ship)  (saxo-scry our)
-            ..cock(+> (busk(diz (wast:diz ryn)) (xong fro) pax))
+          ++  COCK                                      ::    COCK:LA:HO:UM:AM
+            ^+  .                                       ::  SEND NEW ACK
+            ::  ~&  [%BACK KAY DAM]
+            =*  COP  `COOP`?:(=(%GOOD KAY) ~ ``[%DEAD-PACKET ~])
+            =/  SEG  (SEIN-SCRY HER)
+            =^  PAX  DIZ  (ZUUL:DIZ NOW SEG [%BACK COP DAM ~S0])
+            =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+            ..COCK(+> (BUSK(DIZ (WAST:DIZ RYN)) (XONG FRO) PAX))
           ::
-          ++  deer                                      ::    deer:la:ho:um:am
-            |=  [cha=path num=@ud dut=(unit)]           ::  interpret message
+          ++  DEER                                      ::    DEER:LA:HO:UM:AM
+            |=  [CHA=PATH NUM=@UD DUT=(UNIT)]           ::  INTERPRET MESSAGE
             ^+  +>
-            =+  rum=(fall (~(get by raz.bah) cha) *race)
-            ::  ~&  [%rx kay cha num [dod.rum did.rum] ?=(~ dut)]
-            =*  bad  (~(has in bad.fox) her)
-            =.  kay  ?.((~(has in bad.fox) her) kay ~&(%blocked %dead))
+            =+  RUM=(FALL (~(GET BY RAZ.BAH) CHA) *RACE)
+            ::  ~&  [%RX KAY CHA NUM [DOD.RUM DID.RUM] ?=(~ DUT)]
+            =*  BAD  (~(HAS IN BAD.FOX) HER)
+            =.  KAY  ?.((~(HAS IN BAD.FOX) HER) KAY ~&(%BLOCKED %DEAD))
             %=    +>.$
                 +>
-              ?:  (lth num did.rum)
+              ?:  (LTH NUM DID.RUM)
                 ::
-                ::  this message already acknowledged; repeat old ack,
-                ::  or negative ack if this ship is blocked
+                ::  THIS MESSAGE ALREADY ACKNOWLEDGED; REPEAT OLD ACK,
+                ::  OR NEGATIVE ACK IF THIS SHIP IS BLOCKED
                 ::
-                =*  cop  ^-  coop
-                  %+  fall
-                    (~(get by bum.rum) num)
-                  ?:(bad ~ ``[%blocked ~])
-                con:(cook (~(get by bum.rum) num) cha `[ryn dam])
+                =*  COP  ^-  COOP
+                  %+  FALL
+                    (~(GET BY BUM.RUM) NUM)
+                  ?:(BAD ~ ``[%BLOCKED ~])
+                CON:(COOK (~(GET BY BUM.RUM) NUM) CHA `[RYN DAM])
               ::
-              ::  insert this message in unprocessed set
+              ::  INSERT THIS MESSAGE IN UNPROCESSED SET
               ::
-              =.  mis.rum  (~(put by mis.rum) num [kay ryn dam dut])
+              =.  MIS.RUM  (~(PUT BY MIS.RUM) NUM [KAY RYN DAM DUT])
               ::
-              ::  if ship is blocked, advance pointer to latest message
+              ::  IF SHIP IS BLOCKED, ADVANCE POINTER TO LATEST MESSAGE
               ::
-              =.  did.rum  ?.(bad did.rum num)
+              =.  DID.RUM  ?.(BAD DID.RUM NUM)
               ::
-              ::  process update
+              ::  PROCESS UPDATE
               ::
-              (coat cha rum)
+              (COAT CHA RUM)
             ==
           ::
-          ++  dine                                      ::    dine:la:ho:um:am
-            |=  fud=meal                                ::  interpret meal
+          ++  DINE                                      ::    DINE:LA:HO:UM:AM
+            |=  FUD=MEAL                                ::  INTERPRET MEAL
             ^+  +>
-            ?-    -.fud
-                %back
-              =.  +>  ?.(=(%full aut) +> cock)          ::  finish handshake
-              +>(..la (tock p.fud q.fud r.fud))
+            ?-    -.FUD
+                %BACK
+              =.  +>  ?.(=(%FULL AUT) +> COCK)          ::  FINISH HANDSHAKE
+              +>(..LA (TOCK P.FUD Q.FUD R.FUD))
             ::
-                %bond
-              ::  ~&  [%bond p.fud q.fud]
-              (deer p.fud q.fud ?-(kay %dead ~, %good [~ r.fud]))
+                %BOND
+              ::  ~&  [%BOND P.FUD Q.FUD]
+              (DEER P.FUD Q.FUD ?-(KAY %DEAD ~, %GOOD [~ R.FUD]))
             ::
-                %carp
-              ::  =+  zol=(~(get by olz.weg) s.fud)
-              ::  ?^  zol  cock(kay u.zol)
-              =^  neb  nys.weg
-                  =+  neb=(~(get by nys.weg) s.fud)
-                  ?^  neb  [u.neb nys.weg]
-                  =+  neb=`bait`[(kins p.fud) 0 r.fud ~]
-                  [neb (~(put by nys.weg) s.fud neb)]
-              ?>  (lth q.fud p.r.neb)
-              ?>  =((kins p.fud) p.neb)
-              ?>  =(r.fud p.r.neb)
-              =+  doy=`(unit @)`(~(get by q.r.neb) q.fud)
-              ?^  doy  cock
+                %CARP
+              ::  =+  ZOL=(~(GET BY OLZ.WEG) S.FUD)
+              ::  ?^  ZOL  COCK(KAY U.ZOL)
+              =^  NEB  NYS.WEG
+                  =+  NEB=(~(GET BY NYS.WEG) S.FUD)
+                  ?^  NEB  [U.NEB NYS.WEG]
+                  =+  NEB=`BAIT`[(KINS P.FUD) 0 R.FUD ~]
+                  [NEB (~(PUT BY NYS.WEG) S.FUD NEB)]
+              ?>  (LTH Q.FUD P.R.NEB)
+              ?>  =((KINS P.FUD) P.NEB)
+              ?>  =(R.FUD P.R.NEB)
+              =+  DOY=`(UNIT @)`(~(GET BY Q.R.NEB) Q.FUD)
+              ?^  DOY  COCK
               =>  ^+  .   %=  .
-                    q.r.neb  (~(put by q.r.neb) q.fud t.fud)
-                    q.neb    +(q.neb)
+                    Q.R.NEB  (~(PUT BY Q.R.NEB) Q.FUD T.FUD)
+                    Q.NEB    +(Q.NEB)
                   ==
-              ::  ~&  [%carp q.fud s.fud q.neb p.r.neb]
-              ?:  =(q.neb p.r.neb)
-                =:  nys.weg  (~(del by nys.weg) s.fud)
-                ::  olz.weg  (~(put by olz.weg) s.fud kay)
+              ::  ~&  [%CARP Q.FUD S.FUD Q.NEB P.R.NEB]
+              ?:  =(Q.NEB P.R.NEB)
+                =:  NYS.WEG  (~(DEL BY NYS.WEG) S.FUD)
+                ::  OLZ.WEG  (~(PUT BY OLZ.WEG) S.FUD KAY)
                   ==
-                (golf p.neb r.neb)
-              =.  +>.$  cock
-              +>.$(nys.weg (~(put by nys.weg) s.fud neb))
+                (GOLF P.NEB R.NEB)
+              =.  +>.$  COCK
+              +>.$(NYS.WEG (~(PUT BY NYS.WEG) S.FUD NEB))
             ::
-                %fore
-              =+  ^=  lyn  ^-  lane
-                  ?~  q.fud  ryn
-                  ?.  ?=(%if -.u.q.fud)  u.q.fud
-                  [%ix +.u.q.fud]
-                  ::  u.q.fud
-              ?:  =(our p.fud)
-                (emit %mead lyn r.fud)
-              =/  zid  (myx:gus p.fud)
-              =/  zon  %*(xong ..xong her p.fud)
-              =/  fro=(list ship)  (saxo-scry our)
-              (emir (wist:zid now (zon fro) [~ lyn] r.fud))
+                %FORE
+              =+  ^=  LYN  ^-  LANE
+                  ?~  Q.FUD  RYN
+                  ?.  ?=(%IF -.U.Q.FUD)  U.Q.FUD
+                  [%IX +.U.Q.FUD]
+                  ::  U.Q.FUD
+              ?:  =(OUR P.FUD)
+                (EMIT %MEAD LYN R.FUD)
+              =/  ZID  (MYX:GUS P.FUD)
+              =/  ZON  %*(XONG ..XONG HER P.FUD)
+              =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+              (EMIR (WIST:ZID NOW (ZON FRO) [~ LYN] R.FUD))
             ==
           ::
-          ++  emir                                      ::    emir:la:ho:um:am
-            |=  ben=(list boon)                         ::  emit boons
+          ++  EMIR                                      ::    EMIR:LA:HO:UM:AM
+            |=  BEN=(LIST BOON)                         ::  EMIT BOONS
             ^+  +>
-            ?~(ben +> $(ben t.ben, bin [i.ben bin]))
+            ?~(BEN +> $(BEN T.BEN, BIN [I.BEN BIN]))
           ::
-          ++  emit                                      ::    emit:la:ho:um:am
-            |=  bun=boon                                ::  emit a boon
-            +>(bin [bun bin])
+          ++  EMIT                                      ::    EMIT:LA:HO:UM:AM
+            |=  BUN=BOON                                ::  EMIT A BOON
+            +>(BIN [BUN BIN])
           ::
-          ++  golf                                      ::    golf:la:ho:um:am
-            |=  [sin=skin duv=dove]                     ::  assemble fragments
+          ++  GOLF                                      ::    GOLF:LA:HO:UM:AM
+            |=  [SIN=SKIN DUV=DOVE]                     ::  ASSEMBLE FRAGMENTS
             ^+  +>
-            %+  chew  sin
-            =+  [nix=0 rax=*(list @)]
+            %+  CHEW  SIN
+            =+  [NIX=0 RAX=*(LIST @)]
             |-  ^-  @
-            ?:  =(p.duv nix)
-              (can 13 (turn (flop rax) |=(a=@ [1 a])))
-            $(nix +(nix), rax [(need (~(get by q.duv) nix)) rax])
-          --                                            ::  --la:ho:um:am
+            ?:  =(P.DUV NIX)
+              (CAN 13 (TURN (FLOP RAX) |=(A=@ [1 A])))
+            $(NIX +(NIX), RAX [(NEED (~(GET BY Q.DUV) NIX)) RAX])
+          --                                            ::  --LA:HO:UM:AM
         ::
-        ++  pong                                        ::    pong:ho:um:am
-          |=  hen=duct                                  ::  test connection
+        ++  PONG                                        ::    PONG:HO:UM:AM
+          |=  HEN=DUCT                                  ::  TEST CONNECTION
           ^+  +>
-          ?.  ?&  =(~ puq.puz)
-                  ?|  bust:puz
-                      ?=(~ rue.puz)
-                      (gth now (add ~s32 u.rue.puz))
-                      (lth u.rue.puz hop.fox)
+          ?.  ?&  =(~ PUQ.PUZ)
+                  ?|  BUST:PUZ
+                      ?=(~ RUE.PUZ)
+                      (GTH NOW (ADD ~S32 U.RUE.PUZ))
+                      (LTH U.RUE.PUZ HOP.FOX)
                   ==
               ==
             +>.$
-          (wool [/a/ping hen] /a/pi ~ |)
+          (WOOL [/A/PING HEN] /A/PI ~ |)
         ::
-        ++  thaw                                        ::    thaw:ho:um:am
-          |=  fro=(list ship)
-          ^+  +>                                        ::  wakeup bomb
-          =+  oub=bust:puz
-          =^  yem  puz  (wack:puz now)
-          =+  bou=bust:puz
-          =.  bin
-              ?.  &(bou !oub)  bin
-              :_(bin [%wine her " not responding still trying"])
-          =.  diz  ?:((boom:puz now) (pode:diz now) diz)
-          (busk (xong fro) yem)
+        ++  THAW                                        ::    THAW:HO:UM:AM
+          |=  FRO=(LIST SHIP)
+          ^+  +>                                        ::  WAKEUP BOMB
+          =+  OUB=BUST:PUZ
+          =^  YEM  PUZ  (WACK:PUZ NOW)
+          =+  BOU=BUST:PUZ
+          =.  BIN
+              ?.  &(BOU !OUB)  BIN
+              :_(BIN [%WINE HER " NOT RESPONDING STILL TRYING"])
+          =.  DIZ  ?:((BOOM:PUZ NOW) (PODE:DIZ NOW) DIZ)
+          (BUSK (XONG FRO) YEM)
         ::
-        ++  tock                                        ::    tock:ho:um:am
-          |=  [cop=coop fap=flap cot=@dr]               ::  e2e ack by hash
+        ++  TOCK                                        ::    TOCK:HO:UM:AM
+          |=  [COP=COOP FAP=FLAP COT=@DR]               ::  E2E ACK BY HASH
           ^+  +>
-          =^  yoh  puz  (bick:puz now fap)
+          =^  YOH  PUZ  (BICK:PUZ NOW FAP)
           =.  +>.$
-            ?~  p.yoh  +>.$
-            =^  hud  +>.$
-              (done p.u.p.yoh q.u.p.yoh)
-            ?~  hud  +>.$
+            ?~  P.YOH  +>.$
+            =^  HUD  +>.$
+              (DONE P.U.P.YOH Q.U.P.YOH)
+            ?~  HUD  +>.$
             %=    +>.$
-                bin
-              :_  bin
-              `boon`[%cake her [[lyf:sen:gus clon:diz] u.p.yoh] cop u.hud]
+                BIN
+              :_  BIN
+              `BOON`[%CAKE HER [[LYF:SEN:GUS CLON:DIZ] U.P.YOH] COP U.HUD]
             ==
-          =/  fro=(list ship)  (saxo-scry our)
-          (busk (xong fro) q.yoh)
+          =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+          (BUSK (XONG FRO) Q.YOH)
         ::
-        ++  wind                                        ::    wind:ho:um:am
-          |=  [gom=soup ham=meal]
-          ::  ~&  [%wind her gom]
+        ++  WIND                                        ::    WIND:HO:UM:AM
+          |=  [GOM=SOUP HAM=MEAL]
+          ::  ~&  [%WIND HER GOM]
           ^+  +>
-          =/  seg  (sein-scry her)
-          =^  wyv  diz  (zuul:diz now seg ham)
-          =^  feh  puz  (whap:puz now gom wyv)
-          =/  fro=(list ship)  (saxo-scry our)
-          (busk (xong fro) feh)
+          =/  SEG  (SEIN-SCRY HER)
+          =^  WYV  DIZ  (ZUUL:DIZ NOW SEG HAM)
+          =^  FEH  PUZ  (WHAP:PUZ NOW GOM WYV)
+          =/  FRO=(LIST SHIP)  (SAXO-SCRY OUR)
+          (BUSK (XONG FRO) FEH)
         ::
-        ++  wool                                        ::    wool:ho:um:am
-          |=  [hen=duct cha=path val=*]                 ::  send a statement
+        ++  WOOL                                        ::    WOOL:HO:UM:AM
+          |=  [HEN=DUCT CHA=PATH VAL=*]                 ::  SEND A STATEMENT
           ^+  +>
-          =/  rol=rill  (fall (~(get by ryl.bah) cha) *rill)
-          =/  sex=@ud  sed.rol
-          ::  ~&  [%tx [our her] cha sex]
-          ::  if we don't have a public key for :her,
-          ::  subscribe to %jael for keys and proceed
+          =/  ROL=RILL  (FALL (~(GET BY RYL.BAH) CHA) *RILL)
+          =/  SEX=@UD  SED.ROL
+          ::  ~&  [%TX [OUR HER] CHA SEX]
+          ::  IF WE DON'T HAVE A PUBLIC KEY FOR :HER,
+          ::  SUBSCRIBE TO %JAEL FOR KEYS AND PROCEED
           ::
-          ::    XX update state so we only ask once?
+          ::    XX UPDATE STATE SO WE ONLY ASK ONCE?
           ::
-          =?  bin  =(~ lew.wod.dur.diz)  :_(bin [%beer her])
-          ::  if we don't have a public key for :her,
-          ::  scry into %jael for them.
-          ::  (skin will only be %open if the scry is ~)
+          =?  BIN  =(~ LEW.WOD.DUR.DIZ)  :_(BIN [%BEER HER])
+          ::  IF WE DON'T HAVE A PUBLIC KEY FOR :HER,
+          ::  SCRY INTO %JAEL FOR THEM.
+          ::  (SKIN WILL ONLY BE %OPEN IF THE SCRY IS ~)
           ::
-          =?  lew.wod.dur.diz  =(~ lew.wod.dur.diz)
-              =/  life  (life-scry her)
-              ?~(life ~ (deed-scry her u.life))
-          =.  ryl.bah
-              %+  ~(put by ryl.bah)  cha
-              %=  rol
-                sed  +(sed.rol)
-                san  (~(put by san.rol) sex hen)
+          =?  LEW.WOD.DUR.DIZ  =(~ LEW.WOD.DUR.DIZ)
+              =/  LIFE  (LIFE-SCRY HER)
+              ?~(LIFE ~ (DEED-SCRY HER U.LIFE))
+          =.  RYL.BAH
+              %+  ~(PUT BY RYL.BAH)  CHA
+              %=  ROL
+                SED  +(SED.ROL)
+                SAN  (~(PUT BY SAN.ROL) SEX HEN)
               ==
-          %+  wind  [cha sex]
-          [%bond cha sex val]
+          %+  WIND  [CHA SEX]
+          [%BOND CHA SEX VAL]
         ::
-        ++  zest                                        ::    zest:ho:um:am
-          :~  :~  :*  [%rtt rtt.sop.bah]
-                      [%rto rto.sop.bah]
-                      [%rtn rtn.sop.bah]
-                      [%rue rue.sop.bah]
+        ++  ZEST                                        ::    ZEST:HO:UM:AM
+          :~  :~  :*  [%RTT RTT.SOP.BAH]
+                      [%RTO RTO.SOP.BAH]
+                      [%RTN RTN.SOP.BAH]
+                      [%RUE RUE.SOP.BAH]
                   ==
-                  :*  [%nus nus.sop.bah]
-                      [%nif nif.sop.bah]
-                      [%nep nep.sop.bah]
-                      [%caw caw.sop.bah]
-                      [%cag cag.sop.bah]
+                  :*  [%NUS NUS.SOP.BAH]
+                      [%NIF NIF.SOP.BAH]
+                      [%NEP NEP.SOP.BAH]
+                      [%CAW CAW.SOP.BAH]
+                      [%CAG CAG.SOP.BAH]
                   ==
-                  =+  qup=~(tap to puq.sop.bah)
-                  :-  %qup
-                  %+  turn  qup
-                  |=  [a=@ud b=soul]
-                  :*  a
-                      nux.b
-                      liv.b
-                      lys.b
-                      `@p`(mug (shaf %flap pac.b))
-                      gom.b
+                  =+  QUP=~(TAP TO PUQ.SOP.BAH)
+                  :-  %QUP
+                  %+  TURN  QUP
+                  |=  [A=@UD B=SOUL]
+                  :*  A
+                      NUX.B
+                      LIV.B
+                      LYS.B
+                      `@P`(MUG (SHAF %FLAP PAC.B))
+                      GOM.B
                   ==
               ==
           ::
-              :-  %raz
-              =+  zar=~(tap by raz.bah)
-              %+  turn  zar
-              |=  [a=path b=race]
-              :+  a
-                did.b
-              =+  ciy=~(tap by mis.b)
-              %+  turn  ciy
-              |=  [c=@ud d=[p=cape q=lane r=flap s=(unit)]]
-              [c p.d r.d]
+              :-  %RAZ
+              =+  ZAR=~(TAP BY RAZ.BAH)
+              %+  TURN  ZAR
+              |=  [A=PATH B=RACE]
+              :+  A
+                DID.B
+              =+  CIY=~(TAP BY MIS.B)
+              %+  TURN  CIY
+              |=  [C=@UD D=[P=CAPE Q=LANE R=FLAP S=(UNIT)]]
+              [C P.D R.D]
           ::
-              [%ryl ~(tap to ryl.bah)]
-              [%lun lun.wod.dur.diz]
-              [%caq caq.dur.diz]
-              [%lew lew.wod.dur.diz]
+              [%RYL ~(TAP TO RYL.BAH)]
+              [%LUN LUN.WOD.DUR.DIZ]
+              [%CAQ CAQ.DUR.DIZ]
+              [%LEW LEW.WOD.DUR.DIZ]
           ==
         ::
-        ++  zank                                        ::    zank:ho:um:am
-          %=  +>.$                                      ::  resolve
-            gus      (nux:gus diz)
-            wab.weg  (~(put by wab.weg) her bah(sop abet:puz))
+        ++  ZANK                                        ::    ZANK:HO:UM:AM
+          %=  +>.$                                      ::  RESOLVE
+            GUS      (NUX:GUS DIZ)
+            WAB.WEG  (~(PUT BY WAB.WEG) HER BAH(SOP ABET:PUZ))
           ==
         ::
-        ++  xong                                        ::    xong:ho:um:am
-          |=  fro=(list ship)
-          ^-  (list ship)                               ::  route unto
-          =/  too  (saxo-scry her)
-          =+  ^=  oot  ^-  (list ship)
-              =|  oot=(list ship)
-              |-  ^+  oot
-              ?~  too  ~
-              ?:  (lien fro |=(a=ship =(a i.too)))  ~
-              [i.too $(too t.too)]
-          ::  ~&  [%xong-to [our her] (weld oot ?>(?=(^ fro) t.fro))]
-          (weld oot ?>(?=(^ fro) t.fro))
-        --                                              ::  --ho:um:am
+        ++  XONG                                        ::    XONG:HO:UM:AM
+          |=  FRO=(LIST SHIP)
+          ^-  (LIST SHIP)                               ::  ROUTE UNTO
+          =/  TOO  (SAXO-SCRY HER)
+          =+  ^=  OOT  ^-  (LIST SHIP)
+              =|  OOT=(LIST SHIP)
+              |-  ^+  OOT
+              ?~  TOO  ~
+              ?:  (LIEN FRO |=(A=SHIP =(A I.TOO)))  ~
+              [I.TOO $(TOO T.TOO)]
+          ::  ~&  [%XONG-TO [OUR HER] (WELD OOT ?>(?=(^ FRO) T.FRO))]
+          (WELD OOT ?>(?=(^ FRO) T.FRO))
+        --                                              ::  --HO:UM:AM
       ::
-      ++  kick                                          ::    kick:um:am
-        |=  hen=duct                                    ::  test connection
+      ++  KICK                                          ::    KICK:UM:AM
+        |=  HEN=DUCT                                    ::  TEST CONNECTION
         ^+  +>
-        =/  hoy  (tail (saxo-scry our))
+        =/  HOY  (TAIL (SAXO-SCRY OUR))
         |-  ^+  +>.^$
-        ?~  hoy
+        ?~  HOY
           +>.^$
-        $(hoy t.hoy, +>.^$ (pong i.hoy hen))
+        $(HOY T.HOY, +>.^$ (PONG I.HOY HEN))
       ::
-      ++  pals                                          ::    pals:um:am
-        ^-  (list @p)                                   ::  active neighbors
-        %+  turn
-          %+  skim  ~(tap by wab.weg)
-          |=  [a=ship b=bath]
-          !(~(boom pu sop.b) now)
-        |=([a=ship b=bath] a)
+      ++  PALS                                          ::    PALS:UM:AM
+        ^-  (LIST @P)                                   ::  ACTIVE NEIGHBORS
+        %+  TURN
+          %+  SKIM  ~(TAP BY WAB.WEG)
+          |=  [A=SHIP B=BATH]
+          !(~(BOOM PU SOP.B) NOW)
+        |=([A=SHIP B=BATH] A)
       ::
-      ++  pong                                          ::    pong:um:am
-        |=  [her=ship hen=duct]                         ::  test neighbor
+      ++  PONG                                          ::    PONG:UM:AM
+        |=  [HER=SHIP HEN=DUCT]                         ::  TEST NEIGHBOR
         ^+  +>
-        zank:(pong:(ho her) hen)
+        ZANK:(PONG:(HO HER) HEN)
       ::
-      ++  zork                                          ::    zork:um:am
-        ^-  [p=(list boon) q=fort]                      ::  resolve
-        :-  (flop bin)
-        %_  fox
-          ton  (~(su go ton.fox) gus)
-          zac  weg
+      ++  ZORK                                          ::    ZORK:UM:AM
+        ^-  [P=(LIST BOON) Q=FORT]                      ::  RESOLVE
+        :-  (FLOP BIN)
+        %_  FOX
+          TON  (~(SU GO TON.FOX) GUS)
+          ZAC  WEG
         ==
-      --                                                ::  --um:am
-    --                                                  ::  --am
+      --                                                ::  --UM:AM
+    --                                                  ::  --AM
   --
   .  ==
   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  ::              section 4aH, protocol vane            ::
+  ::              SECTION 4AH, PROTOCOL VANE            ::
   ::
-  =|  $:  fox=fort                                      ::  kernel state
+  =|  $:  FOX=FORT                                      ::  KERNEL STATE
       ==                                                ::
-  |=  [our=ship now=@da eny=@uvJ ski=sley]              ::  current invocation
-  ^?                                                    ::  opaque core
+  |=  [OUR=SHIP NOW=@DA ENY=@UVJ SKI=SLEY]              ::  CURRENT INVOCATION
+  ^?                                                    ::  OPAQUE CORE
   =<
-    ~%  %ames-protocol  ..is  ~
-    |%                                                  ::  vane interface
-    ++  call                                            ::  handle request
-      ~/  %call
-      |=  $:  hen=duct
-              type=*
-              wrapped-task=(hobo task:able)
+    ~%  %AMES-PROTOCOL  ..IS  ~
+    |%                                                  ::  VANE INTERFACE
+    ++  CALL                                            ::  HANDLE REQUEST
+      ~/  %CALL
+      |=  $:  HEN=DUCT
+              TYPE=*
+              WRAPPED-TASK=(HOBO TASK:ABLE)
           ==
-      ^-  [(list move) _..^$]
-      =/  task=task:able
-        ?.  ?=(%soft -.wrapped-task)
-          wrapped-task
-        ((hard task:able) p.wrapped-task)
-      =.  any.ton.fox  eny
-      =^  duy  ..knob  (knob hen task)
-      [duy ..^$]
+      ^-  [(LIST MOVE) _..^$]
+      =/  TASK=TASK:ABLE
+        ?.  ?=(%SOFT -.WRAPPED-TASK)
+          WRAPPED-TASK
+        ((HARD TASK:ABLE) P.WRAPPED-TASK)
+      =.  ANY.TON.FOX  ENY
+      =^  DUY  ..KNOB  (KNOB HEN TASK)
+      [DUY ..^$]
     ::
-    ++  load
-      |=  old=fort
-      ..^$(fox old)
+    ++  LOAD
+      |=  OLD=FORT
+      ..^$(FOX OLD)
     ::
-    ++  scry
-      |=  [fur=(unit (set monk)) ren=@tas why=shop syd=desk lot=coin tyl=path]
-      ^-  (unit (unit cage))
-      ?.  ?=(%& -.why)  [~ ~]
-      ?~  tyl  [~ ~]
-      =+  hun=(slaw %p i.tyl)
-      ?~  hun  [~ ~]
-      ?.  =(`@`0 ren)  ~
-      ?.  ?=([$$ %da @] lot)
+    ++  SCRY
+      |=  [FUR=(UNIT (SET MONK)) REN=@TAS WHY=SHOP SYD=DESK LOT=COIN TYL=PATH]
+      ^-  (UNIT (UNIT CAGE))
+      ?.  ?=(%& -.WHY)  [~ ~]
+      ?~  TYL  [~ ~]
+      =+  HUN=(SLAW %P I.TYL)
+      ?~  HUN  [~ ~]
+      ?.  =(`@`0 REN)  ~
+      ?.  ?=([$$ %DA @] LOT)
         ~
-      ?.  =(now q.p.lot)  ~
-      (temp u.hun [syd t.tyl])
+      ?.  =(NOW Q.P.LOT)  ~
+      (TEMP U.HUN [SYD T.TYL])
     ::
-    ++  stay  fox
-    ++  take                                            ::  accept response
-      ~/  %take
-      |=  [tea=wire hen=duct hin=(hypo sign:able)]
-      ^-  [(list move) _..^$]
-      =.  any.ton.fox  eny
-      =^  duy  ..knap
-        (knap tea hen q.hin)
-      [duy ..^$]
+    ++  STAY  FOX
+    ++  TAKE                                            ::  ACCEPT RESPONSE
+      ~/  %TAKE
+      |=  [TEA=WIRE HEN=DUCT HIN=(HYPO SIGN:ABLE)]
+      ^-  [(LIST MOVE) _..^$]
+      =.  ANY.TON.FOX  ENY
+      =^  DUY  ..KNAP
+        (KNAP TEA HEN Q.HIN)
+      [DUY ..^$]
     --
-  ~%  %ames-impl  ..is  ~
+  ~%  %AMES-IMPL  ..IS  ~
   |%
-  ++  clop
-    ~/  %clop
-    |=  [now=@da hen=duct bon=boon]
-    ^-  [(list move) fort]
-    ?-    -.bon
-        %beer
-      =/  =wire  /pubs/(scot %p p.bon)
-      :_  fox  [hen [%pass wire %j %pubs p.bon]]~
+  ++  CLOP
+    ~/  %CLOP
+    |=  [NOW=@DA HEN=DUCT BON=BOON]
+    ^-  [(LIST MOVE) FORT]
+    ?-    -.BON
+        %BEER
+      =/  =WIRE  /PUBS/(SCOT %P P.BON)
+      :_  FOX  [HEN [%PASS WIRE %J %PUBS P.BON]]~
     ::
-        %bock
-      :_  fox  [hen %give %turf tuf.fox]~
+        %BOCK
+      :_  FOX  [HEN %GIVE %TURF TUF.FOX]~
     ::
-        %brew
-      :_  fox  [hen [%pass / %j %turf ~]]~
+        %BREW
+      :_  FOX  [HEN [%PASS / %J %TURF ~]]~
     ::
-        %cake
-      ::  ~?  ?=(^ r.bon)  [%cake-woot-bad hen r.bon]
-      :_  fox
-      :~  [s.bon %give %woot p.bon r.bon]
+        %CAKE
+      ::  ~?  ?=(^ R.BON)  [%CAKE-WOOT-BAD HEN R.BON]
+      :_  FOX
+      :~  [S.BON %GIVE %WOOT P.BON R.BON]
       ==
     ::
-        %mead
-      =^  moz  +>.$  (knob hen [%hear p.bon q.bon])
-      [moz fox]
+        %MEAD
+      =^  MOZ  +>.$  (KNOB HEN [%HEAR P.BON Q.BON])
+      [MOZ FOX]
     ::
-        %milk
-      ::  ~&  [%milk p.bon q.bon]
-      ?>  ?=([@ @ *] q.q.bon)
-      ?>  ?=(?(%a %c %e %g %j) i.q.q.bon)
-      =/  =wire  [(scot %p our) (scot %p p.bon) q.q.bon]
-      :_  fox  [hen %pass wire i.q.q.bon %west p.bon t.q.q.bon r.bon]~
+        %MILK
+      ::  ~&  [%MILK P.BON Q.BON]
+      ?>  ?=([@ @ *] Q.Q.BON)
+      ?>  ?=(?(%A %C %E %G %J) I.Q.Q.BON)
+      =/  =WIRE  [(SCOT %P OUR) (SCOT %P P.BON) Q.Q.BON]
+      :_  FOX  [HEN %PASS WIRE I.Q.Q.BON %WEST P.BON T.Q.Q.BON R.BON]~
     ::
-        %ouzo
-      ::  ~&  [%send now p.bon `@p`(mug (shaf %flap q.bon))]
-      ~|  [%ames-bad-duct duct=gad.fox lane=p.bon]
-      ?>  ?=(^ gad.fox)
-      :_  fox
-      [[gad.fox [%give %send p.bon q.bon]] ~]
+        %OUZO
+      ::  ~&  [%SEND NOW P.BON `@P`(MUG (SHAF %FLAP Q.BON))]
+      ~|  [%AMES-BAD-DUCT DUCT=GAD.FOX LANE=P.BON]
+      ?>  ?=(^ GAD.FOX)
+      :_  FOX
+      [[GAD.FOX [%GIVE %SEND P.BON Q.BON]] ~]
     ::
-        %pito
-      :_  fox(tim `p.bon)
-      %-  flop
-      ^-  (list move)
-      :-  [gad.fox %pass /ames %b %wait p.bon]
-      ?~  tim.fox  ~
-      [gad.fox %pass /ames %b %rest u.tim.fox]~
+        %PITO
+      :_  FOX(TIM `P.BON)
+      %-  FLOP
+      ^-  (LIST MOVE)
+      :-  [GAD.FOX %PASS /AMES %B %WAIT P.BON]
+      ?~  TIM.FOX  ~
+      [GAD.FOX %PASS /AMES %B %REST U.TIM.FOX]~
     ::
-        %raki
-      =*  her  p.bon
-      =/  moz=(list move)
-        [hen [%pass / %j %meet her life=q.bon pass=r.bon]]~
-      ::  poke :dns with an indirect binding if her is a planet we're spnsoring
+        %RAKI
+      =*  HER  P.BON
+      =/  MOZ=(LIST MOVE)
+        [HEN [%PASS / %J %MEET HER LIFE=Q.BON PASS=R.BON]]~
+      ::  POKE :DNS WITH AN INDIRECT BINDING IF HER IS A PLANET WE'RE SPNSORING
       ::
-      =?  moz  ?&  ?=(%duke (clan:title her))
-                   ?=(%king (clan:title our))
-                   =(our (~(sein-scry am [our now fox ski]) her))
+      =?  MOZ  ?&  ?=(%DUKE (CLAN:TITLE HER))
+                   ?=(%KING (CLAN:TITLE OUR))
+                   =(OUR (~(SEIN-SCRY AM [OUR NOW FOX SKI]) HER))
                ==
-        =/  cmd  [%meet her]
-        =/  pok  [%dns %poke `cage`[%dns-command !>(cmd)]]
-        :_  moz  [hen [%pass / %g %deal [our our] pok]]
-      [moz fox]
+        =/  CMD  [%MEET HER]
+        =/  POK  [%DNS %POKE `CAGE`[%DNS-COMMAND !>(CMD)]]
+        :_  MOZ  [HEN [%PASS / %G %DEAL [OUR OUR] POK]]
+      [MOZ FOX]
     ::
-        %sake
-      =/  =wire  /our/(scot %p our)
-      :_  fox  [hen [%pass wire %j %vein ~]]~
+        %SAKE
+      =/  =WIRE  /OUR/(SCOT %P OUR)
+      :_  FOX  [HEN [%PASS WIRE %J %VEIN ~]]~
     ::
-        %wine
-      :_  fox
-      =+  fom=~(rend co %$ %p p.bon)
-      :~  :-  hen
-          :+  %slip  %d
-          :+  %flog  %text
-          ;:  weld
+        %WINE
+      :_  FOX
+      =+  FOM=~(REND CO %$ %P P.BON)
+      :~  :-  HEN
+          :+  %SLIP  %D
+          :+  %FLOG  %TEXT
+          ;:  WELD
             "; "
-            fom
-            q.bon
+            FOM
+            Q.BON
           ==
       ==
     ==
   ::
-  ++  knap
-    ~/  %knap
-    |=  [tea=wire hen=duct sih=sign:able]
-    ^-  [(list move) _+>]
-    ?-  +<.sih
-        %crud  [[[hen [%slip %d %flog +.sih]] ~] +>]
+  ++  KNAP
+    ~/  %KNAP
+    |=  [TEA=WIRE HEN=DUCT SIH=SIGN:ABLE]
+    ^-  [(LIST MOVE) _+>]
+    ?-  +<.SIH
+        %CRUD  [[[HEN [%SLIP %D %FLOG +.SIH]] ~] +>]
     ::
-        %mack  ?~  +>.sih  $(sih [%g %nice ~])          ::  XX using old code
-               $(sih [%g %mean `[%mack +>+.sih]])
+        %MACK  ?~  +>.SIH  $(SIH [%G %NICE ~])          ::  XX USING OLD CODE
+               $(SIH [%G %MEAN `[%MACK +>+.SIH]])
     ::
-        %turf
-      =.  tuf.fox  turf.sih
+        %TURF
+      =.  TUF.FOX  TURF.SIH
       [~ +>.$]
     ::
-        %pubs
-      ?.  ?=([%pubs @ ~] tea)
-        ~&  [%strange-pubs tea]
+        %PUBS
+      ?.  ?=([%PUBS @ ~] TEA)
+        ~&  [%STRANGE-PUBS TEA]
         [~ +>]
-      =/  her=ship  (slav %p i.t.tea)
-      =/  gus  (~(us go ton.fox) our)
-      =/  diz  (myx:gus her)
-      ?:  =(0 life.sih)
-          ::  this should clear lew.wod.dur.diz because it means
-          ::  we no longer trust that their public key came to
-          ::  us honestly (becuse of a %jael snapshot restore).
-          ::  in practice, that crashes in ++cluy:las:as:go, so
-          ::  we ignore for now.
-          ~&  [%ames-hear-empty-pub her]
+      =/  HER=SHIP  (SLAV %P I.T.TEA)
+      =/  GUS  (~(US GO TON.FOX) OUR)
+      =/  DIZ  (MYX:GUS HER)
+      ?:  =(0 LIFE.SIH)
+          ::  THIS SHOULD CLEAR LEW.WOD.DUR.DIZ BECAUSE IT MEANS
+          ::  WE NO LONGER TRUST THAT THEIR PUBLIC KEY CAME TO
+          ::  US HONESTLY (BECUSE OF A %JAEL SNAPSHOT RESTORE).
+          ::  IN PRACTICE, THAT CRASHES IN ++CLUY:LAS:AS:GO, SO
+          ::  WE IGNORE FOR NOW.
+          ~&  [%AMES-HEAR-EMPTY-PUB HER]
           [~ +>.$]
-      =/  ded=deed
-        [life.sih (~(got by pubs.sih) life.sih) oath=~]
-      =.  lew.wod.dur.diz  `ded
-      =.  ton.fox  (~(su go ton.fox) (nux:gus diz))
+      =/  DED=DEED
+        [LIFE.SIH (~(GOT BY PUBS.SIH) LIFE.SIH) OATH=~]
+      =.  LEW.WOD.DUR.DIZ  `DED
+      =.  TON.FOX  (~(SU GO TON.FOX) (NUX:GUS DIZ))
       [~ +>.$]
     ::
-        %unto  [~ +>]
+        %UNTO  [~ +>]
     ::
-        %vein
-      ?.  ?=([%our @ ~] tea)
-        ~&  [%strange-vein tea]
+        %VEIN
+      ?.  ?=([%OUR @ ~] TEA)
+        ~&  [%STRANGE-VEIN TEA]
         [~ +>]
-      =.  fox  (~(vein am [our now fox ski]) life.sih vein.sih)
+      =.  FOX  (~(VEIN AM [OUR NOW FOX SKI]) LIFE.SIH VEIN.SIH)
       [~ +>.$]
     ::
-        %woot  [~ +>]
+        %WOOT  [~ +>]
     ::
         *
-      =+  ^=  fuy
-        ^-  [p=(list boon) q=fort]
-        ?-  +<.sih
+      =+  ^=  FUY
+        ^-  [P=(LIST BOON) Q=FORT]
+        ?-  +<.SIH
         ::
-            %wake
-          (~(wake am [our now fox ski]) hen)
+            %WAKE
+          (~(WAKE AM [OUR NOW FOX SKI]) HEN)
         ::
-            ?(%mean %nice)                              ::  XX obsolete
-          ?:  ?=([%ye ~] tea)
-            [~ fox]
-          ?>  ?=([@ @ @ *] tea)
-          =/  her  (slav %p i.t.tea)
-          =*  pax  t.t.tea
-          =<  zork  =<  zank
-          %^  ~(rack am [our now fox ski])  her  pax
-          ::  ~&  [%knap-ack ?-(+<.sih %mean `p.+.sih, %nice ~)]
-          ?-(+<.sih %mean `p.+.sih, %nice ~)
+            ?(%MEAN %NICE)                              ::  XX OBSOLETE
+          ?:  ?=([%YE ~] TEA)
+            [~ FOX]
+          ?>  ?=([@ @ @ *] TEA)
+          =/  HER  (SLAV %P I.T.TEA)
+          =*  PAX  T.T.TEA
+          =<  ZORK  =<  ZANK
+          %^  ~(RACK AM [OUR NOW FOX SKI])  HER  PAX
+          ::  ~&  [%KNAP-ACK ?-(+<.SIH %MEAN `P.+.SIH, %NICE ~)]
+          ?-(+<.SIH %MEAN `P.+.SIH, %NICE ~)
         ==
-      =>  %_(. fox q.fuy)
-      =|  out=(list move)
-      |-  ^-  [p=(list move) q=_+>.^$]
-      ?~  p.fuy
-        [(flop out) +>.^$]
-      =^  toe  fox  (clop now hen i.p.fuy)
-      $(p.fuy t.p.fuy, out (weld (flop toe) out))
+      =>  %_(. FOX Q.FUY)
+      =|  OUT=(LIST MOVE)
+      |-  ^-  [P=(LIST MOVE) Q=_+>.^$]
+      ?~  P.FUY
+        [(FLOP OUT) +>.^$]
+      =^  TOE  FOX  (CLOP NOW HEN I.P.FUY)
+      $(P.FUY T.P.FUY, OUT (WELD (FLOP TOE) OUT))
     ==
   ::
-  ++  knob
-    ~/  %knob
-    |=  [hen=duct kyz=task:able]
-    ^-  [(list move) _+>]
-    ?:  ?=(%crud -.kyz)
-      [[[hen [%slip %d %flog kyz]] ~] +>]
-    ?:  ?=(%west -.kyz)
-      ?>  ?=([%pi ~] q.kyz)
+  ++  KNOB
+    ~/  %KNOB
+    |=  [HEN=DUCT KYZ=TASK:ABLE]
+    ^-  [(LIST MOVE) _+>]
+    ?:  ?=(%CRUD -.KYZ)
+      [[[HEN [%SLIP %D %FLOG KYZ]] ~] +>]
+    ?:  ?=(%WEST -.KYZ)
+      ?>  ?=([%PI ~] Q.KYZ)
       :_  +>.$
-      [[hen %give %mack ~] ~]
-    ?:  ?=(%wegh -.kyz)
-      ~&  %ames-weighing
-      [[hen %give %mass wegh]~ +>]
-    =+  ^=  fuy
-        ^-  [p=(list boon) q=fort]
-        ?-    -.kyz
-            %barn
-          :_  fox(gad hen)
-          [%bock ~]~
+      [[HEN %GIVE %MACK ~] ~]
+    ?:  ?=(%WEGH -.KYZ)
+      ~&  %AMES-WEIGHING
+      [[HEN %GIVE %MASS WEGH]~ +>]
+    =+  ^=  FUY
+        ^-  [P=(LIST BOON) Q=FORT]
+        ?-    -.KYZ
+            %BARN
+          :_  FOX(GAD HEN)
+          [%BOCK ~]~
         ::
-            %bonk
-          :_  fox
-          ?~  tim.fox
-            ~&  %ames-bonk-e
+            %BONK
+          :_  FOX
+          ?~  TIM.FOX
+            ~&  %AMES-BONK-E
             ~
-          [%pito u.tim.fox]~
+          [%PITO U.TIM.FOX]~
         ::
-            %hear
-          (~(gnaw am [our now fox ski]) %good p.kyz q.kyz)
+            %HEAR
+          (~(GNAW AM [OUR NOW FOX SKI]) %GOOD P.KYZ Q.KYZ)
         ::
-            %halo
-          (~(gnaw am [our now fox ski]) %dead p.kyz q.kyz)
+            %HALO
+          (~(GNAW AM [OUR NOW FOX SKI]) %DEAD P.KYZ Q.KYZ)
         ::
-            %hole
-          (~(gnaw am [our now fox ski]) %dead p.kyz q.kyz)
+            %HOLE
+          (~(GNAW AM [OUR NOW FOX SKI]) %DEAD P.KYZ Q.KYZ)
         ::
-            %init
-          :_  fox  [[%sake ~] [%brew ~] ~]
+            %INIT
+          :_  FOX  [[%SAKE ~] [%BREW ~] ~]
         ::
-            %kick
-          =^  ban  fox  (~(kick am [our now fox(hop p.kyz) ski]) hen)
-          ::  +next:am called here because +wake calls +kick in a loop
+            %KICK
+          =^  BAN  FOX  (~(KICK AM [OUR NOW FOX(HOP P.KYZ) SKI]) HEN)
+          ::  +NEXT:AM CALLED HERE BECAUSE +WAKE CALLS +KICK IN A LOOP
           ::
-          [(weld p.ban ~(next am [our now fox ski])) fox]
+          [(WELD P.BAN ~(NEXT AM [OUR NOW FOX SKI])) FOX]
         ::
-            %nuke
+            %NUKE
           :-  ~
-          ?:  (~(has in bad.fox) p.kyz)
-            ~&  [%unblock p.kyz]
-            fox(bad (~(del in bad.fox) p.kyz))
-          ~&  [%block p.kyz]
-          fox(bad (~(put in bad.fox) p.kyz))
+          ?:  (~(HAS IN BAD.FOX) P.KYZ)
+            ~&  [%UNBLOCK P.KYZ]
+            FOX(BAD (~(DEL IN BAD.FOX) P.KYZ))
+          ~&  [%BLOCK P.KYZ]
+          FOX(BAD (~(PUT IN BAD.FOX) P.KYZ))
         ::
-            %sunk
-          =*  who  p.kyz
-          =*  lyf  q.kyz
-          ?:  =(our who)
-            ?:  (lth lyf p:(head val.ton.fox))
-              ::  replaying our old sinkage, ignore
-              ::  XX review
+            %SUNK
+          =*  WHO  P.KYZ
+          =*  LYF  Q.KYZ
+          ?:  =(OUR WHO)
+            ?:  (LTH LYF P:(HEAD VAL.TON.FOX))
+              ::  REPLAYING OUR OLD SINKAGE, IGNORE
+              ::  XX REVIEW
               ::
-              [~ fox]
-            ::  XX include some helpful instructions here
+              [~ FOX]
+            ::  XX INCLUDE SOME HELPFUL INSTRUCTIONS HERE
             ::
-            :_  fox
-            [%wine who ", you have sunk"]~
+            :_  FOX
+            [%WINE WHO ", YOU HAVE SUNK"]~
           ::
-          =:  hoc.ton.fox  (~(del by hoc.ton.fox) who)
-              wab.zac.fox  (~(del by wab.zac.fox) who)
+          =:  HOC.TON.FOX  (~(DEL BY HOC.TON.FOX) WHO)
+              WAB.ZAC.FOX  (~(DEL BY WAB.ZAC.FOX) WHO)
             ==
-          [[%wine who " has sunk"]~ fox]
+          [[%WINE WHO " HAS SUNK"]~ FOX]
         ::
-            %vega
-          ::  re-initialize our cryptosuite B cores
+            %VEGA
+          ::  RE-INITIALIZE OUR CRYPTOSUITE B CORES
           ::
-          =/  =wund
-            %+  turn
-              val.ton.fox
-            |=  [=life =ring *]
-            [life ring (nol:nu:crub:crypto ring)]
-          [~ fox(val.ton wund)]
+          =/  =WUND
+            %+  TURN
+              VAL.TON.FOX
+            |=  [=LIFE =RING *]
+            [LIFE RING (NOL:NU:CRUB:CRYPTO RING)]
+          [~ FOX(VAL.TON WUND)]
         ::
-            %wake
-          (~(wake am [our now fox ski]) hen)
+            %WAKE
+          (~(WAKE AM [OUR NOW FOX SKI]) HEN)
         ::
-            %want
-          (~(wise am [our now fox ski]) hen p.kyz q.kyz r.kyz)
+            %WANT
+          (~(WISE AM [OUR NOW FOX SKI]) HEN P.KYZ Q.KYZ R.KYZ)
         ==
-    =>  %_(. fox q.fuy)
-    =|  out=(list move)
-    |-  ^-  [p=(list move) q=_+>.^$]
-    ?~  p.fuy
-      [(flop out) +>.^$]
-    =^  toe  fox  (clop now hen i.p.fuy)
-    $(p.fuy t.p.fuy, out (weld (flop toe) out))
+    =>  %_(. FOX Q.FUY)
+    =|  OUT=(LIST MOVE)
+    |-  ^-  [P=(LIST MOVE) Q=_+>.^$]
+    ?~  P.FUY
+      [(FLOP OUT) +>.^$]
+    =^  TOE  FOX  (CLOP NOW HEN I.P.FUY)
+    $(P.FUY T.P.FUY, OUT (WELD (FLOP TOE) OUT))
   ::
-  ++  temp
-    ~/  %temp
-    |=  [his=ship tyl=path]
-    ^-  (unit (unit cage))
-    ?:  ?=([?(%show %tell) *] tyl)
-      ?^  t.tyl  [~ ~]
-      =+  zet=zest:(ho:~(um am [our now fox ski]) his)
-      ``[%noun ?:(=(%show i.tyl) !>(>zet<) !>(zet))]
-    ?:  ?=([%pals ~] tyl)
-      ?.  =(our his)
+  ++  TEMP
+    ~/  %TEMP
+    |=  [HIS=SHIP TYL=PATH]
+    ^-  (UNIT (UNIT CAGE))
+    ?:  ?=([?(%SHOW %TELL) *] TYL)
+      ?^  T.TYL  [~ ~]
+      =+  ZET=ZEST:(HO:~(UM AM [OUR NOW FOX SKI]) HIS)
+      ``[%NOUN ?:(=(%SHOW I.TYL) !>(>ZET<) !>(ZET))]
+    ?:  ?=([%PALS ~] TYL)
+      ?.  =(OUR HIS)
         ~
-      ``[%noun !>(pals:~(um am [our now fox ski]))]
-    ?:  ?=([%time ~] tyl)
-      ?.  =(our his)
+      ``[%NOUN !>(PALS:~(UM AM [OUR NOW FOX SKI]))]
+    ?:  ?=([%TIME ~] TYL)
+      ?.  =(OUR HIS)
         ~
-      ``[%noun !>(tim.fox)]
+      ``[%NOUN !>(TIM.FOX)]
     ~
   ::
-  ++  wegh
-    ^-  mass
-    :+  %ames  %|
-    :~  :+  %town  %|
-        =>  ton.fox
-        :~  wund+&+val
-            deed+&+law
-            fast+&+seh
-            them+&+hoc
+  ++  WEGH
+    ^-  MASS
+    :+  %AMES  %|
+    :~  :+  %TOWN  %|
+        =>  TON.FOX
+        :~  WUND+&+VAL
+            DEED+&+LAW
+            FAST+&+SEH
+            THEM+&+HOC
         ==
-        :+  %corn  %|
-        =>  zac.fox
-        :~  incoming+&+nys
-            complete+&+olz
-            neighbor+&+wab
+        :+  %CORN  %|
+        =>  ZAC.FOX
+        :~  INCOMING+&+NYS
+            COMPLETE+&+OLZ
+            NEIGHBOR+&+WAB
         ==
-        dot+&+fox
+        DOT+&+FOX
     ==
   --

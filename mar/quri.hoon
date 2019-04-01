@@ -1,17 +1,17 @@
 ::
-::::  /hoon/quri/mar
+::::  /HOON/QURI/MAR
   ::
 /?    310
-=,  eyre
-=,  mimes:html
-=,  html
-|_  url/quri
+=,  EYRE
+=,  MIMES:HTML
+=,  HTML
+|_  URL/QURI
 ::
-++  grow  |%    ++  mime  [text+/x-uri (as-octt (apex:en-purl url))]
+++  GROW  |%    ++  MIME  [TEXT+/X-URI (AS-OCTT (APEX:EN-PURL URL))]
           --
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  quri                                        ::  clam from %noun
-  ++  mime  |=(mim/^mime (rash q.q.mim zest:de-purl))
+  ++  NOUN  QURI                                        ::  CLAM FROM %NOUN
+  ++  MIME  |=(MIM/^MIME (RASH Q.Q.MIM ZEST:DE-PURL))
   --
 --

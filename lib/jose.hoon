@@ -1,214 +1,214 @@
-/+  base64, primitive-rsa, *pkcs
-=*  rsa  primitive-rsa
+/+  BASE64, PRIMITIVE-RSA, *PKCS
+=*  RSA  PRIMITIVE-RSA
 |%
-::  +en-base64url: url-safe base64 encoding, without padding
+::  +EN-BASE64URL: URL-SAFE BASE64 ENCODING, WITHOUT PADDING
 ::
-++  en-base64url
-  ~(en base64 | &)
-::  +de-base64url: url-safe base64 decoding, without padding
+++  EN-BASE64URL
+  ~(EN BASE64 | &)
+::  +DE-BASE64URL: URL-SAFE BASE64 DECODING, WITHOUT PADDING
 ::
-++  de-base64url
-  ~(de base64 | &)
-::  |octn: encode/decode unsigned atoms as big-endian octet stream
+++  DE-BASE64URL
+  ~(DE BASE64 | &)
+::  |OCTN: ENCODE/DECODE UNSIGNED ATOMS AS BIG-ENDIAN OCTET STREAM
 ::
-++  octn
+++  OCTN
   |%
-  ++  en  |=(a=@u `octs`[(met 3 a) (swp 3 a)])
-  ++  de  |=(a=octs `@u`(rev 3 p.a q.a))
+  ++  EN  |=(A=@U `OCTS`[(MET 3 A) (SWP 3 A)])
+  ++  DE  |=(A=OCTS `@U`(REV 3 P.A Q.A))
   --
-::  +eor: explicit sort order comparator
+::  +EOR: EXPLICIT SORT ORDER COMPARATOR
 ::
-::    Lookup :a and :b in :lit, and pass their indices to :com.
+::    LOOKUP :A AND :B IN :LIT, AND PASS THEIR INDICES TO :COM.
 ::
-++  eor
-  |=  [com=$-([@ @] ?) lit=(list)]
-  |=  [a=* b=*]
+++  EOR
+  |=  [COM=$-([@ @] ?) LIT=(LIST)]
+  |=  [A=* B=*]
   ^-  ?
-  (fall (bind (both (find ~[a] lit) (find ~[b] lit)) com) |)
-::  +en-json-sort: json encoding with sorted object keys
+  (FALL (BIND (BOTH (FIND ~[A] LIT) (FIND ~[B] LIT)) COM) |)
+::  +EN-JSON-SORT: JSON ENCODING WITH SORTED OBJECT KEYS
 ::
-::    XX move %zuse with sorting optional?
+::    XX MOVE %ZUSE WITH SORTING OPTIONAL?
 ::
-++  en-json-sort                                 ::  XX rename
-  |^  |=([sor=$-(^ ?) val=json] (apex val sor ""))
-  ::                                                  ::  ++apex:en-json:html
-  ++  apex
-    =,  en-json:html
-    |=  {val/json sor/$-(^ ?) rez/tape}
-    ^-  tape
-    ?~  val  (weld "null" rez)
-    ?-    -.val
-        $a
+++  EN-JSON-SORT                                 ::  XX RENAME
+  |^  |=([SOR=$-(^ ?) VAL=JSON] (APEX VAL SOR ""))
+  ::                                                  ::  ++APEX:EN-JSON:HTML
+  ++  APEX
+    =,  EN-JSON:HTML
+    |=  {VAL/JSON SOR/$-(^ ?) REZ/TAPE}
+    ^-  TAPE
+    ?~  VAL  (WELD "NULL" REZ)
+    ?-    -.VAL
+        $A
       :-  '['
-      =.  rez  [']' rez]
+      =.  REZ  [']' REZ]
       !.
-      ?~  p.val  rez
+      ?~  P.VAL  REZ
       |-
-      ?~  t.p.val  ^$(val i.p.val)
-      ^$(val i.p.val, rez [',' $(p.val t.p.val)])
+      ?~  T.P.VAL  ^$(VAL I.P.VAL)
+      ^$(VAL I.P.VAL, REZ [',' $(P.VAL T.P.VAL)])
    ::
-        $b  (weld ?:(p.val "true" "false") rez)
-        $n  (weld (trip p.val) rez)
-        $s
+        $B  (WELD ?:(P.VAL "TRUE" "FALSE") REZ)
+        $N  (WELD (TRIP P.VAL) REZ)
+        $S
       :-  '"'
-      =.  rez  ['"' rez]
-      =+  viz=(trip p.val)
+      =.  REZ  ['"' REZ]
+      =+  VIZ=(TRIP P.VAL)
       !.
-      |-  ^-  tape
-      ?~  viz  rez
-      =+  hed=(jesc i.viz)
-      ?:  ?=({@ $~} hed)
-        [i.hed $(viz t.viz)]
-      (weld hed $(viz t.viz))
+      |-  ^-  TAPE
+      ?~  VIZ  REZ
+      =+  HED=(JESC I.VIZ)
+      ?:  ?=({@ $~} HED)
+        [I.HED $(VIZ T.VIZ)]
+      (WELD HED $(VIZ T.VIZ))
    ::
-        $o
+        $O
       :-  '{'
-      =.  rez  ['}' rez]
-      =/  viz
-        %+  sort  ~(tap by p.val)
-        |=((pair) (sor (head p) (head q)))
-      ?~  viz  rez
+      =.  REZ  ['}' REZ]
+      =/  VIZ
+        %+  SORT  ~(TAP BY P.VAL)
+        |=((PAIR) (SOR (HEAD P) (HEAD Q)))
+      ?~  VIZ  REZ
       !.
-      |-  ^+  rez
-      ?~  t.viz  ^$(val [%s p.i.viz], rez [':' ^$(val q.i.viz)])
-      =.  rez  [',' $(viz t.viz)]
-      ^$(val [%s p.i.viz], rez [':' ^$(val q.i.viz)])
+      |-  ^+  REZ
+      ?~  T.VIZ  ^$(VAL [%S P.I.VIZ], REZ [':' ^$(VAL Q.I.VIZ)])
+      =.  REZ  [',' $(VIZ T.VIZ)]
+      ^$(VAL [%S P.I.VIZ], REZ [':' ^$(VAL Q.I.VIZ)])
     ==
   --
-::  %/lib/jose
+::  %/LIB/JOSE
 ::
-::  |jwk: json representations of cryptographic keys (rfc7517)
+::  |JWK: JSON REPRESENTATIONS OF CRYPTOGRAPHIC KEYS (RFC7517)
 ::
-::    Url-safe base64 encoding of key parameters in big-endian byte order.
-::    RSA-only for now
+::    URL-SAFE BASE64 ENCODING OF KEY PARAMETERS IN BIG-ENDIAN BYTE ORDER.
+::    RSA-ONLY FOR NOW
 ::
-++  jwk
+++  JWK
   |%
-  ::  |en:jwk: encoding of json cryptographic keys
+  ::  |EN:JWK: ENCODING OF JSON CRYPTOGRAPHIC KEYS
   ::
-  ++  en
+  ++  EN
     =>  |%
-        ::  +numb:en:jwk: base64-url encode big-endian number
+        ::  +NUMB:EN:JWK: BASE64-URL ENCODE BIG-ENDIAN NUMBER
         ::
-        ++  numb  (corl en-base64url en:octn)
+        ++  NUMB  (CORL EN-BASE64URL EN:OCTN)
         --
     |%
-    ::  +pass:en:jwk: json encode public key
+    ::  +PASS:EN:JWK: JSON ENCODE PUBLIC KEY
     ::
-    ++  pass
-      |=  k=key:rsa
-      ^-  json
-      [%o (my kty+s+'RSA' n+s+(numb n.pub.k) e+s+(numb e.pub.k) ~)]
-    ::  +ring:en:jwk: json encode private key
+    ++  PASS
+      |=  K=KEY:RSA
+      ^-  JSON
+      [%O (MY KTY+S+'RSA' N+S+(NUMB N.PUB.K) E+S+(NUMB E.PUB.K) ~)]
+    ::  +RING:EN:JWK: JSON ENCODE PRIVATE KEY
     ::
-    ++  ring
-      |=  k=key:rsa
-      ^-  json
-      ~|  %rsa-need-ring
-      ?>  ?=(^ sek.k)
-      :-  %o  %-  my  :~
-        kty+s+'RSA'
-        n+s+(numb n.pub.k)
-        e+s+(numb e.pub.k)
-        d+s+(numb d.u.sek.k)
-        p+s+(numb p.u.sek.k)
-        q+s+(numb q.u.sek.k)
+    ++  RING
+      |=  K=KEY:RSA
+      ^-  JSON
+      ~|  %RSA-NEED-RING
+      ?>  ?=(^ SEK.K)
+      :-  %O  %-  MY  :~
+        KTY+S+'RSA'
+        N+S+(NUMB N.PUB.K)
+        E+S+(NUMB E.PUB.K)
+        D+S+(NUMB D.U.SEK.K)
+        P+S+(NUMB P.U.SEK.K)
+        Q+S+(NUMB Q.U.SEK.K)
       ==
     --
-  ::  |de:jwk: decoding of json cryptographic keys
+  ::  |DE:JWK: DECODING OF JSON CRYPTOGRAPHIC KEYS
   ::
-  ++  de
-    =,  dejs-soft:format
+  ++  DE
+    =,  DEJS-SOFT:FORMAT
     =>  |%
-        ::  +numb:de:jwk: parse base64-url big-endian number
+        ::  +NUMB:DE:JWK: PARSE BASE64-URL BIG-ENDIAN NUMBER
         ::
-        ++  numb  (cu (cork de-base64url (lift de:octn)) so)
+        ++  NUMB  (CU (CORK DE-BASE64URL (LIFT DE:OCTN)) SO)
         --
     |%
-    ::  +pass:de:jwk: decode json public key
+    ::  +PASS:DE:JWK: DECODE JSON PUBLIC KEY
     ::
-    ++  pass
-      %+  ci
-        =/  a  (unit @ux)
-        |=  [kty=@t n=a e=a]
-        ^-  (unit key:rsa)
-        =/  pub  (both n e)
-        ?~(pub ~ `[u.pub ~])
-      (ot kty+(su (jest 'RSA')) n+numb e+numb ~)
-    ::  +ring:de:jwk: decode json private key
+    ++  PASS
+      %+  CI
+        =/  A  (UNIT @UX)
+        |=  [KTY=@T N=A E=A]
+        ^-  (UNIT KEY:RSA)
+        =/  PUB  (BOTH N E)
+        ?~(PUB ~ `[U.PUB ~])
+      (OT KTY+(SU (JEST 'RSA')) N+NUMB E+NUMB ~)
+    ::  +RING:DE:JWK: DECODE JSON PRIVATE KEY
     ::
-    ++  ring
-      %+  ci
-        =/  a  (unit @ux)
-        |=  [kty=@t n=a e=a d=a p=a q=a]
-        ^-  (unit key:rsa)
-        =/  pub  (both n e)
-        =/  sek  :(both d p q)
-        ?:(|(?=(~ pub) ?=(~ sek)) ~ `[u.pub sek])
-      (ot kty+(su (jest 'RSA')) n+numb e+numb d+numb p+numb q+numb ~)
+    ++  RING
+      %+  CI
+        =/  A  (UNIT @UX)
+        |=  [KTY=@T N=A E=A D=A P=A Q=A]
+        ^-  (UNIT KEY:RSA)
+        =/  PUB  (BOTH N E)
+        =/  SEK  :(BOTH D P Q)
+        ?:(|(?=(~ PUB) ?=(~ SEK)) ~ `[U.PUB SEK])
+      (OT KTY+(SU (JEST 'RSA')) N+NUMB E+NUMB D+NUMB P+NUMB Q+NUMB ~)
     --
-  ::  |thumb:jwk: "thumbprint" json-encoded key (rfc7638)
+  ::  |THUMB:JWK: "THUMBPRINT" JSON-ENCODED KEY (RFC7638)
   ::
-  ++  thumb
+  ++  THUMB
     |%
-    ::  +pass:thumb:jwk: thumbprint json-encoded public key
+    ::  +PASS:THUMB:JWK: THUMBPRINT JSON-ENCODED PUBLIC KEY
     ::
-    ++  pass
-      |=  k=key:rsa
-      (en-base64url 32 (shax (crip (en-json-sort aor (pass:en k)))))
-    ::  +ring:thumb:jwk: thumbprint json-encoded private key
+    ++  PASS
+      |=  K=KEY:RSA
+      (EN-BASE64URL 32 (SHAX (CRIP (EN-JSON-SORT AOR (PASS:EN K)))))
+    ::  +RING:THUMB:JWK: THUMBPRINT JSON-ENCODED PRIVATE KEY
     ::
-    ++  ring  !!
+    ++  RING  !!
     --
   --
-::  |jws: json web signatures (rfc7515)
+::  |JWS: JSON WEB SIGNATURES (RFC7515)
 ::
-::    Note: flattened signature form only.
+::    NOTE: FLATTENED SIGNATURE FORM ONLY.
 ::
-++  jws
+++  JWS
   |%
-  ::  +sign:jws: sign json value
+  ::  +SIGN:JWS: SIGN JSON VALUE
   ::
-  ++  sign
-    |=  [k=key:rsa pro=json lod=json]
-    |^  ^-  json
-        =.  pro  header
-        =/  protect=cord  (encode pro)
-        =/  payload=cord  (encode lod)
-        :-  %o  %-  my  :~
-          protected+s+protect
-          payload+s+payload
-          signature+s+(sign protect payload)
+  ++  SIGN
+    |=  [K=KEY:RSA PRO=JSON LOD=JSON]
+    |^  ^-  JSON
+        =.  PRO  HEADER
+        =/  PROTECT=CORD  (ENCODE PRO)
+        =/  PAYLOAD=CORD  (ENCODE LOD)
+        :-  %O  %-  MY  :~
+          PROTECTED+S+PROTECT
+          PAYLOAD+S+PAYLOAD
+          SIGNATURE+S+(SIGN PROTECT PAYLOAD)
         ==
-    ::  +header:sign:jws: set signature algorithm in header
+    ::  +HEADER:SIGN:JWS: SET SIGNATURE ALGORITHM IN HEADER
     ::
-    ++  header
-      ?>  ?=([%o *] pro)
-      ^-  json
-      [%o (~(put by p.pro) %alg s+'RS256')]
-    ::  +encode:sign:jws: encode json for signing
+    ++  HEADER
+      ?>  ?=([%O *] PRO)
+      ^-  JSON
+      [%O (~(PUT BY P.PRO) %ALG S+'RS256')]
+    ::  +ENCODE:SIGN:JWS: ENCODE JSON FOR SIGNING
     ::
-    ::    Alphabetically sort object keys, url-safe base64 encode
-    ::    the serialized json.
+    ::    ALPHABETICALLY SORT OBJECT KEYS, URL-SAFE BASE64 ENCODE
+    ::    THE SERIALIZED JSON.
     ::
-    ++  encode
-      |=  jon=json
-      %-  en-base64url
-      %-  as-octt:mimes:html
-      (en-json-sort aor jon)
-    ::  +sign:sign:jws: compute signature
+    ++  ENCODE
+      |=  JON=JSON
+      %-  EN-BASE64URL
+      %-  AS-OCTT:MIMES:HTML
+      (EN-JSON-SORT AOR JON)
+    ::  +SIGN:SIGN:JWS: COMPUTE SIGNATURE
     ::
-    ::    Url-safe base64 encode in big-endian byte order.
+    ::    URL-SAFE BASE64 ENCODE IN BIG-ENDIAN BYTE ORDER.
     ::
-    ++  sign
-      |=  [protect=cord payload=cord]
-      =/  msg=@t   (rap 3 ~[protect '.' payload])
-      =/  sig=@ud  (~(sign rs256 k) (met 3 msg) msg)
-      =/  len=@ud  (met 3 n.pub.k)
-      (en-base64url len (rev 3 len sig))
+    ++  SIGN
+      |=  [PROTECT=CORD PAYLOAD=CORD]
+      =/  MSG=@T   (RAP 3 ~[PROTECT '.' PAYLOAD])
+      =/  SIG=@UD  (~(SIGN RS256 K) (MET 3 MSG) MSG)
+      =/  LEN=@UD  (MET 3 N.PUB.K)
+      (EN-BASE64URL LEN (REV 3 LEN SIG))
     --
-  ::  +verify:jws: verify signature
+  ::  +VERIFY:JWS: VERIFY SIGNATURE
   ::
-  ++  verify  !!
+  ++  VERIFY  !!
   --
 --

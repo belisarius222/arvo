@@ -1,8 +1,8 @@
-::  Possibly non-fatal http error
+::  POSSIBLY NON-FATAL HTTP ERROR
 ::
-::::  /hoon/recoverable-error/sur
+::::  /HOON/RECOVERABLE-ERROR/SUR
   ::
 ::
-$%  ::  more later, {@u (cask)}
-  {$429 p/{$rate-limit p/(unit @da)}}
+$%  ::  MORE LATER, {@U (CASK)}
+  {$429 P/{$RATE-LIMIT P/(UNIT @DA)}}
 ==

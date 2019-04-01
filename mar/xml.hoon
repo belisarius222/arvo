@@ -1,20 +1,20 @@
 ::
-::::  /hoon/xml/mar
+::::  /HOON/XML/MAR
   ::
 /?    310
   ::
-::::  compute
+::::  COMPUTE
   ::
-=,  mimes:html
-=,  html
-|_  xml/@t
+=,  MIMES:HTML
+=,  HTML
+|_  XML/@T
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%                                                    ::
-  ++  mime  [/application/xml (as-octs xml)]            ::  to %mime
-  ++  hymn  (need (de-xml xml))                         ::  to %hymn
+  ++  MIME  [/APPLICATION/XML (AS-OCTS XML)]            ::  TO %MIME
+  ++  HYMN  (NEED (DE-XML XML))                         ::  TO %HYMN
   --                                                    ::
-++  grab  |%                                            ::  convert from
-          ++  noun  @t                                  ::  clam from %noun
-          ++  mime  |=({p/mite q/octs} q.q)             ::  retrieve form $mime
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  @T                                  ::  CLAM FROM %NOUN
+          ++  MIME  |=({P/MITE Q/OCTS} Q.Q)             ::  RETRIEVE FORM $MIME
 --        --

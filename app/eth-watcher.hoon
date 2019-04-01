@@ -1,568 +1,568 @@
-::  watcher: ethereum event log collector
+::  WATCHER: ETHEREUM EVENT LOG COLLECTOR
 ::
-/+  *eth-watcher
+/+  *ETH-WATCHER
 ::
-=,  ethereum
-=,  rpc
+=,  ETHEREUM
+=,  RPC
 ::
 |%
-++  state
-  $:  eyes=(map name eye)
+++  STATE
+  $:  EYES=(MAP NAME EYE)
   ==
 ::
-++  eye
-  $:  config
-      latest-block=@ud
-      filter-id=@ud
-      poll-timer=(unit @da)
-      snapshot
-      sap=history
+++  EYE
+  $:  CONFIG
+      LATEST-BLOCK=@UD
+      FILTER-ID=@UD
+      POLL-TIMER=(UNIT @DA)
+      SNAPSHOT
+      SAP=HISTORY
   ==
 ::
-++  history
-  $:  interval=_100
-      max-count=_10
-      count=@ud
-      latest-block=@ud
-      snaps=(qeu snapshot)
+++  HISTORY
+  $:  INTERVAL=_100
+      MAX-COUNT=_10
+      COUNT=@UD
+      LATEST-BLOCK=@UD
+      SNAPS=(QEU SNAPSHOT)
   ==
 ::
-++  move  (pair bone card)
-++  card
-  $%  [%hiss wire (unit user:eyre) mark %hiss hiss:eyre]
-      [%wait wire @da]
-      [%rest @da]
-      [%info wire desk nori:clay]
-      [%diff %eth-watcher-update update]
-      [%quit ~]
+++  MOVE  (PAIR BONE CARD)
+++  CARD
+  $%  [%HISS WIRE (UNIT USER:EYRE) MARK %HISS HISS:EYRE]
+      [%WAIT WIRE @DA]
+      [%REST @DA]
+      [%INFO WIRE DESK NORI:CLAY]
+      [%DIFF %ETH-WATCHER-UPDATE UPDATE]
+      [%QUIT ~]
   ==
 --
 ::
-|_  [bowl:gall state]
+|_  [BOWL:GALL STATE]
 ::
-++  prep
-  |=  old=(unit state)
-  ?~  old
-    [~ ..prep]
-  [~ ..prep(+<+ u.old)]
+++  PREP
+  |=  OLD=(UNIT STATE)
+  ?~  OLD
+    [~ ..PREP]
+  [~ ..PREP(+<+ U.OLD)]
 ::
-++  poke-noun
-  |=  [what=?(%save %load) =name]
-  ^-  (quip move _+>)
-  =+  eye=(fall (~(get by eyes) name) *eye)
-  ?-  what
-      %save
-    =/  pax=path
-      /(scot %p our)/home/(scot %da now)/watcher/[name]/jam
+++  POKE-NOUN
+  |=  [WHAT=?(%SAVE %LOAD) =NAME]
+  ^-  (QUIP MOVE _+>)
+  =+  EYE=(FALL (~(GET BY EYES) NAME) *EYE)
+  ?-  WHAT
+      %SAVE
+    =/  PAX=PATH
+      /(SCOT %P OUR)/HOME/(SCOT %DA NOW)/WATCHER/[NAME]/JAM
     :_  +>.$
     :_  ~
-    ^-  move
-    :*  ost
-        %info
-        /jamfile
-        (foal:space:userlib pax [%jam !>((jam eye))])
+    ^-  MOVE
+    :*  OST
+        %INFO
+        /JAMFILE
+        (FOAL:SPACE:USERLIB PAX [%JAM !>((JAM EYE))])
     ==
   ::
-      %load
-    =.  eyes
-      %+  ~(put by eyes)  name
-      =-  (^eye (cue .^(@ %cx -)))
-      /(scot %p our)/home/(scot %da now)/watcher/[name]/jam
-    done:new-filter:(open:watcher name)
+      %LOAD
+    =.  EYES
+      %+  ~(PUT BY EYES)  NAME
+      =-  (^EYE (CUE .^(@ %CX -)))
+      /(SCOT %P OUR)/HOME/(SCOT %DA NOW)/WATCHER/[NAME]/JAM
+    DONE:NEW-FILTER:(OPEN:WATCHER NAME)
   ==
 ::
-++  poke-eth-watcher-action
-  |=  act=action
-  ^-  (quip move _+>)
-  ?-  -.act
-      %watch
-    done:(init:watcher +.act)
+++  POKE-ETH-WATCHER-ACTION
+  |=  ACT=ACTION
+  ^-  (QUIP MOVE _+>)
+  ?-  -.ACT
+      %WATCH
+    DONE:(INIT:WATCHER +.ACT)
   ::
-      %clear
-    wipe:(open:watcher +.act)
+      %CLEAR
+    WIPE:(OPEN:WATCHER +.ACT)
   ==
 ::
-++  peek-x
-  |=  pax=path
-  ^-  (unit (unit [%noun *]))
-  ?.  ?=([@ *] pax)  ~
-  =+  eye=(~(get by eyes) i.pax)
-  ?~  eye  [~ ~]
-  ::  /name: all logs
+++  PEEK-X
+  |=  PAX=PATH
+  ^-  (UNIT (UNIT [%NOUN *]))
+  ?.  ?=([@ *] PAX)  ~
+  =+  EYE=(~(GET BY EYES) I.PAX)
+  ?~  EYE  [~ ~]
+  ::  /NAME: ALL LOGS
   ::
-  ?~  t.pax  ``[%noun logs.u.eye]
-  ::  /name/num: most recent num logs
+  ?~  T.PAX  ``[%NOUN LOGS.U.EYE]
+  ::  /NAME/NUM: MOST RECENT NUM LOGS
   ::
-  =+  num=(slaw %ud i.t.pax)
-  ?^  num  ``[%noun (scag u.num logs.u.eye)]
-  ::  /name/debug: debug information
+  =+  NUM=(SLAW %UD I.T.PAX)
+  ?^  NUM  ``[%NOUN (SCAG U.NUM LOGS.U.EYE)]
+  ::  /NAME/DEBUG: DEBUG INFORMATION
   ::
-  ?.  ?=(%debug i.t.pax)  ~
-  =-  ``[%noun -]
-  =,  u.eye
-  :*  node=(en-purl:html node)
-      last=last-heard-block
-      lent=(lent logs)
-      time=poll-timer
+  ?.  ?=(%DEBUG I.T.PAX)  ~
+  =-  ``[%NOUN -]
+  =,  U.EYE
+  :*  NODE=(EN-PURL:HTML NODE)
+      LAST=LAST-HEARD-BLOCK
+      LENT=(LENT LOGS)
+      TIME=POLL-TIMER
   ==
 ::
-++  peer
-  |=  pax=path
-  ^-  (quip move _+>)
-  ?>  ?=([@ ~] pax)
-  done:(put-snapshot-diff:(open:watcher i.pax) ost)
+++  PEER
+  |=  PAX=PATH
+  ^-  (QUIP MOVE _+>)
+  ?>  ?=([@ ~] PAX)
+  DONE:(PUT-SNAPSHOT-DIFF:(OPEN:WATCHER I.PAX) OST)
 ::
-++  wake
-  |=  [wir=wire ~]
-  ^-  (quip move _+>)
-  ?>  ?=([@ %poll ~] wir)
-  done:poll-filter:(open:watcher i.wir)
+++  WAKE
+  |=  [WIR=WIRE ~]
+  ^-  (QUIP MOVE _+>)
+  ?>  ?=([@ %POLL ~] WIR)
+  DONE:POLL-FILTER:(OPEN:WATCHER I.WIR)
 ::
-++  sigh-tang
-  |=  [wir=wire res=tang]
-  ^-  (quip move _+>)
-  ~&  ['something went wrong!' wir]
-  ~_  res
+++  SIGH-TANG
+  |=  [WIR=WIRE RES=TANG]
+  ^-  (QUIP MOVE _+>)
+  ~&  ['SOMETHING WENT WRONG!' WIR]
+  ~_  RES
   [~ +>.$]
 ::
-++  sigh-json-rpc-response
-  |=  [wir=wire res=response:rpc:jstd]
-  ^-  (quip move _+>)
-  ?>  ?=([@ *] wir)
-  =<  done
-  %-  sigh-json-rpc-response:(open:watcher i.wir)
-  [t.wir res]
+++  SIGH-JSON-RPC-RESPONSE
+  |=  [WIR=WIRE RES=RESPONSE:RPC:JSTD]
+  ^-  (QUIP MOVE _+>)
+  ?>  ?=([@ *] WIR)
+  =<  DONE
+  %-  SIGH-JSON-RPC-RESPONSE:(OPEN:WATCHER I.WIR)
+  [T.WIR RES]
 ::
-++  watcher
-  |_  $:  =name
-          =eye
-          rewind-block=(unit @ud)
-          new-logs=loglist
-          moves=(list move)
+++  WATCHER
+  |_  $:  =NAME
+          =EYE
+          REWIND-BLOCK=(UNIT @UD)
+          NEW-LOGS=LOGLIST
+          MOVES=(LIST MOVE)
       ==
   ::
-  ::  +open: initialize core
+  ::  +OPEN: INITIALIZE CORE
   ::
-  ++  open
-    |=  nom=^name
+  ++  OPEN
+    |=  NOM=^NAME
     ^+  +>
-    +>.$(name nom, eye (~(got by eyes) nom))
+    +>.$(NAME NOM, EYE (~(GOT BY EYES) NOM))
   ::
-  ::  +init: set up eye and initialize core
+  ::  +INIT: SET UP EYE AND INITIALIZE CORE
   ::
-  ++  init
-    |=  [nom=^name =config]
+  ++  INIT
+    |=  [NOM=^NAME =CONFIG]
     ^+  +>
-    =.  name  nom
-    =.  eye
-      %*(. *^eye - config, last-heard-block from-block.config)
-    get-latest-block
+    =.  NAME  NOM
+    =.  EYE
+      %*(. *^EYE - CONFIG, LAST-HEARD-BLOCK FROM-BLOCK.CONFIG)
+    GET-LATEST-BLOCK
   ::
-  ::  +|  outward
+  ::  +|  OUTWARD
   ::
-  ::  +wipe: delete eye
+  ::  +WIPE: DELETE EYE
   ::
-  ++  wipe
-    =>  cancel-wait-poll
-    =>  cancel-subscribers
-    :-  (flop moves)
-    ..watcher(eyes (~(del by eyes) name))
+  ++  WIPE
+    =>  CANCEL-WAIT-POLL
+    =>  CANCEL-SUBSCRIBERS
+    :-  (FLOP MOVES)
+    ..WATCHER(EYES (~(DEL BY EYES) NAME))
   ::
-  ::  +done: store changes, update subscribers
+  ::  +DONE: STORE CHANGES, UPDATE SUBSCRIBERS
   ::
-  ++  done
-    ^-  [(list move) _..watcher]
-    =?  .  ?=(^ rewind-block)
-      ::  if we're rewinding to a block, then we throw away any moves
-      ::  and changes we were going to make.
+  ++  DONE
+    ^-  [(LIST MOVE) _..WATCHER]
+    =?  .  ?=(^ REWIND-BLOCK)
+      ::  IF WE'RE REWINDING TO A BLOCK, THEN WE THROW AWAY ANY MOVES
+      ::  AND CHANGES WE WERE GOING TO MAKE.
       ::
-      =:  moves     *(list move)
-          new-logs  *loglist
+      =:  MOVES     *(LIST MOVE)
+          NEW-LOGS  *LOGLIST
         ==
-      (restore-block u.rewind-block)
-    ::  if we have any updates, send them
+      (RESTORE-BLOCK U.REWIND-BLOCK)
+    ::  IF WE HAVE ANY UPDATES, SEND THEM
     ::
-    =?  .  !=(~ new-logs)
-      (fan-diff %logs new-logs)
-    ::  produce moves, store updated state
+    =?  .  !=(~ NEW-LOGS)
+      (FAN-DIFF %LOGS NEW-LOGS)
+    ::  PRODUCE MOVES, STORE UPDATED STATE
     ::
-    :-  (flop moves)
-    ..watcher(eyes (~(put by eyes) name eye))
+    :-  (FLOP MOVES)
+    ..WATCHER(EYES (~(PUT BY EYES) NAME EYE))
   ::
-  ::  +put-move: store side-effect
+  ::  +PUT-MOVE: STORE SIDE-EFFECT
   ::
-  ++  put-move
-    |=  =card
-    %_(+> moves [[ost card] moves])
+  ++  PUT-MOVE
+    |=  =CARD
+    %_(+> MOVES [[OST CARD] MOVES])
   ::
-  ++  put-moves
-    |=  moz=(list move)
-    %_(+> moves (weld (flop moz) moves))
+  ++  PUT-MOVES
+    |=  MOZ=(LIST MOVE)
+    %_(+> MOVES (WELD (FLOP MOZ) MOVES))
   ::
-  ::  +put-rpc-request: store rpc request to ethereum node
+  ::  +PUT-RPC-REQUEST: STORE RPC REQUEST TO ETHEREUM NODE
   ::
-  ++  put-rpc-request
-    |=  [wir=wire id=(unit @t) req=request]
+  ++  PUT-RPC-REQUEST
+    |=  [WIR=WIRE ID=(UNIT @T) REQ=REQUEST]
     ^+  +>
-    %-  put-move
-    ^-  card
-    :*  %hiss
-        [name wir]
+    %-  PUT-MOVE
+    ^-  CARD
+    :*  %HISS
+        [NAME WIR]
         ~
-        %json-rpc-response
-        %hiss
-        %+  json-request  node.eye
-        (request-to-json id req)
+        %JSON-RPC-RESPONSE
+        %HISS
+        %+  JSON-REQUEST  NODE.EYE
+        (REQUEST-TO-JSON ID REQ)
     ==
   ::
-  ::  +put-log: store change made by event
+  ::  +PUT-LOG: STORE CHANGE MADE BY EVENT
   ::
-  ++  put-log
-    |=  log=event-log
+  ++  PUT-LOG
+    |=  LOG=EVENT-LOG
     %_  +>
-      new-logs    (store-new-logs ~[log] new-logs)
-      logs.eye    (store-new-logs ~[log] logs.eye)
-      heard.eye   (~(put in heard.eye) (log-to-id log))
+      NEW-LOGS    (STORE-NEW-LOGS ~[LOG] NEW-LOGS)
+      LOGS.EYE    (STORE-NEW-LOGS ~[LOG] LOGS.EYE)
+      HEARD.EYE   (~(PUT IN HEARD.EYE) (LOG-TO-ID LOG))
     ==
   ::
-  ::  +|  subscriptions
+  ::  +|  SUBSCRIPTIONS
   ::
-  ++  put-diff
-    |=  [for=bone dif=update]
-    %_(+> moves [[for %diff %eth-watcher-update dif] moves])
+  ++  PUT-DIFF
+    |=  [FOR=BONE DIF=UPDATE]
+    %_(+> MOVES [[FOR %DIFF %ETH-WATCHER-UPDATE DIF] MOVES])
   ::
-  ++  put-snapshot-diff
-    |=  for=bone
-    (put-diff for %snap last-heard-block.eye heard.eye logs.eye)
+  ++  PUT-SNAPSHOT-DIFF
+    |=  FOR=BONE
+    (PUT-DIFF FOR %SNAP LAST-HEARD-BLOCK.EYE HEARD.EYE LOGS.EYE)
   ::
-  ++  get-subscribers
-    ^-  (list bone)
-    %+  murn  ~(tap by sup)
-    |=  [b=bone s=ship p=path]
-    ^-  (unit bone)
-    ?>  ?=([@ *] p)
-    ?:(=(name i.p) `b ~)
+  ++  GET-SUBSCRIBERS
+    ^-  (LIST BONE)
+    %+  MURN  ~(TAP BY SUP)
+    |=  [B=BONE S=SHIP P=PATH]
+    ^-  (UNIT BONE)
+    ?>  ?=([@ *] P)
+    ?:(=(NAME I.P) `B ~)
   ::
-  ++  fan-diff
-    |=  dif=update
-    %-  put-moves
-    %+  turn  get-subscribers
-    |=  b=bone
-    ^-  move
-    [b %diff %eth-watcher-update dif]
+  ++  FAN-DIFF
+    |=  DIF=UPDATE
+    %-  PUT-MOVES
+    %+  TURN  GET-SUBSCRIBERS
+    |=  B=BONE
+    ^-  MOVE
+    [B %DIFF %ETH-WATCHER-UPDATE DIF]
   ::
-  ++  cancel-subscribers
-    %-  put-moves
-    %+  turn  get-subscribers
-    |=(b=bone [b %quit ~])
+  ++  CANCEL-SUBSCRIBERS
+    %-  PUT-MOVES
+    %+  TURN  GET-SUBSCRIBERS
+    |=(B=BONE [B %QUIT ~])
   ::
-  ::  +|  catch-up-operations
+  ::  +|  CATCH-UP-OPERATIONS
   ::
-  ::  +get-latest-block
+  ::  +GET-LATEST-BLOCK
   ::
-  ::    Get latest block from eth node and compare to our own latest block.
-  ::    Get intervening blocks in chunks until we're caught up, then set
-  ::    up a filter going forward.
+  ::    GET LATEST BLOCK FROM ETH NODE AND COMPARE TO OUR OWN LATEST BLOCK.
+  ::    GET INTERVENING BLOCKS IN CHUNKS UNTIL WE'RE CAUGHT UP, THEN SET
+  ::    UP A FILTER GOING FORWARD.
   ::
-  ++  get-latest-block
-    =>  cancel-wait-poll
-    (put-rpc-request /catch-up/block-number `'block number' %eth-block-number ~)
+  ++  GET-LATEST-BLOCK
+    =>  CANCEL-WAIT-POLL
+    (PUT-RPC-REQUEST /CATCH-UP/BLOCK-NUMBER `'BLOCK NUMBER' %ETH-BLOCK-NUMBER ~)
   ::
-  ::  +catch-up: get next chunk
+  ::  +CATCH-UP: GET NEXT CHUNK
   ::
-  ++  catch-up
-    |=  from-block=@ud
+  ++  CATCH-UP
+    |=  FROM-BLOCK=@UD
     ^+  +>
-    ?:  (gte from-block latest-block.eye)
-      new-filter
-    =/  next-block  (min latest-block.eye (add from-block 5.760))  ::  ~d1
-    ~?  debug=|
-      [%catching-up from=from-block to=latest-block.eye]
-    %-  put-rpc-request
-    :+  /catch-up/step/(scot %ud from-block)/(scot %ud next-block)
-      `'catch up'
-    :*  %eth-get-logs
-        `number+from-block
-        `number+next-block
-        contracts.eye
-        topics.eye
+    ?:  (GTE FROM-BLOCK LATEST-BLOCK.EYE)
+      NEW-FILTER
+    =/  NEXT-BLOCK  (MIN LATEST-BLOCK.EYE (ADD FROM-BLOCK 5.760))  ::  ~D1
+    ~?  DEBUG=|
+      [%CATCHING-UP FROM=FROM-BLOCK TO=LATEST-BLOCK.EYE]
+    %-  PUT-RPC-REQUEST
+    :+  /CATCH-UP/STEP/(SCOT %UD FROM-BLOCK)/(SCOT %UD NEXT-BLOCK)
+      `'CATCH UP'
+    :*  %ETH-GET-LOGS
+        `NUMBER+FROM-BLOCK
+        `NUMBER+NEXT-BLOCK
+        CONTRACTS.EYE
+        TOPICS.EYE
     ==
   ::
-  ::  +|  filter-operations
+  ::  +|  FILTER-OPERATIONS
   ::
-  ::  +new-filter: request a new polling filter
+  ::  +NEW-FILTER: REQUEST A NEW POLLING FILTER
   ::
-  ::    Listens from the last-heard block onward.
+  ::    LISTENS FROM THE LAST-HEARD BLOCK ONWARD.
   ::
-  ++  new-filter
-    %-  put-rpc-request
-    :+  /filter/new  `'new filter'
-    ^-  request:rpc
-    :*  %eth-new-filter
-        `number+last-heard-block.eye
-        ?~(to-block.eye ~ `number+u.to-block.eye)
-        contracts.eye
-        topics.eye
+  ++  NEW-FILTER
+    %-  PUT-RPC-REQUEST
+    :+  /FILTER/NEW  `'NEW FILTER'
+    ^-  REQUEST:RPC
+    :*  %ETH-NEW-FILTER
+        `NUMBER+LAST-HEARD-BLOCK.EYE
+        ?~(TO-BLOCK.EYE ~ `NUMBER+U.TO-BLOCK.EYE)
+        CONTRACTS.EYE
+        TOPICS.EYE
     ==
   ::
-  ::  +read-filter: get all events the filter captures
+  ::  +READ-FILTER: GET ALL EVENTS THE FILTER CAPTURES
   ::
-  ++  read-filter
-    %-  put-rpc-request
-    :+  /filter/logs  `'filter logs'
-    [%eth-get-filter-logs filter-id.eye]
+  ++  READ-FILTER
+    %-  PUT-RPC-REQUEST
+    :+  /FILTER/LOGS  `'FILTER LOGS'
+    [%ETH-GET-FILTER-LOGS FILTER-ID.EYE]
   ::
-  ::  +poll-filter: get all new events since last poll (or filter creation)
+  ::  +POLL-FILTER: GET ALL NEW EVENTS SINCE LAST POLL (OR FILTER CREATION)
   ::
-  ++  poll-filter
-    ?:  =(0 filter-id.eye)
-      ~&  %no-filter-bad-poll
+  ++  POLL-FILTER
+    ?:  =(0 FILTER-ID.EYE)
+      ~&  %NO-FILTER-BAD-POLL
       .
-    %-  put-rpc-request
-    :+  /filter/changes  `'poll filter'
-    [%eth-get-filter-changes filter-id.eye]
+    %-  PUT-RPC-REQUEST
+    :+  /FILTER/CHANGES  `'POLL FILTER'
+    [%ETH-GET-FILTER-CHANGES FILTER-ID.EYE]
   ::
-  ::  +wait-poll: remind us to poll in four minutes
+  ::  +WAIT-POLL: REMIND US TO POLL IN FOUR MINUTES
   ::
-  ::    Four minutes because Ethereum RPC filters time out after five.
-  ::    We don't check for an existing timer or clear an old one here,
-  ::    sane flows shouldn't see this being called superfluously.
+  ::    FOUR MINUTES BECAUSE ETHEREUM RPC FILTERS TIME OUT AFTER FIVE.
+  ::    WE DON'T CHECK FOR AN EXISTING TIMER OR CLEAR AN OLD ONE HERE,
+  ::    SANE FLOWS SHOULDN'T SEE THIS BEING CALLED SUPERFLUOUSLY.
   ::
-  ++  wait-poll
-    =+  wen=(add now ~m4)
-    %-  put-move(poll-timer.eye `wen)
-    [%wait name^/poll wen]
+  ++  WAIT-POLL
+    =+  WEN=(ADD NOW ~M4)
+    %-  PUT-MOVE(POLL-TIMER.EYE `WEN)
+    [%WAIT NAME^/POLL WEN]
   ::
-  ::  +cancel-wait-poll: remove poll reminder
+  ::  +CANCEL-WAIT-POLL: REMOVE POLL REMINDER
   ::
-  ++  cancel-wait-poll
-    ?~  poll-timer.eye  ..cancel-wait-poll
-    %-  put-move(poll-timer.eye ~)
-    [%rest u.poll-timer.eye]
+  ++  CANCEL-WAIT-POLL
+    ?~  POLL-TIMER.EYE  ..CANCEL-WAIT-POLL
+    %-  PUT-MOVE(POLL-TIMER.EYE ~)
+    [%REST U.POLL-TIMER.EYE]
   ::
-  ::  +|  filter-results
+  ::  +|  FILTER-RESULTS
   ::
-  ::  +sigh-json-rpc-response: process rpc response
+  ::  +SIGH-JSON-RPC-RESPONSE: PROCESS RPC RESPONSE
   ::
-  ++  sigh-json-rpc-response
-    |=  [wir=wire res=response:rpc:jstd]
+  ++  SIGH-JSON-RPC-RESPONSE
+    |=  [WIR=WIRE RES=RESPONSE:RPC:JSTD]
     ^+  +>
-    ~!  -.res
-    ?:  ?=(%fail -.res)
-      ?:  =(405 p.hit.res)
-        ~&  'HTTP 405 error (expected if using infura)'
+    ~!  -.RES
+    ?:  ?=(%FAIL -.RES)
+      ?:  =(405 P.HIT.RES)
+        ~&  'HTTP 405 ERROR (EXPECTED IF USING INFURA)'
         +>.$
-      ?.  =(5 (div p.hit.res 100))
-        ~&  [%http-error hit.res]
+      ?.  =(5 (DIV P.HIT.RES 100))
+        ~&  [%HTTP-ERROR HIT.RES]
         +>.$
-      ?+  wir
-        ~&  [%retrying-node ~] ::((soft tang) q.res)]
-        wait-poll
-          [%catch-up %step @ta @ta ~]
-        ~&  %retrying-catch-up
-        (catch-up (slav %ud `@ta`i.t.t.wir))
+      ?+  WIR
+        ~&  [%RETRYING-NODE ~] ::((SOFT TANG) Q.RES)]
+        WAIT-POLL
+          [%CATCH-UP %STEP @TA @TA ~]
+        ~&  %RETRYING-CATCH-UP
+        (CATCH-UP (SLAV %UD `@TA`I.T.T.WIR))
       ==
-    ?+  wir  ~|([%weird-sigh-wire wir] !!)
-        [%filter %new *]
-      (take-new-filter res)
+    ?+  WIR  ~|([%WEIRD-SIGH-WIRE WIR] !!)
+        [%FILTER %NEW *]
+      (TAKE-NEW-FILTER RES)
     ::
-        [%filter *]
-      (take-filter-results res)
+        [%FILTER *]
+      (TAKE-FILTER-RESULTS RES)
     ::
-        [%catch-up %block-number ~]
-      (take-block-number res)
+        [%CATCH-UP %BLOCK-NUMBER ~]
+      (TAKE-BLOCK-NUMBER RES)
     ::
-        [%catch-up %step @ta @ta ~]
-      =/  from-block  (slav %ud `@ta`i.t.t.wir)
-      =/  next-block  (slav %ud `@ta`i.t.t.t.wir)
-      (take-catch-up-step res from-block next-block)
+        [%CATCH-UP %STEP @TA @TA ~]
+      =/  FROM-BLOCK  (SLAV %UD `@TA`I.T.T.WIR)
+      =/  NEXT-BLOCK  (SLAV %UD `@TA`I.T.T.T.WIR)
+      (TAKE-CATCH-UP-STEP RES FROM-BLOCK NEXT-BLOCK)
     ==
   ::
-  ::  +take-new-filter: store filter-id and read it
+  ::  +TAKE-NEW-FILTER: STORE FILTER-ID AND READ IT
   ::
-  ++  take-new-filter
-    |=  rep=response:rpc:jstd
+  ++  TAKE-NEW-FILTER
+    |=  REP=RESPONSE:RPC:JSTD
     ^+  +>
-    ~|  rep
-    ?<  ?=(%batch -.rep)
-    ?<  ?=(%fail -.rep)
-    ?:  ?=(%error -.rep)
-      ~&  [%filter-error--retrying message.rep]
-      new-filter
-    =-  read-filter(filter-id.eye -)
-    (parse-eth-new-filter-res res.rep)
+    ~|  REP
+    ?<  ?=(%BATCH -.REP)
+    ?<  ?=(%FAIL -.REP)
+    ?:  ?=(%ERROR -.REP)
+      ~&  [%FILTER-ERROR--RETRYING MESSAGE.REP]
+      NEW-FILTER
+    =-  READ-FILTER(FILTER-ID.EYE -)
+    (PARSE-ETH-NEW-FILTER-RES RES.REP)
   ::
-  ::  +take-filter-results: parse results into event-logs and process them
+  ::  +TAKE-FILTER-RESULTS: PARSE RESULTS INTO EVENT-LOGS AND PROCESS THEM
   ::
-  ++  take-filter-results
-    |=  rep=response:rpc:jstd
+  ++  TAKE-FILTER-RESULTS
+    |=  REP=RESPONSE:RPC:JSTD
     ^+  +>
-    ?<  ?=(%batch -.rep)
-    ?<  ?=(%fail -.rep)
-    ?:  ?=(%error -.rep)
-      ?.  ?|  =('filter not found' message.rep)  ::  geth
-              =('Filter not found' message.rep)  ::  parity
+    ?<  ?=(%BATCH -.REP)
+    ?<  ?=(%FAIL -.REP)
+    ?:  ?=(%ERROR -.REP)
+      ?.  ?|  =('FILTER NOT FOUND' MESSAGE.REP)  ::  GETH
+              =('FILTER NOT FOUND' MESSAGE.REP)  ::  PARITY
           ==
-        ~&  [%unhandled-filter-error +.rep]
+        ~&  [%UNHANDLED-FILTER-ERROR +.REP]
         +>
-      ~&  [%filter-timed-out--recreating block=last-heard-block.eye +.rep]
-      ::  arguably should rewind 40 blocks on the off chance the chain reorganized
-      ::  when we blinked.  this will also restart the filter.
+      ~&  [%FILTER-TIMED-OUT--RECREATING BLOCK=LAST-HEARD-BLOCK.EYE +.REP]
+      ::  ARGUABLY SHOULD REWIND 40 BLOCKS ON THE OFF CHANCE THE CHAIN REORGANIZED
+      ::  WHEN WE BLINKED.  THIS WILL ALSO RESTART THE FILTER.
       ::
-      ::  (restore-block ?:((lth last-heard-block 40) 0 (sub.add last-heard-block 40)))
+      ::  (RESTORE-BLOCK ?:((LTH LAST-HEARD-BLOCK 40) 0 (SUB.ADD LAST-HEARD-BLOCK 40)))
       ::
-      ::  counter-argument: it's a royal pain to restore from a snapshot
-      ::  every time you can't ping the node for 5 minutes.  this is likely
-      ::  to destabilize the network.  better to manually restore if we
-      ::  notice an anomaly.
+      ::  COUNTER-ARGUMENT: IT'S A ROYAL PAIN TO RESTORE FROM A SNAPSHOT
+      ::  EVERY TIME YOU CAN'T PING THE NODE FOR 5 MINUTES.  THIS IS LIKELY
+      ::  TO DESTABILIZE THE NETWORK.  BETTER TO MANUALLY RESTORE IF WE
+      ::  NOTICE AN ANOMALY.
       ::
-      ::  third way: don't trust anything that doesn't have 40 confirmations
+      ::  THIRD WAY: DON'T TRUST ANYTHING THAT DOESN'T HAVE 40 CONFIRMATIONS
       ::
-      new-filter
-    ::  kick polling timer, only if it hasn't already been.
-    =?  +>  |(?=(~ poll-timer.eye) (gth now u.poll-timer.eye))
-      wait-poll
-    (take-events rep)
+      NEW-FILTER
+    ::  KICK POLLING TIMER, ONLY IF IT HASN'T ALREADY BEEN.
+    =?  +>  |(?=(~ POLL-TIMER.EYE) (GTH NOW U.POLL-TIMER.EYE))
+      WAIT-POLL
+    (TAKE-EVENTS REP)
   ::
-  ::  +take-block-number: take block number and start catching up
+  ::  +TAKE-BLOCK-NUMBER: TAKE BLOCK NUMBER AND START CATCHING UP
   ::
-  ++  take-block-number
-    |=  rep=response:rpc:jstd
+  ++  TAKE-BLOCK-NUMBER
+    |=  REP=RESPONSE:RPC:JSTD
     ^+  +>
-    ?<  ?=(%batch -.rep)
-    ?<  ?=(%fail -.rep)
-    ?:  ?=(%error -.rep)
-      ~&  [%take-block-number-error--retrying message.rep]
-      get-latest-block
-    =.  latest-block.eye  (parse-eth-block-number res.rep)
-    (catch-up last-heard-block.eye)
+    ?<  ?=(%BATCH -.REP)
+    ?<  ?=(%FAIL -.REP)
+    ?:  ?=(%ERROR -.REP)
+      ~&  [%TAKE-BLOCK-NUMBER-ERROR--RETRYING MESSAGE.REP]
+      GET-LATEST-BLOCK
+    =.  LATEST-BLOCK.EYE  (PARSE-ETH-BLOCK-NUMBER RES.REP)
+    (CATCH-UP LAST-HEARD-BLOCK.EYE)
   ::
-  ::  +take-catch-up-step: process chunk
+  ::  +TAKE-CATCH-UP-STEP: PROCESS CHUNK
   ::
-  ++  take-catch-up-step
-    |=  [rep=response:rpc:jstd from-block=@ud next-block=@ud]
+  ++  TAKE-CATCH-UP-STEP
+    |=  [REP=RESPONSE:RPC:JSTD FROM-BLOCK=@UD NEXT-BLOCK=@UD]
     ^+  +>
-    ?<  ?=(%batch -.rep)
-    ?<  ?=(%fail -.rep)
-    ?:  ?=(%error -.rep)
-      ~&  [%catch-up-step-error--retrying message.rep]
-      (catch-up from-block)
-    =.  +>.$  (take-events rep)
-    (catch-up next-block)
+    ?<  ?=(%BATCH -.REP)
+    ?<  ?=(%FAIL -.REP)
+    ?:  ?=(%ERROR -.REP)
+      ~&  [%CATCH-UP-STEP-ERROR--RETRYING MESSAGE.REP]
+      (CATCH-UP FROM-BLOCK)
+    =.  +>.$  (TAKE-EVENTS REP)
+    (CATCH-UP NEXT-BLOCK)
   ::
-  ::  +take-events: process events
+  ::  +TAKE-EVENTS: PROCESS EVENTS
   ::
-  ++  take-events
-    |=  rep=response:rpc:jstd
+  ++  TAKE-EVENTS
+    |=  REP=RESPONSE:RPC:JSTD
     ^+  +>
-    ?<  ?=(%batch -.rep)
-    ?<  ?=(%fail -.rep)
-    ?<  ?=(%error -.rep)
-    ?.  ?=(%a -.res.rep)
-      ~&  [%events-not-array rep]
+    ?<  ?=(%BATCH -.REP)
+    ?<  ?=(%FAIL -.REP)
+    ?<  ?=(%ERROR -.REP)
+    ?.  ?=(%A -.RES.REP)
+      ~&  [%EVENTS-NOT-ARRAY REP]
       !!
-    =*  changes  p.res.rep
-    ~?  &(debug=| (gth (lent changes) 0))
-      :*  %processing-changes
-          changes=(lent changes)
-          block=last-heard-block.eye
-          id=filter-id.eye
+    =*  CHANGES  P.RES.REP
+    ~?  &(DEBUG=| (GTH (LENT CHANGES) 0))
+      :*  %PROCESSING-CHANGES
+          CHANGES=(LENT CHANGES)
+          BLOCK=LAST-HEARD-BLOCK.EYE
+          ID=FILTER-ID.EYE
       ==
     |-  ^+  +>.^$
-    ?~  changes  +>.^$
+    ?~  CHANGES  +>.^$
     =.  +>.^$
-      (take-event-log (parse-event-log i.changes))
-    $(changes t.changes)
+      (TAKE-EVENT-LOG (PARSE-EVENT-LOG I.CHANGES))
+    $(CHANGES T.CHANGES)
   ::
-  ::  +take-event-log: obtain changes from event-log
+  ::  +TAKE-EVENT-LOG: OBTAIN CHANGES FROM EVENT-LOG
   ::
-  ++  take-event-log
-    |=  log=event-log
+  ++  TAKE-EVENT-LOG
+    |=  LOG=EVENT-LOG
     ^+  +>
-    ?~  mined.log
-      ~&  %ignoring-unmined-event
+    ?~  MINED.LOG
+      ~&  %IGNORING-UNMINED-EVENT
       +>
-    =*  place  u.mined.log
-    ?:  (~(has in heard.eye) block-number.place log-index.place)
-      ?.  removed.u.mined.log
-        ~?  debug=|
-          [%ignoring-duplicate-event tx=transaction-hash.u.mined.log]
+    =*  PLACE  U.MINED.LOG
+    ?:  (~(HAS IN HEARD.EYE) BLOCK-NUMBER.PLACE LOG-INDEX.PLACE)
+      ?.  REMOVED.U.MINED.LOG
+        ~?  DEBUG=|
+          [%IGNORING-DUPLICATE-EVENT TX=TRANSACTION-HASH.U.MINED.LOG]
         +>
-      ::  block was reorganized away, so rewind to this block and
-      ::  start syncing again.
+      ::  BLOCK WAS REORGANIZED AWAY, SO REWIND TO THIS BLOCK AND
+      ::  START SYNCING AGAIN.
       ::
-      ~&  :*  'removed event!  Perhaps chain has reorganized?'
-              tx-hash=transaction-hash.u.mined.log
-              block-number=block-number.u.mined.log
-              block-hash=block-hash.u.mined.log
+      ~&  :*  'REMOVED EVENT!  PERHAPS CHAIN HAS REORGANIZED?'
+              TX-HASH=TRANSACTION-HASH.U.MINED.LOG
+              BLOCK-NUMBER=BLOCK-NUMBER.U.MINED.LOG
+              BLOCK-HASH=BLOCK-HASH.U.MINED.LOG
           ==
       %=    +>
-          rewind-block
+          REWIND-BLOCK
         :-  ~
-        ?~  rewind-block
-          block-number.place
-        (min block-number.place u.rewind-block)
+        ?~  REWIND-BLOCK
+          BLOCK-NUMBER.PLACE
+        (MIN BLOCK-NUMBER.PLACE U.REWIND-BLOCK)
       ==
-    =.  last-heard-block.eye
-      (max block-number.place last-heard-block.eye)
-    ?:  ?&  (gte block-number.place from-block.eye)
-            ?|  ?=(~ to-block.eye)
-                (lte block-number.place u.to-block.eye)
+    =.  LAST-HEARD-BLOCK.EYE
+      (MAX BLOCK-NUMBER.PLACE LAST-HEARD-BLOCK.EYE)
+    ?:  ?&  (GTE BLOCK-NUMBER.PLACE FROM-BLOCK.EYE)
+            ?|  ?=(~ TO-BLOCK.EYE)
+                (LTE BLOCK-NUMBER.PLACE U.TO-BLOCK.EYE)
             ==
         ==
-      (put-log log)
-    ~&  :*  %event-block-out-of-range
-            got=block-number.place
-            from=from-block.eye
-            to=to-block.eye
+      (PUT-LOG LOG)
+    ~&  :*  %EVENT-BLOCK-OUT-OF-RANGE
+            GOT=BLOCK-NUMBER.PLACE
+            FROM=FROM-BLOCK.EYE
+            TO=TO-BLOCK.EYE
         ==
     +>.$
   ::
-  ::  +restore-block: rewind to block or earlier
+  ::  +RESTORE-BLOCK: REWIND TO BLOCK OR EARLIER
   ::
-  ++  restore-block
-    |=  block=@ud
+  ++  RESTORE-BLOCK
+    |=  BLOCK=@UD
     ^+  +>
-    =/  old-qeu  snaps.sap.eye
-    ::  clear history
+    =/  OLD-QEU  SNAPS.SAP.EYE
+    ::  CLEAR HISTORY
     ::
-    =:  snaps.sap.eye       ~
-        count.sap.eye       0
-        latest-block.sap.eye  0
+    =:  SNAPS.SAP.EYE       ~
+        COUNT.SAP.EYE       0
+        LATEST-BLOCK.SAP.EYE  0
       ==
-    ::  find a snapshot we can use, remove ones that are too new
+    ::  FIND A SNAPSHOT WE CAN USE, REMOVE ONES THAT ARE TOO NEW
     ::
-    =^  snap=snapshot  +>.$
-      ?:  |(=(~ old-qeu) (lth block last-heard-block:(need ~(top to old-qeu))))
-        [%*(. *snapshot last-heard-block from-block.eye) +>.$]
-      |-  ^-  [snapshot _+>.^$]
-      =^  snap=snapshot  old-qeu
-        ~(get to old-qeu)
-      =:  count.sap.eye       +(count.sap.eye)
-          latest-block.sap.eye  last-heard-block.snap
-          snaps.sap.eye       (~(put to snaps.sap.eye) snap)
+    =^  SNAP=SNAPSHOT  +>.$
+      ?:  |(=(~ OLD-QEU) (LTH BLOCK LAST-HEARD-BLOCK:(NEED ~(TOP TO OLD-QEU))))
+        [%*(. *SNAPSHOT LAST-HEARD-BLOCK FROM-BLOCK.EYE) +>.$]
+      |-  ^-  [SNAPSHOT _+>.^$]
+      =^  SNAP=SNAPSHOT  OLD-QEU
+        ~(GET TO OLD-QEU)
+      =:  COUNT.SAP.EYE       +(COUNT.SAP.EYE)
+          LATEST-BLOCK.SAP.EYE  LAST-HEARD-BLOCK.SNAP
+          SNAPS.SAP.EYE       (~(PUT TO SNAPS.SAP.EYE) SNAP)
         ==
-      ?:  |(=(~ old-qeu) (lth block last-heard-block:(need ~(top to old-qeu))))
-        [snap +>.^$]
+      ?:  |(=(~ OLD-QEU) (LTH BLOCK LAST-HEARD-BLOCK:(NEED ~(TOP TO OLD-QEU))))
+        [SNAP +>.^$]
       $
-    ~&  [%restoring-block block last-heard-block.snap]
-    (restore-snap snap)
+    ~&  [%RESTORING-BLOCK BLOCK LAST-HEARD-BLOCK.SNAP]
+    (RESTORE-SNAP SNAP)
   ::
-  ::  +restore-snap: revert state to snapshot
+  ::  +RESTORE-SNAP: REVERT STATE TO SNAPSHOT
   ::
-  ++  restore-snap
-    |=  snap=snapshot
+  ++  RESTORE-SNAP
+    |=  SNAP=SNAPSHOT
     ^+  +>
-    ::  notify subscribers
-    ::TODO  be more nuanced about what changed, maybe
+    ::  NOTIFY SUBSCRIBERS
+    ::TODO  BE MORE NUANCED ABOUT WHAT CHANGED, MAYBE
     ::
-    =.  +>.$  (fan-diff snap+snap)
-    ::  restore state and kick new fetch cycle
+    =.  +>.$  (FAN-DIFF SNAP+SNAP)
+    ::  RESTORE STATE AND KICK NEW FETCH CYCLE
     ::
-    %=    get-latest-block
-        last-heard-block.eye  last-heard-block.snap
-        heard.eye         heard.snap
-        logs.eye          logs.snap
+    %=    GET-LATEST-BLOCK
+        LAST-HEARD-BLOCK.EYE  LAST-HEARD-BLOCK.SNAP
+        HEARD.EYE         HEARD.SNAP
+        LOGS.EYE          LOGS.SNAP
     ==
   --
 --

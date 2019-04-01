@@ -1,14 +1,14 @@
-::  LiSt directory subnodes
+::  LIST DIRECTORY SUBNODES
 ::
-::::  /hoon/ls/gen
+::::  /HOON/LS/GEN
   ::
 /?    310
-/+    show-dir
+/+    SHOW-DIR
 ::
 ::::
   ::
 ~&  %
-:-  %say
-|=  {^ {arg/path ~} vane/?($g $c)}
-=+  lon=.^(arch (cat 3 vane %y) arg)
-tang+[?~(dir.lon leaf+"~" (show-dir vane arg dir.lon))]~
+:-  %SAY
+|=  {^ {ARG/PATH ~} VANE/?($G $C)}
+=+  LON=.^(ARCH (CAT 3 VANE %Y) ARG)
+TANG+[?~(DIR.LON LEAF+"~" (SHOW-DIR VANE ARG DIR.LON))]~

@@ -1,11 +1,11 @@
 ::
-::::  /hoon/plan-diff/mar
+::::  /HOON/PLAN-DIFF/MAR
   ::
 /?    310
-/-    plan-diff
+/-    PLAN-DIFF
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-|_  plan-diff
-++  grab  |%  ++  noun  plan-diff
+|_  PLAN-DIFF
+++  GRAB  |%  ++  NOUN  PLAN-DIFF
 --        --

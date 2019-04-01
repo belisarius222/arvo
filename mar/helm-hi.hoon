@@ -1,19 +1,19 @@
 ::
-::::  /hoon/helm-hi/mar
+::::  /HOON/HELM-HI/MAR
   ::
 /?    310
-=,  mimes:html
-=,  format
-|_  txt/cord
+=,  MIMES:HTML
+=,  FORMAT
+|_  TXT/CORD
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  @t                                          ::  clam from %noun
-  ++  json  so:dejs
+  ++  NOUN  @T                                          ::  CLAM FROM %NOUN
+  ++  JSON  SO:DEJS
   --
-++  grow
+++  GROW
   |%
-  ++  psal  ;div: {(trip txt)}
-  ++  mime  [text+/plain (as-octs txt)]
+  ++  PSAL  ;DIV: {(TRIP TXT)}
+  ++  MIME  [TEXT+/PLAIN (AS-OCTS TXT)]
   --
 --

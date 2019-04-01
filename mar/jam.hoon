@@ -1,17 +1,17 @@
 ::
-::::  /hoon/jam/mar
+::::  /HOON/JAM/MAR
   ::
 /?    310
 ::
-=,  mimes:html
-|_  mud/@
-++  grow
+=,  MIMES:HTML
+|_  MUD/@
+++  GROW
   |%
-  ++  mime  [/application/octet-stream (as-octs mud)]
+  ++  MIME  [/APPLICATION/OCTET-STREAM (AS-OCTS MUD)]
   --
-++  grab
-  |%                                                    ::  convert from
-  ++  noun  @                                           ::  clam from %noun
+++  GRAB
+  |%                                                    ::  CONVERT FROM
+  ++  NOUN  @                                           ::  CLAM FROM %NOUN
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

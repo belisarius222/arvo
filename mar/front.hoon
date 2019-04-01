@@ -1,20 +1,20 @@
 ::
-::::  /hoon/front/mar
+::::  /HOON/FRONT/MAR
   ::
 /?    310
 ::
 ::::
   ::
-|_  all/(map knot cord)
+|_  ALL/(MAP KNOT CORD)
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  json
-    :-  %o
-    %-  ~(run by all)
-    |=(a/cord s+a)
+  ++  JSON
+    :-  %O
+    %-  ~(RUN BY ALL)
+    |=(A/CORD S+A)
   --
-++  grab  |%                                            ::  convert from
-          ++  noun  (map knot cord)                     ::  clam from %noun
-          :: ++  elem  ,~
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  (MAP KNOT CORD)                     ::  CLAM FROM %NOUN
+          :: ++  ELEM  ,~
 --        --

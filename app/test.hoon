@@ -1,180 +1,180 @@
 ::
 |%
-++  test
-  $%  [%arvo ~]       ::UNIMPLEMENTED
-      [%marks ~]      ::UNIMPLEMENTED
-      [%cores p=path]
-      [%hoons p=path]
-      [%names p=path]
-      [%renders p=path]
+++  TEST
+  $%  [%ARVO ~]       ::UNIMPLEMENTED
+      [%MARKS ~]      ::UNIMPLEMENTED
+      [%CORES P=PATH]
+      [%HOONS P=PATH]
+      [%NAMES P=PATH]
+      [%RENDERS P=PATH]
   ==
 --
 ::
 |%
-++  join
-  |=  {a/cord b/(list cord)}
-  ?~  b  ''
-  (rap 3 |-([i.b ?~(t.b ~ [a $(b t.b)])]))
+++  JOIN
+  |=  {A/CORD B/(LIST CORD)}
+  ?~  B  ''
+  (RAP 3 |-([I.B ?~(T.B ~ [A $(B T.B)])]))
 ::
-++  fake-fcgi  [%many [%blob *cred:eyre] $+[%n ~] ~]
+++  FAKE-FCGI  [%MANY [%BLOB *CRED:EYRE] $+[%N ~] ~]
 --
 ::
-=,  gall
-=,  ford
-=,  format
-|_  {bowl $~}
+=,  GALL
+=,  FORD
+=,  FORMAT
+|_  {BOWL $~}
 ::
-++  peek  _~
+++  PEEK  _~
 ::
-++  report-error
-  |=  [=spur bud=build-result]
-  ^-  tang
-  =/  should-fail  (~(get by failing) (flop spur))
-  ?-    -.bud
-      %success
-    ?~  should-fail  ~
-    :~  leaf+"warn: expected failure, {<`tape`u.should-fail>}"
-        leaf+"warn: built succesfully"
-        ?:  ?=(%bake +<.bud)
-          (sell q.cage.bud)
-        ?>  ?=(%core +<.bud)
-        (sell vase.bud)
+++  REPORT-ERROR
+  |=  [=SPUR BUD=BUILD-RESULT]
+  ^-  TANG
+  =/  SHOULD-FAIL  (~(GET BY FAILING) (FLOP SPUR))
+  ?-    -.BUD
+      %SUCCESS
+    ?~  SHOULD-FAIL  ~
+    :~  LEAF+"WARN: EXPECTED FAILURE, {<`TAPE`U.SHOULD-FAIL>}"
+        LEAF+"WARN: BUILT SUCCESFULLY"
+        ?:  ?=(%BAKE +<.BUD)
+          (SELL Q.CAGE.BUD)
+        ?>  ?=(%CORE +<.BUD)
+        (SELL VASE.BUD)
     ==
   ::
-      %error
-    ?^  should-fail
-      ~[>[%failed-known `tape`(weld "TODO: " u.should-fail)]<]
-    (flop message.bud)
+      %ERROR
+    ?^  SHOULD-FAIL
+      ~[>[%FAILED-KNOWN `TAPE`(WELD "TODO: " U.SHOULD-FAIL)]<]
+    (FLOP MESSAGE.BUD)
   ==
 ::
-++  made-a-core
-  |=  [=spur @da res=made-result]
+++  MADE-A-CORE
+  |=  [=SPUR @DA RES=MADE-RESULT]
   :_  +>.$
-  ?:  ?=([%incomplete *] res)
-    ~&  incomplete-core+spur
-    ((slog tang.res) ~)
-  ?.  ?=([%complete %success *] res)
-    ~&  unsuccessful-core+spur
-    ((slog message.build-result.res) ~)
-  ?>  ?=(^ +<.build-result.res)
-  %-  (slog (report-error spur head.build-result.res))
-  =/  nex=(list ^spur)
-    =<  p
-    ;;  ,[%success %$ %cont * p=(list ^spur)]
-    tail.build-result.res
-  ?~  nex  ~&(%cores-tested ~)
-  [ost (build-core nex)]~
+  ?:  ?=([%INCOMPLETE *] RES)
+    ~&  INCOMPLETE-CORE+SPUR
+    ((SLOG TANG.RES) ~)
+  ?.  ?=([%COMPLETE %SUCCESS *] RES)
+    ~&  UNSUCCESSFUL-CORE+SPUR
+    ((SLOG MESSAGE.BUILD-RESULT.RES) ~)
+  ?>  ?=(^ +<.BUILD-RESULT.RES)
+  %-  (SLOG (REPORT-ERROR SPUR HEAD.BUILD-RESULT.RES))
+  =/  NEX=(LIST ^SPUR)
+    =<  P
+    ;;  ,[%SUCCESS %$ %CONT * P=(LIST ^SPUR)]
+    TAIL.BUILD-RESULT.RES
+  ?~  NEX  ~&(%CORES-TESTED ~)
+  [OST (BUILD-CORE NEX)]~
 ::
-++  build-core
-  |=  [a=spur b=(list spur)]
-  ~&  >>  (flop a)
-  :-  %build
-  :+  a-core+a
-    live=|
-  ^-  schematic:ford
-  :-  [%core now-disc %hoon a]
-  [%$ %cont !>(b)]
+++  BUILD-CORE
+  |=  [A=SPUR B=(LIST SPUR)]
+  ~&  >>  (FLOP A)
+  :-  %BUILD
+  :+  A-CORE+A
+    LIVE=|
+  ^-  SCHEMATIC:FORD
+  :-  [%CORE NOW-DISC %HOON A]
+  [%$ %CONT !>(B)]
 ::
-++  made-a-rend
-  |=  [=spur @da res=made-result]
+++  MADE-A-REND
+  |=  [=SPUR @DA RES=MADE-RESULT]
   :_  +>.$
-  ?>  ?=([ren=term ~] spur)
-  =+  `[ren=term pax=path]`?~(spur !! spur)
-  ?:  ?=([%incomplete *] res)
-    ~&  incomplete-core+spur
-    ((slog tang.res) ~)
-  ?.  ?=([%complete %success *] res)
-    ~&  unsuccessful-core+spur
-    ((slog message.build-result.res) ~)
-  ?>  ?=(^ +<.build-result.res)
-  %-  (slog (report-error /[ren]/ren head.build-result.res))
-  =/  nex=(list term)
-    =<  p
-    ;;  ,[%success %$ %cont * p=(list term)]
-    tail.build-result.res
-  ?~  nex  ~&(%rens-tested ~)
-  [ost (build-rend nex)]~
+  ?>  ?=([REN=TERM ~] SPUR)
+  =+  `[REN=TERM PAX=PATH]`?~(SPUR !! SPUR)
+  ?:  ?=([%INCOMPLETE *] RES)
+    ~&  INCOMPLETE-CORE+SPUR
+    ((SLOG TANG.RES) ~)
+  ?.  ?=([%COMPLETE %SUCCESS *] RES)
+    ~&  UNSUCCESSFUL-CORE+SPUR
+    ((SLOG MESSAGE.BUILD-RESULT.RES) ~)
+  ?>  ?=(^ +<.BUILD-RESULT.RES)
+  %-  (SLOG (REPORT-ERROR /[REN]/REN HEAD.BUILD-RESULT.RES))
+  =/  NEX=(LIST TERM)
+    =<  P
+    ;;  ,[%SUCCESS %$ %CONT * P=(LIST TERM)]
+    TAIL.BUILD-RESULT.RES
+  ?~  NEX  ~&(%RENS-TESTED ~)
+  [OST (BUILD-REND NEX)]~
 ::
-++  build-rend
-  |=  [a=term b=(list term)]
-  ~&  >>  [%ren a]
-  :-  %build
-  :+  a-rend+/[a]
-    live=|
-  ^-  schematic:ford
-  =/  bem=beam  (need (de-beam %/example))
-  =/  =rail  [[p q] s]:bem
-  :-  [%bake a fake-fcgi rail]
-  [%$ %cont !>(b)]
+++  BUILD-REND
+  |=  [A=TERM B=(LIST TERM)]
+  ~&  >>  [%REN A]
+  :-  %BUILD
+  :+  A-REND+/[A]
+    LIVE=|
+  ^-  SCHEMATIC:FORD
+  =/  BEM=BEAM  (NEED (DE-BEAM %/EXAMPLE))
+  =/  =RAIL  [[P Q] S]:BEM
+  :-  [%BAKE A FAKE-FCGI RAIL]
+  [%$ %CONT !>(B)]
 ::
-++  poke-noun
-  |=  a=test
+++  POKE-NOUN
+  |=  A=TEST
   :_  +>
-  ?-    -.a
-      %arvo  ~|(%stub !!) ::basically double solid?
-      %hoons  ~&((list-hoons p.a ~) ~)
-      %cores  [ost (build-core [- +]:(list-hoons p.a skip=(sy /sys /ren /tests ~)))]~
-      %names  ~&((list-names p.a) ~)
-      %marks  ~|(%stub !!) ::TODO restore historical handler
-      %renders  [ost (build-rend [- +]:(list-names (weld /ren p.a)))]~
+  ?-    -.A
+      %ARVO  ~|(%STUB !!) ::BASICALLY DOUBLE SOLID?
+      %HOONS  ~&((LIST-HOONS P.A ~) ~)
+      %CORES  [OST (BUILD-CORE [- +]:(LIST-HOONS P.A SKIP=(SY /SYS /REN /TESTS ~)))]~
+      %NAMES  ~&((LIST-NAMES P.A) ~)
+      %MARKS  ~|(%STUB !!) ::TODO RESTORE HISTORICAL HANDLER
+      %RENDERS  [OST (BUILD-REND [- +]:(LIST-NAMES (WELD /REN P.A)))]~
   ==
 ::
-++  list-names
-  |=  a/path  ^-  (list term)
-  =/  hon  (list-hoons a ~)
-  %+  turn  hon
-  |=  b=spur
-  (join '-' (slag 1 (flop b)))
+++  LIST-NAMES
+  |=  A/PATH  ^-  (LIST TERM)
+  =/  HON  (LIST-HOONS A ~)
+  %+  TURN  HON
+  |=  B=SPUR
+  (JOIN '-' (SLAG 1 (FLOP B)))
 ::
-++  list-hoons
-  |=  [under=path skipping=(set spur)]  ^-  (list spur)
-  =/  sup  (flop under)
-  ~&  [%findining-hoons under=under]
-  |-  ^-  (list spur)
-  %-  zing
-  %+  turn
-    =-  (sort ~(tap by -) aor)
-    dir:.^(arch %cy (en-beam now-beak sup))
-  |=  [a=knot ~]  ^-  (list spur)
-  =.  sup  [a sup]
-  ?:  (~(has in skipping) (flop sup))
-    ~&(> [(flop sup) %out-of-scope] ~)
-  =/  ded  (~(get by skip-completely) (flop sup))
-  ?^  ded
-    ~&(> [(flop sup) %skipped `tape`u.ded] ~)
-  ?~  [fil:.^(arch %cy (en-beam now-beak [%hoon sup]))]
+++  LIST-HOONS
+  |=  [UNDER=PATH SKIPPING=(SET SPUR)]  ^-  (LIST SPUR)
+  =/  SUP  (FLOP UNDER)
+  ~&  [%FINDINING-HOONS UNDER=UNDER]
+  |-  ^-  (LIST SPUR)
+  %-  ZING
+  %+  TURN
+    =-  (SORT ~(TAP BY -) AOR)
+    DIR:.^(ARCH %CY (EN-BEAM NOW-BEAK SUP))
+  |=  [A=KNOT ~]  ^-  (LIST SPUR)
+  =.  SUP  [A SUP]
+  ?:  (~(HAS IN SKIPPING) (FLOP SUP))
+    ~&(> [(FLOP SUP) %OUT-OF-SCOPE] ~)
+  =/  DED  (~(GET BY SKIP-COMPLETELY) (FLOP SUP))
+  ?^  DED
+    ~&(> [(FLOP SUP) %SKIPPED `TAPE`U.DED] ~)
+  ?~  [FIL:.^(ARCH %CY (EN-BEAM NOW-BEAK [%HOON SUP]))]
     ^$
-  ~&  (flop sup)
-  [sup ^$]
+  ~&  (FLOP SUP)
+  [SUP ^$]
 ::
-++  now-beak  %_(byk r [%da now])
-++  now-disc  `disc:ford`[p.byk q.byk]
-++  skip-completely
-  ^~  ^-  (map path tape)
-  %-  my  :~ ::TODO don't hardcode
-    :-  /ren/css            "not meant to be called outside /web/pack"
-    :-  /ren/js             "not meant to be called outside /web/pack"
-    :-  /ren/run            "not meant to be called except on a (different) hoon file"
-    :-  /ren/collections    "temporarily disabled"
-    :-  /ren/test-gen       "temporarily disabled"
-    :-  /ren/urb            "temporarily disabled"
-    :-  /ren/x-urb          "temporarily disabled"
-    :-  /ren/x-htm          "temporarily disabled"
-    :-  /ren/x-collections-snip          "temporarily disabled"
-    :-  /ren/x-collections-json          "temporarily disabled"
+++  NOW-BEAK  %_(BYK R [%DA NOW])
+++  NOW-DISC  `DISC:FORD`[P.BYK Q.BYK]
+++  SKIP-COMPLETELY
+  ^~  ^-  (MAP PATH TAPE)
+  %-  MY  :~ ::TODO DON'T HARDCODE
+    :-  /REN/CSS            "NOT MEANT TO BE CALLED OUTSIDE /WEB/PACK"
+    :-  /REN/JS             "NOT MEANT TO BE CALLED OUTSIDE /WEB/PACK"
+    :-  /REN/RUN            "NOT MEANT TO BE CALLED EXCEPT ON A (DIFFERENT) HOON FILE"
+    :-  /REN/COLLECTIONS    "TEMPORARILY DISABLED"
+    :-  /REN/TEST-GEN       "TEMPORARILY DISABLED"
+    :-  /REN/URB            "TEMPORARILY DISABLED"
+    :-  /REN/X-URB          "TEMPORARILY DISABLED"
+    :-  /REN/X-HTM          "TEMPORARILY DISABLED"
+    :-  /REN/X-COLLECTIONS-SNIP          "TEMPORARILY DISABLED"
+    :-  /REN/X-COLLECTIONS-JSON          "TEMPORARILY DISABLED"
   ::
-    :-  /web/landscape      "/$ doensn't work in tests"
+    :-  /WEB/LANDSCAPE      "/$ DOENSN'T WORK IN TESTS"
   ==
 ::
-++  failing
-  ^~  ^-  (map path tape)
-  %-  my  :~ ::TODO don't hardcode
+++  FAILING
+  ^~  ^-  (MAP PATH TAPE)
+  %-  MY  :~ ::TODO DON'T HARDCODE
   ::
-    :-  /gen/al                "compiler types out-of-date"
-    :-  /gen/musk              "compiler types out-of-date"
+    :-  /GEN/AL                "COMPILER TYPES OUT-OF-DATE"
+    :-  /GEN/MUSK              "COMPILER TYPES OUT-OF-DATE"
   ::
-    :-  /gen/cosmetic          "incomplete"
-    :-  /gen/lust              "incomplete"
-    :-  /gen/scantastic        "incomplete"
+    :-  /GEN/COSMETIC          "INCOMPLETE"
+    :-  /GEN/LUST              "INCOMPLETE"
+    :-  /GEN/SCANTASTIC        "INCOMPLETE"
   ==
 --

@@ -1,25 +1,25 @@
 ::
-::::  /hoon/mime/mar
+::::  /HOON/MIME/MAR
   ::
 /?    310
 ::
-|_  own/mime
-++  grow
+|_  OWN/MIME
+++  GROW
   |%
-  ++  jam  `@`q.q.own
+  ++  JAM  `@`Q.Q.OWN
   --
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  mime                                  ::  clam from %noun
-  ++  tape
-    |=(a/_"" [/application/x-urb-unknown (as-octt:mimes:html a)])
+  ++  NOUN  MIME                                  ::  CLAM FROM %NOUN
+  ++  TAPE
+    |=(A/_"" [/APPLICATION/X-URB-UNKNOWN (AS-OCTT:MIMES:HTML A)])
   --
-++  grad
+++  GRAD
   |%
-  ++  form  %mime
-  ++  diff  |=(mime +<)
-  ++  pact  |=(mime +<)
-  ++  join  |=({mime mime} `(unit mime)`~)
+  ++  FORM  %MIME
+  ++  DIFF  |=(MIME +<)
+  ++  PACT  |=(MIME +<)
+  ++  JOIN  |=({MIME MIME} `(UNIT MIME)`~)
   --
 --

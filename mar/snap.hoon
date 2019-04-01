@@ -1,16 +1,16 @@
 ::
-::::  /hoon/snap/mar
+::::  /HOON/SNAP/MAR
   ::
-=,  mimes:html
-|_  snap/snapshot:jael
-++  grow
+=,  MIMES:HTML
+|_  SNAP/SNAPSHOT:JAEL
+++  GROW
   |%
-  ++  mime  [/application/octet-stream (jam snap)]
+  ++  MIME  [/APPLICATION/OCTET-STREAM (JAM SNAP)]
   --
-++  grab
+++  GRAB
   |%
-  ++  noun  snapshot:jael
-  ++  mime  |=([p=mite:eyre q=octs:eyre] (cue q.q))
+  ++  NOUN  SNAPSHOT:JAEL
+  ++  MIME  |=([P=MITE:EYRE Q=OCTS:EYRE] (CUE Q.Q))
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

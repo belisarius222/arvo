@@ -1,11 +1,11 @@
 ::
-::::  /hoon/email/mar
+::::  /HOON/EMAIL/MAR
   ::
 /?    310
-|_  {adr/@ta tyl/tape mez/wall}
+|_  {ADR/@TA TYL/TAPE MEZ/WALL}
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  {@ta tape wall}                                  ::  clam from %noun
+  ++  NOUN  {@TA TAPE WALL}                                  ::  CLAM FROM %NOUN
   --
 --

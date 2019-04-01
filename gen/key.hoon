@@ -1,31 +1,31 @@
-::  Create a private key-file
+::  CREATE A PRIVATE KEY-FILE
 ::
-/-  *sole
-/+  *generators
+/-  *SOLE
+/+  *GENERATORS
 ::
-:-  %ask
-|=  $:  [now=@da eny=@uvJ bec=beak]
-        [who=ship ~]
-        life=_1
+:-  %ASK
+|=  $:  [NOW=@DA ENY=@UVJ BEC=BEAK]
+        [WHO=SHIP ~]
+        LIFE=_1
     ==
-^-  (sole-result (cask cord))
-%+  print   leaf+"generating keys for {(scow %p who)}, life #{(scow %ud life)}"
-%+  prompt  [%| %pope-pass "passphrase: "]
-%+  parse   (boss 256 (star prn))
-|=  fra/@t
-=/  bur  (shaz (add who (shaz fra)))
-=/  cub  (pit:nu:crub:crypto 512 bur)
+^-  (SOLE-RESULT (CASK CORD))
+%+  PRINT   LEAF+"GENERATING KEYS FOR {(SCOW %P WHO)}, LIFE #{(SCOW %UD LIFE)}"
+%+  PROMPT  [%| %POPE-PASS "PASSPHRASE: "]
+%+  PARSE   (BOSS 256 (STAR PRN))
+|=  FRA/@T
+=/  BUR  (SHAZ (ADD WHO (SHAZ FRA)))
+=/  CUB  (PIT:NU:CRUB:CRYPTO 512 BUR)
 ::
-=/  pub=pass  pub:ex:cub
-=/  mag=cord  (end 3 1 pub)
-?>  =('b' mag)
-=/  bod=@  (rsh 3 1 pub)
-=/  cry=@  (rsh 8 1 bod)
-=/  sgn=@  (end 8 1 bod)
-%+  print  leaf+"  authentication: 0x{(render-hex-bytes:ethereum 32 sgn)}"
-%+  print  leaf+"  networking:     0x{(render-hex-bytes:ethereum 32 cry)}"
-%+  print  leaf+"ethereum public keys:"
+=/  PUB=PASS  PUB:EX:CUB
+=/  MAG=CORD  (END 3 1 PUB)
+?>  =('B' MAG)
+=/  BOD=@  (RSH 3 1 PUB)
+=/  CRY=@  (RSH 8 1 BOD)
+=/  SGN=@  (END 8 1 BOD)
+%+  PRINT  LEAF+"  AUTHENTICATION: 0X{(RENDER-HEX-BYTES:ETHEREUM 32 SGN)}"
+%+  PRINT  LEAF+"  NETWORKING:     0X{(RENDER-HEX-BYTES:ETHEREUM 32 CRY)}"
+%+  PRINT  LEAF+"ETHEREUM PUBLIC KEYS:"
 ::
-=/  sed=seed:able:jael
-  [who life sec:ex:cub ~]
-%-  produce  [%atom (scot %uw (jam sed))]
+=/  SED=SEED:ABLE:JAEL
+  [WHO LIFE SEC:EX:CUB ~]
+%-  PRODUCE  [%ATOM (SCOT %UW (JAM SED))]

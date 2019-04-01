@@ -1,1 +1,1 @@
-prey:pubsub:userlib
+PREY:PUBSUB:USERLIB

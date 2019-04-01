@@ -1,102 +1,102 @@
 ::
-::::  /hoon/plan/mar
+::::  /HOON/PLAN/MAR
   ::
 /?    310
-/-    plan-acct, plan-diff
+/-    PLAN-ACCT, PLAN-DIFF
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-=,  eyre
-=,  html
-=,  format
-|_  all/{{who/@txname loc/@txloc} acc/(map knot plan-acct)}
+=,  EYRE
+=,  HTML
+=,  FORMAT
+|_  ALL/{{WHO/@TXNAME LOC/@TXLOC} ACC/(MAP KNOT PLAN-ACCT)}
 ::
-++  grow                                                ::  convert to
-  =+  all
+++  GROW                                                ::  CONVERT TO
+  =+  ALL
   |%
-  ++  txt
-    ^-  wain
-    :+  (cat 3 'User ' ?~(who 'of Urbit' who))
-      (cat 3 'Location ' ?~(loc %unknown loc))
-    %+  turn  (sort ~(tap by acc) aor)
-    |=  {a/knot b/plan-acct}  ^-  cord
-    %+  rap  3
-    :^  a  ': '  usr.b
-    ?~(url.b ~ [', ' (apix:en-purl u.url.b)])
+  ++  TXT
+    ^-  WAIN
+    :+  (CAT 3 'USER ' ?~(WHO 'OF URBIT' WHO))
+      (CAT 3 'LOCATION ' ?~(LOC %UNKNOWN LOC))
+    %+  TURN  (SORT ~(TAP BY ACC) AOR)
+    |=  {A/KNOT B/PLAN-ACCT}  ^-  CORD
+    %+  RAP  3
+    :^  A  ': '  USR.B
+    ?~(URL.B ~ [', ' (APIX:EN-PURL U.URL.B)])
   ::
-  ++  plan-json
-    %-  pairs:enjs  :~
-      who+?~(who ~ s+who)
-      loc+?~(loc ~ s+loc)
-      acc+o+(~(run by acc) json-acct)
+  ++  PLAN-JSON
+    %-  PAIRS:ENJS  :~
+      WHO+?~(WHO ~ S+WHO)
+      LOC+?~(LOC ~ S+LOC)
+      ACC+O+(~(RUN BY ACC) JSON-ACCT)
     ==
-  ++  json-acct                       ::  helper
-    |=  a/plan-acct  ^-  json
-    =/  url  ?~(url.a ~ (tape:enjs (apix:en-purl u.url.a)))
-    (pairs:enjs usr+s+usr.a url+url ~)
+  ++  JSON-ACCT                       ::  HELPER
+    |=  A/PLAN-ACCT  ^-  JSON
+    =/  URL  ?~(URL.A ~ (TAPE:ENJS (APIX:EN-PURL U.URL.A)))
+    (PAIRS:ENJS USR+S+USR.A URL+URL ~)
   --
-++  grab  |%                                            ::  convert from
-          ++  noun  {{cord cord} (map knot plan-acct)}  ::  clam from %noun
-          ++  txt
-            |^  |=  a/wain  ^+  all
-                ?>  ?=({@t @t *} a)
-                :-  [(rash i.a user) (rash i.t.a location)]
-                (malt (turn t.t.a |=(b/cord (rash b account))))
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  {{CORD CORD} (MAP KNOT PLAN-ACCT)}  ::  CLAM FROM %NOUN
+          ++  TXT
+            |^  |=  A/WAIN  ^+  ALL
+                ?>  ?=({@T @T *} A)
+                :-  [(RASH I.A USER) (RASH I.T.A LOCATION)]
+                (MALT (TURN T.T.A |=(B/CORD (RASH B ACCOUNT))))
             ::
-            ++  user  ;~(pfix (jest 'User ') (cook crip (star prn)))
-            ++  knot  %+  cook  crip
-                      (plus ;~(pose nud low hig hep dot sig cab))
-            ++  location  ;~(pfix (jest 'Location ') (cook crip (star prn)))
-            ++  account
-              ;~  plug
-                knot
-                ;~(pfix col ace knot)
-                (punt ;~(pfix com ace aurf:de-purl))
+            ++  USER  ;~(PFIX (JEST 'USER ') (COOK CRIP (STAR PRN)))
+            ++  KNOT  %+  COOK  CRIP
+                      (PLUS ;~(POSE NUD LOW HIG HEP DOT SIG CAB))
+            ++  LOCATION  ;~(PFIX (JEST 'LOCATION ') (COOK CRIP (STAR PRN)))
+            ++  ACCOUNT
+              ;~  PLUG
+                KNOT
+                ;~(PFIX COL ACE KNOT)
+                (PUNT ;~(PFIX COM ACE AURF:DE-PURL))
               ==
             --
-          ++  mime  |=({* a/octs} (txt (to-wain q.a)))     ::  XX mark translation
+          ++  MIME  |=({* A/OCTS} (TXT (TO-WAIN Q.A)))     ::  XX MARK TRANSLATION
           --
-++  grad
+++  GRAD
   |%
-  ++  form  %plan-diff
-  ++  diff
-    |=  neu/_all  ^-  plan-diff                        :: XXX map functions
-    :+  ?:(=(-.all -.neu) ~ (some -.neu))
-      =<  (malt `(list {knot ~})`(murn ~(tap by acc.all) .))
-      |=  {a/knot *}  ^-  (unit {knot ~})
-      ?:((~(has by acc.neu) a) ~ (some [a ~]))
-    =<  (malt (murn ~(tap by acc.neu) .))
-    |=  {a/knot b/plan-acct}  ^-  (unit {knot plan-acct})
-    ?:  =([~ b] (~(get by acc.all) a))
+  ++  FORM  %PLAN-DIFF
+  ++  DIFF
+    |=  NEU/_ALL  ^-  PLAN-DIFF                        :: XXX MAP FUNCTIONS
+    :+  ?:(=(-.ALL -.NEU) ~ (SOME -.NEU))
+      =<  (MALT `(LIST {KNOT ~})`(MURN ~(TAP BY ACC.ALL) .))
+      |=  {A/KNOT *}  ^-  (UNIT {KNOT ~})
+      ?:((~(HAS BY ACC.NEU) A) ~ (SOME [A ~]))
+    =<  (MALT (MURN ~(TAP BY ACC.NEU) .))
+    |=  {A/KNOT B/PLAN-ACCT}  ^-  (UNIT {KNOT PLAN-ACCT})
+    ?:  =([~ B] (~(GET BY ACC.ALL) A))
       ~
-    (some [a b])
+    (SOME [A B])
   ::
-  ++  pact
-    |=  dif/plan-diff  ^+  all                          :: XXX map functions
-    :-  (fall inf.dif -.all)
-    =;  neu  (~(uni by neu) put.dif)
-    =+  del=~(tap by del.dif)
-    |-  ^+  acc.all
-    ?~  del  acc.all
-    $(del t.del, acc.all (~(del by acc.all) p.i.del))
+  ++  PACT
+    |=  DIF/PLAN-DIFF  ^+  ALL                          :: XXX MAP FUNCTIONS
+    :-  (FALL INF.DIF -.ALL)
+    =;  NEU  (~(UNI BY NEU) PUT.DIF)
+    =+  DEL=~(TAP BY DEL.DIF)
+    |-  ^+  ACC.ALL
+    ?~  DEL  ACC.ALL
+    $(DEL T.DEL, ACC.ALL (~(DEL BY ACC.ALL) P.I.DEL))
   ::
-  ++  can-join
-    |=  {ali/plan-diff bob/plan-diff}  ^-  ?
-    ?&  !&(?=({{^ *} {^ *}} +<) !=(u.inf.ali u.inf.bob)) :: compatible info
-        =(~ (~(int by `(map knot *)`del.ali) put.bob))  :: no del-put
-        =(~ (~(int by `(map knot *)`put.ali) del.bob))  :: conflicts
-        .=  (~(int by put.ali) put.bob)                 :: and all put
-        (~(int by put.bob) put.ali)                     :: values match
+  ++  CAN-JOIN
+    |=  {ALI/PLAN-DIFF BOB/PLAN-DIFF}  ^-  ?
+    ?&  !&(?=({{^ *} {^ *}} +<) !=(U.INF.ALI U.INF.BOB)) :: COMPATIBLE INFO
+        =(~ (~(INT BY `(MAP KNOT *)`DEL.ALI) PUT.BOB))  :: NO DEL-PUT
+        =(~ (~(INT BY `(MAP KNOT *)`PUT.ALI) DEL.BOB))  :: CONFLICTS
+        .=  (~(INT BY PUT.ALI) PUT.BOB)                 :: AND ALL PUT
+        (~(INT BY PUT.BOB) PUT.ALI)                     :: VALUES MATCH
     ==
   ::
-  ++  join
-    |=  {ali/plan-diff bob/plan-diff}
-    ^-  (unit plan-diff)
-    ?.  (can-join ali bob)
+  ++  JOIN
+    |=  {ALI/PLAN-DIFF BOB/PLAN-DIFF}
+    ^-  (UNIT PLAN-DIFF)
+    ?.  (CAN-JOIN ALI BOB)
       ~
-    %^    some
-        (mate inf.ali inf.bob)
-      (~(uni by del.ali) del.bob)
-    (~(uni by put.ali) put.bob)
+    %^    SOME
+        (MATE INF.ALI INF.BOB)
+      (~(UNI BY DEL.ALI) DEL.BOB)
+    (~(UNI BY PUT.ALI) PUT.BOB)
   --
 --

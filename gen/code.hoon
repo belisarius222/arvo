@@ -1,16 +1,16 @@
-::  Login code for web UI
+::  LOGIN CODE FOR WEB UI
 ::
-::::  /hoon/code/gen
+::::  /HOON/CODE/GEN
   ::
-:-  %say
-|=  $:  {now/@da eny/@uvJ bec/beak}
+:-  %SAY
+|=  $:  {NOW/@DA ENY/@UVJ BEC/BEAK}
         ~
         ~
     ==
-:-  %tang
+:-  %TANG
 :_  ~
-:-  %leaf
-=*  our  p.bec
-%+  slag  1
-%+  scow  %p
-.^(@p %j /(scot %p our)/code/(scot %da now)/(scot %p our))
+:-  %LEAF
+=*  OUR  P.BEC
+%+  SLAG  1
+%+  SCOW  %P
+.^(@P %J /(SCOT %P OUR)/CODE/(SCOT %DA NOW)/(SCOT %P OUR))

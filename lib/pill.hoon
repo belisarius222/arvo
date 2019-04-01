@@ -1,122 +1,122 @@
-::  |pill: helper functions for making pills
+::  |PILL: HELPER FUNCTIONS FOR MAKING PILLS
 ::
 ^?
 |%
-::  +module-ova: vane load operations.
+::  +MODULE-OVA: VANE LOAD OPERATIONS.
 ::
-::    sys: full path to /sys directory
+::    SYS: FULL PATH TO /SYS DIRECTORY
 ::
-++  module-ova
-  |=  sys=path
-  ^-  (list [wire [%veer term path cord]])
-  %+  turn
-    ^-  (list (pair term path))
-    :~  ::  sys/zuse: standard library
+++  MODULE-OVA
+  |=  SYS=PATH
+  ^-  (LIST [WIRE [%VEER TERM PATH CORD]])
+  %+  TURN
+    ^-  (LIST (PAIR TERM PATH))
+    :~  ::  SYS/ZUSE: STANDARD LIBRARY
         ::
-        [%$ /zuse]
-        ::  sys/vane/ames: network
+        [%$ /ZUSE]
+        ::  SYS/VANE/AMES: NETWORK
         ::
-        [%a /vane/ames]
-        ::  sys/vane/behn: timer
+        [%A /VANE/AMES]
+        ::  SYS/VANE/BEHN: TIMER
         ::
-        [%b /vane/behn]
-        ::  sys/vane/clay: revision control
+        [%B /VANE/BEHN]
+        ::  SYS/VANE/CLAY: REVISION CONTROL
         ::
-        [%c /vane/clay]
-        ::  sys/vane/dill: console
+        [%C /VANE/CLAY]
+        ::  SYS/VANE/DILL: CONSOLE
         ::
-        [%d /vane/dill]
-        ::  sys/vane/eyre: web
+        [%D /VANE/DILL]
+        ::  SYS/VANE/EYRE: WEB
         ::
-        [%e /vane/eyre]
-        ::  sys/vane/ford: build
+        [%E /VANE/EYRE]
+        ::  SYS/VANE/FORD: BUILD
         ::
-        [%f /vane/ford]
-        ::  sys/vane/gall: applications
+        [%F /VANE/FORD]
+        ::  SYS/VANE/GALL: APPLICATIONS
         ::
-        [%g /vane/gall]
-        ::  sys/vane/jael: security
+        [%G /VANE/GALL]
+        ::  SYS/VANE/JAEL: SECURITY
         ::
-        [%j /vane/jael]
+        [%J /VANE/JAEL]
     ==
-  |=  [=term =path]
-  =/  pax  (weld sys path)
-  =/  txt  .^(@ %cx (weld pax /hoon))
-  [[%vane path] [%veer term pax txt]]
-::  +file-ovum: userspace filesystem load
+  |=  [=TERM =PATH]
+  =/  PAX  (WELD SYS PATH)
+  =/  TXT  .^(@ %CX (WELD PAX /HOON))
+  [[%VANE PATH] [%VEER TERM PAX TXT]]
+::  +FILE-OVUM: USERSPACE FILESYSTEM LOAD
 ::
-::     bas: full path to / directory
+::     BAS: FULL PATH TO / DIRECTORY
 ::
-++  file-ovum
-  |=  bas=path
-  ^-  ovum
+++  FILE-OVUM
+  |=  BAS=PATH
+  ^-  OVUM
   ::
-  ::    /app    %gall applications
-  ::    /gen    :dojo generators
-  ::    /lib    %ford libraries
-  ::    /mar    %ford marks
-  ::    /ren    %ford renderers
-  ::    /sec    %eyre security drivers
-  ::    /sur    %ford structures
-  ::    /sys    system files
-  ::    /tests  unit tests
-  ::    /web    %eyre web content
+  ::    /APP    %GALL APPLICATIONS
+  ::    /GEN    :DOJO GENERATORS
+  ::    /LIB    %FORD LIBRARIES
+  ::    /MAR    %FORD MARKS
+  ::    /REN    %FORD RENDERERS
+  ::    /SEC    %EYRE SECURITY DRIVERS
+  ::    /SUR    %FORD STRUCTURES
+  ::    /SYS    SYSTEM FILES
+  ::    /TESTS  UNIT TESTS
+  ::    /WEB    %EYRE WEB CONTENT
   ::
-  %.  [/app /gen /lib /mar /ren /sec /sur /sys /tests /web ~]
-  |=  ::  sal: all spurs to load from
+  %.  [/APP /GEN /LIB /MAR /REN /SEC /SUR /SYS /TESTS /WEB ~]
+  |=  ::  SAL: ALL SPURS TO LOAD FROM
       ::
-      sal/(list spur)
-  ^-  ovum
+      SAL/(LIST SPUR)
+  ^-  OVUM
   ::
-  ::  hav: all user files
+  ::  HAV: ALL USER FILES
   ::
-  =;  hav  ~&  user-files+(lent hav)
-           [[%$ %sync ~] [%into %$ & hav]]
-  =|  hav/mode:clay
-  |-  ^+  hav
-  ?~  sal  ~
-  =.  hav  $(sal t.sal)
+  =;  HAV  ~&  USER-FILES+(LENT HAV)
+           [[%$ %SYNC ~] [%INTO %$ & HAV]]
+  =|  HAV/MODE:CLAY
+  |-  ^+  HAV
+  ?~  SAL  ~
+  =.  HAV  $(SAL T.SAL)
   ::
-  ::  tyl: spur
+  ::  TYL: SPUR
   ::
-  =/  tyl  i.sal
-  |-  ^+  hav
+  =/  TYL  I.SAL
+  |-  ^+  HAV
   ::
-  ::  pax: full path at `tyl`
-  ::  lon: directory at `tyl`
+  ::  PAX: FULL PATH AT `TYL`
+  ::  LON: DIRECTORY AT `TYL`
   ::
-  =/  pax  (weld bas (flop tyl))
-  =/  lon  .^(arch %cy pax)
-  ::  XX this serialization should use marks
+  =/  PAX  (WELD BAS (FLOP TYL))
+  =/  LON  .^(ARCH %CY PAX)
+  ::  XX THIS SERIALIZATION SHOULD USE MARKS
   ::
-  =?  hav  ?=(^ fil.lon)
-      ?.  ?=  ?($css $hoon $js $json $md $txt $udon $umd)
-          -.tyl
+  =?  HAV  ?=(^ FIL.LON)
+      ?.  ?=  ?($CSS $HOON $JS $JSON $MD $TXT $UDON $UMD)
+          -.TYL
         ::
-        ::  install only files with whitelisted marks
+        ::  INSTALL ONLY FILES WITH WHITELISTED MARKS
         ::
-        ~&  ignoring+pax
-        hav
+        ~&  IGNORING+PAX
+        HAV
       ::
-      ::  cot: file as plain-text octet-stream
+      ::  COT: FILE AS PLAIN-TEXT OCTET-STREAM
       ::
-      =;  cot  [[(flop `path`tyl) `[/text/plain cot]] hav]
-      ^-  octs
-      ?-    tyl
-          {$json *}
-        =/  dat  .^(json %cx pax)
-        (as-octt:mimes:html (en-json:html dat))
+      =;  COT  [[(FLOP `PATH`TYL) `[/TEXT/PLAIN COT]] HAV]
+      ^-  OCTS
+      ?-    TYL
+          {$JSON *}
+        =/  DAT  .^(JSON %CX PAX)
+        (AS-OCTT:MIMES:HTML (EN-JSON:HTML DAT))
       ::
-          {$txt *}
-        =/  dat  .^(wain %cx pax)
-        (as-octs:mimes:html (of-wain:format dat))
+          {$TXT *}
+        =/  DAT  .^(WAIN %CX PAX)
+        (AS-OCTS:MIMES:HTML (OF-WAIN:FORMAT DAT))
       ::
           *
-        =/  dat  .^(@t %cx pax)
-        [(met 3 dat) dat]
+        =/  DAT  .^(@T %CX PAX)
+        [(MET 3 DAT) DAT]
       ==
-  =/  all  ~(tap by dir.lon)
-  |-  ^-  mode:clay
-  ?~  all  hav
-  $(all t.all, hav ^$(tyl [p.i.all tyl]))
+  =/  ALL  ~(TAP BY DIR.LON)
+  |-  ^-  MODE:CLAY
+  ?~  ALL  HAV
+  $(ALL T.ALL, HAV ^$(TYL [P.I.ALL TYL]))
 --

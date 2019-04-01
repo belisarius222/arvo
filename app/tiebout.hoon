@@ -1,269 +1,269 @@
-/-  hall, tiebout
-=,  tiebout
-=,  eyre
+/-  HALL, TIEBOUT
+=,  TIEBOUT
+=,  EYRE
 |%
-+$  move  [bone card]
++$  MOVE  [BONE CARD]
 ::
-+$  card
-  $%  [%poke wire dock poke]
-      [%peer wire dock path]
-      [%pull wire dock ~]
-      [%diff diff]
-      [%hiss wire [~ ~] %httr %hiss hiss]
++$  CARD
+  $%  [%POKE WIRE DOCK POKE]
+      [%PEER WIRE DOCK PATH]
+      [%PULL WIRE DOCK ~]
+      [%DIFF DIFF]
+      [%HISS WIRE [~ ~] %HTTR %HISS HISS]
   ==
 ::
-+$  diff
-  $%  [%hall-rumor rumor:hall]
-      [%tiebout-action action]
++$  DIFF
+  $%  [%HALL-RUMOR RUMOR:HALL]
+      [%TIEBOUT-ACTION ACTION]
   ==
 ::
-+$  poke
-  $%  [%tiebout-action action]
++$  POKE
+  $%  [%TIEBOUT-ACTION ACTION]
   ==
 ::
-+$  state
-  $%  [%0 tiebout-zero]
++$  STATE
+  $%  [%0 TIEBOUT-ZERO]
   ==
 ::
-+$  tiebout-zero
++$  TIEBOUT-ZERO
   $:
-      ::  iOS device token
+      ::  IOS DEVICE TOKEN
       ::
-      token=@t
-      ::  ship that routes notifications to Apple
+      TOKEN=@T
+      ::  SHIP THAT ROUTES NOTIFICATIONS TO APPLE
       ::
-      king=@p
-      ::  url of Apple server to send notifications to
+      KING=@P
+      ::  URL OF APPLE SERVER TO SEND NOTIFICATIONS TO
       ::
-      baseurl=@t
-      ::  name and last read
+      BASEURL=@T
+      ::  NAME AND LAST READ
       ::
-      circles=(map name:hall @)
+      CIRCLES=(MAP NAME:HALL @)
   ==
 ::
 --
 ::
-::  state:
+::  STATE:
 ::
-|_  [bol=bowl:gall sta=state]
+|_  [BOL=BOWL:GALL STA=STATE]
 ::
-::  +this: app core subject
+::  +THIS: APP CORE SUBJECT
 ::
-++  this  .
+++  THIS  .
 ::
-::  +prep: set up app state, upgrade app state
+::  +PREP: SET UP APP STATE, UPGRADE APP STATE
 ::
-++  prep
-  |=  old=(unit state)
-  ^-  (quip move _this)
-  ?~  old
+++  PREP
+  |=  OLD=(UNIT STATE)
+  ^-  (QUIP MOVE _THIS)
+  ?~  OLD
     :-  ~
-    %=  this
-      king.sta  ~dabben-larbet
-      baseurl.sta  'https://api.push.apple.com/3/device/'
+    %=  THIS
+      KING.STA  ~DABBEN-LARBET
+      BASEURL.STA  'HTTPS://API.PUSH.APPLE.COM/3/DEVICE/'
     ==
-  ?-  -.u.old
+  ?-  -.U.OLD
     %0
-      [~ this(sta u.old)]
+      [~ THIS(STA U.OLD)]
   ==
 ::
-::  +coup: receive acknowledgement for poke, print error if it failed
+::  +COUP: RECEIVE ACKNOWLEDGEMENT FOR POKE, PRINT ERROR IF IT FAILED
 ::
-++  coup
-  |=  [wir=wire err=(unit tang)]
-  ^-  (quip move _this)
-  ?~  err
-    [~ this]
-  (mean u.err)
+++  COUP
+  |=  [WIR=WIRE ERR=(UNIT TANG)]
+  ^-  (QUIP MOVE _THIS)
+  ?~  ERR
+    [~ THIS]
+  (MEAN U.ERR)
 ::
-::  +poke-noun: receive debugging actions
+::  +POKE-NOUN: RECEIVE DEBUGGING ACTIONS
 ::
-++  poke-noun
-  |=  act=action
-  ^-  (quip move _this)
-  (poke-tiebout-action act)
+++  POKE-NOUN
+  |=  ACT=ACTION
+  ^-  (QUIP MOVE _THIS)
+  (POKE-TIEBOUT-ACTION ACT)
 ::
-::  +poke-tiebout-action: main action handler
+::  +POKE-TIEBOUT-ACTION: MAIN ACTION HANDLER
 ::
-++  poke-tiebout-action
-  |=  act=action
-  ^-  (quip move _this)
-  ?-  -.act
-    $king        (set-king +.act)
-    $token       (set-token +.act)
-    $baseurl     (set-baseurl +.act)
-    $add-circle  (add-circle +.act)
-    $del-circle  (del-circle +.act)
-    $notify      (send-notify +.act)
+++  POKE-TIEBOUT-ACTION
+  |=  ACT=ACTION
+  ^-  (QUIP MOVE _THIS)
+  ?-  -.ACT
+    $KING        (SET-KING +.ACT)
+    $TOKEN       (SET-TOKEN +.ACT)
+    $BASEURL     (SET-BASEURL +.ACT)
+    $ADD-CIRCLE  (ADD-CIRCLE +.ACT)
+    $DEL-CIRCLE  (DEL-CIRCLE +.ACT)
+    $NOTIFY      (SEND-NOTIFY +.ACT)
   ==
 ::
-::  +add-circle: add circle and subscribe for updates
+::  +ADD-CIRCLE: ADD CIRCLE AND SUBSCRIBE FOR UPDATES
 ::
-++  add-circle
-  |=  nom=name:hall
-  ^-  (quip move _this)
-  :_  this(circles.sta (~(put by circles.sta) nom 0))
-  [ost.bol %peer /our/[nom] [our.bol %hall] /circle/[nom]/config/grams]~
+++  ADD-CIRCLE
+  |=  NOM=NAME:HALL
+  ^-  (QUIP MOVE _THIS)
+  :_  THIS(CIRCLES.STA (~(PUT BY CIRCLES.STA) NOM 0))
+  [OST.BOL %PEER /OUR/[NOM] [OUR.BOL %HALL] /CIRCLE/[NOM]/CONFIG/GRAMS]~
 ::
-::  +del-circle: delete circle and unsubscribe from updates
+::  +DEL-CIRCLE: DELETE CIRCLE AND UNSUBSCRIBE FROM UPDATES
 ::
-++  del-circle
-  |=  nom=name:hall
-  ^-  (quip move _this)
-  :_  this(circles.sta (~(del by circles.sta) nom))
-  [ost.bol %pull /our/[nom] [our.bol %hall] ~]~
+++  DEL-CIRCLE
+  |=  NOM=NAME:HALL
+  ^-  (QUIP MOVE _THIS)
+  :_  THIS(CIRCLES.STA (~(DEL BY CIRCLES.STA) NOM))
+  [OST.BOL %PULL /OUR/[NOM] [OUR.BOL %HALL] ~]~
 ::
-::  +set-king: set king @p
+::  +SET-KING: SET KING @P
 ::
-++  set-king
-  |=  kng=@p
-  ^-  (quip move _this)
-  [~ this(king.sta kng)]
+++  SET-KING
+  |=  KNG=@P
+  ^-  (QUIP MOVE _THIS)
+  [~ THIS(KING.STA KNG)]
 ::
-::  +set-token: set iOS device token @t
+::  +SET-TOKEN: SET IOS DEVICE TOKEN @T
 ::
-++  set-token
-  |=  tok=@t
-  ^-  (quip move _this)
-  [~ this(token.sta tok)]
+++  SET-TOKEN
+  |=  TOK=@T
+  ^-  (QUIP MOVE _THIS)
+  [~ THIS(TOKEN.STA TOK)]
 ::
-::  +set-baseurl: set base url @t
+::  +SET-BASEURL: SET BASE URL @T
 ::
-++  set-baseurl
-  |=  burl=@t
-  ^-  (quip move _this)
-  [~ this(baseurl.sta burl)]
+++  SET-BASEURL
+  |=  BURL=@T
+  ^-  (QUIP MOVE _THIS)
+  [~ THIS(BASEURL.STA BURL)]
 ::
-::  +send-notify: if king, send hiss. if not, do nothing.
+::  +SEND-NOTIFY: IF KING, SEND HISS. IF NOT, DO NOTHING.
 ::
-++  send-notify
-  |=  not=notification
-  ^-  (quip move _this)
-  ?:  =(king.sta our.bol)
-    :_  this
-    [ost.bol %hiss /request [~ ~] %httr %hiss (create-apns-request not)]~
-  [~ this]
+++  SEND-NOTIFY
+  |=  NOT=NOTIFICATION
+  ^-  (QUIP MOVE _THIS)
+  ?:  =(KING.STA OUR.BOL)
+    :_  THIS
+    [OST.BOL %HISS /REQUEST [~ ~] %HTTR %HISS (CREATE-APNS-REQUEST NOT)]~
+  [~ THIS]
 ::
-::  +diff-hall-prize: receive new circle data
+::  +DIFF-HALL-PRIZE: RECEIVE NEW CIRCLE DATA
 ::
-++  diff-hall-prize
-  |=  [wir=wire piz=prize:hall]
-  ^-  (quip move _this)
-  ?+  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  DIFF-HALL-PRIZE
+  |=  [WIR=WIRE PIZ=PRIZE:HALL]
+  ^-  (QUIP MOVE _THIS)
+  ?+  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-  ::  %our: set config of circle and iterate through messages, sending
-  ::  notifications for all messages where number is higher than our last-read
+  ::  %OUR: SET CONFIG OF CIRCLE AND ITERATE THROUGH MESSAGES, SENDING
+  ::  NOTIFICATIONS FOR ALL MESSAGES WHERE NUMBER IS HIGHER THAN OUR LAST-READ
   ::
-      {%our @ @}
-    ?>  ?=(%circle -.piz)
-    =/  nom/name:hall  i.t.wir
-    =/  red/@ud  red.loc.cos.piz
-    [~ this(circles.sta (~(put by circles.sta) nom red))]
+      {%OUR @ @}
+    ?>  ?=(%CIRCLE -.PIZ)
+    =/  NOM/NAME:HALL  I.T.WIR
+    =/  RED/@UD  RED.LOC.COS.PIZ
+    [~ THIS(CIRCLES.STA (~(PUT BY CIRCLES.STA) NOM RED))]
   ==
 ::
-::  +reap: recieve acknowledgement for peer
+::  +REAP: RECIEVE ACKNOWLEDGEMENT FOR PEER
 ::
-++  reap
-  |=  [wir=wire err=(unit tang)]
-  ^-  (quip move _this)
-  ?~  err
-    [~ this]
-  ?+  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  REAP
+  |=  [WIR=WIRE ERR=(UNIT TANG)]
+  ^-  (QUIP MOVE _THIS)
+  ?~  ERR
+    [~ THIS]
+  ?+  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
     ::
-      {%our @ @}
-    ?<  ?=(~ t.wir)
-    [~ this]
+      {%OUR @ @}
+    ?<  ?=(~ T.WIR)
+    [~ THIS]
   ==
 ::
-::  +quit: receive subscription failed, resubscribe
+::  +QUIT: RECEIVE SUBSCRIPTION FAILED, RESUBSCRIBE
 ::
-++  quit
-  |=  wir=wire
-  ^-  (quip move _this)
-  ?+  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  QUIT
+  |=  WIR=WIRE
+  ^-  (QUIP MOVE _THIS)
+  ?+  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
     ::
-      {%our @ @}
-    ?<  ?=(~ t.wir)
-    :_  this
-    =/  doc/dock  [our.bol %hall]
-    [ost.bol %peer /our/[i.t.wir] doc /circle/[i.t.wir]/config/grams]~
+      {%OUR @ @}
+    ?<  ?=(~ T.WIR)
+    :_  THIS
+    =/  DOC/DOCK  [OUR.BOL %HALL]
+    [OST.BOL %PEER /OUR/[I.T.WIR] DOC /CIRCLE/[I.T.WIR]/CONFIG/GRAMS]~
   ==
 
 ::
-::  +diff-hall-rumor: receive message or a read event from a hall circle
+::  +DIFF-HALL-RUMOR: RECEIVE MESSAGE OR A READ EVENT FROM A HALL CIRCLE
 ::
-++  diff-hall-rumor
-  |=  [wir=wire rum=rumor:hall]
-  ^-  (quip move _this)
-  ?+  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  DIFF-HALL-RUMOR
+  |=  [WIR=WIRE RUM=RUMOR:HALL]
+  ^-  (QUIP MOVE _THIS)
+  ?+  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-  ::  %our
+  ::  %OUR
   ::
-      {%our @ @}
-    ?>  ?=(%circle -.rum)
-    =/  nom/name:hall  i.t.wir
-    ?+  -.rum.rum
-      [~ this]
+      {%OUR @ @}
+    ?>  ?=(%CIRCLE -.RUM)
+    =/  NOM/NAME:HALL  I.T.WIR
+    ?+  -.RUM.RUM
+      [~ THIS]
     ::
-    ::  %gram: send notification if envelope is lower than read number
+    ::  %GRAM: SEND NOTIFICATION IF ENVELOPE IS LOWER THAN READ NUMBER
     ::
-      %gram
-    =/  red  (~(get by circles.sta) nom)
-    ?~  red
-      (mean [leaf+"invalid circle for diff: {(spud wir)}"]~)
-    ?:  (gth num.nev.rum.rum u.red)
-      :_  this(circles.sta (~(put by circles.sta) nom u.red))
-      (conditional-msg-to-not u.red nev.rum.rum)
-    :_  this
-    (conditional-msg-to-not u.red nev.rum.rum)
+      %GRAM
+    =/  RED  (~(GET BY CIRCLES.STA) NOM)
+    ?~  RED
+      (MEAN [LEAF+"INVALID CIRCLE FOR DIFF: {(SPUD WIR)}"]~)
+    ?:  (GTH NUM.NEV.RUM.RUM U.RED)
+      :_  THIS(CIRCLES.STA (~(PUT BY CIRCLES.STA) NOM U.RED))
+      (CONDITIONAL-MSG-TO-NOT U.RED NEV.RUM.RUM)
+    :_  THIS
+    (CONDITIONAL-MSG-TO-NOT U.RED NEV.RUM.RUM)
     ::
-    ::   %config: set our read number
+    ::   %CONFIG: SET OUR READ NUMBER
     ::
-      %config
-    ?+  -.dif.rum.rum
-      [~ this]
+      %CONFIG
+    ?+  -.DIF.RUM.RUM
+      [~ THIS]
       ::
-      %read
-    [~ this(circles.sta (~(put by circles.sta) nom red.dif.rum.rum))]
+      %READ
+    [~ THIS(CIRCLES.STA (~(PUT BY CIRCLES.STA) NOM RED.DIF.RUM.RUM))]
     ==
     ==
   ==
 ::
-::  generate notification move from hall message if conditions are met
+::  GENERATE NOTIFICATION MOVE FROM HALL MESSAGE IF CONDITIONS ARE MET
 ::
-++  conditional-msg-to-not
-  |=  [red=@ud env=envelope:hall]
-  ^-  (list move)
-  ?:  =(aut.gam.env our.bol)
+++  CONDITIONAL-MSG-TO-NOT
+  |=  [RED=@UD ENV=ENVELOPE:HALL]
+  ^-  (LIST MOVE)
+  ?:  =(AUT.GAM.ENV OUR.BOL)
     ~
-  =/  pay  %-  my  :~
-    alert+s+'New message from {(cite:title aut.gam.env)}'
+  =/  PAY  %-  MY  :~
+    ALERT+S+'NEW MESSAGE FROM {(CITE:TITLE AUT.GAM.ENV)}'
   ==
-  =/  not/notification  [token.sta 'com.tlon.urbit-client' pay]
-  ?:  (lte num.env red)
+  =/  NOT/NOTIFICATION  [TOKEN.STA 'COM.TLON.URBIT-CLIENT' PAY]
+  ?:  (LTE NUM.ENV RED)
     ~
-  =/  doc/dock  [king.sta dap.bol]
-  [ost.bol %poke /ask-king doc %tiebout-action [%notify not]]~
+  =/  DOC/DOCK  [KING.STA DAP.BOL]
+  [OST.BOL %POKE /ASK-KING DOC %TIEBOUT-ACTION [%NOTIFY NOT]]~
 
 ::
-::  +create-apns-request: create hiss with payload for APNs
+::  +CREATE-APNS-REQUEST: CREATE HISS WITH PAYLOAD FOR APNS
 ::
-++  create-apns-request
-  |=  not=notification
-  ^-  hiss
-  =/  furl=@t  (crip (weld (trip baseurl.sta) (trip token.not)))
-  =/  url=purl  (need (de-purl:html furl))
-  =/  jon=json  :-  %o
-  %-  my  :~
-    aps+o+payload.not
+++  CREATE-APNS-REQUEST
+  |=  NOT=NOTIFICATION
+  ^-  HISS
+  =/  FURL=@T  (CRIP (WELD (TRIP BASEURL.STA) (TRIP TOKEN.NOT)))
+  =/  URL=PURL  (NEED (DE-PURL:HTML FURL))
+  =/  JON=JSON  :-  %O
+  %-  MY  :~
+    APS+O+PAYLOAD.NOT
   ==
-  :^  url  %post
-  %-  my  :~
-    apns-topic+[topic.not ~]  :: generate map from raw noun
+  :^  URL  %POST
+  %-  MY  :~
+    APNS-TOPIC+[TOPIC.NOT ~]  :: GENERATE MAP FROM RAW NOUN
   ==
-  (some (as-octt:mimes:html (en-json:html jon)))
+  (SOME (AS-OCTT:MIMES:HTML (EN-JSON:HTML JON)))
 --

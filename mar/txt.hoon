@@ -1,267 +1,267 @@
 ::
-::::  /hoon/txt/mar
+::::  /HOON/TXT/MAR
   ::
 /?    310
 ::
-=,  clay
-=,  differ
-=,  format
-=,  mimes:html
-|_  txt/wain
+=,  CLAY
+=,  DIFFER
+=,  FORMAT
+=,  MIMES:HTML
+|_  TXT/WAIN
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  mime  |=({p/mite:eyre q/octs:eyre} (to-wain q.q))
-  ++  noun  wain                                        ::  clam from %noun
+  ++  MIME  |=({P/MITE:EYRE Q/OCTS:EYRE} (TO-WAIN Q.Q))
+  ++  NOUN  WAIN                                        ::  CLAM FROM %NOUN
   --
-++  grow
-  =>  v=.
+++  GROW
+  =>  V=.
   |%
-  ++  mime  =>  v  [/text/plain (as-octs (of-wain txt))]
-  ++  elem  =>  v  ;pre: {(trip (of-wain txt))}
+  ++  MIME  =>  V  [/TEXT/PLAIN (AS-OCTS (OF-WAIN TXT))]
+  ++  ELEM  =>  V  ;PRE: {(TRIP (OF-WAIN TXT))}
   --
-++  grad
+++  GRAD
   |%
-  ++  form  %txt-diff
-  ++  diff
-    |=  tyt/wain
-    ^-  (urge cord)
-    (lusk txt tyt (loss txt tyt))
+  ++  FORM  %TXT-DIFF
+  ++  DIFF
+    |=  TYT/WAIN
+    ^-  (URGE CORD)
+    (LUSK TXT TYT (LOSS TXT TYT))
   ::
-  ++  pact
-    |=  dif/(urge cord)
-    ~|  [%pacting dif]
-    ^-  wain
-    (lurk txt dif)
+  ++  PACT
+    |=  DIF/(URGE CORD)
+    ~|  [%PACTING DIF]
+    ^-  WAIN
+    (LURK TXT DIF)
   ::
-  ++  join
-    |=  {ali/(urge cord) bob/(urge cord)}
-    ^-  (unit (urge cord))
+  ++  JOIN
+    |=  {ALI/(URGE CORD) BOB/(URGE CORD)}
+    ^-  (UNIT (URGE CORD))
     |^
-    =.  ali  (clean ali)
-    =.  bob  (clean bob)
-    |-  ^-  (unit (urge cord))
-    ?~  ali  `bob
-    ?~  bob  `ali
-    ?-    -.i.ali
+    =.  ALI  (CLEAN ALI)
+    =.  BOB  (CLEAN BOB)
+    |-  ^-  (UNIT (URGE CORD))
+    ?~  ALI  `BOB
+    ?~  BOB  `ALI
+    ?-    -.I.ALI
         %&
-      ?-    -.i.bob
+      ?-    -.I.BOB
           %&
-        ?:  =(p.i.ali p.i.bob)
-          %+  bind  $(ali t.ali, bob t.bob)
-          |=(cud/(urge cord) [i.ali cud])
-        ?:  (gth p.i.ali p.i.bob)
-          %+  bind  $(p.i.ali (sub p.i.ali p.i.bob), bob t.bob)
-          |=(cud/(urge cord) [i.bob cud])
-        %+  bind  $(ali t.ali, p.i.bob (sub p.i.bob p.i.ali))
-        |=(cud/(urge cord) [i.ali cud])
+        ?:  =(P.I.ALI P.I.BOB)
+          %+  BIND  $(ALI T.ALI, BOB T.BOB)
+          |=(CUD/(URGE CORD) [I.ALI CUD])
+        ?:  (GTH P.I.ALI P.I.BOB)
+          %+  BIND  $(P.I.ALI (SUB P.I.ALI P.I.BOB), BOB T.BOB)
+          |=(CUD/(URGE CORD) [I.BOB CUD])
+        %+  BIND  $(ALI T.ALI, P.I.BOB (SUB P.I.BOB P.I.ALI))
+        |=(CUD/(URGE CORD) [I.ALI CUD])
     ::
           %|
-        ?:  =(p.i.ali (lent p.i.bob))
-          %+  bind  $(ali t.ali, bob t.bob)
-          |=(cud/(urge cord) [i.bob cud])
-        ?:  (gth p.i.ali (lent p.i.bob))
-          %+  bind  $(p.i.ali (sub p.i.ali (lent p.i.bob)), bob t.bob)
-          |=(cud/(urge cord) [i.bob cud])
+        ?:  =(P.I.ALI (LENT P.I.BOB))
+          %+  BIND  $(ALI T.ALI, BOB T.BOB)
+          |=(CUD/(URGE CORD) [I.BOB CUD])
+        ?:  (GTH P.I.ALI (LENT P.I.BOB))
+          %+  BIND  $(P.I.ALI (SUB P.I.ALI (LENT P.I.BOB)), BOB T.BOB)
+          |=(CUD/(URGE CORD) [I.BOB CUD])
         ~
       ==
     ::
         %|
-      ?-  -.i.bob
+      ?-  -.I.BOB
           %|  ~
           %&
-        ?:  =(p.i.bob (lent p.i.ali))
-          %+  bind  $(ali t.ali, bob t.bob)
-          |=(cud/(urge cord) [i.ali cud])
-        ?:  (gth p.i.bob (lent p.i.ali))
-          %+  bind  $(ali t.ali, p.i.bob (sub p.i.bob (lent p.i.ali)))
-          |=(cud/(urge cord) [i.ali cud])
+        ?:  =(P.I.BOB (LENT P.I.ALI))
+          %+  BIND  $(ALI T.ALI, BOB T.BOB)
+          |=(CUD/(URGE CORD) [I.ALI CUD])
+        ?:  (GTH P.I.BOB (LENT P.I.ALI))
+          %+  BIND  $(ALI T.ALI, P.I.BOB (SUB P.I.BOB (LENT P.I.ALI)))
+          |=(CUD/(URGE CORD) [I.ALI CUD])
         ~
       ==
     ==
-    ++  clean                                          ::  clean
-      |=  wig/(urge cord)
-      ^-  (urge cord)
-      ?~  wig  ~
-      ?~  t.wig  wig
-      ?:  ?=(%& -.i.wig)
-        ?:  ?=(%& -.i.t.wig)
-          $(wig [[%& (add p.i.wig p.i.t.wig)] t.t.wig])
-        [i.wig $(wig t.wig)]
-      ?:  ?=(%| -.i.t.wig)
-        $(wig [[%| (welp p.i.wig p.i.t.wig) (welp q.i.wig q.i.t.wig)] t.t.wig])
-      [i.wig $(wig t.wig)]
+    ++  CLEAN                                          ::  CLEAN
+      |=  WIG/(URGE CORD)
+      ^-  (URGE CORD)
+      ?~  WIG  ~
+      ?~  T.WIG  WIG
+      ?:  ?=(%& -.I.WIG)
+        ?:  ?=(%& -.I.T.WIG)
+          $(WIG [[%& (ADD P.I.WIG P.I.T.WIG)] T.T.WIG])
+        [I.WIG $(WIG T.WIG)]
+      ?:  ?=(%| -.I.T.WIG)
+        $(WIG [[%| (WELP P.I.WIG P.I.T.WIG) (WELP Q.I.WIG Q.I.T.WIG)] T.T.WIG])
+      [I.WIG $(WIG T.WIG)]
     --
   ::
-  ++  mash
-    |=  $:  {als/ship ald/desk ali/(urge cord)}
-            {bos/ship bod/desk bob/(urge cord)}
+  ++  MASH
+    |=  $:  {ALS/SHIP ALD/DESK ALI/(URGE CORD)}
+            {BOS/SHIP BOD/DESK BOB/(URGE CORD)}
         ==
-    ^-  (urge cord)
+    ^-  (URGE CORD)
     |^
-    =.  ali  (clean ali)
-    =.  bob  (clean bob)
-    |-  ^-  (urge cord)
-    ?~  ali  bob
-    ?~  bob  ali
-    ?-    -.i.ali
+    =.  ALI  (CLEAN ALI)
+    =.  BOB  (CLEAN BOB)
+    |-  ^-  (URGE CORD)
+    ?~  ALI  BOB
+    ?~  BOB  ALI
+    ?-    -.I.ALI
         %&
-      ?-    -.i.bob
+      ?-    -.I.BOB
           %&
-        ?:  =(p.i.ali p.i.bob)
-          [i.ali $(ali t.ali, bob t.bob)]
-        ?:  (gth p.i.ali p.i.bob)
-          [i.bob $(p.i.ali (sub p.i.ali p.i.bob), bob t.bob)]
-        [i.ali $(ali t.ali, p.i.bob (sub p.i.bob p.i.ali))]
+        ?:  =(P.I.ALI P.I.BOB)
+          [I.ALI $(ALI T.ALI, BOB T.BOB)]
+        ?:  (GTH P.I.ALI P.I.BOB)
+          [I.BOB $(P.I.ALI (SUB P.I.ALI P.I.BOB), BOB T.BOB)]
+        [I.ALI $(ALI T.ALI, P.I.BOB (SUB P.I.BOB P.I.ALI))]
       ::
           %|
-        ?:  =(p.i.ali (lent p.i.bob))
-          [i.bob $(ali t.ali, bob t.bob)]
-        ?:  (gth p.i.ali (lent p.i.bob))
-          [i.bob $(p.i.ali (sub p.i.ali (lent p.i.bob)), bob t.bob)]
-        =+  ^-  {fic/(unce cord) ali/(urge cord) bob/(urge cord)}
-            (resolve ali bob)
-        [fic $(ali ali, bob bob)]
-        ::  ~   ::  here, alice is good for a while, but not for the whole
-      ==    ::  length of bob's changes
+        ?:  =(P.I.ALI (LENT P.I.BOB))
+          [I.BOB $(ALI T.ALI, BOB T.BOB)]
+        ?:  (GTH P.I.ALI (LENT P.I.BOB))
+          [I.BOB $(P.I.ALI (SUB P.I.ALI (LENT P.I.BOB)), BOB T.BOB)]
+        =+  ^-  {FIC/(UNCE CORD) ALI/(URGE CORD) BOB/(URGE CORD)}
+            (RESOLVE ALI BOB)
+        [FIC $(ALI ALI, BOB BOB)]
+        ::  ~   ::  HERE, ALICE IS GOOD FOR A WHILE, BUT NOT FOR THE WHOLE
+      ==    ::  LENGTH OF BOB'S CHANGES
     ::
         %|
-      ?-  -.i.bob
+      ?-  -.I.BOB
           %|
-        =+  ^-  {fic/(unce cord) ali/(urge cord) bob/(urge cord)}
-            (resolve ali bob)
-        [fic $(ali ali, bob bob)]
+        =+  ^-  {FIC/(UNCE CORD) ALI/(URGE CORD) BOB/(URGE CORD)}
+            (RESOLVE ALI BOB)
+        [FIC $(ALI ALI, BOB BOB)]
       ::
           %&
-        ?:  =(p.i.bob (lent p.i.ali))
-          [i.ali $(ali t.ali, bob t.bob)]
-        ?:  (gth p.i.bob (lent p.i.ali))
-          [i.ali $(ali t.ali, p.i.bob (sub p.i.bob (lent p.i.ali)))]
-        =+  ^-  {fic/(unce cord) ali/(urge cord) bob/(urge cord)}
-            (resolve ali bob)
-        [fic $(ali ali, bob bob)]
+        ?:  =(P.I.BOB (LENT P.I.ALI))
+          [I.ALI $(ALI T.ALI, BOB T.BOB)]
+        ?:  (GTH P.I.BOB (LENT P.I.ALI))
+          [I.ALI $(ALI T.ALI, P.I.BOB (SUB P.I.BOB (LENT P.I.ALI)))]
+        =+  ^-  {FIC/(UNCE CORD) ALI/(URGE CORD) BOB/(URGE CORD)}
+            (RESOLVE ALI BOB)
+        [FIC $(ALI ALI, BOB BOB)]
       ==
     ==
     ::
-    ++  annotate                                        ::  annotate conflict
-      |=  $:  ali/(list @t)
-              bob/(list @t)
-              bas/(list @t)
+    ++  ANNOTATE                                        ::  ANNOTATE CONFLICT
+      |=  $:  ALI/(LIST @T)
+              BOB/(LIST @T)
+              BAS/(LIST @T)
           ==
-      ^-  (list @t)
-      %-  zing
-      ^-  (list (list @t))
-      %-  flop
-      ^-  (list (list @t))
+      ^-  (LIST @T)
+      %-  ZING
+      ^-  (LIST (LIST @T))
+      %-  FLOP
+      ^-  (LIST (LIST @T))
       :-  :_  ~
-          %^  cat  3  '<<<<<<<<<<<<'
-          %^  cat  3  ' '
-          %^  cat  3  `@t`(scot %p bos)
-          %^  cat  3  '/'
-          bod
+          %^  CAT  3  '<<<<<<<<<<<<'
+          %^  CAT  3  ' '
+          %^  CAT  3  `@T`(SCOT %P BOS)
+          %^  CAT  3  '/'
+          BOD
 
-      :-  bob
+      :-  BOB
       :-  ~['------------']
-      :-  bas
+      :-  BAS
       :-  ~['++++++++++++']
-      :-  ali
+      :-  ALI
       :-  :_  ~
-          %^  cat  3  '>>>>>>>>>>>>'
-          %^  cat  3  ' '
-          %^  cat  3  `@t`(scot %p als)
-          %^  cat  3  '/'
-          ald
+          %^  CAT  3  '>>>>>>>>>>>>'
+          %^  CAT  3  ' '
+          %^  CAT  3  `@T`(SCOT %P ALS)
+          %^  CAT  3  '/'
+          ALD
       ~
     ::
-    ++  clean                                          ::  clean
-      |=  wig/(urge cord)
-      ^-  (urge cord)
-      ?~  wig  ~
-      ?~  t.wig  wig
-      ?:  ?=(%& -.i.wig)
-        ?:  ?=(%& -.i.t.wig)
-          $(wig [[%& (add p.i.wig p.i.t.wig)] t.t.wig])
-        [i.wig $(wig t.wig)]
-      ?:  ?=(%| -.i.t.wig)
-        $(wig [[%| (welp p.i.wig p.i.t.wig) (welp q.i.wig q.i.t.wig)] t.t.wig])
-      [i.wig $(wig t.wig)]
+    ++  CLEAN                                          ::  CLEAN
+      |=  WIG/(URGE CORD)
+      ^-  (URGE CORD)
+      ?~  WIG  ~
+      ?~  T.WIG  WIG
+      ?:  ?=(%& -.I.WIG)
+        ?:  ?=(%& -.I.T.WIG)
+          $(WIG [[%& (ADD P.I.WIG P.I.T.WIG)] T.T.WIG])
+        [I.WIG $(WIG T.WIG)]
+      ?:  ?=(%| -.I.T.WIG)
+        $(WIG [[%| (WELP P.I.WIG P.I.T.WIG) (WELP Q.I.WIG Q.I.T.WIG)] T.T.WIG])
+      [I.WIG $(WIG T.WIG)]
     ::
-    ++  resolve
-      |=  {ali/(urge cord) bob/(urge cord)}
-      ^-  {fic/{%| p/(list cord) q/(list cord)} ali/(urge cord) bob/(urge cord)}
-      =-  [[%| bac (annotate alc boc bac)] ali bob]
-      |-  ^-  $:  $:  bac/(list cord)
-                      alc/(list cord)
-                      boc/(list cord)
+    ++  RESOLVE
+      |=  {ALI/(URGE CORD) BOB/(URGE CORD)}
+      ^-  {FIC/{%| P/(LIST CORD) Q/(LIST CORD)} ALI/(URGE CORD) BOB/(URGE CORD)}
+      =-  [[%| BAC (ANNOTATE ALC BOC BAC)] ALI BOB]
+      |-  ^-  $:  $:  BAC/(LIST CORD)
+                      ALC/(LIST CORD)
+                      BOC/(LIST CORD)
                   ==
-                  ali/(urge cord)
-                  bob/(urge cord)
+                  ALI/(URGE CORD)
+                  BOB/(URGE CORD)
               ==
-      ?~  ali  [[~ ~ ~] ali bob]
-      ?~  bob  [[~ ~ ~] ali bob]
-      ?-    -.i.ali
+      ?~  ALI  [[~ ~ ~] ALI BOB]
+      ?~  BOB  [[~ ~ ~] ALI BOB]
+      ?-    -.I.ALI
           %&
-        ?-    -.i.bob
-            %&  [[~ ~ ~] ali bob]                       ::  no conflict
+        ?-    -.I.BOB
+            %&  [[~ ~ ~] ALI BOB]                       ::  NO CONFLICT
             %|
-          =+  lob=(lent p.i.bob)
-          ?:  =(lob p.i.ali)
-            [[p.i.bob p.i.bob q.i.bob] t.ali t.bob]
-          ?:  (lth lob p.i.ali)
-            [[p.i.bob p.i.bob q.i.bob] [[%& (sub p.i.ali lob)] t.ali] t.bob]
-          =+  wat=(scag (sub lob p.i.ali) p.i.bob)
-          =+  ^=  res
+          =+  LOB=(LENT P.I.BOB)
+          ?:  =(LOB P.I.ALI)
+            [[P.I.BOB P.I.BOB Q.I.BOB] T.ALI T.BOB]
+          ?:  (LTH LOB P.I.ALI)
+            [[P.I.BOB P.I.BOB Q.I.BOB] [[%& (SUB P.I.ALI LOB)] T.ALI] T.BOB]
+          =+  WAT=(SCAG (SUB LOB P.I.ALI) P.I.BOB)
+          =+  ^=  RES
               %=  $
-                ali  t.ali
-                bob  [[%| (scag (sub lob p.i.ali) p.i.bob) ~] t.bob]
+                ALI  T.ALI
+                BOB  [[%| (SCAG (SUB LOB P.I.ALI) P.I.BOB) ~] T.BOB]
               ==
-          :*  :*  (welp bac.res wat)
-                  (welp alc.res wat)
-                  (welp boc.res q.i.bob)
+          :*  :*  (WELP BAC.RES WAT)
+                  (WELP ALC.RES WAT)
+                  (WELP BOC.RES Q.I.BOB)
               ==
-              ali.res
-              bob.res
+              ALI.RES
+              BOB.RES
           ==
         ==
       ::
           %|
-        ?-    -.i.bob
+        ?-    -.I.BOB
             %&
-          =+  loa=(lent p.i.ali)
-          ?:  =(loa p.i.bob)
-            [[p.i.ali q.i.ali p.i.ali] t.ali t.bob]
-          ?:  (lth loa p.i.bob)
-            [[p.i.ali q.i.ali p.i.ali] t.ali [[%& (sub p.i.bob loa)] t.bob]]
-          =+  wat=(slag (sub loa p.i.bob) p.i.ali)
-          =+  ^=  res
+          =+  LOA=(LENT P.I.ALI)
+          ?:  =(LOA P.I.BOB)
+            [[P.I.ALI Q.I.ALI P.I.ALI] T.ALI T.BOB]
+          ?:  (LTH LOA P.I.BOB)
+            [[P.I.ALI Q.I.ALI P.I.ALI] T.ALI [[%& (SUB P.I.BOB LOA)] T.BOB]]
+          =+  WAT=(SLAG (SUB LOA P.I.BOB) P.I.ALI)
+          =+  ^=  RES
               %=  $
-                ali  [[%| (scag (sub loa p.i.bob) p.i.ali) ~] t.ali]
-                bob  t.bob
+                ALI  [[%| (SCAG (SUB LOA P.I.BOB) P.I.ALI) ~] T.ALI]
+                BOB  T.BOB
               ==
-          :*  :*  (welp bac.res wat)
-                  (welp alc.res q.i.ali)
-                  (welp boc.res wat)
+          :*  :*  (WELP BAC.RES WAT)
+                  (WELP ALC.RES Q.I.ALI)
+                  (WELP BOC.RES WAT)
               ==
-              ali.res
-              bob.res
+              ALI.RES
+              BOB.RES
           ==
         ::
             %|
-          =+  loa=(lent p.i.ali)
-          =+  lob=(lent p.i.bob)
-          ?:  =(loa lob)
-            [[p.i.ali q.i.ali q.i.bob] t.ali t.bob]
-          =+  ^=  res
-              ?:  (gth loa lob)
-                $(ali [[%| (scag (sub loa lob) p.i.ali) ~] t.ali], bob t.bob)
-              ~&  [%scagging loa=loa pibob=p.i.bob slag=(scag loa p.i.bob)]
-              $(ali t.ali, bob [[%| (scag (sub lob loa) p.i.bob) ~] t.bob])
-          :*  :*  (welp bac.res ?:((gth loa lob) p.i.bob p.i.ali))
-                  (welp alc.res q.i.ali)
-                  (welp boc.res q.i.bob)
+          =+  LOA=(LENT P.I.ALI)
+          =+  LOB=(LENT P.I.BOB)
+          ?:  =(LOA LOB)
+            [[P.I.ALI Q.I.ALI Q.I.BOB] T.ALI T.BOB]
+          =+  ^=  RES
+              ?:  (GTH LOA LOB)
+                $(ALI [[%| (SCAG (SUB LOA LOB) P.I.ALI) ~] T.ALI], BOB T.BOB)
+              ~&  [%SCAGGING LOA=LOA PIBOB=P.I.BOB SLAG=(SCAG LOA P.I.BOB)]
+              $(ALI T.ALI, BOB [[%| (SCAG (SUB LOB LOA) P.I.BOB) ~] T.BOB])
+          :*  :*  (WELP BAC.RES ?:((GTH LOA LOB) P.I.BOB P.I.ALI))
+                  (WELP ALC.RES Q.I.ALI)
+                  (WELP BOC.RES Q.I.BOB)
               ==
-              ali.res
-              bob.res
+              ALI.RES
+              BOB.RES
           ==
         ==
       ==

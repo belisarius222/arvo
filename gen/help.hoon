@@ -1,64 +1,64 @@
-::  Describe available comands: +help, +help %tree, +help %hood
+::  DESCRIBE AVAILABLE COMANDS: +HELP, +HELP %TREE, +HELP %HOOD
 ::
-::::  /hoon/help/gen
+::::  /HOON/HELP/GEN
   ::
 /?    310
 ::
 ::::
   ::
 |%
-++  path-heps
-  |=  a/path  ^-  tape
-  ?~  a  ""
-  |-  ^-  tape
-  %+  welp  (trip i.a)
-  ?~  t.a  ""
-  ['-' $(a t.a)]
+++  PATH-HEPS
+  |=  A/PATH  ^-  TAPE
+  ?~  A  ""
+  |-  ^-  TAPE
+  %+  WELP  (TRIP I.A)
+  ?~  T.A  ""
+  ['-' $(A T.A)]
 ::
-++  rend
-  |=  {a/@thoon b/path}  ^-  tank
-  =;  c/(pair tape tape)
-    =/  tab  (sub 10 (mod (lent "{p.c}  ") 10))
-    [%palm ["  {(reap tab ' ')}" ``~] leaf+p.c leaf+q.c ~]
-  :-  ?-  b
-        ~  "/"  :: XX !! maybe?
-        {$hood ^}  "|{(path-heps t.b)}"
-        ^          "+{(path-heps b)}"  :: XX deal with :hall|foo
+++  REND
+  |=  {A/@THOON B/PATH}  ^-  TANK
+  =;  C/(PAIR TAPE TAPE)
+    =/  TAB  (SUB 10 (MOD (LENT "{P.C}  ") 10))
+    [%PALM ["  {(REAP TAB ' ')}" ``~] LEAF+P.C LEAF+Q.C ~]
+  :-  ?-  B
+        ~  "/"  :: XX !! MAYBE?
+        {$HOOD ^}  "|{(PATH-HEPS T.B)}"
+        ^          "+{(PATH-HEPS B)}"  :: XX DEAL WITH :HALL|FOO
       ==
-  =/  c  (to-wain:format a)
-  ?~  c  "~"
-  ?.  =('::  ' (end 3 4 i.c))
-    "<undocumented>"
-  (trip i.c)
+  =/  C  (TO-WAIN:FORMAT A)
+  ?~  C  "~"
+  ?.  =('::  ' (END 3 4 I.C))
+    "<UNDOCUMENTED>"
+  (TRIP I.C)
 ::
-++  read-at
-  |=  {len/@u pax/path}
-  |=  {nam/@t ark/arch}  ^-  (unit {@t path})
-  ?.  (~(has by dir.ark) %hoon)  ~
-  %+  bind  (file:space:userlib (welp pax /[nam]/hoon))
-  |=  a/*  ^-  {cord path}
-  [;;(@t a) (welp (slag len pax) /[nam])]
+++  READ-AT
+  |=  {LEN/@U PAX/PATH}
+  |=  {NAM/@T ARK/ARCH}  ^-  (UNIT {@T PATH})
+  ?.  (~(HAS BY DIR.ARK) %HOON)  ~
+  %+  BIND  (FILE:SPACE:USERLIB (WELP PAX /[NAM]/HOON))
+  |=  A/*  ^-  {CORD PATH}
+  [;;(@T A) (WELP (SLAG LEN PAX) /[NAM])]
 --
 ::
-:-  %say
-|=  {{now/time @ our/ship ^} typ/$@(~ {p/term ~}) ~}
-=/  pax/path  /(scot %p our)/home/(scot %da now)/gen  :: XX hardcoded
-=+  len=(lent pax)
-=.  pax  ?~(typ pax (welp pax /[p.typ]))
-:-  %tang  %-  flop  ^-  tang
-=+  ark=.^(arch cy+pax)
-%+  welp
-  ?~  typ  ~
-  =/  red  ((read-at len (scag len pax)) p.typ ark) :: XX ugly
-  (drop (bind red rend))
-|-  ^-  tang
-=+  =<  arl=~(tap by (~(urn by dir.ark) .))
-    |=({a/@t ~} .^(arch cy+(welp pax /[a])))
-%+  welp
-  =/  dir/(list {@ path})
-    (murn arl (read-at len pax))
-  `tang`(turn (sort dir aor) rend)
-%-  zing  ^-  (list tang)
-%+  turn  (sort arl aor)
-|=  {a/@t b/arch}
-^$(pax (welp pax /[a]), ark b)
+:-  %SAY
+|=  {{NOW/TIME @ OUR/SHIP ^} TYP/$@(~ {P/TERM ~}) ~}
+=/  PAX/PATH  /(SCOT %P OUR)/HOME/(SCOT %DA NOW)/GEN  :: XX HARDCODED
+=+  LEN=(LENT PAX)
+=.  PAX  ?~(TYP PAX (WELP PAX /[P.TYP]))
+:-  %TANG  %-  FLOP  ^-  TANG
+=+  ARK=.^(ARCH CY+PAX)
+%+  WELP
+  ?~  TYP  ~
+  =/  RED  ((READ-AT LEN (SCAG LEN PAX)) P.TYP ARK) :: XX UGLY
+  (DROP (BIND RED REND))
+|-  ^-  TANG
+=+  =<  ARL=~(TAP BY (~(URN BY DIR.ARK) .))
+    |=({A/@T ~} .^(ARCH CY+(WELP PAX /[A])))
+%+  WELP
+  =/  DIR/(LIST {@ PATH})
+    (MURN ARL (READ-AT LEN PAX))
+  `TANG`(TURN (SORT DIR AOR) REND)
+%-  ZING  ^-  (LIST TANG)
+%+  TURN  (SORT ARL AOR)
+|=  {A/@T B/ARCH}
+^$(PAX (WELP PAX /[A]), ARK B)

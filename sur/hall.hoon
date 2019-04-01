@@ -1,271 +1,271 @@
 ::
-::::  /sur/hall/hoon
+::::  /SUR/HALL/HOON
   ::
 ^?
 |%
 ::
-::TODO  use different words for different kinds of burdens
-::TODO  rename det/delta in most place? they may be (different kinds of) deltas,
-::      but location in control flow already indicates delta-ness.
+::TODO  USE DIFFERENT WORDS FOR DIFFERENT KINDS OF BURDENS
+::TODO  RENAME DET/DELTA IN MOST PLACE? THEY MAY BE (DIFFERENT KINDS OF) DELTAS,
+::      BUT LOCATION IN CONTROL FLOW ALREADY INDICATES DELTA-NESS.
 ::
 ::  #
-::  #  %wrappers
+::  #  %WRAPPERS
 ::  #
-::    wrapper molds, for semantic clarity.
-+|  %wrappers
+::    WRAPPER MOLDS, FOR SEMANTIC CLARITY.
++|  %WRAPPERS
 ::
-::TODO  rename
-++  name  term                                          ::  circle name
-++  nick  cord                                          ::  local nickname
-++  tags  (set knot)                                    ::  usage tags
+::TODO  RENAME
+++  NAME  TERM                                          ::  CIRCLE NAME
+++  NICK  CORD                                          ::  LOCAL NICKNAME
+++  TAGS  (SET KNOT)                                    ::  USAGE TAGS
 ::
 ::  #
-::  #  %query-models
+::  #  %QUERY-MODELS
 ::  #
-::    models relating to queries, their results and updates.
-+|  %query-models
+::    MODELS RELATING TO QUERIES, THEIR RESULTS AND UPDATES.
++|  %QUERY-MODELS
 ::
-++  query                                               ::  query paths
-  $%  {$client ~}                                      ::  shared ui state
-      {$circles who/ship}                               ::  readable circles
-      {$public ~}                                      ::  public memberships
-      {$burden who/ship}  ::TODO  eventually, nom/name. ::  duties to share
-      {$report ~}                                      ::  duty reports
-      {$peers nom/name}                                 ::  readers of story
-      $:  $circle                                       ::  story query
-          nom/name                                      ::  circle name
-          wer/(unit circle)                             ::  from source
-          wat/(set circle-data)                         ::  data to get
-          ran/range                                     ::  query duration
+++  QUERY                                               ::  QUERY PATHS
+  $%  {$CLIENT ~}                                      ::  SHARED UI STATE
+      {$CIRCLES WHO/SHIP}                               ::  READABLE CIRCLES
+      {$PUBLIC ~}                                      ::  PUBLIC MEMBERSHIPS
+      {$BURDEN WHO/SHIP}  ::TODO  EVENTUALLY, NOM/NAME. ::  DUTIES TO SHARE
+      {$REPORT ~}                                      ::  DUTY REPORTS
+      {$PEERS NOM/NAME}                                 ::  READERS OF STORY
+      $:  $CIRCLE                                       ::  STORY QUERY
+          NOM/NAME                                      ::  CIRCLE NAME
+          WER/(UNIT CIRCLE)                             ::  FROM SOURCE
+          WAT/(SET CIRCLE-DATA)                         ::  DATA TO GET
+          RAN/RANGE                                     ::  QUERY DURATION
       ==                                                ::
-      ::TODO  in the future, we may want much more      ::
-      ::      detailed querying abilities.              ::
+      ::TODO  IN THE FUTURE, WE MAY WANT MUCH MORE      ::
+      ::      DETAILED QUERYING ABILITIES.              ::
   ==                                                    ::
-++  circle-data                                         ::  kinds of circle data
-  $?  $grams                                            ::  messages
-      $group-l                                          ::  local presence
-      $group-r                                          ::  remote presences
-      $config-l                                         ::  local config
-      $config-r                                         ::  remote configs
+++  CIRCLE-DATA                                         ::  KINDS OF CIRCLE DATA
+  $?  $GRAMS                                            ::  MESSAGES
+      $GROUP-L                                          ::  LOCAL PRESENCE
+      $GROUP-R                                          ::  REMOTE PRESENCES
+      $CONFIG-L                                         ::  LOCAL CONFIG
+      $CONFIG-R                                         ::  REMOTE CONFIGS
   ==                                                    ::
-++  range                                               ::  inclusive msg range
-  %-  unit                                              ::  ~ means everything
-  $:  hed/place                                         ::  start of range
-      tal/(unit place)                                  ::  opt end of range
+++  RANGE                                               ::  INCLUSIVE MSG RANGE
+  %-  UNIT                                              ::  ~ MEANS EVERYTHING
+  $:  HED/PLACE                                         ::  START OF RANGE
+      TAL/(UNIT PLACE)                                  ::  OPT END OF RANGE
   ==                                                    ::
-++  place                                               ::  range indicators
-  $%  {$da @da}                                         ::  date
-      {$ud @ud}                                         ::  message number
-      {$sd @sd}                                         ::  previous messages
+++  PLACE                                               ::  RANGE INDICATORS
+  $%  {$DA @DA}                                         ::  DATE
+      {$UD @UD}                                         ::  MESSAGE NUMBER
+      {$SD @SD}                                         ::  PREVIOUS MESSAGES
   ==                                                    ::
-++  prize                                               ::  query result
-  $%  {$client prize-client}                            ::  /client
-      {$circles cis/(set name)}                         ::  /circles
-      {$public cis/(set circle)}                        ::  /public
-      {$burden sos/(map name burden)}                   ::  /burden
-      {$report ~}                                      ::  /report
-      {$peers pes/(jar ship query)}                     ::  /peers
-      {$circle package}                                 ::  /circle
+++  PRIZE                                               ::  QUERY RESULT
+  $%  {$CLIENT PRIZE-CLIENT}                            ::  /CLIENT
+      {$CIRCLES CIS/(SET NAME)}                         ::  /CIRCLES
+      {$PUBLIC CIS/(SET CIRCLE)}                        ::  /PUBLIC
+      {$BURDEN SOS/(MAP NAME BURDEN)}                   ::  /BURDEN
+      {$REPORT ~}                                      ::  /REPORT
+      {$PEERS PES/(JAR SHIP QUERY)}                     ::  /PEERS
+      {$CIRCLE PACKAGE}                                 ::  /CIRCLE
   ==                                                    ::
-++  prize-client                                        ::  shared ui state
-  $:  gys/(jug char audience)                           ::  glyph bindings
-      nis/(map ship nick)                               ::  local nicknames
+++  PRIZE-CLIENT                                        ::  SHARED UI STATE
+  $:  GYS/(JUG CHAR AUDIENCE)                           ::  GLYPH BINDINGS
+      NIS/(MAP SHIP NICK)                               ::  LOCAL NICKNAMES
   ==                                                    ::
-++  rumor                                               ::  query result change
-  $%  {$client rum/rumor-client}                        ::  /client
-      {$circles add/? cir/name}                         ::  /circles
-      {$public add/? cir/circle}                        ::  /public
-      {$burden nom/name rum/rumor-story}                ::  /burden
-      {$peers add/? who/ship qer/query}                 ::  /peers
-      {$circle rum/rumor-story}                         ::  /circle
+++  RUMOR                                               ::  QUERY RESULT CHANGE
+  $%  {$CLIENT RUM/RUMOR-CLIENT}                        ::  /CLIENT
+      {$CIRCLES ADD/? CIR/NAME}                         ::  /CIRCLES
+      {$PUBLIC ADD/? CIR/CIRCLE}                        ::  /PUBLIC
+      {$BURDEN NOM/NAME RUM/RUMOR-STORY}                ::  /BURDEN
+      {$PEERS ADD/? WHO/SHIP QER/QUERY}                 ::  /PEERS
+      {$CIRCLE RUM/RUMOR-STORY}                         ::  /CIRCLE
   ==                                                    ::
-++  rumor-client                                        ::  changed ui state
-  $%  {$glyph diff-glyph}                               ::  un/bound glyph
-      {$nick diff-nick}                                 ::  changed nickname
+++  RUMOR-CLIENT                                        ::  CHANGED UI STATE
+  $%  {$GLYPH DIFF-GLYPH}                               ::  UN/BOUND GLYPH
+      {$NICK DIFF-NICK}                                 ::  CHANGED NICKNAME
   ==                                                    ::
-++  shipment                                            ::  standard payload
-  $:  cos/lobby                                         ::  loc & rem configs
-      pes/crowd                                         ::  loc & rem presences
+++  SHIPMENT                                            ::  STANDARD PAYLOAD
+  $:  COS/LOBBY                                         ::  LOC & REM CONFIGS
+      PES/CROWD                                         ::  LOC & REM PRESENCES
   ==                                                    ::
-++  burden                                              ::  full story state
-  $:  gaz/(list telegram)                               ::  all messages
-      shipment                                          ::  metadata
+++  BURDEN                                              ::  FULL STORY STATE
+  $:  GAZ/(LIST TELEGRAM)                               ::  ALL MESSAGES
+      SHIPMENT                                          ::  METADATA
   ==                                                    ::
-++  package                                             ::  story state
-  $:  nes/(list envelope)                               ::  messages
-      shipment                                          ::  metadata
+++  PACKAGE                                             ::  STORY STATE
+  $:  NES/(LIST ENVELOPE)                               ::  MESSAGES
+      SHIPMENT                                          ::  METADATA
   ==                                                    ::
-++  diff-glyph  {bin/? gyf/char aud/audience}           ::  un/bound glyph
-++  diff-nick   {who/ship nic/nick}                     ::  changed nickname
-++  diff-story                                          ::  story change
-  $%  {$new cof/config}                                 ::  new story
-      {$bear bur/burden}                                ::  new inherited story
-      {$peer add/? who/ship qer/query}                  ::  gain/lose subscriber
-      {$config cir/circle dif/diff-config}              ::  new/changed config
-      {$status cir/circle who/ship dif/diff-status}     ::  new/changed status
-      {$remove ~}                                      ::  removed story
+++  DIFF-GLYPH  {BIN/? GYF/CHAR AUD/AUDIENCE}           ::  UN/BOUND GLYPH
+++  DIFF-NICK   {WHO/SHIP NIC/NICK}                     ::  CHANGED NICKNAME
+++  DIFF-STORY                                          ::  STORY CHANGE
+  $%  {$NEW COF/CONFIG}                                 ::  NEW STORY
+      {$BEAR BUR/BURDEN}                                ::  NEW INHERITED STORY
+      {$PEER ADD/? WHO/SHIP QER/QUERY}                  ::  GAIN/LOSE SUBSCRIBER
+      {$CONFIG CIR/CIRCLE DIF/DIFF-CONFIG}              ::  NEW/CHANGED CONFIG
+      {$STATUS CIR/CIRCLE WHO/SHIP DIF/DIFF-STATUS}     ::  NEW/CHANGED STATUS
+      {$REMOVE ~}                                      ::  REMOVED STORY
   ==                                                    ::
-++  rumor-story                                         ::  story rumor
-  $%  {$gram src/circle nev/envelope}                   ::  new/changed message
-      diff-story                                        ::  both in & outward
+++  RUMOR-STORY                                         ::  STORY RUMOR
+  $%  {$GRAM SRC/CIRCLE NEV/ENVELOPE}                   ::  NEW/CHANGED MESSAGE
+      DIFF-STORY                                        ::  BOTH IN & OUTWARD
   ==                                                    ::
-++  diff-config                                         ::  config change
-  $%  {$full cof/config}                                ::  set w/o side-effects
-      {$source add/? src/source}                        ::  add/rem sources
-      {$caption cap/cord}                               ::  changed description
-      {$usage add/? tas/tags}                           ::  add/rem usage tags
-      {$filter fit/filter}                              ::  changed filter
-      {$secure sec/security}                            ::  changed security
-      {$permit add/? sis/(set ship)}                    ::  add/rem to b/w-list
-      {$remove ~}                                       ::  removed config
-      {$read red/@ud}                                   ::  changed read message
+++  DIFF-CONFIG                                         ::  CONFIG CHANGE
+  $%  {$FULL COF/CONFIG}                                ::  SET W/O SIDE-EFFECTS
+      {$SOURCE ADD/? SRC/SOURCE}                        ::  ADD/REM SOURCES
+      {$CAPTION CAP/CORD}                               ::  CHANGED DESCRIPTION
+      {$USAGE ADD/? TAS/TAGS}                           ::  ADD/REM USAGE TAGS
+      {$FILTER FIT/FILTER}                              ::  CHANGED FILTER
+      {$SECURE SEC/SECURITY}                            ::  CHANGED SECURITY
+      {$PERMIT ADD/? SIS/(SET SHIP)}                    ::  ADD/REM TO B/W-LIST
+      {$REMOVE ~}                                       ::  REMOVED CONFIG
+      {$READ RED/@UD}                                   ::  CHANGED READ MESSAGE
   ==                                                    ::
-++  diff-status                                         ::  status change
-  $%  {$full sat/status}                                ::  fully changed status
-      {$presence pec/presence}                          ::  changed presence
-      {$human dif/diff-human}                           ::  changed name
-      {$remove ~}                                       ::  removed status
+++  DIFF-STATUS                                         ::  STATUS CHANGE
+  $%  {$FULL SAT/STATUS}                                ::  FULLY CHANGED STATUS
+      {$PRESENCE PEC/PRESENCE}                          ::  CHANGED PRESENCE
+      {$HUMAN DIF/DIFF-HUMAN}                           ::  CHANGED NAME
+      {$REMOVE ~}                                       ::  REMOVED STATUS
   ==                                                    ::
-++  diff-human                                          ::  name change
-  $%  {$full man/human}                                 ::  fully changed name
-      {$handle han/(unit cord)}                         ::  changed handle
-      {$true tru/(unit truename)}                       ::  changed true name
-  ==                                                    ::
-::
-::  #
-::  #  %client-communication
-::  #
-::    hall interfaces for clients.
-+|  %client-communication
-::
-++  action                                              ::  user action
-  $%  ::  circle configuration                          ::
-      {$create nom/name des/cord sec/security}          ::  create circle
-      {$design nom/name cof/config}                     ::  create with config
-      {$delete nom/name why/(unit cord)}                ::  delete + announce
-      {$depict nom/name des/cord}                       ::  change description
-      {$filter nom/name fit/filter}                     ::  change message rules
-      {$permit nom/name inv/? sis/(set ship)}           ::  invite/banish
-      {$source nom/name sub/? srs/(set source)}         ::  un/sub to/from src
-      {$read nom/name red/@ud}                          ::  change read message
-      {$newdm sis/(set ship)}
-      {$usage nom/name add/? tas/tags}                  ::  add/rem usage tags
-      ::  messaging                                     ::
-      {$convey tos/(list thought)}                      ::  post exact
-      {$phrase aud/audience ses/(list speech)}          ::  post easy
-      ::  personal metadata                             ::
-      {$notify aud/audience pes/(unit presence)}        ::  our presence update
-      {$naming aud/audience man/human}                  ::  our name update
-      ::  changing shared ui                            ::
-      {$glyph gyf/char aud/audience bin/?}              ::  un/bind a glyph
-      {$nick who/ship nic/nick}                         ::  new identity
-      ::  misc changes                                  ::
-      {$public add/? cir/circle}                        ::  show/hide membership
+++  DIFF-HUMAN                                          ::  NAME CHANGE
+  $%  {$FULL MAN/HUMAN}                                 ::  FULLY CHANGED NAME
+      {$HANDLE HAN/(UNIT CORD)}                         ::  CHANGED HANDLE
+      {$TRUE TRU/(UNIT TRUENAME)}                       ::  CHANGED TRUE NAME
   ==                                                    ::
 ::
 ::  #
-::  #  %hall-communication
+::  #  %CLIENT-COMMUNICATION
 ::  #
-::    structures for communicating between halls.
-+|  %hall-communication
+::    HALL INTERFACES FOR CLIENTS.
++|  %CLIENT-COMMUNICATION
 ::
-++  command                                             ::  effect on story
-  $%  {$publish tos/(list thought)}                     ::  deliver
-      {$present nos/(set name) dif/diff-status}         ::  status update
-      {$bearing ~}                                     ::  prompt to listen
-  ==                                                    ::
-::
-::  #
-::  #  %circles
-::  #
-::    messaging targets and their metadata.
-+|  %circles
-::
-++  circle     {hos/ship nom/name}                      ::  native target
-::  circle configurations.                              ::
-++  lobby      {loc/config rem/(map circle config)}     ::  our & srcs configs
-++  config                                              ::  circle config
-  $:  src/(set source)                                  ::  active sources
-      cap/cord                                          ::  description
-      tag/tags                                          ::  usage tags
-      fit/filter                                        ::  message rules
-      con/control                                       ::  restrictions
-      red/@ud                                           ::  last read message
-  ==                                                    ::
-++  source  {cir/circle ran/range}                      ::  subscription target
-++  filter                                              ::  content filters
-  $:  cas/?                                             ::  dis/allow capitals
-      utf/?                                             ::  dis/allow non-ascii
-      ::TODO  maybe message length
-  ==                                                    ::
-++  control    {sec/security sis/(set ship)}            ::  access control
-++  security                                            ::  security mode
-  $?  $channel                                          ::  blacklist
-      $village                                          ::  whitelist
-      $journal                                          ::  pub r, whitelist w
-      $mailbox                                          ::  our r, blacklist w
-      $custom                                           ::  according to custom-rule
-  ==                                                    ::
-::  participant metadata.                               ::
-++  crowd      {loc/group rem/(map circle group)}       ::  our & srcs presences
-++  group      (map ship status)                        ::  presence map
-++  status     {pec/presence man/human}                 ::  participant
-++  presence                                            ::  status type
-  $?  $gone                                             ::  absent
-      $idle                                             ::  idle
-      $hear                                             ::  present
-      $talk                                             ::  typing
-  ==                                                    ::
-++  human                                               ::  human identifier
-  $:  han/(unit cord)                                   ::  handle
-      tru/(unit truename)                               ::  true name
-  ==                                                    ::
-++  truename   {fir/cord mid/(unit cord) las/cord}      ::  real-life name
-::
-::  #
-::  #  %message-data
-::  #
-::    structures for containing main message data.
-+|  %message-data
-::
-::TODO  some structure for extra message state
-::      local (to clients): delivery state, read flags
-::      remote (to halls): sequence nr
-++  envelope   {num/@ud gam/telegram}                   ::  outward message
-++  telegram   {aut/ship thought}                       ::  whose message
-++  thought                                             ::  inner message
-  $:  uid/serial                                        ::  unique identifier
-      aud/audience                                      ::  destinations
-      wen/@da                                           ::  timestamp
-      sep/speech                                        ::  content
-  ==                                                    ::
-++  speech                                              ::  content body
-  $%  {$lin pat/? msg/cord}                             ::  no/@ text line
-      {$url url/purf:eyre}                              ::  parsed url
-      {$exp exp/cord res/(list tank)}                   ::  hoon line
-      {$ire top/serial sep/speech}                      ::  in reply to
-      {$fat tac/attache sep/speech}                     ::  attachment
-      {$app app/term sep/speech}                        ::  app message
-      {$inv inv/? cir/circle}                           ::  inv/ban for circle
-  ==                                                    ::
-++  attache                                             ::  attachment
-  $%  {$name nom/cord tac/attache}                      ::  named attachment
-      {$text (list cord)}                               ::  text lines
-      {$tank (list tank)}                               ::  tank list
+++  ACTION                                              ::  USER ACTION
+  $%  ::  CIRCLE CONFIGURATION                          ::
+      {$CREATE NOM/NAME DES/CORD SEC/SECURITY}          ::  CREATE CIRCLE
+      {$DESIGN NOM/NAME COF/CONFIG}                     ::  CREATE WITH CONFIG
+      {$DELETE NOM/NAME WHY/(UNIT CORD)}                ::  DELETE + ANNOUNCE
+      {$DEPICT NOM/NAME DES/CORD}                       ::  CHANGE DESCRIPTION
+      {$FILTER NOM/NAME FIT/FILTER}                     ::  CHANGE MESSAGE RULES
+      {$PERMIT NOM/NAME INV/? SIS/(SET SHIP)}           ::  INVITE/BANISH
+      {$SOURCE NOM/NAME SUB/? SRS/(SET SOURCE)}         ::  UN/SUB TO/FROM SRC
+      {$READ NOM/NAME RED/@UD}                          ::  CHANGE READ MESSAGE
+      {$NEWDM SIS/(SET SHIP)}
+      {$USAGE NOM/NAME ADD/? TAS/TAGS}                  ::  ADD/REM USAGE TAGS
+      ::  MESSAGING                                     ::
+      {$CONVEY TOS/(LIST THOUGHT)}                      ::  POST EXACT
+      {$PHRASE AUD/AUDIENCE SES/(LIST SPEECH)}          ::  POST EASY
+      ::  PERSONAL METADATA                             ::
+      {$NOTIFY AUD/AUDIENCE PES/(UNIT PRESENCE)}        ::  OUR PRESENCE UPDATE
+      {$NAMING AUD/AUDIENCE MAN/HUMAN}                  ::  OUR NAME UPDATE
+      ::  CHANGING SHARED UI                            ::
+      {$GLYPH GYF/CHAR AUD/AUDIENCE BIN/?}              ::  UN/BIND A GLYPH
+      {$NICK WHO/SHIP NIC/NICK}                         ::  NEW IDENTITY
+      ::  MISC CHANGES                                  ::
+      {$PUBLIC ADD/? CIR/CIRCLE}                        ::  SHOW/HIDE MEMBERSHIP
   ==                                                    ::
 ::
 ::  #
-::  #  %message-metadata
+::  #  %HALL-COMMUNICATION
 ::  #
-::    structures for containing message metadata.
-+|  %message-metadata
+::    STRUCTURES FOR COMMUNICATING BETWEEN HALLS.
++|  %HALL-COMMUNICATION
 ::
-++  serial     @uvH                                     ::  unique identifier
-++  audience   (set circle)                             ::  destinations
-++  tracking   (map circle delivery)                    ::  delivery per target
-++  delivery                                            ::  delivery state
-  $?  $pending                                          ::  undelivered
-      $accepted                                         ::  received
-      $rejected                                         ::  denied
+++  COMMAND                                             ::  EFFECT ON STORY
+  $%  {$PUBLISH TOS/(LIST THOUGHT)}                     ::  DELIVER
+      {$PRESENT NOS/(SET NAME) DIF/DIFF-STATUS}         ::  STATUS UPDATE
+      {$BEARING ~}                                     ::  PROMPT TO LISTEN
+  ==                                                    ::
+::
+::  #
+::  #  %CIRCLES
+::  #
+::    MESSAGING TARGETS AND THEIR METADATA.
++|  %CIRCLES
+::
+++  CIRCLE     {HOS/SHIP NOM/NAME}                      ::  NATIVE TARGET
+::  CIRCLE CONFIGURATIONS.                              ::
+++  LOBBY      {LOC/CONFIG REM/(MAP CIRCLE CONFIG)}     ::  OUR & SRCS CONFIGS
+++  CONFIG                                              ::  CIRCLE CONFIG
+  $:  SRC/(SET SOURCE)                                  ::  ACTIVE SOURCES
+      CAP/CORD                                          ::  DESCRIPTION
+      TAG/TAGS                                          ::  USAGE TAGS
+      FIT/FILTER                                        ::  MESSAGE RULES
+      CON/CONTROL                                       ::  RESTRICTIONS
+      RED/@UD                                           ::  LAST READ MESSAGE
+  ==                                                    ::
+++  SOURCE  {CIR/CIRCLE RAN/RANGE}                      ::  SUBSCRIPTION TARGET
+++  FILTER                                              ::  CONTENT FILTERS
+  $:  CAS/?                                             ::  DIS/ALLOW CAPITALS
+      UTF/?                                             ::  DIS/ALLOW NON-ASCII
+      ::TODO  MAYBE MESSAGE LENGTH
+  ==                                                    ::
+++  CONTROL    {SEC/SECURITY SIS/(SET SHIP)}            ::  ACCESS CONTROL
+++  SECURITY                                            ::  SECURITY MODE
+  $?  $CHANNEL                                          ::  BLACKLIST
+      $VILLAGE                                          ::  WHITELIST
+      $JOURNAL                                          ::  PUB R, WHITELIST W
+      $MAILBOX                                          ::  OUR R, BLACKLIST W
+      $CUSTOM                                           ::  ACCORDING TO CUSTOM-RULE
+  ==                                                    ::
+::  PARTICIPANT METADATA.                               ::
+++  CROWD      {LOC/GROUP REM/(MAP CIRCLE GROUP)}       ::  OUR & SRCS PRESENCES
+++  GROUP      (MAP SHIP STATUS)                        ::  PRESENCE MAP
+++  STATUS     {PEC/PRESENCE MAN/HUMAN}                 ::  PARTICIPANT
+++  PRESENCE                                            ::  STATUS TYPE
+  $?  $GONE                                             ::  ABSENT
+      $IDLE                                             ::  IDLE
+      $HEAR                                             ::  PRESENT
+      $TALK                                             ::  TYPING
+  ==                                                    ::
+++  HUMAN                                               ::  HUMAN IDENTIFIER
+  $:  HAN/(UNIT CORD)                                   ::  HANDLE
+      TRU/(UNIT TRUENAME)                               ::  TRUE NAME
+  ==                                                    ::
+++  TRUENAME   {FIR/CORD MID/(UNIT CORD) LAS/CORD}      ::  REAL-LIFE NAME
+::
+::  #
+::  #  %MESSAGE-DATA
+::  #
+::    STRUCTURES FOR CONTAINING MAIN MESSAGE DATA.
++|  %MESSAGE-DATA
+::
+::TODO  SOME STRUCTURE FOR EXTRA MESSAGE STATE
+::      LOCAL (TO CLIENTS): DELIVERY STATE, READ FLAGS
+::      REMOTE (TO HALLS): SEQUENCE NR
+++  ENVELOPE   {NUM/@UD GAM/TELEGRAM}                   ::  OUTWARD MESSAGE
+++  TELEGRAM   {AUT/SHIP THOUGHT}                       ::  WHOSE MESSAGE
+++  THOUGHT                                             ::  INNER MESSAGE
+  $:  UID/SERIAL                                        ::  UNIQUE IDENTIFIER
+      AUD/AUDIENCE                                      ::  DESTINATIONS
+      WEN/@DA                                           ::  TIMESTAMP
+      SEP/SPEECH                                        ::  CONTENT
+  ==                                                    ::
+++  SPEECH                                              ::  CONTENT BODY
+  $%  {$LIN PAT/? MSG/CORD}                             ::  NO/@ TEXT LINE
+      {$URL URL/PURF:EYRE}                              ::  PARSED URL
+      {$EXP EXP/CORD RES/(LIST TANK)}                   ::  HOON LINE
+      {$IRE TOP/SERIAL SEP/SPEECH}                      ::  IN REPLY TO
+      {$FAT TAC/ATTACHE SEP/SPEECH}                     ::  ATTACHMENT
+      {$APP APP/TERM SEP/SPEECH}                        ::  APP MESSAGE
+      {$INV INV/? CIR/CIRCLE}                           ::  INV/BAN FOR CIRCLE
+  ==                                                    ::
+++  ATTACHE                                             ::  ATTACHMENT
+  $%  {$NAME NOM/CORD TAC/ATTACHE}                      ::  NAMED ATTACHMENT
+      {$TEXT (LIST CORD)}                               ::  TEXT LINES
+      {$TANK (LIST TANK)}                               ::  TANK LIST
+  ==                                                    ::
+::
+::  #
+::  #  %MESSAGE-METADATA
+::  #
+::    STRUCTURES FOR CONTAINING MESSAGE METADATA.
++|  %MESSAGE-METADATA
+::
+++  SERIAL     @UVH                                     ::  UNIQUE IDENTIFIER
+++  AUDIENCE   (SET CIRCLE)                             ::  DESTINATIONS
+++  TRACKING   (MAP CIRCLE DELIVERY)                    ::  DELIVERY PER TARGET
+++  DELIVERY                                            ::  DELIVERY STATE
+  $?  $PENDING                                          ::  UNDELIVERED
+      $ACCEPTED                                         ::  RECEIVED
+      $REJECTED                                         ::  DENIED
   ==                                                    ::
 --

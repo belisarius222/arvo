@@ -1,39 +1,39 @@
-::  watcher: ethereum event log collector
+::  WATCHER: ETHEREUM EVENT LOG COLLECTOR
 ::
 |%
-++  name  @tas
+++  NAME  @TAS
 ::
-++  config
-  $:  node=purl:eyre
-      from-block=@ud
-      to-block=(unit @ud)
-      contracts=(list address:ethereum)
-      topics=(list $@(@ux (list @ux)))
+++  CONFIG
+  $:  NODE=PURL:EYRE
+      FROM-BLOCK=@UD
+      TO-BLOCK=(UNIT @UD)
+      CONTRACTS=(LIST ADDRESS:ETHEREUM)
+      TOPICS=(LIST $@(@UX (LIST @UX)))
   ==
 ::
-++  action
-  $%  [%watch =name =config]
-      ::TODO  support modifying existing config for future polling
-      [%clear =name]
+++  ACTION
+  $%  [%WATCH =NAME =CONFIG]
+      ::TODO  SUPPORT MODIFYING EXISTING CONFIG FOR FUTURE POLLING
+      [%CLEAR =NAME]
   ==
 ::
-++  update
-  $%  ::  %snap: all known-good logs, sent on-subscribe and on-reorg
-      ::TODO  there's probably a way to be more nuanced about what we forgot
-      ::      to cope with a reorg
+++  UPDATE
+  $%  ::  %SNAP: ALL KNOWN-GOOD LOGS, SENT ON-SUBSCRIBE AND ON-REORG
+      ::TODO  THERE'S PROBABLY A WAY TO BE MORE NUANCED ABOUT WHAT WE FORGOT
+      ::      TO COPE WITH A REORG
       ::
-      [%snap =snapshot]
-      ::  %vent: newly added logs
+      [%SNAP =SNAPSHOT]
+      ::  %VENT: NEWLY ADDED LOGS
       ::
-      [%logs =loglist]
+      [%LOGS =LOGLIST]
   ==
 ::
-++  snapshot
-  $:  last-heard-block=@ud
-      heard=(set event-id:ethereum)
-      logs=loglist
+++  SNAPSHOT
+  $:  LAST-HEARD-BLOCK=@UD
+      HEARD=(SET EVENT-ID:ETHEREUM)
+      LOGS=LOGLIST
   ==
 ::
-++  loglist
-  (list event-log:rpc:ethereum)  ::  newest first
+++  LOGLIST
+  (LIST EVENT-LOG:RPC:ETHEREUM)  ::  NEWEST FIRST
 --

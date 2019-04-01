@@ -1,35 +1,35 @@
 ::
-::::  /hoon/http/lib
+::::  /HOON/HTTP/LIB
   ::
   ::
   ::
 /?    310
 ::
-=,  mimes:html
-=,  html
+=,  MIMES:HTML
+=,  HTML
 |%
-++  request
-  $:  domain/(list cord)
-      end-point/path
-      req-type/$?($get {$post p/json})
-      headers/math:eyre
-      queries/quay:eyre
+++  REQUEST
+  $:  DOMAIN/(LIST CORD)
+      END-POINT/PATH
+      REQ-TYPE/$?($GET {$POST P/JSON})
+      HEADERS/MATH:EYRE
+      QUERIES/QUAY:EYRE
   ==
-++  send
-  |=  {ost/bone pour-path/wire params/request}
-  :^  ost  %them  pour-path
-  `(unit hiss:eyre)`[~ (request-to-hiss params)]
+++  SEND
+  |=  {OST/BONE POUR-PATH/WIRE PARAMS/REQUEST}
+  :^  OST  %THEM  POUR-PATH
+  `(UNIT HISS:EYRE)`[~ (REQUEST-TO-HISS PARAMS)]
 ::
-++  request-to-hiss
-  |=  request  ^-  hiss:eyre
-  =-  ~&  hiss=-  -
-  :-  ^-  parsed-url/purl:eyre
-      :+  :+  security=%.y
-            port=~
-          host=[%.y [path=domain]]
-        endpoint=[extensions=~ point=end-point]       ::  ++pork,
-      q-strings=queries                               ::  ++quay
-  ?@  req-type
-    [%get headers ~]
-  [%post headers ~ (as-octt:mimes:html (en-json p.req-type))]
+++  REQUEST-TO-HISS
+  |=  REQUEST  ^-  HISS:EYRE
+  =-  ~&  HISS=-  -
+  :-  ^-  PARSED-URL/PURL:EYRE
+      :+  :+  SECURITY=%.Y
+            PORT=~
+          HOST=[%.Y [PATH=DOMAIN]]
+        ENDPOINT=[EXTENSIONS=~ POINT=END-POINT]       ::  ++PORK,
+      Q-STRINGS=QUERIES                               ::  ++QUAY
+  ?@  REQ-TYPE
+    [%GET HEADERS ~]
+  [%POST HEADERS ~ (AS-OCTT:MIMES:HTML (EN-JSON P.REQ-TYPE))]
 --

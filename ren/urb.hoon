@@ -1,19 +1,19 @@
 ::
-::::  /hoon/urb/ren
+::::  /HOON/URB/REN
   ::
 /?    309
-/+  landscape
-/=  full-page
-  /^  manx
+/+  LANDSCAPE
+/=  FULL-PAGE
+  /^  MANX
   /|
-    /,  /web/collections  /;  landscape  /collections-elem/
-        /web/landscape    /;  landscape  /!hymn/
-        /web/pages        /|  /!hymn/
-                              /hymn/
+    /,  /WEB/COLLECTIONS  /;  LANDSCAPE  /COLLECTIONS-ELEM/
+        /WEB/LANDSCAPE    /;  LANDSCAPE  /!HYMN/
+        /WEB/PAGES        /|  /!HYMN/
+                              /HYMN/
                           ==
-        /                 /;  landscape  /!hymn/
+        /                 /;  LANDSCAPE  /!HYMN/
     ==
     ::
-    /:  /===/web/404  /;  landscape  /!hymn/
+    /:  /===/WEB/404  /;  LANDSCAPE  /!HYMN/
   ==
-full-page
+FULL-PAGE

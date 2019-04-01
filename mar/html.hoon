@@ -1,21 +1,21 @@
 ::
-::::  /hoon/html/mar
+::::  /HOON/HTML/MAR
   ::
 /?    310
   ::
-::::  compute
+::::  COMPUTE
   ::
-=,  html
-|_  htm/@t
+=,  HTML
+|_  HTM/@T
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%                                                    ::
-  ++  mime  [/text/html (met 3 htm) htm]                ::  to %mime
-  ++  hymn  (need (de-xml htm))                         ::  to %hymn
+  ++  MIME  [/TEXT/HTML (MET 3 HTM) HTM]                ::  TO %MIME
+  ++  HYMN  (NEED (DE-XML HTM))                         ::  TO %HYMN
   --                                                    ::
-++  grab  |%                                            ::  convert from
-          ++  noun  @t                                  ::  clam from %noun
-          ++  mime  |=({p/mite q/octs} q.q)             ::  retrieve form $mime
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  @T                                  ::  CLAM FROM %NOUN
+          ++  MIME  |=({P/MITE Q/OCTS} Q.Q)             ::  RETRIEVE FORM $MIME
           --
-++  grad  %mime
+++  GRAD  %MIME
 --

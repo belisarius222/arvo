@@ -1,31 +1,31 @@
-::  Untyped best-guess printer
+::  UNTYPED BEST-GUESS PRINTER
 ::
-::::  /hoon/pretty-file/lib
+::::  /HOON/PRETTY-FILE/LIB
   ::
 /?    310
 ::
-=<  pretty-file
+=<  PRETTY-FILE
 |%
-++  pretty-noun
-  |=  pri/*  ^-  tank
-  ?~  pri
-    leaf+"~"
-  ?@  pri
-    leaf+?:(((sane %tas) pri) <`@tas`pri> <pri>)
-  =<  rose+[" " ?:(- "~[" "[") "]"]^+
-  |-  ^-  {? (list tank)}
-  ?~  +.pri
-    [& ^$(pri -.pri) ~]
-  ?@  +.pri
-    [| ^$(pri -.pri) ^$(pri +.pri) ~]
-  [+< - +>]:[^$(pri -.pri) $(pri +.pri)]
+++  PRETTY-NOUN
+  |=  PRI/*  ^-  TANK
+  ?~  PRI
+    LEAF+"~"
+  ?@  PRI
+    LEAF+?:(((SANE %TAS) PRI) <`@TAS`PRI> <PRI>)
+  =<  ROSE+[" " ?:(- "~[" "[") "]"]^+
+  |-  ^-  {? (LIST TANK)}
+  ?~  +.PRI
+    [& ^$(PRI -.PRI) ~]
+  ?@  +.PRI
+    [| ^$(PRI -.PRI) ^$(PRI +.PRI) ~]
+  [+< - +>]:[^$(PRI -.PRI) $(PRI +.PRI)]
 ::
-++  vale-cord  |=(a/cord `?`(levy (trip a) |=(b/@ |((gte b 32) =(10 b)))))
+++  VALE-CORD  |=(A/CORD `?`(LEVY (TRIP A) |=(B/@ |((GTE B 32) =(10 B)))))
 ::
-++  wain-to-tang  |=(a/wain (turn a |=(b/cord leaf+(trip b))))
-++  pretty-file
-  |=  fyl/*  ^-  tang
-  =+  `(unit wain)`?@(fyl `(to-wain:format fyl) ((soft wain) fyl))
-  ?^  -  (wain-to-tang u)
-  [(pretty-noun fyl)]~
+++  WAIN-TO-TANG  |=(A/WAIN (TURN A |=(B/CORD LEAF+(TRIP B))))
+++  PRETTY-FILE
+  |=  FYL/*  ^-  TANG
+  =+  `(UNIT WAIN)`?@(FYL `(TO-WAIN:FORMAT FYL) ((SOFT WAIN) FYL))
+  ?^  -  (WAIN-TO-TANG U)
+  [(PRETTY-NOUN FYL)]~
 --

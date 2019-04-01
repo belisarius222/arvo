@@ -1,74 +1,74 @@
 ::
-::::  /hoon/ivory/gen
+::::  /HOON/IVORY/GEN
   ::
 /?    310
 ::
 ::::
   !:
-:-  %say
-|=  [[now=@da * bec=beak] *]
-:-  %noun
-::  sys: root path to boot system, `/~me/[desk]/now/sys`
+:-  %SAY
+|=  [[NOW=@DA * BEC=BEAK] *]
+:-  %NOUN
+::  SYS: ROOT PATH TO BOOT SYSTEM, `/~ME/[DESK]/NOW/SYS`
 ::
-=/  sys=path
-  /(scot %p p.bec)/[q.bec]/(scot %da now)/sys
-::  compiler-source: hoon source file producing compiler, `sys/hoon`
+=/  SYS=PATH
+  /(SCOT %P P.BEC)/[Q.BEC]/(SCOT %DA NOW)/SYS
+::  COMPILER-SOURCE: HOON SOURCE FILE PRODUCING COMPILER, `SYS/HOON`
 ::
-=/  compiler-source
-  .^(@t %cx (welp sys /hoon/hoon))
-::  compiler-hoon: compiler as hoon expression
+=/  COMPILER-SOURCE
+  .^(@T %CX (WELP SYS /HOON/HOON))
+::  COMPILER-HOON: COMPILER AS HOON EXPRESSION
 ::
-::    Parsed with a static path for reproducibility.
+::    PARSED WITH A STATIC PATH FOR REPRODUCIBILITY.
 ::
-~&  %ivory-parsing
-=/  compiler-hoon  (rain /sys/hoon/hoon compiler-source)
-~&  %ivory-parsed
-::  arvo-source: hoon source file producing arvo kernel, `sys/arvo`
+~&  %IVORY-PARSING
+=/  COMPILER-HOON  (RAIN /SYS/HOON/HOON COMPILER-SOURCE)
+~&  %IVORY-PARSED
+::  ARVO-SOURCE: HOON SOURCE FILE PRODUCING ARVO KERNEL, `SYS/ARVO`
 ::
-=/  arvo-source
-  .^(@t %cx (welp sys /arvo/hoon))
-::  whole-hoon: arvo within compiler
+=/  ARVO-SOURCE
+  .^(@T %CX (WELP SYS /ARVO/HOON))
+::  WHOLE-HOON: ARVO WITHIN COMPILER
 ::
-::    Parsed with a static path for reproducibility.
+::    PARSED WITH A STATIC PATH FOR REPRODUCIBILITY.
 ::
-=/  whole-hoon=hoon
-  :+  %tsbn  compiler-hoon
-  :+  %tsld  (rain /sys/arvo/hoon arvo-source)
+=/  WHOLE-HOON=HOON
+  :+  %TSBN  COMPILER-HOON
+  :+  %TSLD  (RAIN /SYS/ARVO/HOON ARVO-SOURCE)
   [%$ 7]
-::  compile the whole schmeer
+::  COMPILE THE WHOLE SCHMEER
 ::
-~&  %ivory-compiling
-=/  whole-formula
-  q:(~(mint ut %noun) %noun whole-hoon)
-~&  %ivory-compiled
-::  zuse-ovo: standard library installation event
+~&  %IVORY-COMPILING
+=/  WHOLE-FORMULA
+  Q:(~(MINT UT %NOUN) %NOUN WHOLE-HOON)
+~&  %IVORY-COMPILED
+::  ZUSE-OVO: STANDARD LIBRARY INSTALLATION EVENT
 ::
-::    Arvo parses the %veer card contents with +rain;
-::    we include a static path for reproducibility.
+::    ARVO PARSES THE %VEER CARD CONTENTS WITH +RAIN;
+::    WE INCLUDE A STATIC PATH FOR REPRODUCIBILITY.
 ::
-=/  zuse-ovo=ovum
-  :-  /vane/zuse
-  [%veer %$ /sys/zuse/hoon .^(@ %cx (weld sys /zuse/hoon))]
-::  installed: Arvo gate (formal instance) with %zuse installed
+=/  ZUSE-OVO=OVUM
+  :-  /VANE/ZUSE
+  [%VEER %$ /SYS/ZUSE/HOON .^(@ %CX (WELD SYS /ZUSE/HOON))]
+::  INSTALLED: ARVO GATE (FORMAL INSTANCE) WITH %ZUSE INSTALLED
 ::
-::    The :zuse-ovo event occurs at a defaulted date for reproducibility.
+::    THE :ZUSE-OVO EVENT OCCURS AT A DEFAULTED DATE FOR REPRODUCIBILITY.
 ::
-~&  %zuse-installing
-=/  installed
+~&  %ZUSE-INSTALLING
+=/  INSTALLED
   .*  0
-  :+  %7  whole-formula
-  [%9 2 %10 [6 %1 *@da zuse-ovo] %0 1]
-~&  %zuse-installed
-::  our boot-ova is a list containing one massive formula:
+  :+  %7  WHOLE-FORMULA
+  [%9 2 %10 [6 %1 *@DA ZUSE-OVO] %0 1]
+~&  %ZUSE-INSTALLED
+::  OUR BOOT-OVA IS A LIST CONTAINING ONE MASSIVE FORMULA:
 ::
-::    We evaluate :whole-formula (for jet registration),
-::    then ignore the result and produces :installed
+::    WE EVALUATE :WHOLE-FORMULA (FOR JET REGISTRATION),
+::    THEN IGNORE THE RESULT AND PRODUCES :INSTALLED
 ::
-=/  boot-ova=(list)
-  [[%7 whole-formula %1 installed] ~]
-::  a pill is a 3-tuple of event-lists: [boot kernel userspace]
+=/  BOOT-OVA=(LIST)
+  [[%7 WHOLE-FORMULA %1 INSTALLED] ~]
+::  A PILL IS A 3-TUPLE OF EVENT-LISTS: [BOOT KERNEL USERSPACE]
 ::
-::    Our kernel event-list is ~, as we've already installed them.
-::    Our userspace event-list is ~, as this pill must be compact.
+::    OUR KERNEL EVENT-LIST IS ~, AS WE'VE ALREADY INSTALLED THEM.
+::    OUR USERSPACE EVENT-LIST IS ~, AS THIS PILL MUST BE COMPACT.
 ::
-[boot-ova ~ ~]
+[BOOT-OVA ~ ~]

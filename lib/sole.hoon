@@ -1,139 +1,139 @@
 ::
-::::  /hoon/sole/lib
+::::  /HOON/SOLE/LIB
   ::
 /?    310
-/-    *sole
+/-    *SOLE
 ::::
   ::
-|_  sole-share                                          ::  shared-state engine
-++  abet  +<
-++  apply
-  |=  ted/sole-edit
+|_  SOLE-SHARE                                          ::  SHARED-STATE ENGINE
+++  ABET  +<
+++  APPLY
+  |=  TED/SOLE-EDIT
   ^+  +>
-  ?-    -.ted
-    $del  +>.$(buf (weld (scag p.ted buf) (slag +(p.ted) buf)))
-    $ins  +>.$(buf (weld (scag p.ted buf) `_buf`[q.ted (slag p.ted buf)]))
-    $mor  |-  ^+  +>.^$
-          ?~  p.ted
+  ?-    -.TED
+    $DEL  +>.$(BUF (WELD (SCAG P.TED BUF) (SLAG +(P.TED) BUF)))
+    $INS  +>.$(BUF (WELD (SCAG P.TED BUF) `_BUF`[Q.TED (SLAG P.TED BUF)]))
+    $MOR  |-  ^+  +>.^$
+          ?~  P.TED
             +>.^$
-          $(p.ted t.p.ted, +>.^$ ^$(ted i.p.ted))
-    $nop  +>.$
-    $set  +>.$(buf p.ted)
+          $(P.TED T.P.TED, +>.^$ ^$(TED I.P.TED))
+    $NOP  +>.$
+    $SET  +>.$(BUF P.TED)
   ==
 ::
 ::::
-::  ++transmute: symmetric operational transformation.
+::  ++TRANSMUTE: SYMMETRIC OPERATIONAL TRANSFORMATION.
 ::
-::  for any sole state +>, obeys
+::  FOR ANY SOLE STATE +>, OBEYS
 ::
-::      =+  [x=(transmute a b) y=(transmute b a)]
-::      .=  (apply:(apply a) x)
-::          (apply:(apply b) y)
+::      =+  [X=(TRANSMUTE A B) Y=(TRANSMUTE B A)]
+::      .=  (APPLY:(APPLY A) X)
+::          (APPLY:(APPLY B) Y)
 ::
-++  transmute                                         ::  dex as after sin
-  |=  {sin/sole-edit dex/sole-edit}
-  ~|  [%transmute sin dex]
-  ^-  sole-edit
-  ?:  ?=($mor -.sin)
-    |-  ^-  sole-edit
-    ?~  p.sin  dex
-    $(p.sin t.p.sin, dex ^$(sin i.p.sin))
+++  TRANSMUTE                                         ::  DEX AS AFTER SIN
+  |=  {SIN/SOLE-EDIT DEX/SOLE-EDIT}
+  ~|  [%TRANSMUTE SIN DEX]
+  ^-  SOLE-EDIT
+  ?:  ?=($MOR -.SIN)
+    |-  ^-  SOLE-EDIT
+    ?~  P.SIN  DEX
+    $(P.SIN T.P.SIN, DEX ^$(SIN I.P.SIN))
   ::
-  ?:  ?=($mor -.dex)
-    :-  %mor
-    |-  ^-  (list sole-edit)
-    ?~  p.dex  ~
-    [^$(dex i.p.dex) $(p.dex t.p.dex)]
+  ?:  ?=($MOR -.DEX)
+    :-  %MOR
+    |-  ^-  (LIST SOLE-EDIT)
+    ?~  P.DEX  ~
+    [^$(DEX I.P.DEX) $(P.DEX T.P.DEX)]
   ::
-  ?:  |(?=($nop -.sin) ?=($nop -.dex))  dex
-  ?:  ?=($set -.sin)                    [%nop ~]
-  ?:  ?=($set -.dex)                    dex
+  ?:  |(?=($NOP -.SIN) ?=($NOP -.DEX))  DEX
+  ?:  ?=($SET -.SIN)                    [%NOP ~]
+  ?:  ?=($SET -.DEX)                    DEX
   ::
-  ?-    -.sin
-      $del
-    ?-  -.dex
-      $del  ?:  =(p.sin p.dex)  [%nop ~]
-            ?:((lth p.sin p.dex) dex(p (dec p.dex)) dex)
-      $ins  ?:((lth p.sin p.dex) dex(p (dec p.dex)) dex)
+  ?-    -.SIN
+      $DEL
+    ?-  -.DEX
+      $DEL  ?:  =(P.SIN P.DEX)  [%NOP ~]
+            ?:((LTH P.SIN P.DEX) DEX(P (DEC P.DEX)) DEX)
+      $INS  ?:((LTH P.SIN P.DEX) DEX(P (DEC P.DEX)) DEX)
     ==
   ::
-      $ins
-    ?-  -.dex
-      $del  ?:((lte p.sin p.dex) dex(p +(p.dex)) dex)
-      $ins  ?:  =(p.sin p.dex)
-              ?:((lth q.sin q.dex) dex dex(p +(p.dex)))
-            ?:((lte p.sin p.dex) dex(p +(p.dex)) dex)
+      $INS
+    ?-  -.DEX
+      $DEL  ?:((LTE P.SIN P.DEX) DEX(P +(P.DEX)) DEX)
+      $INS  ?:  =(P.SIN P.DEX)
+              ?:((LTH Q.SIN Q.DEX) DEX DEX(P +(P.DEX)))
+            ?:((LTE P.SIN P.DEX) DEX(P +(P.DEX)) DEX)
     ==
   ==
 ::
-++  commit                                            ::  local change
-  |=  ted/sole-edit
-  ^-  sole-share
-  abet:(apply(own.ven +(own.ven), leg [ted leg]) ted)
+++  COMMIT                                            ::  LOCAL CHANGE
+  |=  TED/SOLE-EDIT
+  ^-  SOLE-SHARE
+  ABET:(APPLY(OWN.VEN +(OWN.VEN), LEG [TED LEG]) TED)
 ::
 ::::
-::  ++inverse: inverse of change in context.
+::  ++INVERSE: INVERSE OF CHANGE IN CONTEXT.
 ::
-::  for any sole state +>, obeys
+::  FOR ANY SOLE STATE +>, OBEYS
 ::
-::      =(+> (apply:(apply a) (inverse a)))
+::      =(+> (APPLY:(APPLY A) (INVERSE A)))
 ::
-++  inverse                                           ::  relative inverse
-  |=  ted/sole-edit
-  ^-  sole-edit
-  =.  ted  ?.(?=({$mor * ~} ted) ted i.p.ted)
-  ?-  -.ted
-    $del  [%ins p.ted (snag p.ted buf)]
-    $ins  [%del p.ted]
-    $mor  :-  %mor
-          %-  flop
-          |-  ^-  (list sole-edit)
-          ?~  p.ted  ~
-          :-  ^$(ted i.p.ted)
-          $(p.ted t.p.ted, +>.^$ (apply i.p.ted))
-    $nop  [%nop ~]
-    $set  [%set buf]
+++  INVERSE                                           ::  RELATIVE INVERSE
+  |=  TED/SOLE-EDIT
+  ^-  SOLE-EDIT
+  =.  TED  ?.(?=({$MOR * ~} TED) TED I.P.TED)
+  ?-  -.TED
+    $DEL  [%INS P.TED (SNAG P.TED BUF)]
+    $INS  [%DEL P.TED]
+    $MOR  :-  %MOR
+          %-  FLOP
+          |-  ^-  (LIST SOLE-EDIT)
+          ?~  P.TED  ~
+          :-  ^$(TED I.P.TED)
+          $(P.TED T.P.TED, +>.^$ (APPLY I.P.TED))
+    $NOP  [%NOP ~]
+    $SET  [%SET BUF]
   ==
 ::
-++  receive                                           ::  naturalize event
-  |=  sole-change
-  ^-  {sole-edit sole-share}
-  ?.  &(=(his.ler his.ven) (lte own.ler own.ven))
-    ~&  [%receive-sync his+[his.ler his.ven] own+[own.ler own.ven]]
+++  RECEIVE                                           ::  NATURALIZE EVENT
+  |=  SOLE-CHANGE
+  ^-  {SOLE-EDIT SOLE-SHARE}
+  ?.  &(=(HIS.LER HIS.VEN) (LTE OWN.LER OWN.VEN))
+    ~&  [%RECEIVE-SYNC HIS+[HIS.LER HIS.VEN] OWN+[OWN.LER OWN.VEN]]
     !!
-  ?>  &(=(his.ler his.ven) (lte own.ler own.ven))
-  ?>  |(!=(own.ler own.ven) =(`@`0 haw) =(haw (sham buf)))
-  =.  leg  (scag (sub own.ven own.ler) leg)
-  ::  ~?  !=(own.ler own.ven)  [%miss-leg leg]
-  =+  dat=(transmute [%mor leg] ted)
-  ::  ~?  !=(~ leg)  [%transmute from+ted to+dat ~]
-  [dat abet:(apply(his.ven +(his.ven)) dat)]
+  ?>  &(=(HIS.LER HIS.VEN) (LTE OWN.LER OWN.VEN))
+  ?>  |(!=(OWN.LER OWN.VEN) =(`@`0 HAW) =(HAW (SHAM BUF)))
+  =.  LEG  (SCAG (SUB OWN.VEN OWN.LER) LEG)
+  ::  ~?  !=(OWN.LER OWN.VEN)  [%MISS-LEG LEG]
+  =+  DAT=(TRANSMUTE [%MOR LEG] TED)
+  ::  ~?  !=(~ LEG)  [%TRANSMUTE FROM+TED TO+DAT ~]
+  [DAT ABET:(APPLY(HIS.VEN +(HIS.VEN)) DAT)]
 ::
-++  remit                                             ::  conditional accept
-  |=  {cal/sole-change ask/$-((list @c) ?)}
-  ^-  {(unit sole-change) sole-share}
-  =+  old=buf
-  =^  dat  +>+<.$  (receive cal)
-  ?:  (ask buf)
+++  REMIT                                             ::  CONDITIONAL ACCEPT
+  |=  {CAL/SOLE-CHANGE ASK/$-((LIST @C) ?)}
+  ^-  {(UNIT SOLE-CHANGE) SOLE-SHARE}
+  =+  OLD=BUF
+  =^  DAT  +>+<.$  (RECEIVE CAL)
+  ?:  (ASK BUF)
     [~ +>+<.$]
-  =^  lic  +>+<.$  (transmit (inverse(buf old) dat))
-  [`lic +>+<.$]
+  =^  LIC  +>+<.$  (TRANSMIT (INVERSE(BUF OLD) DAT))
+  [`LIC +>+<.$]
 ::
-++  transmit                                          ::  outgoing change
-  |=  ted/sole-edit
-  ^-  {sole-change sole-share}
-  [[[his.ven own.ven] (sham buf) ted] (commit ted)]
+++  TRANSMIT                                          ::  OUTGOING CHANGE
+  |=  TED/SOLE-EDIT
+  ^-  {SOLE-CHANGE SOLE-SHARE}
+  [[[HIS.VEN OWN.VEN] (SHAM BUF) TED] (COMMIT TED)]
 ::
-++  transceive                                        ::  receive and invert
-  |=  sole-change
-  ^-  {sole-edit sole-share}
-  =+  old=buf
-  =^  dat  +>+<.$  (receive +<.$)
-  [(inverse(buf old) dat) +>+<.$]
+++  TRANSCEIVE                                        ::  RECEIVE AND INVERT
+  |=  SOLE-CHANGE
+  ^-  {SOLE-EDIT SOLE-SHARE}
+  =+  OLD=BUF
+  =^  DAT  +>+<.$  (RECEIVE +<.$)
+  [(INVERSE(BUF OLD) DAT) +>+<.$]
 ::
-++  transpose                                         ::  adjust position
-  |=  pos/@ud
-  =+  dat=(transmute [%mor leg] [%ins pos `@c`0])
-  ?>  ?=($ins -.dat)
-  p.dat
+++  TRANSPOSE                                         ::  ADJUST POSITION
+  |=  POS/@UD
+  =+  DAT=(TRANSMUTE [%MOR LEG] [%INS POS `@C`0])
+  ?>  ?=($INS -.DAT)
+  P.DAT
 --

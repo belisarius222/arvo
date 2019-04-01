@@ -1,13 +1,13 @@
-::  Fetch contents at url
+::  FETCH CONTENTS AT URL
 ::
-::::  /hoon/curl/gen
+::::  /HOON/CURL/GEN
   ::
 /?    310
-/-  sole
-/+  generators
-=,  [generators eyre]
-:-  %get  |=  {^ {a/tape ~} ~}
-^-  (sole-request:sole (cask httr))
-%+  curl  (scan a auri:de-purl:html)
-|=  hit/httr
-(produce %httr hit)
+/-  SOLE
+/+  GENERATORS
+=,  [GENERATORS EYRE]
+:-  %GET  |=  {^ {A/TAPE ~} ~}
+^-  (SOLE-REQUEST:SOLE (CASK HTTR))
+%+  CURL  (SCAN A AURI:DE-PURL:HTML)
+|=  HIT/HTTR
+(PRODUCE %HTTR HIT)

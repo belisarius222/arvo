@@ -1,18 +1,18 @@
 ::
-::::  /hoon/atom/mar
+::::  /HOON/ATOM/MAR
   ::
 /?    310
 ::
-::::  A minimal atom mark
+::::  A MINIMAL ATOM MARK
   ::
-=,  mimes:html
-|_  ato/@
-++  grab  |%
-          ++  noun  @
-          ++  mime  |=({* p/octs:eyre} q.p)
+=,  MIMES:HTML
+|_  ATO/@
+++  GRAB  |%
+          ++  NOUN  @
+          ++  MIME  |=({* P/OCTS:EYRE} Q.P)
           --
-++  grow  |%
-          ++  mime  [/application/x-urb-unknown (as-octs ato)]
+++  GROW  |%
+          ++  MIME  [/APPLICATION/X-URB-UNKNOWN (AS-OCTS ATO)]
           --
-++  grad  %mime
+++  GRAD  %MIME
 --

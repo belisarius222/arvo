@@ -1,5 +1,5 @@
-::  Disassembled page <head>/<body>
+::  DISASSEMBLED PAGE <HEAD>/<BODY>
 ::
-::::  /hoon/urb/sur
+::::  /HOON/URB/SUR
   ::
-{hed/{dep/@uvH ele/marl} bod/{dep/@uvH ele/marl}}
+{HED/{DEP/@UVH ELE/MARL} BOD/{DEP/@UVH ELE/MARL}}

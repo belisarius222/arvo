@@ -1,210 +1,210 @@
-/-  asn1
-::  |der: distinguished encoding rules for ASN.1
+/-  ASN1
+::  |DER: DISTINGUISHED ENCODING RULES FOR ASN.1
 ::
-::    DER is a tag-length-value binary encoding for ASN.1, designed
-::    so that there is only one (distinguished) valid encoding for an
-::    instance of a type.
+::    DER IS A TAG-LENGTH-VALUE BINARY ENCODING FOR ASN.1, DESIGNED
+::    SO THAT THERE IS ONLY ONE (DISTINGUISHED) VALID ENCODING FOR AN
+::    INSTANCE OF A TYPE.
 ::
 |%
-::  +en:der: encode +spec:asn1 to +octs (kindof)
+::  +EN:DER: ENCODE +SPEC:ASN1 TO +OCTS (KINDOF)
 ::
-++  en
-  =<  |=  a=spec:asn1
-      ^-  [len=@ud dat=@ux]
-      =/  b  ~(ren raw a)
-      [(lent b) (rep 3 b)]
+++  EN
+  =<  |=  A=SPEC:ASN1
+      ^-  [LEN=@UD DAT=@UX]
+      =/  B  ~(REN RAW A)
+      [(LENT B) (REP 3 B)]
   |%
-  ::  +raw:en:der: door for encoding +spec:asn1 to list of bytes
+  ::  +RAW:EN:DER: DOOR FOR ENCODING +SPEC:ASN1 TO LIST OF BYTES
   ::
-  ++  raw
-    |_  pec=spec:asn1
-    ::  +ren:raw:en:der: render +spec:asn1 to tag-length-value bytes
+  ++  RAW
+    |_  PEC=SPEC:ASN1
+    ::  +REN:RAW:EN:DER: RENDER +SPEC:ASN1 TO TAG-LENGTH-VALUE BYTES
     ::
-    ++  ren
-      ^-  (list @D)
-      =/  a  lem
-      [tag (weld (len a) a)]
-    ::  +tag:raw:en:der: tag byte
+    ++  REN
+      ^-  (LIST @D)
+      =/  A  LEM
+      [TAG (WELD (LEN A) A)]
+    ::  +TAG:RAW:EN:DER: TAG BYTE
     ::
-    ++  tag
+    ++  TAG
       ^-  @D
-      ?-  pec
-        [%int *]   2
-        [%bit *]   3
-        [%oct *]   4
-        [%nul *]   5
-        [%obj *]   6
-        [%seq *]  48              :: constructed: (con 0x20 16)
-        [%set *]  49              :: constructed: (con 0x20 17)
-        [%con *]  ;:  con
-                    0x80                    :: context-specifc
-                    ?:(imp.bes.pec 0 0x20)  :: implicit?
-                    (dis 0x1f tag.bes.pec)  :: 5 bits of custom tag
+      ?-  PEC
+        [%INT *]   2
+        [%BIT *]   3
+        [%OCT *]   4
+        [%NUL *]   5
+        [%OBJ *]   6
+        [%SEQ *]  48              :: CONSTRUCTED: (CON 0X20 16)
+        [%SET *]  49              :: CONSTRUCTED: (CON 0X20 17)
+        [%CON *]  ;:  CON
+                    0X80                    :: CONTEXT-SPECIFC
+                    ?:(IMP.BES.PEC 0 0X20)  :: IMPLICIT?
+                    (DIS 0X1F TAG.BES.PEC)  :: 5 BITS OF CUSTOM TAG
                   ==
       ==
-    ::  +lem:raw:en:der: element bytes
+    ::  +LEM:RAW:EN:DER: ELEMENT BYTES
     ::
-    ++  lem
-      ^-  (list @D)
-      ?-  pec
-        ::  unsigned only, interpreted as positive-signed and
-        ::  rendered in big-endian byte order. negative-signed would
-        ::  be two's complement
+    ++  LEM
+      ^-  (LIST @D)
+      ?-  PEC
+        ::  UNSIGNED ONLY, INTERPRETED AS POSITIVE-SIGNED AND
+        ::  RENDERED IN BIG-ENDIAN BYTE ORDER. NEGATIVE-SIGNED WOULD
+        ::  BE TWO'S COMPLEMENT
         ::
-        [%int *]  =/  a  (flop (rip 3 int.pec))
-                  ?~  a  [0 ~]
-                  ?:((lte i.a 127) a [0 a])
-        ::  padded to byte-width, must be already byte-aligned
+        [%INT *]  =/  A  (FLOP (RIP 3 INT.PEC))
+                  ?~  A  [0 ~]
+                  ?:((LTE I.A 127) A [0 A])
+        ::  PADDED TO BYTE-WIDTH, MUST BE ALREADY BYTE-ALIGNED
         ::
-        [%bit *]  =/  a  (rip 3 bit.pec)
-                  =/  b  ~|  %der-invalid-bit
-                      ?.  =(0 (mod len.pec 8))
-                        ~|(%der-invalid-bit-alignment !!)
-                      (sub (div len.pec 8) (lent a))
-                  [0 (weld a (reap b 0))]
-        ::  padded to byte-width
+        [%BIT *]  =/  A  (RIP 3 BIT.PEC)
+                  =/  B  ~|  %DER-INVALID-BIT
+                      ?.  =(0 (MOD LEN.PEC 8))
+                        ~|(%DER-INVALID-BIT-ALIGNMENT !!)
+                      (SUB (DIV LEN.PEC 8) (LENT A))
+                  [0 (WELD A (REAP B 0))]
+        ::  PADDED TO BYTE-WIDTH
         ::
-        [%oct *]  =/  a  (rip 3 oct.pec)
-                  =/  b  ~|  %der-invalid-oct
-                      (sub len.pec (lent a))
-                  (weld a (reap b 0))
+        [%OCT *]  =/  A  (RIP 3 OCT.PEC)
+                  =/  B  ~|  %DER-INVALID-OCT
+                      (SUB LEN.PEC (LENT A))
+                  (WELD A (REAP B 0))
         ::
-        [%nul *]  ~
-        [%obj *]  (rip 3 obj.pec)
+        [%NUL *]  ~
+        [%OBJ *]  (RIP 3 OBJ.PEC)
         ::
-        [%seq *]  %-  zing
-                  |-  ^-  (list (list @))
-                  ?~  seq.pec  ~
-                  :-  ren(pec i.seq.pec)
-                  $(seq.pec t.seq.pec)
-        ::  presumed to be already deduplicated and sorted
+        [%SEQ *]  %-  ZING
+                  |-  ^-  (LIST (LIST @))
+                  ?~  SEQ.PEC  ~
+                  :-  REN(PEC I.SEQ.PEC)
+                  $(SEQ.PEC T.SEQ.PEC)
+        ::  PRESUMED TO BE ALREADY DEDUPLICATED AND SORTED
         ::
-        [%set *]  %-  zing
-                  |-  ^-  (list (list @))
-                  ?~  set.pec  ~
-                  :-  ren(pec i.set.pec)
-                  $(set.pec t.set.pec)
-        ::  already constructed
+        [%SET *]  %-  ZING
+                  |-  ^-  (LIST (LIST @))
+                  ?~  SET.PEC  ~
+                  :-  REN(PEC I.SET.PEC)
+                  $(SET.PEC T.SET.PEC)
+        ::  ALREADY CONSTRUCTED
         ::
-        [%con *]  con.pec
+        [%CON *]  CON.PEC
       ==
-    ::  +len:raw:en:der: length bytes
+    ::  +LEN:RAW:EN:DER: LENGTH BYTES
     ::
-    ++  len
-      |=  a=(list @D)
-      ^-  (list @D)
-      =/  b  (lent a)
-      ?:  (lte b 127)
-        [b ~]                :: note: big-endian
-      [(con 0x80 (met 3 b)) (flop (rip 3 b))]
+    ++  LEN
+      |=  A=(LIST @D)
+      ^-  (LIST @D)
+      =/  B  (LENT A)
+      ?:  (LTE B 127)
+        [B ~]                :: NOTE: BIG-ENDIAN
+      [(CON 0X80 (MET 3 B)) (FLOP (RIP 3 B))]
     --
   --
-::  +de:der: decode atom to +spec:asn1
+::  +DE:DER: DECODE ATOM TO +SPEC:ASN1
 ::
-++  de
-  |=  [len=@ud dat=@ux]
-  ^-  (unit spec:asn1)
-  :: XX refactor into +parse
-  =/  a  (rip 3 dat)
-  =/  b  ~|  %der-invalid-len
-      (sub len (lent a))
-  (rust `(list @D)`(weld a (reap b 0)) parse)
-::  +parse:der: DER parser combinator
+++  DE
+  |=  [LEN=@UD DAT=@UX]
+  ^-  (UNIT SPEC:ASN1)
+  :: XX REFACTOR INTO +PARSE
+  =/  A  (RIP 3 DAT)
+  =/  B  ~|  %DER-INVALID-LEN
+      (SUB LEN (LENT A))
+  (RUST `(LIST @D)`(WELD A (REAP B 0)) PARSE)
+::  +PARSE:DER: DER PARSER COMBINATOR
 ::
-++  parse
-  =<  ^-  $-(nail (like spec:asn1))
-      ;~  pose
-        (stag %int (bass 256 (sear int ;~(pfix (tag 2) till))))
-        (stag %bit (sear bit (boss 256 ;~(pfix (tag 3) till))))
-        (stag %oct (boss 256 ;~(pfix (tag 4) till)))
-        (stag %nul (cold ~ ;~(plug (tag 5) (tag 0))))
-        (stag %obj (^boss 256 ;~(pfix (tag 6) till)))
-        (stag %seq (sear recur ;~(pfix (tag 48) till)))
-        (stag %set (sear recur ;~(pfix (tag 49) till)))
-        (stag %con ;~(plug (sear context next) till))
+++  PARSE
+  =<  ^-  $-(NAIL (LIKE SPEC:ASN1))
+      ;~  POSE
+        (STAG %INT (BASS 256 (SEAR INT ;~(PFIX (TAG 2) TILL))))
+        (STAG %BIT (SEAR BIT (BOSS 256 ;~(PFIX (TAG 3) TILL))))
+        (STAG %OCT (BOSS 256 ;~(PFIX (TAG 4) TILL)))
+        (STAG %NUL (COLD ~ ;~(PLUG (TAG 5) (TAG 0))))
+        (STAG %OBJ (^BOSS 256 ;~(PFIX (TAG 6) TILL)))
+        (STAG %SEQ (SEAR RECUR ;~(PFIX (TAG 48) TILL)))
+        (STAG %SET (SEAR RECUR ;~(PFIX (TAG 49) TILL)))
+        (STAG %CON ;~(PLUG (SEAR CONTEXT NEXT) TILL))
       ==
   |%
-  ::  +tag:parse:der: parse tag byte
+  ::  +TAG:PARSE:DER: PARSE TAG BYTE
   ::
-  ++  tag
-    |=(a=@D (just a))
-  ::  +int:parse:der: sear unsigned big-endian bytes
+  ++  TAG
+    |=(A=@D (JUST A))
+  ::  +INT:PARSE:DER: SEAR UNSIGNED BIG-ENDIAN BYTES
   ::
-  ++  int
-    |=  a=(list @D)
-    ^-  (unit (list @D))
-    ?~  a  ~
-    ?:  ?=([@ ~] a)  `a
-    ?.  =(0 i.a)  `a
-    ?.((gth i.t.a 127) ~ `t.a)
-  ::  +bit:parse:der: convert bytewidth to bitwidth
+  ++  INT
+    |=  A=(LIST @D)
+    ^-  (UNIT (LIST @D))
+    ?~  A  ~
+    ?:  ?=([@ ~] A)  `A
+    ?.  =(0 I.A)  `A
+    ?.((GTH I.T.A 127) ~ `T.A)
+  ::  +BIT:PARSE:DER: CONVERT BYTEWIDTH TO BITWIDTH
   ::
-  ++  bit
-    |=  [len=@ud dat=@ux]
-    ^-  (unit [len=@ud dat=@ux])
-    ?.  =(0 (end 3 1 dat))  ~
+  ++  BIT
+    |=  [LEN=@UD DAT=@UX]
+    ^-  (UNIT [LEN=@UD DAT=@UX])
+    ?.  =(0 (END 3 1 DAT))  ~
     :+  ~
-      (mul 8 (dec len))
-    (rsh 3 1 dat)
-  ::  +recur:parse:der: parse bytes for a list of +spec:asn1
+      (MUL 8 (DEC LEN))
+    (RSH 3 1 DAT)
+  ::  +RECUR:PARSE:DER: PARSE BYTES FOR A LIST OF +SPEC:ASN1
   ::
-  ++  recur
-    |=(a=(list @) (rust a (star parse)))
-  ::  +context:parse:der: decode context-specific tag byte
+  ++  RECUR
+    |=(A=(LIST @) (RUST A (STAR PARSE)))
+  ::  +CONTEXT:PARSE:DER: DECODE CONTEXT-SPECIFIC TAG BYTE
   ::
-  ++  context
-    |=  a=@D
-    ^-  (unit bespoke:asn1)
-    ?.  =(1 (cut 0 [7 1] a))  ~
+  ++  CONTEXT
+    |=  A=@D
+    ^-  (UNIT BESPOKE:ASN1)
+    ?.  =(1 (CUT 0 [7 1] A))  ~
     :+  ~
-      =(1 (cut 0 [5 1] a))
-    (dis 0x1f a)
-  ::  +boss:parse:der: shadowed to count as well
+      =(1 (CUT 0 [5 1] A))
+    (DIS 0X1F A)
+  ::  +BOSS:PARSE:DER: SHADOWED TO COUNT AS WELL
   ::
-  ::    Use for parsing +octs more broadly?
+  ::    USE FOR PARSING +OCTS MORE BROADLY?
   ::
-  ++  boss
-    |*  [wuc=@ tyd=rule]
-    %+  cook
-      |=  waq=(list @)
-      :-  (lent waq)
-      (reel waq |=([p=@ q=@] (add p (mul wuc q))))
-    tyd
-  ::  +till:parse:der: parser combinator for len-prefixed bytes
+  ++  BOSS
+    |*  [WUC=@ TYD=RULE]
+    %+  COOK
+      |=  WAQ=(LIST @)
+      :-  (LENT WAQ)
+      (REEL WAQ |=([P=@ Q=@] (ADD P (MUL WUC Q))))
+    TYD
+  ::  +TILL:PARSE:DER: PARSER COMBINATOR FOR LEN-PREFIXED BYTES
   ::
-  ::  advance until
+  ::  ADVANCE UNTIL
   ::
-  ++  till
-    |=  tub/nail
-    ^-  (like (list @D))
-    ?~  q.tub
-      (fail tub)
-    ::  fuz: first byte - length, or length of the length
+  ++  TILL
+    |=  TUB/NAIL
+    ^-  (LIKE (LIST @D))
+    ?~  Q.TUB
+      (FAIL TUB)
+    ::  FUZ: FIRST BYTE - LENGTH, OR LENGTH OF THE LENGTH
     ::
-    =*  fuz  i.q.tub
-    ::  nex: offset of value bytes from fuz
-    ::  len: length of value bytes
+    =*  FUZ  I.Q.TUB
+    ::  NEX: OFFSET OF VALUE BYTES FROM FUZ
+    ::  LEN: LENGTH OF VALUE BYTES
     ::
-    =+  ^-  [nex=@ len=@]
-      ::  faz: meaningful bits in fuz
+    =+  ^-  [NEX=@ LEN=@]
+      ::  FAZ: MEANINGFUL BITS IN FUZ
       ::
-      =/  faz  (end 0 7 fuz)
-      ?:  =(0 (cut 0 [7 1] fuz))
-        [0 faz]
-      [faz (rep 3 (flop (scag faz t.q.tub)))]
-    ?:  ?&  !=(0 nex)
-            !=(nex (met 3 len))
+      =/  FAZ  (END 0 7 FUZ)
+      ?:  =(0 (CUT 0 [7 1] FUZ))
+        [0 FAZ]
+      [FAZ (REP 3 (FLOP (SCAG FAZ T.Q.TUB)))]
+    ?:  ?&  !=(0 NEX)
+            !=(NEX (MET 3 LEN))
         ==
-      (fail tub)
-    ::  zuf: value bytes
+      (FAIL TUB)
+    ::  ZUF: VALUE BYTES
     ::
-    =/  zuf  (swag [nex len] t.q.tub)
-    ?.  =(len (lent zuf))
-      (fail tub)
-    ::  zaf:  product nail
+    =/  ZUF  (SWAG [NEX LEN] T.Q.TUB)
+    ?.  =(LEN (LENT ZUF))
+      (FAIL TUB)
+    ::  ZAF:  PRODUCT NAIL
     ::
-    =/  zaf  [p.p.tub (add +(nex) q.p.tub)]
-    [zaf `[zuf zaf (slag (add nex len) t.q.tub)]]
+    =/  ZAF  [P.P.TUB (ADD +(NEX) Q.P.TUB)]
+    [ZAF `[ZUF ZAF (SLAG (ADD NEX LEN) T.Q.TUB)]]
   --
 --
 

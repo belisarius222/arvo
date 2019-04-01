@@ -1,10 +1,10 @@
-|_  a=manx
-++  grab
+|_  A=MANX
+++  GRAB
   |%
-  ++  noun  manx
+  ++  NOUN  MANX
   --
-++  grow
+++  GROW
   |%
-  ++  htm  a
+  ++  HTM  A
   --
 --

@@ -1,221 +1,221 @@
-::  %behn, just a timer
+::  %BEHN, JUST A TIMER
 !:
 !?  164
 ::
-=,  behn
-|=  pit=vase
+=,  BEHN
+|=  PIT=VASE
 =>  |%
-    +$  move  [p=duct q=(wind note:able gift:able)]
-    +$  sign  ~
+    +$  MOVE  [P=DUCT Q=(WIND NOTE:ABLE GIFT:ABLE)]
+    +$  SIGN  ~
     ::
-    +$  behn-state
-      $:  timers=(list timer)
-          unix-duct=duct
-          next-wake=(unit @da)
+    +$  BEHN-STATE
+      $:  TIMERS=(LIST TIMER)
+          UNIX-DUCT=DUCT
+          NEXT-WAKE=(UNIT @DA)
       ==
     ::
-    +$  timer  [date=@da =duct]
+    +$  TIMER  [DATE=@DA =DUCT]
     --
 ::
 =>  |%
-++  per-event
-  =|  moves=(list move)
-  |=  [[our=ship now=@da =duct] state=behn-state]
+++  PER-EVENT
+  =|  MOVES=(LIST MOVE)
+  |=  [[OUR=SHIP NOW=@DA =DUCT] STATE=BEHN-STATE]
   ::
   |%
-  ::  %entry-points
+  ::  %ENTRY-POINTS
   ::
-  ::  +born: urbit restarted; refresh :next-wake and store wakeup timer duct
+  ::  +BORN: URBIT RESTARTED; REFRESH :NEXT-WAKE AND STORE WAKEUP TIMER DUCT
   ::
-  ++  born  set-unix-wake(next-wake.state ~, unix-duct.state duct)
-  ::  +crud: error report; hand off to %dill to be printed
+  ++  BORN  SET-UNIX-WAKE(NEXT-WAKE.STATE ~, UNIX-DUCT.STATE DUCT)
+  ::  +CRUD: ERROR REPORT; HAND OFF TO %DILL TO BE PRINTED
   ::
-  ++  crud
-    |=  [p=@tas q=tang]
-    ^+  [moves state]
-    [[duct %slip %d %flog %crud p q]~ state]
-  ::  +rest: cancel the timer at :date, then adjust unix wakeup
-  ::  +wait: set a new timer at :date, then adjust unix wakeup
+  ++  CRUD
+    |=  [P=@TAS Q=TANG]
+    ^+  [MOVES STATE]
+    [[DUCT %SLIP %D %FLOG %CRUD P Q]~ STATE]
+  ::  +REST: CANCEL THE TIMER AT :DATE, THEN ADJUST UNIX WAKEUP
+  ::  +WAIT: SET A NEW TIMER AT :DATE, THEN ADJUST UNIX WAKEUP
   ::
-  ++  rest  |=(date=@da set-unix-wake(timers.state (unset-timer [date duct])))
-  ++  wait  |=(date=@da set-unix-wake(timers.state (set-timer [date duct])))
-  ::  +vega: learn of a kernel upgrade
+  ++  REST  |=(DATE=@DA SET-UNIX-WAKE(TIMERS.STATE (UNSET-TIMER [DATE DUCT])))
+  ++  WAIT  |=(DATE=@DA SET-UNIX-WAKE(TIMERS.STATE (SET-TIMER [DATE DUCT])))
+  ::  +VEGA: LEARN OF A KERNEL UPGRADE
   ::
-  ++  vega  [moves state]
-  ::  +wake: unix says wake up; process the elapsed timer and set :next-wake
+  ++  VEGA  [MOVES STATE]
+  ::  +WAKE: UNIX SAYS WAKE UP; PROCESS THE ELAPSED TIMER AND SET :NEXT-WAKE
   ::
-  ++  wake
-    ^+  [moves state]
+  ++  WAKE
+    ^+  [MOVES STATE]
     ::
-    ?~  timers.state  ~|(%behn-wake-no-timer !!)
-    ::  if unix woke us too early, retry by resetting the unix wakeup timer
+    ?~  TIMERS.STATE  ~|(%BEHN-WAKE-NO-TIMER !!)
+    ::  IF UNIX WOKE US TOO EARLY, RETRY BY RESETTING THE UNIX WAKEUP TIMER
     ::
-    ?:  (gth date.i.timers.state now)
-      ~?  debug=%.n  [%behn-wake-too-soon `@dr`(sub date.i.timers.state now)]
-      set-unix-wake(next-wake.state ~)
-    ::  pop first timer, tell vane it has elapsed, and adjust next unix wakeup
+    ?:  (GTH DATE.I.TIMERS.STATE NOW)
+      ~?  DEBUG=%.N  [%BEHN-WAKE-TOO-SOON `@DR`(SUB DATE.I.TIMERS.STATE NOW)]
+      SET-UNIX-WAKE(NEXT-WAKE.STATE ~)
+    ::  POP FIRST TIMER, TELL VANE IT HAS ELAPSED, AND ADJUST NEXT UNIX WAKEUP
     ::
-    =<  set-unix-wake
-    (emit-vane-wake(timers.state t.timers.state) duct.i.timers.state)
-  ::  +wegh: produce memory usage report for |mass
+    =<  SET-UNIX-WAKE
+    (EMIT-VANE-WAKE(TIMERS.STATE T.TIMERS.STATE) DUCT.I.TIMERS.STATE)
+  ::  +WEGH: PRODUCE MEMORY USAGE REPORT FOR |MASS
   ::
-  ++  wegh
-    ^+  [moves state]
-    :_  state  :_  ~
-    :^  duct  %give  %mass
-    :+  %behn  %|
-    :~  timers+&+timers.state
-        dot+&+state
+  ++  WEGH
+    ^+  [MOVES STATE]
+    :_  STATE  :_  ~
+    :^  DUCT  %GIVE  %MASS
+    :+  %BEHN  %|
+    :~  TIMERS+&+TIMERS.STATE
+        DOT+&+STATE
     ==
-  ::  %utilities
+  ::  %UTILITIES
   ::
   ::+|
   ::
-  ++  event-core  .
-  ::  +emit-vane-wake: produce a move to wake a vane; assumes no prior moves
+  ++  EVENT-CORE  .
+  ::  +EMIT-VANE-WAKE: PRODUCE A MOVE TO WAKE A VANE; ASSUMES NO PRIOR MOVES
   ::
-  ++  emit-vane-wake  |=(=^duct event-core(moves [duct %give %wake ~]~))
-  ::  +emit-doze: set new unix wakeup timer in state and emit move to unix
+  ++  EMIT-VANE-WAKE  |=(=^DUCT EVENT-CORE(MOVES [DUCT %GIVE %WAKE ~]~))
+  ::  +EMIT-DOZE: SET NEW UNIX WAKEUP TIMER IN STATE AND EMIT MOVE TO UNIX
   ::
-  ::    We prepend the unix %doze event so that it is handled first. Arvo must
-  ::    handle this first because the moves %behn emits will get handled in
-  ::    depth-first order. If we're handling a %wake which causes a move to a
-  ::    different vane and a %doze event to send to unix, Arvo needs to process
-  ::    the %doze first because otherwise if the move to the other vane calls
-  ::    back into %behn and emits a second %doze, the second %doze would be
-  ::    handled by unix first which is incorrect.
+  ::    WE PREPEND THE UNIX %DOZE EVENT SO THAT IT IS HANDLED FIRST. ARVO MUST
+  ::    HANDLE THIS FIRST BECAUSE THE MOVES %BEHN EMITS WILL GET HANDLED IN
+  ::    DEPTH-FIRST ORDER. IF WE'RE HANDLING A %WAKE WHICH CAUSES A MOVE TO A
+  ::    DIFFERENT VANE AND A %DOZE EVENT TO SEND TO UNIX, ARVO NEEDS TO PROCESS
+  ::    THE %DOZE FIRST BECAUSE OTHERWISE IF THE MOVE TO THE OTHER VANE CALLS
+  ::    BACK INTO %BEHN AND EMITS A SECOND %DOZE, THE SECOND %DOZE WOULD BE
+  ::    HANDLED BY UNIX FIRST WHICH IS INCORRECT.
   ::
-  ++  emit-doze
-    |=  =date=(unit @da)
-    ^+  event-core
-    ::  make sure we don't try to wake up in the past
+  ++  EMIT-DOZE
+    |=  =DATE=(UNIT @DA)
+    ^+  EVENT-CORE
+    ::  MAKE SURE WE DON'T TRY TO WAKE UP IN THE PAST
     ::
-    =?  date-unit  ?=(^ date-unit)  `(max now u.date-unit)
+    =?  DATE-UNIT  ?=(^ DATE-UNIT)  `(MAX NOW U.DATE-UNIT)
     ::
-    %_  event-core
-      next-wake.state  date-unit
-      moves            [[unix-duct.state %give %doze date-unit] moves]
+    %_  EVENT-CORE
+      NEXT-WAKE.STATE  DATE-UNIT
+      MOVES            [[UNIX-DUCT.STATE %GIVE %DOZE DATE-UNIT] MOVES]
     ==
-  ::  +set-unix-wake: set or unset next unix wakeup timer based on :i.timers
+  ::  +SET-UNIX-WAKE: SET OR UNSET NEXT UNIX WAKEUP TIMER BASED ON :I.TIMERS
   ::
-  ++  set-unix-wake
-    =<  [moves state]
-    ^+  event-core
+  ++  SET-UNIX-WAKE
+    =<  [MOVES STATE]
+    ^+  EVENT-CORE
     ::
-    =*  next-wake  next-wake.state
-    =*  timers     timers.state
-    ::  if no timers, cancel existing wakeup timer or no-op
+    =*  NEXT-WAKE  NEXT-WAKE.STATE
+    =*  TIMERS     TIMERS.STATE
+    ::  IF NO TIMERS, CANCEL EXISTING WAKEUP TIMER OR NO-OP
     ::
-    ?~  timers
-      ?~  next-wake
-        event-core
-      (emit-doze ~)
-    ::  if :next-wake is in the past or not soon enough, reset it
+    ?~  TIMERS
+      ?~  NEXT-WAKE
+        EVENT-CORE
+      (EMIT-DOZE ~)
+    ::  IF :NEXT-WAKE IS IN THE PAST OR NOT SOON ENOUGH, RESET IT
     ::
-    ?^  next-wake
-      ?:  &((gte date.i.timers u.next-wake) (lte now u.next-wake))
-        event-core
-      (emit-doze `date.i.timers)
-    ::  there was no unix wakeup timer; set one
+    ?^  NEXT-WAKE
+      ?:  &((GTE DATE.I.TIMERS U.NEXT-WAKE) (LTE NOW U.NEXT-WAKE))
+        EVENT-CORE
+      (EMIT-DOZE `DATE.I.TIMERS)
+    ::  THERE WAS NO UNIX WAKEUP TIMER; SET ONE
     ::
-    (emit-doze `date.i.timers)
-  ::  +set-timer: set a timer, maintaining the sort order of the :timers list
+    (EMIT-DOZE `DATE.I.TIMERS)
+  ::  +SET-TIMER: SET A TIMER, MAINTAINING THE SORT ORDER OF THE :TIMERS LIST
   ::
-  ++  set-timer
-    =*  timers  timers.state
-    |=  t=timer
-    ^+  timers
+  ++  SET-TIMER
+    =*  TIMERS  TIMERS.STATE
+    |=  T=TIMER
+    ^+  TIMERS
     ::
-    ?~  timers
-      ~[t]
-    ::  ignore duplicates
+    ?~  TIMERS
+      ~[T]
+    ::  IGNORE DUPLICATES
     ::
-    ?:  =(t i.timers)
-      ~?  debug=%.n  [%behn-set-duplicate t]
-      timers
-    ::  timers at the same date form a fifo queue
+    ?:  =(T I.TIMERS)
+      ~?  DEBUG=%.N  [%BEHN-SET-DUPLICATE T]
+      TIMERS
+    ::  TIMERS AT THE SAME DATE FORM A FIFO QUEUE
     ::
-    ?:  (lth date.t date.i.timers)
-      [t timers]
+    ?:  (LTH DATE.T DATE.I.TIMERS)
+      [T TIMERS]
     ::
-    [i.timers $(timers t.timers)]
-  ::  +unset-timer: cancel a timer; if it already expired, no-op
+    [I.TIMERS $(TIMERS T.TIMERS)]
+  ::  +UNSET-TIMER: CANCEL A TIMER; IF IT ALREADY EXPIRED, NO-OP
   ::
-  ++  unset-timer
-    =*  timers  timers.state
-    |=  t=timer
-    ^+  timers
-    ::  if we don't have this timer, no-op
+  ++  UNSET-TIMER
+    =*  TIMERS  TIMERS.STATE
+    |=  T=TIMER
+    ^+  TIMERS
+    ::  IF WE DON'T HAVE THIS TIMER, NO-OP
     ::
-    ?~  timers
-      ~?  debug=%.n  [%behn-unset-missing t]
+    ?~  TIMERS
+      ~?  DEBUG=%.N  [%BEHN-UNSET-MISSING T]
       ~
-    ?:  =(i.timers t)
-      t.timers
+    ?:  =(I.TIMERS T)
+      T.TIMERS
     ::
-    [i.timers $(timers t.timers)]
+    [I.TIMERS $(TIMERS T.TIMERS)]
   --
 --
 ::
-=|  behn-state
-=*  state  -
-|=  [our=ship now=@da eny=@uvJ ski=sley]
-=*  behn-gate  .
+=|  BEHN-STATE
+=*  STATE  -
+|=  [OUR=SHIP NOW=@DA ENY=@UVJ SKI=SLEY]
+=*  BEHN-GATE  .
 ^?
 |%
-::  +call: handle a +task:able:behn request
+::  +CALL: HANDLE A +TASK:ABLE:BEHN REQUEST
 ::
-++  call
-  |=  $:  hen=duct
-          type=*
-          wrapped-task=(hobo task:able)
+++  CALL
+  |=  $:  HEN=DUCT
+          TYPE=*
+          WRAPPED-TASK=(HOBO TASK:ABLE)
       ==
-  ^-  [(list move) _behn-gate]
+  ^-  [(LIST MOVE) _BEHN-GATE]
   ::
-  =/  =task:able
-    ?.  ?=(%soft -.wrapped-task)
-      wrapped-task
-    ((hard task:able) p.wrapped-task)
+  =/  =TASK:ABLE
+    ?.  ?=(%SOFT -.WRAPPED-TASK)
+      WRAPPED-TASK
+    ((HARD TASK:ABLE) P.WRAPPED-TASK)
   ::
-  =/  event-core  (per-event [our now hen] state)
+  =/  EVENT-CORE  (PER-EVENT [OUR NOW HEN] STATE)
   ::
-  =^  moves  state
-    ?-  -.task
-      %born  born:event-core
-      %crud  (crud:event-core [p q]:task)
-      %rest  (rest:event-core date=p.task)
-      %vega  vega:event-core
-      %wait  (wait:event-core date=p.task)
-      %wake  wake:event-core
-      %wegh  wegh:event-core
+  =^  MOVES  STATE
+    ?-  -.TASK
+      %BORN  BORN:EVENT-CORE
+      %CRUD  (CRUD:EVENT-CORE [P Q]:TASK)
+      %REST  (REST:EVENT-CORE DATE=P.TASK)
+      %VEGA  VEGA:EVENT-CORE
+      %WAIT  (WAIT:EVENT-CORE DATE=P.TASK)
+      %WAKE  WAKE:EVENT-CORE
+      %WEGH  WEGH:EVENT-CORE
     ==
-  [moves behn-gate]
-::  +load: migrate an old state to a new behn version
+  [MOVES BEHN-GATE]
+::  +LOAD: MIGRATE AN OLD STATE TO A NEW BEHN VERSION
 ::
-++  load
-  |=  old=*
-  ^+  behn-gate
+++  LOAD
+  |=  OLD=*
+  ^+  BEHN-GATE
   ::
-  ~|  %behn-load-fail
-  behn-gate(state (behn-state old))
-::  +scry: view timer state
+  ~|  %BEHN-LOAD-FAIL
+  BEHN-GATE(STATE (BEHN-STATE OLD))
+::  +SCRY: VIEW TIMER STATE
 ::
-::    TODO: not referentially transparent w.r.t. elapsed timers,
-::    which might or might not show up in the product
+::    TODO: NOT REFERENTIALLY TRANSPARENT W.R.T. ELAPSED TIMERS,
+::    WHICH MIGHT OR MIGHT NOT SHOW UP IN THE PRODUCT
 ::
-++  scry
-  |=  [fur=(unit (set monk)) ren=@tas why=shop syd=desk lot=coin tyl=path]
-  ^-  (unit (unit cage))
+++  SCRY
+  |=  [FUR=(UNIT (SET MONK)) REN=@TAS WHY=SHOP SYD=DESK LOT=COIN TYL=PATH]
+  ^-  (UNIT (UNIT CAGE))
   ::
-  ?.  ?=(%& -.why)
+  ?.  ?=(%& -.WHY)
     ~
-  [~ ~ %tank !>(>timers<)]
+  [~ ~ %TANK !>(>TIMERS<)]
 ::
-++  stay  state
-++  take
-  |=  [tea=wire hen=duct hin=(hypo sign)]
-  ^-  [(list move) _behn-gate]
-  ~|  %behn-take-not-implemented
+++  STAY  STATE
+++  TAKE
+  |=  [TEA=WIRE HEN=DUCT HIN=(HYPO SIGN)]
+  ^-  [(LIST MOVE) _BEHN-GATE]
+  ~|  %BEHN-TAKE-NOT-IMPLEMENTED
   !!
 --
 

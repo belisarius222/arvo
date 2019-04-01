@@ -1,199 +1,199 @@
 ::
 /?    310
-/-  hall
-=,  eyre
+/-  HALL
+=,  EYRE
 =>
 |%
-++  audience  (map partner (pair envelope delivery))    ::  destination+state
-++  bouquet  (set flavor)                               ::  complete aroma
-++  delivery                                            ::  delivery state
-  $?  $pending                                          ::  undelivered
-      $received                                         ::  delivered
-      $rejected                                         ::  undeliverable
-      $released                                         ::  sent one-way
-      $accepted                                         ::  fully processed
+++  AUDIENCE  (MAP PARTNER (PAIR ENVELOPE DELIVERY))    ::  DESTINATION+STATE
+++  BOUQUET  (SET FLAVOR)                               ::  COMPLETE AROMA
+++  DELIVERY                                            ::  DELIVERY STATE
+  $?  $PENDING                                          ::  UNDELIVERED
+      $RECEIVED                                         ::  DELIVERED
+      $REJECTED                                         ::  UNDELIVERABLE
+      $RELEASED                                         ::  SENT ONE-WAY
+      $ACCEPTED                                         ::  FULLY PROCESSED
   ==                                                    ::
-++  envelope  (pair ? (unit partner))                   ::  visible sender
-++  flavor  path                                        ::  content flavor
-++  passport                                            ::  foreign flow
-  $%  {$twitter p/@t}                                   ::  twitter
+++  ENVELOPE  (PAIR ? (UNIT PARTNER))                   ::  VISIBLE SENDER
+++  FLAVOR  PATH                                        ::  CONTENT FLAVOR
+++  PASSPORT                                            ::  FOREIGN FLOW
+  $%  {$TWITTER P/@T}                                   ::  TWITTER
   ==                                                    ::
-++  presence   ?($gone $hear $talk)                     ::  status type
-++  speech                                              ::  narrative action
-  $%  {$lan p/knot q/@t}                                ::  local announce
-      {$exp p/@t}                                       ::  hoon line
-      {$non ~}                                         ::  no content (yo)
-      {$ext p/@tas q/*}                                 ::  extended action
-      {$fat p/torso q/speech}                           ::  attachment
-      {$url p/purf}                                     ::  parsed url
-      {$ire p/serial q/speech}                          ::  in-reply-to
-      {$lin p/? q/@t}                                   ::  no/@ text line
-      {$mor p/(list speech)}                            ::  multiplex
-      {$app p/@tas q/@t}                                ::  app message
-      $:  $api                                          ::  api message
-          service/@tas                                  ::  service name
-          id/@t                                         ::  id on the service
-          id-url/purf                                   ::  link to id
-          summary/@t                                    ::  summary of event
-          body/@t                                       ::  body of event
-          url/purf                                      ::  link to event
-          meta/json                                     ::  other data for web
+++  PRESENCE   ?($GONE $HEAR $TALK)                     ::  STATUS TYPE
+++  SPEECH                                              ::  NARRATIVE ACTION
+  $%  {$LAN P/KNOT Q/@T}                                ::  LOCAL ANNOUNCE
+      {$EXP P/@T}                                       ::  HOON LINE
+      {$NON ~}                                         ::  NO CONTENT (YO)
+      {$EXT P/@TAS Q/*}                                 ::  EXTENDED ACTION
+      {$FAT P/TORSO Q/SPEECH}                           ::  ATTACHMENT
+      {$URL P/PURF}                                     ::  PARSED URL
+      {$IRE P/SERIAL Q/SPEECH}                          ::  IN-REPLY-TO
+      {$LIN P/? Q/@T}                                   ::  NO/@ TEXT LINE
+      {$MOR P/(LIST SPEECH)}                            ::  MULTIPLEX
+      {$APP P/@TAS Q/@T}                                ::  APP MESSAGE
+      $:  $API                                          ::  API MESSAGE
+          SERVICE/@TAS                                  ::  SERVICE NAME
+          ID/@T                                         ::  ID ON THE SERVICE
+          ID-URL/PURF                                   ::  LINK TO ID
+          SUMMARY/@T                                    ::  SUMMARY OF EVENT
+          BODY/@T                                       ::  BODY OF EVENT
+          URL/PURF                                      ::  LINK TO EVENT
+          META/JSON                                     ::  OTHER DATA FOR WEB
       ==                                                ::
   ==                                                    ::
-++  serial     @uvH                                     ::  unique identity
-++  partner    (each station passport)                  ::  interlocutor
-++  statement  (trel @da bouquet speech)                ::  when this
-++  station    (pair ship knot)                         ::  domestic flow
-++  telegram   (pair ship thought)                      ::  who which whom what
-++  thought    (trel serial audience statement)         ::  which whom what
-++  torso                                               ::  attachment
-  $%  {$name (pair @t torso)}                           ::  named attachment
-      {$text (list @t)}                                 ::  text lines
-      {$tank (list tank)}                               ::  tank list
+++  SERIAL     @UVH                                     ::  UNIQUE IDENTITY
+++  PARTNER    (EACH STATION PASSPORT)                  ::  INTERLOCUTOR
+++  STATEMENT  (TREL @DA BOUQUET SPEECH)                ::  WHEN THIS
+++  STATION    (PAIR SHIP KNOT)                         ::  DOMESTIC FLOW
+++  TELEGRAM   (PAIR SHIP THOUGHT)                      ::  WHO WHICH WHOM WHAT
+++  THOUGHT    (TREL SERIAL AUDIENCE STATEMENT)         ::  WHICH WHOM WHAT
+++  TORSO                                               ::  ATTACHMENT
+  $%  {$NAME (PAIR @T TORSO)}                           ::  NAMED ATTACHMENT
+      {$TEXT (LIST @T)}                                 ::  TEXT LINES
+      {$TANK (LIST TANK)}                               ::  TANK LIST
   ==                                                    ::
 --
 |%
-++  from-json
-  =,  dejs-soft:format
-  |:  $:{a/^json}  ^-  (list telegram:hall)
-  =-  %-  zing
-      %+  turn
-        (need ((ar (ot ship+(su fed:ag) thought+thot ~)) a))
-      convert-telegram
+++  FROM-JSON
+  =,  DEJS-SOFT:FORMAT
+  |:  $:{A/^JSON}  ^-  (LIST TELEGRAM:HALL)
+  =-  %-  ZING
+      %+  TURN
+        (NEED ((AR (OT SHIP+(SU FED:AG) THOUGHT+THOT ~)) A))
+      CONVERT-TELEGRAM
   |%
-  ++  of
-    |*  a/(pole {@tas fist})
-    |=  b/^json
-    %.  ((of:dejs-soft:format a) b)
-    %-  slog
-    ?+  b  ~
-        {$o *}
-      %+  murn  `(list {@tas fist})`a
-      |=  {c/term d/fist}  ^-  (unit tank)
-      =+  (~(get by p.b) c)
+  ++  OF
+    |*  A/(POLE {@TAS FIST})
+    |=  B/^JSON
+    %.  ((OF:DEJS-SOFT:FORMAT A) B)
+    %-  SLOG
+    ?+  B  ~
+        {$O *}
+      %+  MURN  `(LIST {@TAS FIST})`A
+      |=  {C/TERM D/FIST}  ^-  (UNIT TANK)
+      =+  (~(GET BY P.B) C)
       ?~  -  ~
-      =+  (d u)
-      ?~  -  (some >[c u]<)
+      =+  (D U)
+      ?~  -  (SOME >[C U]<)
       ~
     ==
-  ++  op                                              ::  parse keys of map
-    |*  {fel/rule wit/fist}
-    %+  cu  malt
-    %+  ci
-      |=  a/(map cord _(need *wit))
-      ^-  (unit (list _[(wonk *fel) (need *wit)]))
-      (zl (turn ~(tap by a) (head-rush fel)))
-    (om wit)
+  ++  OP                                              ::  PARSE KEYS OF MAP
+    |*  {FEL/RULE WIT/FIST}
+    %+  CU  MALT
+    %+  CI
+      |=  A/(MAP CORD _(NEED *WIT))
+      ^-  (UNIT (LIST _[(WONK *FEL) (NEED *WIT)]))
+      (ZL (TURN ~(TAP BY A) (HEAD-RUSH FEL)))
+    (OM WIT)
   ::
-  ++  as                                              ::  array as set
-    |*  a/fist
-    (cu ~(gas in *(set _(need *a))) (ar a))
+  ++  AS                                              ::  ARRAY AS SET
+    |*  A/FIST
+    (CU ~(GAS IN *(SET _(NEED *A))) (AR A))
   ::
-  ++  ke                                              ::  callbacks
-    |*  {gar/* sef/_|.(fist)}
-    |=  jon/^json
-    ^-  (unit _gar)
-    =-  ~!  gar  ~!  (need -)  -
-    ((sef) jon)
+  ++  KE                                              ::  CALLBACKS
+    |*  {GAR/* SEF/_|.(FIST)}
+    |=  JON/^JSON
+    ^-  (UNIT _GAR)
+    =-  ~!  GAR  ~!  (NEED -)  -
+    ((SEF) JON)
   ::
-  ++  lake  |*(a/_* $-(^json (unit a)))
-  ++  head-rush
-    |*  a/rule
-    |*  {cord *}
-    =+  nit=(rush +<- a)
-    ?~  nit  ~
-    (some [u.nit +>->])
+  ++  LAKE  |*(A/_* $-(^JSON (UNIT A)))
+  ++  HEAD-RUSH
+    |*  A/RULE
+    |*  {CORD *}
+    =+  NIT=(RUSH +<- A)
+    ?~  NIT  ~
+    (SOME [U.NIT +>->])
   ::
-  ++  thot
-    ^-  $-(^json (unit thought))
-    %-  ot  :~
-      serial+`$-(^json (unit serial))`(ci (slat %uv) so)
-      audience+`$-(^json (unit audience))`audi
-      statement+`$-(^json (unit statement))`stam
+  ++  THOT
+    ^-  $-(^JSON (UNIT THOUGHT))
+    %-  OT  :~
+      SERIAL+`$-(^JSON (UNIT SERIAL))`(CI (SLAT %UV) SO)
+      AUDIENCE+`$-(^JSON (UNIT AUDIENCE))`AUDI
+      STATEMENT+`$-(^JSON (UNIT STATEMENT))`STAM
     ==
   ::
-  ++  audi  `$-(^json (unit audience))`(op parn memb)
-  ++  auri  (op parn (ci (soft presence) so))
-  ++  memb  ^-  $-(^json (unit (pair envelope delivery)))
-            (ot envelope+lope delivery+(ci (soft delivery) so) ~)
-  ++  lope  (ot visible+bo sender+(mu (su parn)) ~)
+  ++  AUDI  `$-(^JSON (UNIT AUDIENCE))`(OP PARN MEMB)
+  ++  AURI  (OP PARN (CI (SOFT PRESENCE) SO))
+  ++  MEMB  ^-  $-(^JSON (UNIT (PAIR ENVELOPE DELIVERY)))
+            (OT ENVELOPE+LOPE DELIVERY+(CI (SOFT DELIVERY) SO) ~)
+  ++  LOPE  (OT VISIBLE+BO SENDER+(MU (SU PARN)) ~)
   ::
-  ++  parn
-    ^-  $-(nail (like partner))
-    %+  pick
-      ;~((glue net) ;~(pfix sig fed:ag) urs:ab)
-    %+  sear  (soft passport)
-    ;~((glue net) sym urs:ab)                         ::  XX  [a-z0-9_]{1,15}
+  ++  PARN
+    ^-  $-(NAIL (LIKE PARTNER))
+    %+  PICK
+      ;~((GLUE NET) ;~(PFIX SIG FED:AG) URS:AB)
+    %+  SEAR  (SOFT PASSPORT)
+    ;~((GLUE NET) SYM URS:AB)                         ::  XX  [A-Z0-9_]{1,15}
   ::
-  ++  stam  (ot date+di bouquet+(as (ar so)) speech+spec ~)
-  ++  spec
-    %+  ke  *speech  |.  ~+
-    %-  of  :~
-      lin+(ot say+bo txt+so ~)
-      url+(ot txt+(su aurf:de-purl:html) ~)
-      exp+(ot txt+so ~)
-      app+(ot txt+so src+so ~)
-      fat+(ot tor+tors taf+spec ~)
-      ext+(ot nom+so txe+blob ~)
-      non+ul
-      mor+(ar spec)
-      ::  inv+(ot ship+(su fed:ag) party+(su urs:ab) ~)
+  ++  STAM  (OT DATE+DI BOUQUET+(AS (AR SO)) SPEECH+SPEC ~)
+  ++  SPEC
+    %+  KE  *SPEECH  |.  ~+
+    %-  OF  :~
+      LIN+(OT SAY+BO TXT+SO ~)
+      URL+(OT TXT+(SU AURF:DE-PURL:HTML) ~)
+      EXP+(OT TXT+SO ~)
+      APP+(OT TXT+SO SRC+SO ~)
+      FAT+(OT TOR+TORS TAF+SPEC ~)
+      EXT+(OT NOM+SO TXE+BLOB ~)
+      NON+UL
+      MOR+(AR SPEC)
+      ::  INV+(OT SHIP+(SU FED:AG) PARTY+(SU URS:AB) ~)
     ==
-  ++  tors
-    %+  ke  *torso  |.  ~+
-    %-  of  :~
-      name+(ot nom+so mon+tors ~)
-      text+(cu to-wain:format so)
-      tank+(ot dat+(cu (hard (list tank)) blob) ~)
+  ++  TORS
+    %+  KE  *TORSO  |.  ~+
+    %-  OF  :~
+      NAME+(OT NOM+SO MON+TORS ~)
+      TEXT+(CU TO-WAIN:FORMAT SO)
+      TANK+(OT DAT+(CU (HARD (LIST TANK)) BLOB) ~)
     ==
   ::
-  ++  blob  (cu cue (su fel:de-base64:mimes:html))
+  ++  BLOB  (CU CUE (SU FEL:DE-BASE64:MIMES:HTML))
   ::
   ::
-  ++  convert-telegram
-    |=  t/telegram
-    ^-  (list telegram:hall)
-    =+  aud=(convert-audience q.q.t)
-    %+  turn  (convert-speech r.r.q.t)
-    |=  s/speech:hall
-    [p.t p.q.t aud p.r.q.t s]
+  ++  CONVERT-TELEGRAM
+    |=  T/TELEGRAM
+    ^-  (LIST TELEGRAM:HALL)
+    =+  AUD=(CONVERT-AUDIENCE Q.Q.T)
+    %+  TURN  (CONVERT-SPEECH R.R.Q.T)
+    |=  S/SPEECH:HALL
+    [P.T P.Q.T AUD P.R.Q.T S]
   ::
-  ++  convert-audience
-    |=  a/audience
-    ^-  audience:hall
-    %-  sy
-    ^-  (list circle:hall)
-    %+  murn  ~(tap in ~(key by a))
-    |=  p/partner
-    ^-  (unit circle:hall)
-    ?-  -.p
-      %&  :+  ~  p.p.p
-          ?:  ?|  =(q.p.p 'porch')
-                  =(q.p.p 'court')
-                  =(q.p.p 'floor')
+  ++  CONVERT-AUDIENCE
+    |=  A/AUDIENCE
+    ^-  AUDIENCE:HALL
+    %-  SY
+    ^-  (LIST CIRCLE:HALL)
+    %+  MURN  ~(TAP IN ~(KEY BY A))
+    |=  P/PARTNER
+    ^-  (UNIT CIRCLE:HALL)
+    ?-  -.P
+      %&  :+  ~  P.P.P
+          ?:  ?|  =(Q.P.P 'PORCH')
+                  =(Q.P.P 'COURT')
+                  =(Q.P.P 'FLOOR')
               ==
-            %inbox
-          q.p.p
+            %INBOX
+          Q.P.P
       %|  ~
     ==
   ::
-  ++  convert-speech
-    |=  s/speech
-    ^-  (list speech:hall)
-    ?+  -.s  ~&([%ignoring -.s] ~)
-      $lin  [%lin !p.s q.s]~
-      $url  [%url p.s]~
-      $exp  [%exp p.s ~]~
-      $ire  %+  turn  (convert-speech q.s)
-            |=  i/speech:hall
-            [%ire p.s i]
-      $app  [%app p.s [%lin | q.s]]~
-      $fat  ?:  &(?=($exp -.q.s) ?=($tank -.p.s))
-              [%exp p.q.s +.p.s]~
-            =+  ses=(convert-speech q.s)
-            =?  ses  =(0 (lent ses))  [%lin | '']~
-            [[%fat p.s (snag 0 ses)] (slag 1 ses)]
-      $mor  (zing (turn p.s convert-speech))
+  ++  CONVERT-SPEECH
+    |=  S/SPEECH
+    ^-  (LIST SPEECH:HALL)
+    ?+  -.S  ~&([%IGNORING -.S] ~)
+      $LIN  [%LIN !P.S Q.S]~
+      $URL  [%URL P.S]~
+      $EXP  [%EXP P.S ~]~
+      $IRE  %+  TURN  (CONVERT-SPEECH Q.S)
+            |=  I/SPEECH:HALL
+            [%IRE P.S I]
+      $APP  [%APP P.S [%LIN | Q.S]]~
+      $FAT  ?:  &(?=($EXP -.Q.S) ?=($TANK -.P.S))
+              [%EXP P.Q.S +.P.S]~
+            =+  SES=(CONVERT-SPEECH Q.S)
+            =?  SES  =(0 (LENT SES))  [%LIN | '']~
+            [[%FAT P.S (SNAG 0 SES)] (SLAG 1 SES)]
+      $MOR  (ZING (TURN P.S CONVERT-SPEECH))
     ==
   --
 --

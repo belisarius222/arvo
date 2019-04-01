@@ -1,19 +1,19 @@
 ::
-::::  /hoon/ask-mail/mar
+::::  /HOON/ASK-MAIL/MAR
   ::
 /?    310
-=,  format
-=,  mimes:html
-|_  txt/cord
+=,  FORMAT
+=,  MIMES:HTML
+|_  TXT/CORD
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  @t                                          ::  clam from %noun
-  ++  json  so:dejs
+  ++  NOUN  @T                                          ::  CLAM FROM %NOUN
+  ++  JSON  SO:DEJS
   --
-++  grow
+++  GROW
   |%
-  ++  psal  ;div: {(trip txt)}
-  ++  mime  [text+/plain (as-octs txt)]
+  ++  PSAL  ;DIV: {(TRIP TXT)}
+  ++  MIME  [TEXT+/PLAIN (AS-OCTS TXT)]
   --
 --

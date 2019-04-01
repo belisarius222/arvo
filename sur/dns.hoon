@@ -1,71 +1,71 @@
 |%
-::  +provider: DNS service provider (gcloud only for now)
+::  +PROVIDER: DNS SERVICE PROVIDER (GCLOUD ONLY FOR NOW)
 ::
-+$  provider
-  $%  [%fcloud zone=@ta auth=[email=@t key=@t]]
-      [%gcloud project=@ta zone=@ta]
++$  PROVIDER
+  $%  [%FCLOUD ZONE=@TA AUTH=[EMAIL=@T KEY=@T]]
+      [%GCLOUD PROJECT=@TA ZONE=@TA]
   ==
-::  +authority: responsibility for a DNS zone
+::  +AUTHORITY: RESPONSIBILITY FOR A DNS ZONE
 ::
-+$  authority
-  $:  :: dom: authority over a fully-qualified domain
++$  AUTHORITY
+  $:  :: DOM: AUTHORITY OVER A FULLY-QUALIFIED DOMAIN
       ::
-      dom=turf
-      :: pro: DNS service provider
+      DOM=TURF
+      :: PRO: DNS SERVICE PROVIDER
       ::
-      pro=provider
+      PRO=PROVIDER
   ==
-::  +target: a ship is bound to a ...
+::  +TARGET: A SHIP IS BOUND TO A ...
 ::
-+$  target
-  $%  :: %direct: an A record
++$  TARGET
+  $%  :: %DIRECT: AN A RECORD
       ::
-      [%direct %if p=@if]
-      :: %indirect: a CNAME record
+      [%DIRECT %IF P=@IF]
+      :: %INDIRECT: A CNAME RECORD
       ::
-      [%indirect p=ship]
+      [%INDIRECT P=SHIP]
   ==
-::  +bound: an established binding, plus history
+::  +BOUND: AN ESTABLISHED BINDING, PLUS HISTORY
 ::
-+$  bound
-  $:  :: wen: established
++$  BOUND
+  $:  :: WEN: ESTABLISHED
       ::
-      wen=@da
-      ::  id:  binding UUID (unused by gcloud)
+      WEN=@DA
+      ::  ID:  BINDING UUID (UNUSED BY GCLOUD)
       ::
-      id=@ta
-      :: cur: current target
+      ID=@TA
+      :: CUR: CURRENT TARGET
       ::
-      cur=target
-      :: hit: historical targets
+      CUR=TARGET
+      :: HIT: HISTORICAL TARGETS
       ::
-      hit=(list (pair @da target))
+      HIT=(LIST (PAIR @DA TARGET))
   ==
-::  +nameserver: a b s o l u t e  p o w e r
+::  +NAMESERVER: A B S O L U T E  P O W E R
 ::
-+$  nameserver
-  $:  aut=authority
-      bon=(map ship bound)
-      dep=(jar ship (pair ship target))
-      pen=(map ship target)
++$  NAMESERVER
+  $:  AUT=AUTHORITY
+      BON=(MAP SHIP BOUND)
+      DEP=(JAR SHIP (PAIR SHIP TARGET))
+      PEN=(MAP SHIP TARGET)
   ==
-::  +relay: a good parent keeps track
+::  +RELAY: A GOOD PARENT KEEPS TRACK
 ::
-+$  relay
-  $:  wen=@da
-      wer=(unit @if)
-      ::  XX track bound state per domain
++$  RELAY
+  $:  WEN=@DA
+      WER=(UNIT @IF)
+      ::  XX TRACK BOUND STATE PER DOMAIN
       ::
-      dom=(unit turf)
-      tar=target
+      DOM=(UNIT TURF)
+      TAR=TARGET
   ==
-::  +command: top-level app actions
+::  +COMMAND: TOP-LEVEL APP ACTIONS
 ::
-+$  command
-  $%  [%authority aut=authority]
-      [%bind for=ship him=ship tar=target]
-      [%bond for=ship him=ship dom=turf]
-      [%ip %if addr=@if]
-      [%meet him=ship]
++$  COMMAND
+  $%  [%AUTHORITY AUT=AUTHORITY]
+      [%BIND FOR=SHIP HIM=SHIP TAR=TARGET]
+      [%BOND FOR=SHIP HIM=SHIP DOM=TURF]
+      [%IP %IF ADDR=@IF]
+      [%MEET HIM=SHIP]
   ==
 --

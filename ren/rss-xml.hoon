@@ -1,36 +1,36 @@
-::  Simple rss transformer
+::  SIMPLE RSS TRANSFORMER
 ::
-::::  /hoon/rss-xml/ren
+::::  /HOON/RSS-XML/REN
   ::
 /?    310
-/=  sum  /&snip&elem&/|(/elem/ /~[;div;])
-/=  kid  /^  (map knot {marl marl})
-         /_  /&snip&/elem/
-/$    |=({bem/beam *} [our=p.bem tub=(slag 1 (flop s.bem))])
+/=  SUM  /&SNIP&ELEM&/|(/ELEM/ /~[;DIV;])
+/=  KID  /^  (MAP KNOT {MARL MARL})
+         /_  /&SNIP&/ELEM/
+/$    |=({BEM/BEAM *} [OUR=P.BEM TUB=(SLAG 1 (FLOP S.BEM))])
 ::
-::::  ~fyr, ~tasfyn-partyv
+::::  ~FYR, ~TASFYN-PARTYV
   ::
-::~&  [sum=sum kid=kid]
-::  Link from relative path
-=,  eyre
-=,  html
-=+  hok=.^(hart %e /(scot %p our)/host/real)
-=+  ref=|=(a/path (en-purl hok `(weld tub a) ~))
-::  urb:front attrs confuse RSS validators, readers
-=+  no-meta=|=(a/marl ^+(a ?~(a ~ ?.(?=($meta n.g.i.a) a $(a t.a)))))
+::~&  [SUM=SUM KID=KID]
+::  LINK FROM RELATIVE PATH
+=,  EYRE
+=,  HTML
+=+  HOK=.^(HART %E /(SCOT %P OUR)/HOST/REAL)
+=+  REF=|=(A/PATH (EN-PURL HOK `(WELD TUB A) ~))
+::  URB:FRONT ATTRS CONFUSE RSS VALIDATORS, READERS
+=+  NO-META=|=(A/MARL ^+(A ?~(A ~ ?.(?=($META N.G.I.A) A $(A T.A)))))
 ::
-%-  crip  %-  en-xml
-;rss(version "2.0")
-  ;channel
-    ;title: *{hed.sum}
-    ;link: {(ref /)}
-    ;description: *{(no-meta tal.sum)}
-    ;*  %+  turn  ~(tap by kid)
-        |=  {nom/@t hed/marl tal/marl}
-        ;item
-          ;title: *{hed}
-          ;description: *{(no-meta tal)}
-          ;link: {(ref /[nom])}
+%-  CRIP  %-  EN-XML
+;RSS(VERSION "2.0")
+  ;CHANNEL
+    ;TITLE: *{HED.SUM}
+    ;LINK: {(REF /)}
+    ;DESCRIPTION: *{(NO-META TAL.SUM)}
+    ;*  %+  TURN  ~(TAP BY KID)
+        |=  {NOM/@T HED/MARL TAL/MARL}
+        ;ITEM
+          ;TITLE: *{HED}
+          ;DESCRIPTION: *{(NO-META TAL)}
+          ;LINK: {(REF /[NOM])}
         ==
   ==
 ==

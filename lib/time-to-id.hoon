@@ -1,10 +1,10 @@
-::  Use lower bits of @da as hash identifier
+::  USE LOWER BITS OF @DA AS HASH IDENTIFIER
 ::
-::::  /hoon/time-to-id/lib
+::::  /HOON/TIME-TO-ID/LIB
   ::
 /?    310
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-|=  a/time  ^-  tape
-['c' (s-co:co f:(yell a))]
+|=  A/TIME  ^-  TAPE
+['C' (S-CO:CO F:(YELL A))]

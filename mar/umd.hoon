@@ -1,32 +1,32 @@
 ::
-::::  /hoon/umd/mar
+::::  /HOON/UMD/MAR
   ::
-/+    cram
+/+    CRAM
 ::
-|_  mud/@t
-++  grow
+|_  MUD/@T
+++  GROW
   |%
-  ++  mime  [/text/x-unmark (as-octs:mimes:html mud)]
-  ++  txt
-    (to-wain:format mud)
-  ++  elem
-    ^-  manx
-    =,  cram
-    elm:(static (ream mud))
-  ++  front  :: XX performance, types
-    ^-  (map term knot)
-    %-  ~(run by inf:(static:cram (ream mud)))
-    |=  a=dime  ^-  cord
-    ?+  (end 3 1 p.a)  (scot a)
-      %t  q.a
+  ++  MIME  [/TEXT/X-UNMARK (AS-OCTS:MIMES:HTML MUD)]
+  ++  TXT
+    (TO-WAIN:FORMAT MUD)
+  ++  ELEM
+    ^-  MANX
+    =,  CRAM
+    ELM:(STATIC (REAM MUD))
+  ++  FRONT  :: XX PERFORMANCE, TYPES
+    ^-  (MAP TERM KNOT)
+    %-  ~(RUN BY INF:(STATIC:CRAM (REAM MUD)))
+    |=  A=DIME  ^-  CORD
+    ?+  (END 3 1 P.A)  (SCOT A)
+      %T  Q.A
     ==
   --
-++  grab
+++  GRAB
   |%
-  ++  mime  |=({p/mite:eyre q/octs:eyre} q.q)
-  ++  noun  @t
-  ++  txt   of-wain:format
+  ++  MIME  |=({P/MITE:EYRE Q/OCTS:EYRE} Q.Q)
+  ++  NOUN  @T
+  ++  TXT   OF-WAIN:FORMAT
   --
-++  grad  %txt
-++  garb  /down
+++  GRAD  %TXT
+++  GARB  /DOWN
 --

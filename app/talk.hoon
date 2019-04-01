@@ -1,2566 +1,2566 @@
 ::                                                      ::  ::
-::::  /app/talk/hoon                                    ::  ::
+::::  /APP/TALK/HOON                                    ::  ::
   ::                                                    ::  ::
 ::
-::TODO  maybe keep track of received grams per circle, too?
+::TODO  MAYBE KEEP TRACK OF RECEIVED GRAMS PER CIRCLE, TOO?
 ::
-::TODO  [type query] => [press tab to cycle search results, newest-first]
-::      => [escape to clear]
+::TODO  [TYPE QUERY] => [PRESS TAB TO CYCLE SEARCH RESULTS, NEWEST-FIRST]
+::      => [ESCAPE TO CLEAR]
 ::
-::  This client implementation makes use of the %inbox
-::  for all its subscriptions and messaging. All
-::  rumors received are exclusively about the %inbox,
-::  since that's the only thing the client ever
-::  subscribes to.
+::  THIS CLIENT IMPLEMENTATION MAKES USE OF THE %INBOX
+::  FOR ALL ITS SUBSCRIPTIONS AND MESSAGING. ALL
+::  RUMORS RECEIVED ARE EXCLUSIVELY ABOUT THE %INBOX,
+::  SINCE THAT'S THE ONLY THING THE CLIENT EVER
+::  SUBSCRIBES TO.
 ::
-/-    sole-sur=sole                                     ::  structures
-/+    *hall, sole-lib=sole                              ::  libraries
-/=    seed  /~  !>(.)
+/-    SOLE-SUR=SOLE                                     ::  STRUCTURES
+/+    *HALL, SOLE-LIB=SOLE                              ::  LIBRARIES
+/=    SEED  /~  !>(.)
 ::
 ::::
   ::
 =>  ::  #
-    ::  #  %arch
+    ::  #  %ARCH
     ::  #
-    ::    data structures
+    ::    DATA STRUCTURES
     ::
     |%
-    ++  state                                           ::  application state
-      $:  ::  messaging state                           ::
-          grams/(list telegram)                         ::  all history
-          known/(map serial @ud)                        ::  messages heard
-          last/@ud                                      ::  last heard
-          count/@ud                                     ::  (lent grams)
-          sources/(set circle)                          ::  our subscriptions
-          ::  circle details                            ::
-          remotes/(map circle group)                    ::  remote presences
-          mirrors/(map circle config)                   ::  remote configs
-          ::  ui state                                  ::
-          nicks/(map ship nick)                         ::  human identities
-          bound/(map audience char)                     ::  bound circle glyphs
-          binds/(jug char audience)                     ::  circle glyph lookup
-          cli/shell                                     ::  interaction state
+    ++  STATE                                           ::  APPLICATION STATE
+      $:  ::  MESSAGING STATE                           ::
+          GRAMS/(LIST TELEGRAM)                         ::  ALL HISTORY
+          KNOWN/(MAP SERIAL @UD)                        ::  MESSAGES HEARD
+          LAST/@UD                                      ::  LAST HEARD
+          COUNT/@UD                                     ::  (LENT GRAMS)
+          SOURCES/(SET CIRCLE)                          ::  OUR SUBSCRIPTIONS
+          ::  CIRCLE DETAILS                            ::
+          REMOTES/(MAP CIRCLE GROUP)                    ::  REMOTE PRESENCES
+          MIRRORS/(MAP CIRCLE CONFIG)                   ::  REMOTE CONFIGS
+          ::  UI STATE                                  ::
+          NICKS/(MAP SHIP NICK)                         ::  HUMAN IDENTITIES
+          BOUND/(MAP AUDIENCE CHAR)                     ::  BOUND CIRCLE GLYPHS
+          BINDS/(JUG CHAR AUDIENCE)                     ::  CIRCLE GLYPH LOOKUP
+          CLI/SHELL                                     ::  INTERACTION STATE
       ==                                                ::
-    ++  shell                                           ::  console session
-      $:  id/bone                                       ::  identifier
-          latest/@ud                                    ::  latest shown msg num
-          say/sole-share:sole-sur                       ::  console state
-          active/audience                               ::  active targets
-          settings/(set term)                           ::  frontend settings
-          width/@ud                                     ::  display width
-          timez/(pair ? @ud)                            ::  timezone adjustment
+    ++  SHELL                                           ::  CONSOLE SESSION
+      $:  ID/BONE                                       ::  IDENTIFIER
+          LATEST/@UD                                    ::  LATEST SHOWN MSG NUM
+          SAY/SOLE-SHARE:SOLE-SUR                       ::  CONSOLE STATE
+          ACTIVE/AUDIENCE                               ::  ACTIVE TARGETS
+          SETTINGS/(SET TERM)                           ::  FRONTEND SETTINGS
+          WIDTH/@UD                                     ::  DISPLAY WIDTH
+          TIMEZ/(PAIR ? @UD)                            ::  TIMEZONE ADJUSTMENT
       ==                                                ::
-    ++  move  (pair bone card)                          ::  all actions
-    ++  lime                                            ::  diff fruit
-      $%  {$sole-effect sole-effect:sole-sur}           ::
+    ++  MOVE  (PAIR BONE CARD)                          ::  ALL ACTIONS
+    ++  LIME                                            ::  DIFF FRUIT
+      $%  {$SOLE-EFFECT SOLE-EFFECT:SOLE-SUR}           ::
       ==                                                ::
-    ++  pear                                            ::  poke fruit
-      $%  {$hall-command command}                       ::
-          {$hall-action action}                         ::
+    ++  PEAR                                            ::  POKE FRUIT
+      $%  {$HALL-COMMAND COMMAND}                       ::
+          {$HALL-ACTION ACTION}                         ::
       ==                                                ::
-    ++  card                                            ::  general card
-      $%  {$diff lime}                                  ::
-          {$poke wire dock pear}                        ::
-          {$peer wire dock path}                        ::
-          {$pull wire dock ~}                          ::
+    ++  CARD                                            ::  GENERAL CARD
+      $%  {$DIFF LIME}                                  ::
+          {$POKE WIRE DOCK PEAR}                        ::
+          {$PEER WIRE DOCK PATH}                        ::
+          {$PULL WIRE DOCK ~}                          ::
       ==                                                ::
-    ++  work                                            ::  interface action
-      $%  ::  circle management                         ::
-          {$join (map circle range)}                    ::  subscribe to
-          {$leave audience}                             ::  unsubscribe from
-          {$create security name cord}                  ::  create circle
-          {$delete name (unit cord)}                    ::  delete circle
-          {$depict name cord}                           ::  change description
-          {$filter name ? ?}                            ::  change message rules
-          {$invite name (set ship)}                     ::  give permission
-          {$banish name (set ship)}                     ::  deny permission
-          {$source name (map circle range)}             ::  add source
-          {$unsource name (map circle range)}           ::  remove source
-          {$read name @ud}                              ::  set read count
-          ::  personal metadata                         ::
-          {$attend audience (unit presence)}            ::  set our presence
-          {$name audience human}                        ::  set our name
-          ::  messaging                                 ::
-          {$say (list speech)}                          ::  send message
-          {$eval cord hoon}                             ::  send #-message
-          {$target p/audience q/(unit work)}            ::  set active targets
-          {$reply $@(@ud {@u @ud}) (list speech)}       ::  reply to
-          ::  displaying info                           ::
-          {$number $@(@ud {@u @ud})}                    ::  relative/absolute
-          {$who audience}                               ::  presence
-          {$what (unit $@(char audience))}              ::  show bound glyph
-          {$circles ~}                                 ::  show our circles
-          {$sources circle}                             ::  show active sources
-          ::  ui settings                               ::
-          {$bind char (unit audience)}                  ::  bind glyph
-          {$unbind char (unit audience)}                ::  unbind glyph
-          {$nick (unit ship) (unit cord)}               ::  un/set/show nick
-          {$set term}                                   ::  enable setting
-          {$unset term}                                 ::  disable setting
-          {$width @ud}                                  ::  change display width
-          {$timez ? @ud}                                ::  adjust shown times
-          ::  miscellaneous                             ::
-          {$show circle}                                ::  show membership
-          {$hide circle}                                ::  hide membership
-          {$help ~}                                    ::  print usage info
+    ++  WORK                                            ::  INTERFACE ACTION
+      $%  ::  CIRCLE MANAGEMENT                         ::
+          {$JOIN (MAP CIRCLE RANGE)}                    ::  SUBSCRIBE TO
+          {$LEAVE AUDIENCE}                             ::  UNSUBSCRIBE FROM
+          {$CREATE SECURITY NAME CORD}                  ::  CREATE CIRCLE
+          {$DELETE NAME (UNIT CORD)}                    ::  DELETE CIRCLE
+          {$DEPICT NAME CORD}                           ::  CHANGE DESCRIPTION
+          {$FILTER NAME ? ?}                            ::  CHANGE MESSAGE RULES
+          {$INVITE NAME (SET SHIP)}                     ::  GIVE PERMISSION
+          {$BANISH NAME (SET SHIP)}                     ::  DENY PERMISSION
+          {$SOURCE NAME (MAP CIRCLE RANGE)}             ::  ADD SOURCE
+          {$UNSOURCE NAME (MAP CIRCLE RANGE)}           ::  REMOVE SOURCE
+          {$READ NAME @UD}                              ::  SET READ COUNT
+          ::  PERSONAL METADATA                         ::
+          {$ATTEND AUDIENCE (UNIT PRESENCE)}            ::  SET OUR PRESENCE
+          {$NAME AUDIENCE HUMAN}                        ::  SET OUR NAME
+          ::  MESSAGING                                 ::
+          {$SAY (LIST SPEECH)}                          ::  SEND MESSAGE
+          {$EVAL CORD HOON}                             ::  SEND #-MESSAGE
+          {$TARGET P/AUDIENCE Q/(UNIT WORK)}            ::  SET ACTIVE TARGETS
+          {$REPLY $@(@UD {@U @UD}) (LIST SPEECH)}       ::  REPLY TO
+          ::  DISPLAYING INFO                           ::
+          {$NUMBER $@(@UD {@U @UD})}                    ::  RELATIVE/ABSOLUTE
+          {$WHO AUDIENCE}                               ::  PRESENCE
+          {$WHAT (UNIT $@(CHAR AUDIENCE))}              ::  SHOW BOUND GLYPH
+          {$CIRCLES ~}                                 ::  SHOW OUR CIRCLES
+          {$SOURCES CIRCLE}                             ::  SHOW ACTIVE SOURCES
+          ::  UI SETTINGS                               ::
+          {$BIND CHAR (UNIT AUDIENCE)}                  ::  BIND GLYPH
+          {$UNBIND CHAR (UNIT AUDIENCE)}                ::  UNBIND GLYPH
+          {$NICK (UNIT SHIP) (UNIT CORD)}               ::  UN/SET/SHOW NICK
+          {$SET TERM}                                   ::  ENABLE SETTING
+          {$UNSET TERM}                                 ::  DISABLE SETTING
+          {$WIDTH @UD}                                  ::  CHANGE DISPLAY WIDTH
+          {$TIMEZ ? @UD}                                ::  ADJUST SHOWN TIMES
+          ::  MISCELLANEOUS                             ::
+          {$SHOW CIRCLE}                                ::  SHOW MEMBERSHIP
+          {$HIDE CIRCLE}                                ::  HIDE MEMBERSHIP
+          {$HELP ~}                                    ::  PRINT USAGE INFO
       ==                                                ::
-    ++  glyphs  `wall`~[">=+-" "}),." "\"'`^" "$%&@"]   ::  circle char pool '
+    ++  GLYPHS  `WALL`~[">=+-" "}),." "\"'`^" "$%&@"]   ::  CIRCLE CHAR POOL '
     --
 ::
 ::  #
-::  #  %work
+::  #  %WORK
 ::  #
-::    functional cores and arms.
+::    FUNCTIONAL CORES AND ARMS.
 ::
-|_  {bol/bowl:gall $1 state}
+|_  {BOL/BOWL:GALL $1 STATE}
 ::
-::  #  %transition
-::    prep transition
-+|  %transition
+::  #  %TRANSITION
+::    PREP TRANSITION
++|  %TRANSITION
 ::
-++  prep
-  ::  adapts state
+++  PREP
+  ::  ADAPTS STATE
   ::
   =>  |%
-      ++  states
-        $%({$1 s/state} {$0 s/state-0})
+      ++  STATES
+        $%({$1 S/STATE} {$0 S/STATE-0})
       ::
-      ++  state-0
-        (cork state |=(a/state a(mirrors (~(run by mirrors.a) config-0))))
-      ++  config-0
-        {src/(set source-0) cap/cord tag/tags fit/filter con/control}
-      ++  source-0
-        {cir/circle ran/range-0}
-      ++  range-0
-        %-  unit
-        $:  hed/place-0
-            tal/(unit place-0)
+      ++  STATE-0
+        (CORK STATE |=(A/STATE A(MIRRORS (~(RUN BY MIRRORS.A) CONFIG-0))))
+      ++  CONFIG-0
+        {SRC/(SET SOURCE-0) CAP/CORD TAG/TAGS FIT/FILTER CON/CONTROL}
+      ++  SOURCE-0
+        {CIR/CIRCLE RAN/RANGE-0}
+      ++  RANGE-0
+        %-  UNIT
+        $:  HED/PLACE-0
+            TAL/(UNIT PLACE-0)
         ==
-      ++  place-0
-        $%  {$da @da}
-            {$ud @ud}
-            {$sd @sd}
+      ++  PLACE-0
+        $%  {$DA @DA}
+            {$UD @UD}
+            {$SD @SD}
         ==
       --
-  =|  mos/(list move)
-  |=  old/(unit states)
-  ^-  (quip move _..prep)
-  ?~  old
-    ta-done:ta-init:ta
-  ?-  -.u.old
+  =|  MOS/(LIST MOVE)
+  |=  OLD/(UNIT STATES)
+  ^-  (QUIP MOVE _..PREP)
+  ?~  OLD
+    TA-DONE:TA-INIT:TA
+  ?-  -.U.OLD
       $1
-    [mos ..prep(+<+ u.old)]
+    [MOS ..PREP(+<+ U.OLD)]
   ::
       $0
-    =.  mos  [[ost.bol %pull /server/inbox server ~] peer-inbox mos]
-    =-  $(old `[%1 s.u.old(mirrors -)])
+    =.  MOS  [[OST.BOL %PULL /SERVER/INBOX SERVER ~] PEER-INBOX MOS]
+    =-  $(OLD `[%1 S.U.OLD(MIRRORS -)])
     |^
-      (~(run by mirrors.s.u.old) prep-config)
+      (~(RUN BY MIRRORS.S.U.OLD) PREP-CONFIG)
     ::
-    ++  prep-config
-      |=  cof/config-0
-      ^-  config
-      =.  src.cof
-        %-  ~(gas in *(set source))
-        (murn ~(tap in src.cof) prep-source)
-      :*  src.cof
-          cap.cof
-          tag.cof
-          fit.cof
-          con.cof
+    ++  PREP-CONFIG
+      |=  COF/CONFIG-0
+      ^-  CONFIG
+      =.  SRC.COF
+        %-  ~(GAS IN *(SET SOURCE))
+        (MURN ~(TAP IN SRC.COF) PREP-SOURCE)
+      :*  SRC.COF
+          CAP.COF
+          TAG.COF
+          FIT.COF
+          CON.COF
           0
       ==
     ::
-    ++  prep-source
-      |=  src/source-0
-      ^-  (unit source)
-      =+  nan=(prep-range ran.src)
-      ?~  nan
-        ~&  [%forgetting-source src]
+    ++  PREP-SOURCE
+      |=  SRC/SOURCE-0
+      ^-  (UNIT SOURCE)
+      =+  NAN=(PREP-RANGE RAN.SRC)
+      ?~  NAN
+        ~&  [%FORGETTING-SOURCE SRC]
         ~
-      `src(ran u.nan)
+      `SRC(RAN U.NAN)
     ::
-    ++  prep-range
-      |=  ran/range-0
-      ^-  (unit range)
-      ?~  ran  `ran
-      ::  ranges with a relative end aren't stored because they end
-      ::  immediately, so if we find one we can safely discard it.
-      ?:  ?=({$~ {$sd @sd}} tal.u.ran)  ~
-      ::  we replace relative range starts with the current date.
-      ::  this is practically correct.
-      ?:  ?=({$sd @sd} hed.u.ran)
-        `ran(hed.u [%da now.bol])
-      `ran
+    ++  PREP-RANGE
+      |=  RAN/RANGE-0
+      ^-  (UNIT RANGE)
+      ?~  RAN  `RAN
+      ::  RANGES WITH A RELATIVE END AREN'T STORED BECAUSE THEY END
+      ::  IMMEDIATELY, SO IF WE FIND ONE WE CAN SAFELY DISCARD IT.
+      ?:  ?=({$~ {$SD @SD}} TAL.U.RAN)  ~
+      ::  WE REPLACE RELATIVE RANGE STARTS WITH THE CURRENT DATE.
+      ::  THIS IS PRACTICALLY CORRECT.
+      ?:  ?=({$SD @SD} HED.U.RAN)
+        `RAN(HED.U [%DA NOW.BOL])
+      `RAN
     --
   ==
 ::
 ::  #
-::  #  %utility
+::  #  %UTILITY
 ::  #
-::    small utility functions.
-+|  %utility
+::    SMALL UTILITY FUNCTIONS.
++|  %UTILITY
 ::
-++  self
-  (true-self [our now our]:bol)
+++  SELF
+  (TRUE-SELF [OUR NOW OUR]:BOL)
 ::
-++  server
-  ::  our hall instance
-  ^-  dock
-  [self %hall]
+++  SERVER
+  ::  OUR HALL INSTANCE
+  ^-  DOCK
+  [SELF %HALL]
 ::
-++  inbox
-  ::    client's circle name
+++  INBOX
+  ::    CLIENT'S CIRCLE NAME
   ::
-  ::  produces the name of the circle used by this
-  ::  client for all its operations
-  ^-  name
-  %inbox
+  ::  PRODUCES THE NAME OF THE CIRCLE USED BY THIS
+  ::  CLIENT FOR ALL ITS OPERATIONS
+  ^-  NAME
+  %INBOX
 ::
-++  incir
-  ::    client's circle
+++  INCIR
+  ::    CLIENT'S CIRCLE
   ::
-  ::  ++inbox, except a full circle.
-  ^-  circle
-  [self inbox]
+  ::  ++INBOX, EXCEPT A FULL CIRCLE.
+  ^-  CIRCLE
+  [SELF INBOX]
 ::
-++  renum
-  ::  find the grams list index for gram with serial.
-  |=  ser/serial
-  ^-  (unit @ud)
-  =+  num=(~(get by known) ser)
-  ?~  num  ~
-  `(sub count +(u.num))
+++  RENUM
+  ::  FIND THE GRAMS LIST INDEX FOR GRAM WITH SERIAL.
+  |=  SER/SERIAL
+  ^-  (UNIT @UD)
+  =+  NUM=(~(GET BY KNOWN) SER)
+  ?~  NUM  ~
+  `(SUB COUNT +(U.NUM))
 ::
-++  recall
-  ::  find a known gram with serial {ser}.
-  |=  ser/serial
-  ^-  (unit telegram)
-  =+  num=(renum ser)
-  ?~  num  ~
-  `(snag u.num grams)
+++  RECALL
+  ::  FIND A KNOWN GRAM WITH SERIAL {SER}.
+  |=  SER/SERIAL
+  ^-  (UNIT TELEGRAM)
+  =+  NUM=(RENUM SER)
+  ?~  NUM  ~
+  `(SNAG U.NUM GRAMS)
 ::
-++  bound-from-binds
-  ::    bound from binds
+++  BOUND-FROM-BINDS
+  ::    BOUND FROM BINDS
   ::
-  ::  using a mapping of character to audiences, create
-  ::  a mapping of audience to character.
+  ::  USING A MAPPING OF CHARACTER TO AUDIENCES, CREATE
+  ::  A MAPPING OF AUDIENCE TO CHARACTER.
   ::
-  |:  bin=binds
-  ^+  bound
-  %-  ~(gas by *(map audience char))
-  =-  (zing -)
-  %+  turn  ~(tap by bin)
-  |=  {a/char b/(set audience)}
-  (turn ~(tap by b) |=(c/audience [c a]))
+  |:  BIN=BINDS
+  ^+  BOUND
+  %-  ~(GAS BY *(MAP AUDIENCE CHAR))
+  =-  (ZING -)
+  %+  TURN  ~(TAP BY BIN)
+  |=  {A/CHAR B/(SET AUDIENCE)}
+  (TURN ~(TAP BY B) |=(C/AUDIENCE [C A]))
 ::
-++  glyph
-  ::  finds a new glyph for assignment.
+++  GLYPH
+  ::  FINDS A NEW GLYPH FOR ASSIGNMENT.
   ::
-  |=  idx/@
-  =<  cha
-  %+  reel  glyphs
-  |=  {all/tape ole/{cha/char num/@}}
-  =+  new=(snag (mod idx (lent all)) all)
-  =+  num=~(wyt in (~(get ju binds) new))
-  ?~  cha.ole  [new num]
-  ?:  (lth num.ole num)
-    ole
-  [new num]
+  |=  IDX/@
+  =<  CHA
+  %+  REEL  GLYPHS
+  |=  {ALL/TAPE OLE/{CHA/CHAR NUM/@}}
+  =+  NEW=(SNAG (MOD IDX (LENT ALL)) ALL)
+  =+  NUM=~(WYT IN (~(GET JU BINDS) NEW))
+  ?~  CHA.OLE  [NEW NUM]
+  ?:  (LTH NUM.OLE NUM)
+    OLE
+  [NEW NUM]
 ::
-++  peer-client
-  ::  ui state peer move
-  ^-  move
-  :*  ost.bol
-      %peer
-      /server/client
-      server
-      /client
+++  PEER-CLIENT
+  ::  UI STATE PEER MOVE
+  ^-  MOVE
+  :*  OST.BOL
+      %PEER
+      /SERVER/CLIENT
+      SERVER
+      /CLIENT
   ==
 ::
-++  peer-inbox
-  ^-  move
-  :*  ost.bol
-      %peer
-      /server/inbox
-      server
+++  PEER-INBOX
+  ^-  MOVE
+  :*  OST.BOL
+      %PEER
+      /SERVER/INBOX
+      SERVER
     ::
-      %+  welp  /circle/[inbox]/grams/config/group
-      ?.  =(0 count)
-        [(scot %ud last) ~]
-      =+  history-msgs=200
-      [(cat 3 '-' (scot %ud history-msgs)) ~]
+      %+  WELP  /CIRCLE/[INBOX]/GRAMS/CONFIG/GROUP
+      ?.  =(0 COUNT)
+        [(SCOT %UD LAST) ~]
+      =+  HISTORY-MSGS=200
+      [(CAT 3 '-' (SCOT %UD HISTORY-MSGS)) ~]
   ==
 ::
 ::  #
-::  #  %engines
+::  #  %ENGINES
 ::  #
-::    main cores.
-+|  %engines
+::    MAIN CORES.
++|  %ENGINES
 ::
-++  ta
-  ::    per transaction
+++  TA
+  ::    PER TRANSACTION
   ::
-  ::  for every transaction/event (poke, peer etc.)
-  ::  talk receives, the ++ta transaction core is
-  ::  called.
-  ::  in processing transactions, ++ta may modify app
-  ::  state, or create moves. these moves get produced
-  ::  upon finalizing the core's with with ++ta-done.
-  ::  when making changes to the shell, the ++sh core is
-  ::  used.
+  ::  FOR EVERY TRANSACTION/EVENT (POKE, PEER ETC.)
+  ::  TALK RECEIVES, THE ++TA TRANSACTION CORE IS
+  ::  CALLED.
+  ::  IN PROCESSING TRANSACTIONS, ++TA MAY MODIFY APP
+  ::  STATE, OR CREATE MOVES. THESE MOVES GET PRODUCED
+  ::  UPON FINALIZING THE CORE'S WITH WITH ++TA-DONE.
+  ::  WHEN MAKING CHANGES TO THE SHELL, THE ++SH CORE IS
+  ::  USED.
   ::
-  |_  ::  moves:  moves created by core operations.
+  |_  ::  MOVES:  MOVES CREATED BY CORE OPERATIONS.
       ::
-      moves/(list move)
+      MOVES/(LIST MOVE)
   ::
-  ::  #  %resolve
-  +|  %resolve
+  ::  #  %RESOLVE
+  +|  %RESOLVE
   ::
-  ++  ta-done
-    ::    resolve core
+  ++  TA-DONE
+    ::    RESOLVE CORE
     ::
-    ::  produces the moves stored in ++ta's moves.
-    ::  %sole-effect moves get squashed into a %mor.
+    ::  PRODUCES THE MOVES STORED IN ++TA'S MOVES.
+    ::  %SOLE-EFFECT MOVES GET SQUASHED INTO A %MOR.
     ::
-    ^+  [*(list move) +>]
+    ^+  [*(LIST MOVE) +>]
     :_  +>
-    ::  seperate our sole-effects from other moves.
-    =/  yop
-      |-  ^-  (pair (list move) (list sole-effect:sole-sur))
-      ?~  moves  [~ ~]
-      =+  mor=$(moves t.moves)
-      ?:  ?&  =(id.cli p.i.moves)
-              ?=({$diff $sole-effect *} q.i.moves)
+    ::  SEPERATE OUR SOLE-EFFECTS FROM OTHER MOVES.
+    =/  YOP
+      |-  ^-  (PAIR (LIST MOVE) (LIST SOLE-EFFECT:SOLE-SUR))
+      ?~  MOVES  [~ ~]
+      =+  MOR=$(MOVES T.MOVES)
+      ?:  ?&  =(ID.CLI P.I.MOVES)
+              ?=({$DIFF $SOLE-EFFECT *} Q.I.MOVES)
           ==
-        [p.mor [+>.q.i.moves q.mor]]
-      [[i.moves p.mor] q.mor]
-    ::  flop moves, flop and squash sole-effects into a %mor.
-    =+  moz=(flop p.yop)
-    =/  foc/(unit sole-effect:sole-sur)
-      ?~  q.yop  ~
-      ?~  t.q.yop  `i.q.yop                             ::  single sole-effect
-      `[%mor (flop q.yop)]                              ::  more sole-effects
-    ::  produce moves or sole-effects and moves.
-    ?~  foc  moz
-    ?~  id.cli  ~&(%client-no-sole moz)
-    [[id.cli %diff %sole-effect u.foc] moz]
+        [P.MOR [+>.Q.I.MOVES Q.MOR]]
+      [[I.MOVES P.MOR] Q.MOR]
+    ::  FLOP MOVES, FLOP AND SQUASH SOLE-EFFECTS INTO A %MOR.
+    =+  MOZ=(FLOP P.YOP)
+    =/  FOC/(UNIT SOLE-EFFECT:SOLE-SUR)
+      ?~  Q.YOP  ~
+      ?~  T.Q.YOP  `I.Q.YOP                             ::  SINGLE SOLE-EFFECT
+      `[%MOR (FLOP Q.YOP)]                              ::  MORE SOLE-EFFECTS
+    ::  PRODUCE MOVES OR SOLE-EFFECTS AND MOVES.
+    ?~  FOC  MOZ
+    ?~  ID.CLI  ~&(%CLIENT-NO-SOLE MOZ)
+    [[ID.CLI %DIFF %SOLE-EFFECT U.FOC] MOZ]
   ::
   ::  #
-  ::  #  %emitters
+  ::  #  %EMITTERS
   ::  #
-  ::    arms that create outward changes.
-  +|  %emitters
+  ::    ARMS THAT CREATE OUTWARD CHANGES.
+  +|  %EMITTERS
   ::
-  ++  ta-emil
-    ::    emit move list
+  ++  TA-EMIL
+    ::    EMIT MOVE LIST
     ::
-    ::  adds multiple moves to the core's list.
-    ::  flops to emulate ++ta-emit.
+    ::  ADDS MULTIPLE MOVES TO THE CORE'S LIST.
+    ::  FLOPS TO EMULATE ++TA-EMIT.
     ::
-    |=  mol/(list move)
-    %_(+> moves (welp (flop mol) moves))
+    |=  MOL/(LIST MOVE)
+    %_(+> MOVES (WELP (FLOP MOL) MOVES))
   ::
-  ++  ta-emit
-    ::  adds a move to the core's list.
+  ++  TA-EMIT
+    ::  ADDS A MOVE TO THE CORE'S LIST.
     ::
-    |=  mov/move
-    %_(+> moves [mov moves])
+    |=  MOV/MOVE
+    %_(+> MOVES [MOV MOVES])
   ::
   ::  #
-  ::  #  %interaction-events
+  ::  #  %INTERACTION-EVENTS
   ::  #
-  ::    arms that apply events we received.
-  +|  %interaction-events
+  ::    ARMS THAT APPLY EVENTS WE RECEIVED.
+  +|  %INTERACTION-EVENTS
   ::
-  ++  ta-init
-    ::  subscribes to our hall.
+  ++  TA-INIT
+    ::  SUBSCRIBES TO OUR HALL.
     ::
-    %-  ta-emil
-    ^-  (list move)
-    ~[peer-client peer-inbox]
+    %-  TA-EMIL
+    ^-  (LIST MOVE)
+    ~[PEER-CLIENT PEER-INBOX]
   ::
-  ++  ta-take
-    ::  accept prize
+  ++  TA-TAKE
+    ::  ACCEPT PRIZE
     ::
-    |=  piz/prize
+    |=  PIZ/PRIZE
     ^+  +>
-    ?+  -.piz  +>
-        $client
+    ?+  -.PIZ  +>
+        $CLIENT
       %=  +>
-        binds   gys.piz
-        bound   (bound-from-binds gys.piz)
-        nicks   nis.piz
+        BINDS   GYS.PIZ
+        BOUND   (BOUND-FROM-BINDS GYS.PIZ)
+        NICKS   NIS.PIZ
       ==
     ::
-        $circle
-      %.  nes.piz
-      %=  ta-unpack
-        sources   (~(run in src.loc.cos.piz) head)
-        mirrors   (~(put by rem.cos.piz) incir loc.cos.piz)
-        remotes   (~(put by rem.pes.piz) incir loc.pes.piz)
+        $CIRCLE
+      %.  NES.PIZ
+      %=  TA-UNPACK
+        SOURCES   (~(RUN IN SRC.LOC.COS.PIZ) HEAD)
+        MIRRORS   (~(PUT BY REM.COS.PIZ) INCIR LOC.COS.PIZ)
+        REMOTES   (~(PUT BY REM.PES.PIZ) INCIR LOC.PES.PIZ)
       ==
     ==
   ::
-  ++  ta-hear
-    ::  apply change
+  ++  TA-HEAR
+    ::  APPLY CHANGE
     ::
-    |=  rum/rumor
+    |=  RUM/RUMOR
     ^+  +>
-    ?+  -.rum  +>
-        $client
-      ?-  -.rum.rum
-          $glyph
-        (ta-change-glyph +.rum.rum)
+    ?+  -.RUM  +>
+        $CLIENT
+      ?-  -.RUM.RUM
+          $GLYPH
+        (TA-CHANGE-GLYPH +.RUM.RUM)
       ::
-          $nick
-        +>(nicks (change-nicks nicks who.rum.rum nic.rum.rum))
+          $NICK
+        +>(NICKS (CHANGE-NICKS NICKS WHO.RUM.RUM NIC.RUM.RUM))
       ==
     ::
-        $circle
-      (ta-change-circle rum.rum)
+        $CIRCLE
+      (TA-CHANGE-CIRCLE RUM.RUM)
     ==
   ::
-  ++  ta-change-circle
-    ::  apply circle change
+  ++  TA-CHANGE-CIRCLE
+    ::  APPLY CIRCLE CHANGE
     ::
-    |=  rum/rumor-story
+    |=  RUM/RUMOR-STORY
     ^+  +>
-    ?+  -.rum
-        ~&([%unexpected-circle-rumor -.rum] +>)
+    ?+  -.RUM
+        ~&([%UNEXPECTED-CIRCLE-RUMOR -.RUM] +>)
     ::
-        $gram
-      (ta-open nev.rum)
+        $GRAM
+      (TA-OPEN NEV.RUM)
     ::
-        $config
-      =+  cur=(fall (~(get by mirrors) cir.rum) *config)
+        $CONFIG
+      =+  CUR=(FALL (~(GET BY MIRRORS) CIR.RUM) *CONFIG)
       =.  +>.$
-        =<  sh-done
-        %-  ~(sh-show-config sh cli)
-        [cir.rum cur dif.rum]
+        =<  SH-DONE
+        %-  ~(SH-SHOW-CONFIG SH CLI)
+        [CIR.RUM CUR DIF.RUM]
       =?  +>.$
-          ?&  ?=($source -.dif.rum)
-              add.dif.rum
-              =(cir.rum incir)
+          ?&  ?=($SOURCE -.DIF.RUM)
+              ADD.DIF.RUM
+              =(CIR.RUM INCIR)
           ==
-        =*  cir  cir.src.dif.rum
-        =+  ren=~(cr-phat cr cir)
-        =+  gyf=(~(get by bound) [cir ~ ~])
-        =<  sh-done
-        =/  sho
-          ::  only present if we're here indefinitely.
-          =*  ran  ran.src.dif.rum
-          ?.  |(?=(~ ran) ?=(~ tal.u.ran))
-            ~(. sh cli)
-          %-  ~(sh-act sh cli)
-          [%notify [cir ~ ~] `%hear]
-        ?^  gyf
-          (sh-note:sho "has glyph {[u.gyf ~]} for {ren}")
-        ::  we use the rendered circle name to determine
-        ::  the glyph for higher glyph consistency when
-        ::  federating.
-        =+  cha=(glyph (mug ren))
-        (sh-work:sho %bind cha `[cir ~ ~])
+        =*  CIR  CIR.SRC.DIF.RUM
+        =+  REN=~(CR-PHAT CR CIR)
+        =+  GYF=(~(GET BY BOUND) [CIR ~ ~])
+        =<  SH-DONE
+        =/  SHO
+          ::  ONLY PRESENT IF WE'RE HERE INDEFINITELY.
+          =*  RAN  RAN.SRC.DIF.RUM
+          ?.  |(?=(~ RAN) ?=(~ TAL.U.RAN))
+            ~(. SH CLI)
+          %-  ~(SH-ACT SH CLI)
+          [%NOTIFY [CIR ~ ~] `%HEAR]
+        ?^  GYF
+          (SH-NOTE:SHO "HAS GLYPH {[U.GYF ~]} FOR {REN}")
+        ::  WE USE THE RENDERED CIRCLE NAME TO DETERMINE
+        ::  THE GLYPH FOR HIGHER GLYPH CONSISTENCY WHEN
+        ::  FEDERATING.
+        =+  CHA=(GLYPH (MUG REN))
+        (SH-WORK:SHO %BIND CHA `[CIR ~ ~])
       %=  +>.$
-          sources
-        ?.  &(?=($source -.dif.rum) =(cir.rum incir))
-          sources
-        %.  cir.src.dif.rum
-        ?:  add.dif.rum
-          ~(put in sources)
-        ~(del in sources)
+          SOURCES
+        ?.  &(?=($SOURCE -.DIF.RUM) =(CIR.RUM INCIR))
+          SOURCES
+        %.  CIR.SRC.DIF.RUM
+        ?:  ADD.DIF.RUM
+          ~(PUT IN SOURCES)
+        ~(DEL IN SOURCES)
       ::
-          mirrors
-        ?:  ?=($remove -.dif.rum)  (~(del by mirrors) cir.rum)
-        %+  ~(put by mirrors)  cir.rum
-        (change-config cur dif.rum)
+          MIRRORS
+        ?:  ?=($REMOVE -.DIF.RUM)  (~(DEL BY MIRRORS) CIR.RUM)
+        %+  ~(PUT BY MIRRORS)  CIR.RUM
+        (CHANGE-CONFIG CUR DIF.RUM)
       ==
     ::
-        $status
-      =+  rem=(fall (~(get by remotes) cir.rum) *group)
-      =+  cur=(fall (~(get by rem) who.rum) *status)
+        $STATUS
+      =+  REM=(FALL (~(GET BY REMOTES) CIR.RUM) *GROUP)
+      =+  CUR=(FALL (~(GET BY REM) WHO.RUM) *STATUS)
       =.  +>.$
-        =<  sh-done
-        %-  ~(sh-show-status sh cli)
-        [cir.rum who.rum cur dif.rum]
+        =<  SH-DONE
+        %-  ~(SH-SHOW-STATUS SH CLI)
+        [CIR.RUM WHO.RUM CUR DIF.RUM]
       %=  +>.$
-          remotes
-        %+  ~(put by remotes)  cir.rum
-        ?:  ?=($remove -.dif.rum)  (~(del by rem) who.rum)
-        %+  ~(put by rem)  who.rum
-        (change-status cur dif.rum)
+          REMOTES
+        %+  ~(PUT BY REMOTES)  CIR.RUM
+        ?:  ?=($REMOVE -.DIF.RUM)  (~(DEL BY REM) WHO.RUM)
+        %+  ~(PUT BY REM)  WHO.RUM
+        (CHANGE-STATUS CUR DIF.RUM)
       ==
     ==
   ::
-  ++  ta-change-glyph
-    ::  applies new set of glyph bindings.
+  ++  TA-CHANGE-GLYPH
+    ::  APPLIES NEW SET OF GLYPH BINDINGS.
     ::
-    |=  {bin/? gyf/char aud/audience}
+    |=  {BIN/? GYF/CHAR AUD/AUDIENCE}
     ^+  +>
-    =+  nek=(change-glyphs binds bin gyf aud)
-    ?:  =(nek binds)  +>.$                              ::  no change
-    =.  binds  nek
-    =.  bound  (bound-from-binds nek)
-    sh-done:~(sh-prod sh cli)
+    =+  NEK=(CHANGE-GLYPHS BINDS BIN GYF AUD)
+    ?:  =(NEK BINDS)  +>.$                              ::  NO CHANGE
+    =.  BINDS  NEK
+    =.  BOUND  (BOUND-FROM-BINDS NEK)
+    SH-DONE:~(SH-PROD SH CLI)
   ::
   ::  #
-  ::  #  %messages
+  ::  #  %MESSAGES
   ::  #
-  ::    storing and updating messages.
-  +|  %messages
+  ::    STORING AND UPDATING MESSAGES.
+  +|  %MESSAGES
   ::
-  ++  ta-unpack
-    ::    open envelopes
+  ++  TA-UNPACK
+    ::    OPEN ENVELOPES
     ::
-    ::  the client currently doesn't care about nums.
+    ::  THE CLIENT CURRENTLY DOESN'T CARE ABOUT NUMS.
     ::
-    |=  nes/(list envelope)
+    |=  NES/(LIST ENVELOPE)
     ^+  +>
-    ?~  nes  +>
-    $(nes t.nes, +> (ta-open i.nes))
+    ?~  NES  +>
+    $(NES T.NES, +> (TA-OPEN I.NES))
   ::
-  ++  ta-open
-    ::  learn message from an envelope.
+  ++  TA-OPEN
+    ::  LEARN MESSAGE FROM AN ENVELOPE.
     ::
-    |=  nev/envelope
+    |=  NEV/ENVELOPE
     ^+  +>
-    =?  last  (gth num.nev last)  num.nev
-    (ta-learn gam.nev)
+    =?  LAST  (GTH NUM.NEV LAST)  NUM.NEV
+    (TA-LEARN GAM.NEV)
   ::
-  ++  ta-learn
-    ::    save/update message
+  ++  TA-LEARN
+    ::    SAVE/UPDATE MESSAGE
     ::
-    ::  store an incoming telegram, updating if it
-    ::  already exists.
+    ::  STORE AN INCOMING TELEGRAM, UPDATING IF IT
+    ::  ALREADY EXISTS.
     ::
-    |=  gam/telegram
+    |=  GAM/TELEGRAM
     ^+  +>
-    =+  old=(renum uid.gam)
-    ?~  old
-      (ta-append gam)                                ::  add
-    (ta-revise u.old gam)                            ::  modify
+    =+  OLD=(RENUM UID.GAM)
+    ?~  OLD
+      (TA-APPEND GAM)                                ::  ADD
+    (TA-REVISE U.OLD GAM)                            ::  MODIFY
   ::
-  ++  ta-append
-    ::  store a new telegram.
+  ++  TA-APPEND
+    ::  STORE A NEW TELEGRAM.
     ::
-    |=  gam/telegram
+    |=  GAM/TELEGRAM
     ^+  +>
-    =:  grams  [gam grams]
-        count  +(count)
-        known  (~(put by known) uid.gam count)
+    =:  GRAMS  [GAM GRAMS]
+        COUNT  +(COUNT)
+        KNOWN  (~(PUT BY KNOWN) UID.GAM COUNT)
     ==
-    =<  sh-done
-    (~(sh-gram sh cli) gam)
+    =<  SH-DONE
+    (~(SH-GRAM SH CLI) GAM)
   ::
-  ++  ta-revise
-    ::  modify a telegram we know.
+  ++  TA-REVISE
+    ::  MODIFY A TELEGRAM WE KNOW.
     ::
-    |=  {num/@ud gam/telegram}
-    =+  old=(snag num grams)
-    ?:  =(gam old)  +>.$                                ::  no change
-    =.  grams
-      %+  welp
-      (scag num grams)
-      [gam (slag +(num) grams)]
-    ?:  =(sep.gam sep.old)  +>.$                        ::  no worthy change
-    =<  sh-done
-    (~(sh-gram sh cli) gam)
+    |=  {NUM/@UD GAM/TELEGRAM}
+    =+  OLD=(SNAG NUM GRAMS)
+    ?:  =(GAM OLD)  +>.$                                ::  NO CHANGE
+    =.  GRAMS
+      %+  WELP
+      (SCAG NUM GRAMS)
+      [GAM (SLAG +(NUM) GRAMS)]
+    ?:  =(SEP.GAM SEP.OLD)  +>.$                        ::  NO WORTHY CHANGE
+    =<  SH-DONE
+    (~(SH-GRAM SH CLI) GAM)
   ::
   ::  #
-  ::  #  %console
+  ::  #  %CONSOLE
   ::  #
-  ::    arms for shell functionality.
-  +|  %console
+  ::    ARMS FOR SHELL FUNCTIONALITY.
+  +|  %CONSOLE
   ::
-  ++  ta-console
-    ::  initialize the shell of this client.
+  ++  TA-CONSOLE
+    ::  INITIALIZE THE SHELL OF THIS CLIENT.
     ::
     ^+  .
-    =|  she/shell
-    =.  id.she  ost.bol
-    ::  XXX: +sy should be smarter than this
-    =/  circle-list=(list circle)  [incir ~]
-    =.  active.she  (sy circle-list)
-    =.  width.she  80
-    sh-done:~(sh-prod sh she)
+    =|  SHE/SHELL
+    =.  ID.SHE  OST.BOL
+    ::  XXX: +SY SHOULD BE SMARTER THAN THIS
+    =/  CIRCLE-LIST=(LIST CIRCLE)  [INCIR ~]
+    =.  ACTIVE.SHE  (SY CIRCLE-LIST)
+    =.  WIDTH.SHE  80
+    SH-DONE:~(SH-PROD SH SHE)
   ::
-  ++  ta-sole
-    ::  apply sole input
+  ++  TA-SOLE
+    ::  APPLY SOLE INPUT
     ::
-    |=  act/sole-action:sole-sur
+    |=  ACT/SOLE-ACTION:SOLE-SUR
     ^+  +>
-    ?.  =(id.cli ost.bol)
-      ~&(%strange-sole !!)
-    sh-done:(~(sh-sole sh cli) act)
+    ?.  =(ID.CLI OST.BOL)
+      ~&(%STRANGE-SOLE !!)
+    SH-DONE:(~(SH-SOLE SH CLI) ACT)
   ::
-  ++  sh
-    ::    per console
+  ++  SH
+    ::    PER CONSOLE
     ::
-    ::  shell core, responsible for handling user input
-    ::  and the related actions, and outputting changes
-    ::  to the cli.
+    ::  SHELL CORE, RESPONSIBLE FOR HANDLING USER INPUT
+    ::  AND THE RELATED ACTIONS, AND OUTPUTTING CHANGES
+    ::  TO THE CLI.
     ::
-    |_  $:  ::  she: console state.
+    |_  $:  ::  SHE: CONSOLE STATE.
             ::
-            she/shell
+            SHE/SHELL
         ==
     ::
-    ::  #  %resolve
-    +|  %resolve
+    ::  #  %RESOLVE
+    +|  %RESOLVE
     ::
-    ++  sh-done
-      ::  stores changes to the cli.
+    ++  SH-DONE
+      ::  STORES CHANGES TO THE CLI.
       ::
       ^+  +>
-      +>(cli she)
+      +>(CLI SHE)
     ::
     ::  #
-    ::  #  %emitters
+    ::  #  %EMITTERS
     ::  #
-    ::    arms that create outward changes.
-    +|  %emitters
+    ::    ARMS THAT CREATE OUTWARD CHANGES.
+    +|  %EMITTERS
     ::
-    ++  sh-fact
-      ::  adds a console effect to ++ta's moves.
+    ++  SH-FACT
+      ::  ADDS A CONSOLE EFFECT TO ++TA'S MOVES.
       ::
-      |=  fec/sole-effect:sole-sur
+      |=  FEC/SOLE-EFFECT:SOLE-SUR
       ^+  +>
-      +>(moves [[id.she %diff %sole-effect fec] moves])
+      +>(MOVES [[ID.SHE %DIFF %SOLE-EFFECT FEC] MOVES])
     ::
-    ++  sh-act
-      ::  adds an action to ++ta's moves.
+    ++  SH-ACT
+      ::  ADDS AN ACTION TO ++TA'S MOVES.
       ::
-      |=  act/action
+      |=  ACT/ACTION
       ^+  +>
       %=  +>
-          moves
-        :_  moves
-        :*  ost.bol
-            %poke
-            /client/action
-            server
-            [%hall-action act]
+          MOVES
+        :_  MOVES
+        :*  OST.BOL
+            %POKE
+            /CLIENT/ACTION
+            SERVER
+            [%HALL-ACTION ACT]
         ==
       ==
     ::
     ::  #
-    ::  #  %cli-interaction
+    ::  #  %CLI-INTERACTION
     ::  #
-    ::    processing user input as it happens.
-    +|  %cli-interaction
+    ::    PROCESSING USER INPUT AS IT HAPPENS.
+    +|  %CLI-INTERACTION
     ::
-    ++  sh-sole
-      ::  applies sole action.
+    ++  SH-SOLE
+      ::  APPLIES SOLE ACTION.
       ::
-      |=  act/sole-action:sole-sur
+      |=  ACT/SOLE-ACTION:SOLE-SUR
       ^+  +>
-      ?-  -.act
-        $det  (sh-edit +.act)
-        $clr  ..sh-sole :: (sh-pact ~) :: XX clear to PM-to-self?
-        $ret  sh-obey
+      ?-  -.ACT
+        $DET  (SH-EDIT +.ACT)
+        $CLR  ..SH-SOLE :: (SH-PACT ~) :: XX CLEAR TO PM-TO-SELF?
+        $RET  SH-OBEY
       ==
     ::
-    ++  sh-edit
-      ::    apply sole edit
+    ++  SH-EDIT
+      ::    APPLY SOLE EDIT
       ::
-      ::  called when typing into the cli prompt.
-      ::  applies the change and does sanitizing.
+      ::  CALLED WHEN TYPING INTO THE CLI PROMPT.
+      ::  APPLIES THE CHANGE AND DOES SANITIZING.
       ::
-      |=  cal/sole-change:sole-sur
+      |=  CAL/SOLE-CHANGE:SOLE-SUR
       ^+  +>
-      =^  inv  say.she  (~(transceive sole-lib say.she) cal)
-      =+  fix=(sh-sane inv buf.say.she)
-      ?~  lit.fix
+      =^  INV  SAY.SHE  (~(TRANSCEIVE SOLE-LIB SAY.SHE) CAL)
+      =+  FIX=(SH-SANE INV BUF.SAY.SHE)
+      ?~  LIT.FIX
         +>.$
-      :: just capital correction
-      ?~  err.fix
-        (sh-slug fix)
-      :: allow interior edits and deletes
-      ?.  &(?=($del -.inv) =(+(p.inv) (lent buf.say.she)))
+      :: JUST CAPITAL CORRECTION
+      ?~  ERR.FIX
+        (SH-SLUG FIX)
+      :: ALLOW INTERIOR EDITS AND DELETES
+      ?.  &(?=($DEL -.INV) =(+(P.INV) (LENT BUF.SAY.SHE)))
         +>.$
-      (sh-slug fix)
+      (SH-SLUG FIX)
     ::
-    ++  sh-read
-      ::    command parser
+    ++  SH-READ
+      ::    COMMAND PARSER
       ::
-      ::  parses the command line buffer. produces work
-      ::  items which can be executed by ++sh-work.
+      ::  PARSES THE COMMAND LINE BUFFER. PRODUCES WORK
+      ::  ITEMS WHICH CAN BE EXECUTED BY ++SH-WORK.
       ::
-      =<  work
-      ::  #  %parsers
-      ::    various parsers for command line input.
+      =<  WORK
+      ::  #  %PARSERS
+      ::    VARIOUS PARSERS FOR COMMAND LINE INPUT.
       |%
-      ++  expr
-        ::  [cord hoon]
-        |=  tub/nail  %.  tub
-        %+  stag  (crip q.tub)
-        wide:(vang & [&1:% &2:% (scot %da now.bol) |3:%])
+      ++  EXPR
+        ::  [CORD HOON]
+        |=  TUB/NAIL  %.  TUB
+        %+  STAG  (CRIP Q.TUB)
+        WIDE:(VANG & [&1:% &2:% (SCOT %DA NOW.BOL) |3:%])
       ::
-      ++  dare
-        ::  @dr
-        %+  sear
-          |=  a/coin
-          ?.  ?=({$$ $dr @} a)  ~
-          (some `@dr`+>.a)
-        nuck:so
+      ++  DARE
+        ::  @DR
+        %+  SEAR
+          |=  A/COIN
+          ?.  ?=({$$ $DR @} A)  ~
+          (SOME `@DR`+>.A)
+        NUCK:SO
       ::
-      ++  ship  ;~(pfix sig fed:ag)                     ::  ship
-      ++  shiz                                          ::  ship set
-        %+  cook
-          |=(a/(list ^ship) (~(gas in *(set ^ship)) a))
-        (most ;~(plug com (star ace)) ship)
+      ++  SHIP  ;~(PFIX SIG FED:AG)                     ::  SHIP
+      ++  SHIZ                                          ::  SHIP SET
+        %+  COOK
+          |=(A/(LIST ^SHIP) (~(GAS IN *(SET ^SHIP)) A))
+        (MOST ;~(PLUG COM (STAR ACE)) SHIP)
       ::
-      ++  cire                                          ::  local circle
-        ;~(pfix cen urs:ab)
+      ++  CIRE                                          ::  LOCAL CIRCLE
+        ;~(PFIX CEN URS:AB)
       ::
-      ++  circ                                          ::  circle
-        ;~  pose
-          (cold incir col)
-          ;~(pfix cen (stag self urs:ab))
-          ;~(pfix net (stag (^sein:title self) urs:ab))
+      ++  CIRC                                          ::  CIRCLE
+        ;~  POSE
+          (COLD INCIR COL)
+          ;~(PFIX CEN (STAG SELF URS:AB))
+          ;~(PFIX NET (STAG (^SEIN:TITLE SELF) URS:AB))
         ::
-          %+  cook
-            |=  {a/@p b/(unit term)}
-            [a ?^(b u.b %inbox)]
-          ;~  plug
-            ship
-            (punt ;~(pfix net urs:ab))
+          %+  COOK
+            |=  {A/@P B/(UNIT TERM)}
+            [A ?^(B U.B %INBOX)]
+          ;~  PLUG
+            SHIP
+            (PUNT ;~(PFIX NET URS:AB))
           ==
         ==
       ::
-      ++  circles-flat                                  ::  collapse mixed list
-        |=  a/(list (each circle (set circle)))
-        ^-  (set circle)
-        ?~  a  ~
-        ?-  -.i.a
-          %&  (~(put in $(a t.a)) p.i.a)
-          %|  (~(uni in $(a t.a)) p.i.a)
+      ++  CIRCLES-FLAT                                  ::  COLLAPSE MIXED LIST
+        |=  A/(LIST (EACH CIRCLE (SET CIRCLE)))
+        ^-  (SET CIRCLE)
+        ?~  A  ~
+        ?-  -.I.A
+          %&  (~(PUT IN $(A T.A)) P.I.A)
+          %|  (~(UNI IN $(A T.A)) P.I.A)
         ==
       ::
-      ++  cirs                                          ::  non-empty circles
-        %+  cook  circles-flat
-        %+  most  ;~(plug com (star ace))
-        (^pick circ (sear sh-glyf glyph))
+      ++  CIRS                                          ::  NON-EMPTY CIRCLES
+        %+  COOK  CIRCLES-FLAT
+        %+  MOST  ;~(PLUG COM (STAR ACE))
+        (^PICK CIRC (SEAR SH-GLYF GLYPH))
       ::
-      ++  drat
-        ::  @da or @dr
+      ++  DRAT
+        ::  @DA OR @DR
         ::
-        ::  pas: whether @dr's are in the past or not.
-        |=  pas/?
-        =-  ;~(pfix sig (sear - crub:so))
-        |=  a/^dime
-        ^-  (unit @da)
-        ?+  p.a  ~
-          $da   `q.a
-          $dr   :-  ~
-                %.  [now.bol q.a]
-                ?:(pas sub add)
+        ::  PAS: WHETHER @DR'S ARE IN THE PAST OR NOT.
+        |=  PAS/?
+        =-  ;~(PFIX SIG (SEAR - CRUB:SO))
+        |=  A/^DIME
+        ^-  (UNIT @DA)
+        ?+  P.A  ~
+          $DA   `Q.A
+          $DR   :-  ~
+                %.  [NOW.BOL Q.A]
+                ?:(PAS SUB ADD)
         ==
       ::
-      ++  pont                                          ::  point for range
-        ::  hed: whether this is the head or tail point.
-        |=  hed/?
-        ;~  pose
-          (cold [%da now.bol] (jest 'now'))
-          (stag %da (drat hed))
-          placer
+      ++  PONT                                          ::  POINT FOR RANGE
+        ::  HED: WHETHER THIS IS THE HEAD OR TAIL POINT.
+        |=  HED/?
+        ;~  POSE
+          (COLD [%DA NOW.BOL] (JEST 'NOW'))
+          (STAG %DA (DRAT HED))
+          PLACER
         ==
       ::
-      ++  rang                                          ::  subscription range
-        =+  ;~  pose
-              (cook some ;~(pfix net (pont |)))
-              (easy ~)
+      ++  RANG                                          ::  SUBSCRIPTION RANGE
+        =+  ;~  POSE
+              (COOK SOME ;~(PFIX NET (PONT |)))
+              (EASY ~)
             ==
-        ;~  pose
-          (cook some ;~(plug ;~(pfix net (pont &)) -))
-          (easy ~)
+        ;~  POSE
+          (COOK SOME ;~(PLUG ;~(PFIX NET (PONT &)) -))
+          (EASY ~)
         ==
       ::
-      ++  sorz                                          ::  non-empty sources
-        %+  cook  ~(gas by *(map circle range))
-        (most ;~(plug com (star ace)) ;~(plug circ rang))
+      ++  SORZ                                          ::  NON-EMPTY SOURCES
+        %+  COOK  ~(GAS BY *(MAP CIRCLE RANGE))
+        (MOST ;~(PLUG COM (STAR ACE)) ;~(PLUG CIRC RANG))
       ::
-      ++  pick                                          ::  message reference
-        ;~(pose nump (cook lent (star mic)))
+      ++  PICK                                          ::  MESSAGE REFERENCE
+        ;~(POSE NUMP (COOK LENT (STAR MIC)))
       ::
-      ++  nump                                          ::  number reference
-        ;~  pose
-          ;~(pfix hep dem:ag)
-          ;~  plug
-            (cook lent (plus (just '0')))
-            ;~(pose dem:ag (easy 0))
+      ++  NUMP                                          ::  NUMBER REFERENCE
+        ;~  POSE
+          ;~(PFIX HEP DEM:AG)
+          ;~  PLUG
+            (COOK LENT (PLUS (JUST '0')))
+            ;~(POSE DEM:AG (EASY 0))
           ==
-          (stag 0 dem:ag)
+          (STAG 0 DEM:AG)
         ==
       ::
-      ++  pore                                          ::  security
-        (perk %channel %village %journal %mailbox ~)
+      ++  PORE                                          ::  SECURITY
+        (PERK %CHANNEL %VILLAGE %JOURNAL %MAILBOX ~)
       ::
-      ++  lobe                                          ::  y/n loob
-        ;~  pose
-          (cold %& ;~(pose (jest 'y') (jest '&') (just 'true')))
-          (cold %| ;~(pose (jest 'n') (jest '|') (just 'false')))
+      ++  LOBE                                          ::  Y/N LOOB
+        ;~  POSE
+          (COLD %& ;~(POSE (JEST 'Y') (JEST '&') (JUST 'TRUE')))
+          (COLD %| ;~(POSE (JEST 'N') (JEST '|') (JUST 'FALSE')))
         ==
       ::
-      ++  message                                       ::  exp, lin or url msg
-        ;~  pose
-          ;~(plug (cold %eval hax) expr)
-          (stag %say speeches)
+      ++  MESSAGE                                       ::  EXP, LIN OR URL MSG
+        ;~  POSE
+          ;~(PLUG (COLD %EVAL HAX) EXPR)
+          (STAG %SAY SPEECHES)
         ==
       ::
-      ++  speeches                                      ::  lin or url msgs
-        %+  most  (jest '•')
-        ;~  pose
-          (stag %url aurf:de-purl:html)
-          :(stag %lin & ;~(pfix vat text))
-          :(stag %lin | ;~(less mic hax text))
+      ++  SPEECHES                                      ::  LIN OR URL MSGS
+        %+  MOST  (JEST '•')
+        ;~  POSE
+          (STAG %URL AURF:DE-PURL:HTML)
+          :(STAG %LIN & ;~(PFIX VAT TEXT))
+          :(STAG %LIN | ;~(LESS MIC HAX TEXT))
         ==
       ::
-      ++  text                                          ::  msg without break
-        %+  cook  crip
-        (plus ;~(less (jest '•') next))
+      ++  TEXT                                          ::  MSG WITHOUT BREAK
+        %+  COOK  CRIP
+        (PLUS ;~(LESS (JEST '•') NEXT))
       ::
-      ++  nick  (cook crip (plus next))                 ::  nickname
-      ++  glyph  (mask "/\\\{(<!?{(zing glyphs)}")      ::  circle postfix
-      ++  setting                                       ::  setting flag
-        %-  perk  :~
-          %nicks
-          %quiet
-          %notify
-          %showtime
+      ++  NICK  (COOK CRIP (PLUS NEXT))                 ::  NICKNAME
+      ++  GLYPH  (MASK "/\\\{(<!?{(ZING GLYPHS)}")      ::  CIRCLE POSTFIX
+      ++  SETTING                                       ::  SETTING FLAG
+        %-  PERK  :~
+          %NICKS
+          %QUIET
+          %NOTIFY
+          %SHOWTIME
         ==
-      ++  work                                          ::  full input
-        %+  knee  *^work  |.  ~+
-        =-  ;~(pose ;~(pfix mic -) message)
-        ;~  pose
+      ++  WORK                                          ::  FULL INPUT
+        %+  KNEE  *^WORK  |.  ~+
+        =-  ;~(POSE ;~(PFIX MIC -) MESSAGE)
+        ;~  POSE
         ::
-        ::  circle management
+        ::  CIRCLE MANAGEMENT
         ::
-          ;~((glue ace) (perk %read ~) cire dem:ag)
+          ;~((GLUE ACE) (PERK %READ ~) CIRE DEM:AG)
         ::
-          ;~((glue ace) (perk %join ~) sorz)
+          ;~((GLUE ACE) (PERK %JOIN ~) SORZ)
         ::
-          ;~((glue ace) (perk %leave ~) cirs)
+          ;~((GLUE ACE) (PERK %LEAVE ~) CIRS)
         ::
-          ;~  (glue ace)  (perk %create ~)
-            pore
-            cire
-            qut
-          ==
-        ::
-          ;~  plug  (perk %delete ~)
-            ;~(pfix ace cire)
-            ;~  pose
-              (cook some ;~(pfix ace qut))
-              (easy ~)
-            ==
+          ;~  (GLUE ACE)  (PERK %CREATE ~)
+            PORE
+            CIRE
+            QUT
           ==
         ::
-          ;~((glue ace) (perk %depict ~) cire qut)
-        ::
-          ;~((glue ace) (perk %filter ~) cire lobe lobe)
-        ::
-          ;~((glue ace) (perk %invite ~) cire shiz)
-        ::
-          ;~((glue ace) (perk %banish ~) cire shiz)
-        ::
-          ;~((glue ace) (perk %source ~) cire sorz)
-        ::
-          ;~((glue ace) (perk %unsource ~) cire sorz)
-          ::TODO  why do these nest-fail when doing perk with multiple?
-        ::
-        ::  personal metadata
-        ::
-          ;~  (glue ace)
-            (perk %attend ~)
-            cirs
-            ;~  pose
-              (cold ~ sig)
-              (cook some (perk %gone %idle %hear %talk ~))
+          ;~  PLUG  (PERK %DELETE ~)
+            ;~(PFIX ACE CIRE)
+            ;~  POSE
+              (COOK SOME ;~(PFIX ACE QUT))
+              (EASY ~)
             ==
           ==
         ::
-          ;~  plug
-            (perk %name ~)
-            ;~(pfix ace cirs)
-            ;~(pfix ace ;~(pose (cook some qut) (cold ~ sig)))
-            ;~  pose
-              ;~  pfix  ace
-                %+  cook  some
-                ;~  pose
-                  ;~((glue ace) qut (cook some qut) qut)
-                  ;~(plug qut (cold ~ ace) qut)
+          ;~((GLUE ACE) (PERK %DEPICT ~) CIRE QUT)
+        ::
+          ;~((GLUE ACE) (PERK %FILTER ~) CIRE LOBE LOBE)
+        ::
+          ;~((GLUE ACE) (PERK %INVITE ~) CIRE SHIZ)
+        ::
+          ;~((GLUE ACE) (PERK %BANISH ~) CIRE SHIZ)
+        ::
+          ;~((GLUE ACE) (PERK %SOURCE ~) CIRE SORZ)
+        ::
+          ;~((GLUE ACE) (PERK %UNSOURCE ~) CIRE SORZ)
+          ::TODO  WHY DO THESE NEST-FAIL WHEN DOING PERK WITH MULTIPLE?
+        ::
+        ::  PERSONAL METADATA
+        ::
+          ;~  (GLUE ACE)
+            (PERK %ATTEND ~)
+            CIRS
+            ;~  POSE
+              (COLD ~ SIG)
+              (COOK SOME (PERK %GONE %IDLE %HEAR %TALK ~))
+            ==
+          ==
+        ::
+          ;~  PLUG
+            (PERK %NAME ~)
+            ;~(PFIX ACE CIRS)
+            ;~(PFIX ACE ;~(POSE (COOK SOME QUT) (COLD ~ SIG)))
+            ;~  POSE
+              ;~  PFIX  ACE
+                %+  COOK  SOME
+                ;~  POSE
+                  ;~((GLUE ACE) QUT (COOK SOME QUT) QUT)
+                  ;~(PLUG QUT (COLD ~ ACE) QUT)
                 ==
               ==
-              ;~(pfix ace (cold ~ sig))
-              (easy ~)
+              ;~(PFIX ACE (COLD ~ SIG))
+              (EASY ~)
             ==
           ==
         ::
-        ::  displaying info
+        ::  DISPLAYING INFO
         ::
-          ;~(plug (perk %who ~) ;~(pose ;~(pfix ace cirs) (easy ~)))
+          ;~(PLUG (PERK %WHO ~) ;~(POSE ;~(PFIX ACE CIRS) (EASY ~)))
         ::
-          ;~  plug
-            (perk %what ~)
-            ;~  pose
-              ;~(pfix ace (cook some ;~(pose glyph cirs)))
-              (easy ~)
+          ;~  PLUG
+            (PERK %WHAT ~)
+            ;~  POSE
+              ;~(PFIX ACE (COOK SOME ;~(POSE GLYPH CIRS)))
+              (EASY ~)
             ==
           ==
         ::
-          ;~(plug (perk %circles ~) (easy ~))
+          ;~(PLUG (PERK %CIRCLES ~) (EASY ~))
         ::
-          ;~((glue ace) (perk %sources ~) circ)
+          ;~((GLUE ACE) (PERK %SOURCES ~) CIRC)
         ::
-          ;~((glue ace) (perk %show ~) circ)
+          ;~((GLUE ACE) (PERK %SHOW ~) CIRC)
         ::
-          ;~((glue ace) (perk %hide ~) circ)
+          ;~((GLUE ACE) (PERK %HIDE ~) CIRC)
         ::
-        ::  ui settings
+        ::  UI SETTINGS
         ::
-          ;~(plug (perk %bind ~) ;~(pfix ace glyph) (punt ;~(pfix ace cirs)))
+          ;~(PLUG (PERK %BIND ~) ;~(PFIX ACE GLYPH) (PUNT ;~(PFIX ACE CIRS)))
         ::
-          ;~(plug (perk %unbind ~) ;~(pfix ace glyph) (punt ;~(pfix ace cirs)))
+          ;~(PLUG (PERK %UNBIND ~) ;~(PFIX ACE GLYPH) (PUNT ;~(PFIX ACE CIRS)))
         ::
-          ;~  plug  (perk %nick ~)
-            ;~  pose
-              ;~  plug
-                (cook some ;~(pfix ace ship))
-                (cold (some '') ;~(pfix ace sig))
+          ;~  PLUG  (PERK %NICK ~)
+            ;~  POSE
+              ;~  PLUG
+                (COOK SOME ;~(PFIX ACE SHIP))
+                (COLD (SOME '') ;~(PFIX ACE SIG))
               ==
-              ;~  plug
-                ;~  pose
-                  (cook some ;~(pfix ace ship))
-                  (easy ~)
+              ;~  PLUG
+                ;~  POSE
+                  (COOK SOME ;~(PFIX ACE SHIP))
+                  (EASY ~)
                 ==
-                ;~  pose
-                  (cook some ;~(pfix ace nick))
-                  (easy ~)
+                ;~  POSE
+                  (COOK SOME ;~(PFIX ACE NICK))
+                  (EASY ~)
                 ==
               ==
             ==
           ==
         ::
-          ;~(plug (cold %width (jest 'set width ')) dem:ag)
+          ;~(PLUG (COLD %WIDTH (JEST 'SET WIDTH ')) DEM:AG)
         ::
-          ;~  plug
-            (cold %timez (jest 'set timezone '))
+          ;~  PLUG
+            (COLD %TIMEZ (JEST 'SET TIMEZONE '))
           ::
-            ;~  pose
-              (cold %| (just '-'))
-              (cold %& (just '+'))
+            ;~  POSE
+              (COLD %| (JUST '-'))
+              (COLD %& (JUST '+'))
             ==
           ::
-            %+  sear
-              |=  a/@ud
-              ^-  (unit @ud)
-              ?:  &((gte a 0) (lte a 14))
-              `a  ~
-            dem:ag
+            %+  SEAR
+              |=  A/@UD
+              ^-  (UNIT @UD)
+              ?:  &((GTE A 0) (LTE A 14))
+              `A  ~
+            DEM:AG
           ==
         ::
-          ;~(plug (perk %set ~) ;~(pose ;~(pfix ace setting) (easy %$)))
+          ;~(PLUG (PERK %SET ~) ;~(POSE ;~(PFIX ACE SETTING) (EASY %$)))
         ::
-          ;~(plug (perk %unset ~) ;~(pfix ace setting))
+          ;~(PLUG (PERK %UNSET ~) ;~(PFIX ACE SETTING))
         ::
-        ::  miscellaneous
+        ::  MISCELLANEOUS
         ::
-          ;~(plug (perk %help ~) (easy ~))
+          ;~(PLUG (PERK %HELP ~) (EASY ~))
         ::
-        ::  (parsers below come last because they match quickly)
+        ::  (PARSERS BELOW COME LAST BECAUSE THEY MATCH QUICKLY)
         ::
-        ::  messaging
+        ::  MESSAGING
         ::
-          (stag %target ;~(plug cirs (punt ;~(pfix ace message))))
+          (STAG %TARGET ;~(PLUG CIRS (PUNT ;~(PFIX ACE MESSAGE))))
         ::
-          (stag %reply ;~(plug pick ;~(pfix ace speeches)))
+          (STAG %REPLY ;~(PLUG PICK ;~(PFIX ACE SPEECHES)))
         ::
-        ::  displaying info
+        ::  DISPLAYING INFO
         ::
-          (stag %number pick)
+          (STAG %NUMBER PICK)
         ==
       --
     ::
-    ++  sh-sane
-      ::    sanitize input
+    ++  SH-SANE
+      ::    SANITIZE INPUT
       ::
-      ::  parses cli prompt input using ++sh-read and
-      ::  sanitizes when invalid.
+      ::  PARSES CLI PROMPT INPUT USING ++SH-READ AND
+      ::  SANITIZES WHEN INVALID.
       ::
-      |=  {inv/sole-edit:sole-sur buf/(list @c)}
-      ^-  {lit/(list sole-edit:sole-sur) err/(unit @u)}
-      =+  res=(rose (tufa buf) sh-read)
-      ?:  ?=(%| -.res)  [[inv]~ `p.res]
+      |=  {INV/SOLE-EDIT:SOLE-SUR BUF/(LIST @C)}
+      ^-  {LIT/(LIST SOLE-EDIT:SOLE-SUR) ERR/(UNIT @U)}
+      =+  RES=(ROSE (TUFA BUF) SH-READ)
+      ?:  ?=(%| -.RES)  [[INV]~ `P.RES]
       :_  ~
-      ?~  p.res  ~
-      =+  wok=u.p.res
-      |-  ^-  (list sole-edit:sole-sur)
-      ?+  -.wok
+      ?~  P.RES  ~
+      =+  WOK=U.P.RES
+      |-  ^-  (LIST SOLE-EDIT:SOLE-SUR)
+      ?+  -.WOK
         ~
       ::
-          $target
-        ?~(q.wok ~ $(wok u.q.wok))
+          $TARGET
+        ?~(Q.WOK ~ $(WOK U.Q.WOK))
       ==
     ::
-    ++  sh-slug
-      ::  corrects invalid prompt input.
+    ++  SH-SLUG
+      ::  CORRECTS INVALID PROMPT INPUT.
       ::
-      |=  {lit/(list sole-edit:sole-sur) err/(unit @u)}
+      |=  {LIT/(LIST SOLE-EDIT:SOLE-SUR) ERR/(UNIT @U)}
       ^+  +>
-      ?~  lit  +>
-      =^  lic  say.she
-          (~(transmit sole-lib say.she) `sole-edit:sole-sur`?~(t.lit i.lit [%mor lit]))
-      (sh-fact [%mor [%det lic] ?~(err ~ [%err u.err]~)])
+      ?~  LIT  +>
+      =^  LIC  SAY.SHE
+          (~(TRANSMIT SOLE-LIB SAY.SHE) `SOLE-EDIT:SOLE-SUR`?~(T.LIT I.LIT [%MOR LIT]))
+      (SH-FACT [%MOR [%DET LIC] ?~(ERR ~ [%ERR U.ERR]~)])
     ::
-    ++  sh-obey
-      ::    apply result
+    ++  SH-OBEY
+      ::    APPLY RESULT
       ::
-      ::  called upon hitting return in the prompt. if
-      ::  input is invalid, ++sh-slug is called.
-      ::  otherwise, the appropriate work is done and
-      ::  the entered command (if any) gets displayed
-      ::  to the user.
+      ::  CALLED UPON HITTING RETURN IN THE PROMPT. IF
+      ::  INPUT IS INVALID, ++SH-SLUG IS CALLED.
+      ::  OTHERWISE, THE APPROPRIATE WORK IS DONE AND
+      ::  THE ENTERED COMMAND (IF ANY) GETS DISPLAYED
+      ::  TO THE USER.
       ::
-      =+  fix=(sh-sane [%nop ~] buf.say.she)
-      ?^  lit.fix
-        (sh-slug fix)
-      =+  jub=(rust (tufa buf.say.she) sh-read)
-      ?~  jub  (sh-fact %bel ~)
-      %.  u.jub
-      =<  sh-work
-      =+  buf=buf.say.she
-      =?  ..sh-obey  &(?=({$';' *} buf) !?=($reply -.u.jub))
-        (sh-note (tufa `(list @)`buf))
-      =^  cal  say.she  (~(transmit sole-lib say.she) [%set ~])
-      %+  sh-fact  %mor
-      :~  [%nex ~]
-          [%det cal]
+      =+  FIX=(SH-SANE [%NOP ~] BUF.SAY.SHE)
+      ?^  LIT.FIX
+        (SH-SLUG FIX)
+      =+  JUB=(RUST (TUFA BUF.SAY.SHE) SH-READ)
+      ?~  JUB  (SH-FACT %BEL ~)
+      %.  U.JUB
+      =<  SH-WORK
+      =+  BUF=BUF.SAY.SHE
+      =?  ..SH-OBEY  &(?=({$';' *} BUF) !?=($REPLY -.U.JUB))
+        (SH-NOTE (TUFA `(LIST @)`BUF))
+      =^  CAL  SAY.SHE  (~(TRANSMIT SOLE-LIB SAY.SHE) [%SET ~])
+      %+  SH-FACT  %MOR
+      :~  [%NEX ~]
+          [%DET CAL]
       ==
     ::
     ::  #
-    ::  #  %user-action
+    ::  #  %USER-ACTION
     ::  #
-    ::    processing user actions.
-    +|  %user-action
+    ::    PROCESSING USER ACTIONS.
+    +|  %USER-ACTION
     ::
-    ++  sh-work
-      ::    do work
+    ++  SH-WORK
+      ::    DO WORK
       ::
-      ::  implements worker arms for different talk
-      ::  commands.
-      ::  worker arms must produce updated state.
+      ::  IMPLEMENTS WORKER ARMS FOR DIFFERENT TALK
+      ::  COMMANDS.
+      ::  WORKER ARMS MUST PRODUCE UPDATED STATE.
       ::
-      |=  job/work
+      |=  JOB/WORK
       ^+  +>
-      =<  work
+      =<  WORK
       |%
       ::
       ::  #
-      ::  #  %helpers
+      ::  #  %HELPERS
       ::  #
-      +|  %helpers
+      +|  %HELPERS
       ::
-      ++  work
-        ::  call correct worker
-        ?-  -.job
-          ::  circle management
-          $join    (join +.job)
-          $leave   (leave +.job)
-          $create  (create +.job)
-          $delete  (delete +.job)
-          $depict  (depict +.job)
-          $filter  (filter +.job)
-          $invite  (permit & +.job)
-          $banish  (permit | +.job)
-          $source  (source & +.job)
-          $unsource  (source | +.job)
-          $read  (read +.job)
-          ::  personal metadata
-          $attend  (attend +.job)
-          $name    (set-name +.job)
-          ::  messaging
-          $say     (say +.job)
-          $eval    (eval +.job)
-          $target  (target +.job)
-          $reply   (reply +.job)
-          ::  displaying info
-          $number  (number +.job)
-          $who     (who +.job)
-          $what    (what +.job)
-          $circles  circles
-          $sources  (list-sources +.job)
-          ::  ui settings
-          $bind    (bind +.job)
-          $unbind  (unbind +.job)
-          $nick    (nick +.job)
-          $set     (wo-set +.job)
-          $unset   (unset +.job)
-          $width   (width +.job)
-          $timez   (timez +.job)
-          ::  miscelaneous
-          $show    (public & +.job)
-          $hide    (public | +.job)
-          $help    help
+      ++  WORK
+        ::  CALL CORRECT WORKER
+        ?-  -.JOB
+          ::  CIRCLE MANAGEMENT
+          $JOIN    (JOIN +.JOB)
+          $LEAVE   (LEAVE +.JOB)
+          $CREATE  (CREATE +.JOB)
+          $DELETE  (DELETE +.JOB)
+          $DEPICT  (DEPICT +.JOB)
+          $FILTER  (FILTER +.JOB)
+          $INVITE  (PERMIT & +.JOB)
+          $BANISH  (PERMIT | +.JOB)
+          $SOURCE  (SOURCE & +.JOB)
+          $UNSOURCE  (SOURCE | +.JOB)
+          $READ  (READ +.JOB)
+          ::  PERSONAL METADATA
+          $ATTEND  (ATTEND +.JOB)
+          $NAME    (SET-NAME +.JOB)
+          ::  MESSAGING
+          $SAY     (SAY +.JOB)
+          $EVAL    (EVAL +.JOB)
+          $TARGET  (TARGET +.JOB)
+          $REPLY   (REPLY +.JOB)
+          ::  DISPLAYING INFO
+          $NUMBER  (NUMBER +.JOB)
+          $WHO     (WHO +.JOB)
+          $WHAT    (WHAT +.JOB)
+          $CIRCLES  CIRCLES
+          $SOURCES  (LIST-SOURCES +.JOB)
+          ::  UI SETTINGS
+          $BIND    (BIND +.JOB)
+          $UNBIND  (UNBIND +.JOB)
+          $NICK    (NICK +.JOB)
+          $SET     (WO-SET +.JOB)
+          $UNSET   (UNSET +.JOB)
+          $WIDTH   (WIDTH +.JOB)
+          $TIMEZ   (TIMEZ +.JOB)
+          ::  MISCELANEOUS
+          $SHOW    (PUBLIC & +.JOB)
+          $HIDE    (PUBLIC | +.JOB)
+          $HELP    HELP
         ==
       ::
-      ++  activate
-        ::  prints message details.
+      ++  ACTIVATE
+        ::  PRINTS MESSAGE DETAILS.
         ::
-        |=  gam/telegram
-        ^+  ..sh-work
-        =+  tay=~(. tr settings.she gam)
-        =.  ..sh-work  (sh-fact tr-fact:tay)
-        sh-prod(active.she aud.gam)
+        |=  GAM/TELEGRAM
+        ^+  ..SH-WORK
+        =+  TAY=~(. TR SETTINGS.SHE GAM)
+        =.  ..SH-WORK  (SH-FACT TR-FACT:TAY)
+        SH-PROD(ACTIVE.SHE AUD.GAM)
       ::
-      ++  deli
-        ::  gets absolute message number from relative.
+      ++  DELI
+        ::  GETS ABSOLUTE MESSAGE NUMBER FROM RELATIVE.
         ::
-        |=  {max/@ud nul/@u fin/@ud}
-        ^-  @ud
-        =+  dog=|-(?:(=(0 fin) 1 (mul 10 $(fin (div fin 10)))))
-        =.  dog  (mul dog (pow 10 nul))
-        =-  ?:((lte - max) - (sub - dog))
-        (add fin (sub max (mod max dog)))
+        |=  {MAX/@UD NUL/@U FIN/@UD}
+        ^-  @UD
+        =+  DOG=|-(?:(=(0 FIN) 1 (MUL 10 $(FIN (DIV FIN 10)))))
+        =.  DOG  (MUL DOG (POW 10 NUL))
+        =-  ?:((LTE - MAX) - (SUB - DOG))
+        (ADD FIN (SUB MAX (MOD MAX DOG)))
       ::
-      ++  set-glyph
-        ::    new glyph binding
+      ++  SET-GLYPH
+        ::    NEW GLYPH BINDING
         ::
-        ::  applies glyph binding to our state and sends
-        ::  an action.
+        ::  APPLIES GLYPH BINDING TO OUR STATE AND SENDS
+        ::  AN ACTION.
         ::
-        |=  {cha/char aud/audience}
-        =:  bound  (~(put by bound) aud cha)
-            binds  (~(put ju binds) cha aud)
+        |=  {CHA/CHAR AUD/AUDIENCE}
+        =:  BOUND  (~(PUT BY BOUND) AUD CHA)
+            BINDS  (~(PUT JU BINDS) CHA AUD)
         ==
-        sh-prod:(sh-act %glyph cha aud &)
+        SH-PROD:(SH-ACT %GLYPH CHA AUD &)
       ::
-      ++  unset-glyph
-        ::    remote old glyph binding
+      ++  UNSET-GLYPH
+        ::    REMOTE OLD GLYPH BINDING
         ::
-        ::  removes either {aud} or all bindings on a
-        ::  glyph and sends an action.
+        ::  REMOVES EITHER {AUD} OR ALL BINDINGS ON A
+        ::  GLYPH AND SENDS AN ACTION.
         ::
-        |=  {cha/char aud/(unit audience)}
-        =/  ole/(set audience)
-          ?^  aud  [u.aud ~ ~]
-          (~(get ju binds) cha)
-        =.  ..sh-work  (sh-act %glyph cha (fall aud ~) |)
-        |-  ^+  ..sh-work
-        ?~  ole  ..sh-work
-        =.  ..sh-work  $(ole l.ole)
-        =.  ..sh-work  $(ole r.ole)
-        %=  ..sh-work
-          bound  (~(del by bound) n.ole)
-          binds  (~(del ju binds) cha n.ole)
-        ==
-      ::
-      ++  reverse-nicks
-        ::  finds all ships whose handle matches {nym}.
-        ::
-        |=  nym/^nick
-        ^-  (list ship)
-        %+  murn  ~(tap by nicks)
-        |=  {p/ship q/^nick}
-        ?.  =(q nym)  ~
-        [~ u=p]
-      ::
-      ++  hoon-head
-        ::    eval data
-        ::
-        ::  makes a vase of environment data to evaluate
-        ::  against (for #-messages).
-        ::
-        ^-  vase
-        !>  ^-  {our/@p now/@da eny/@uvI}
-        [self now.bol (shas %eny eny.bol)]
-      ::
-      ::  #
-      ::  #  %circle-management
-      ::  #
-      +|  %circle-management
-      ::
-      ++  join
-        ::    %join
-        ::
-        ::  change local mailbox config to include
-        ::  subscriptions to {pas}.
-        ::
-        |=  pos/(map circle range)
-        ^+  ..sh-work
-        =+  pas=~(key by pos)
-        =.  ..sh-work
-          sh-prod(active.she pas)
-        ::  default to a day of backlog
-        =.  pos
-          %-  ~(run by pos)
-          |=  r/range
-          ?~(r `[da+(sub now.bol ~d1) ~] r)
-        (sh-act %source inbox & pos)
-      ::
-      ++  leave
-        ::    %leave
-        ::
-        ::  change local mailbox config to exclude
-        ::  subscriptions to {pas}.
-        ::
-        |=  pas/(set circle)
-        ^+  ..sh-work
-        ::  remove *all* sources relating to {pas}.
-        =/  pos
-          %-  ~(gas in *(set ^source))
-          %-  zing
-          =/  sos
-            =-  ~(tap in src:-)
-            (fall (~(get by mirrors) incir) *config)
-          %+  turn  ~(tap in pas)
-          |=  c/circle
-          %+  skim  sos
-          |=(s/^source =(cir.s c))
-        =.  ..sh-work
-          (sh-act %source inbox | pos)
-        (sh-act %notify pas ~)
-      ::
-      ++  create
-        ::    %create
-        ::
-        ::  creates circle {nom} with specified config.
-        ::
-        |=  {sec/security nom/name txt/cord}
-        ^+  ..sh-work
-        =.  ..sh-work
-          (sh-act %create nom txt sec)
-        (join [[[self nom] ~] ~ ~])
-      ::
-      ++  delete
-        ::    %delete
-        ::
-        ::  deletes our circle {nom}, after optionally
-        ::  sending a last announce message {say}.
-        ::
-        |=  {nom/name say/(unit cord)}
-        ^+  ..sh-work
-        (sh-act %delete nom say)
-      ::
-      ++  depict
-        ::    %depict
-        ::
-        ::  changes the description of {nom} to {txt}.
-        ::
-        |=  {nom/name txt/cord}
-        ^+  ..sh-work
-        (sh-act %depict nom txt)
-      ::
-      ++  permit
-        ::    %invite / %banish
-        ::
-        ::  invites or banishes {sis} to/from our
-        ::  circle {nom}.
-        ::
-        |=  {inv/? nom/name sis/(set ship)}
-        ^+  ..sh-work
-        =.  ..sh-work  (sh-act %permit nom inv sis)
-        =-  (sh-act %phrase - [%inv inv [self nom]]~)
-        %-  ~(rep in sis)
-        |=  {s/ship a/audience}
-        (~(put in a) [s %i])
-      ::
-      ++  filter
-        |=  {nom/name cus/? utf/?}
-        ^+  ..sh-work
-        (sh-act %filter nom cus utf)
-      ::
-      ++  source
-        ::    %source
-        ::
-        ::  adds {pas} to {nom}'s src.
-        ::
-        |=  {sub/? nom/name pos/(map circle range)}
-        ^+  ..sh-work
-        (sh-act %source nom sub pos)
-      ::
-      ++  read
-        ::    %read
-        ::
-        ::  set {red} for {nom}
-        ::
-        |=  {nom/name red/@ud}
-        ^+  ..sh-work
-        (sh-act %read nom red)
-      ::
-      ::  #
-      ::  #  %personal-metadata
-      ::  #
-      +|  %personal-metadata
-      ::
-      ++  attend
-        ::  sets our presence to {pec} for {aud}.
-        ::
-        |=  {aud/audience pec/(unit presence)}
-        ^+  ..sh-work
-        (sh-act %notify aud pec)
-      ::
-      ++  set-name
-        ::  sets our name to {man} for {aud}.
-        ::
-        |=  {aud/audience man/human}
-        ^+  ..sh-work
-        (sh-act %naming aud man)
-      ::
-      ::  #
-      ::  #  %messaging
-      ::  #
-      +|  %messaging
-      ::
-      ++  say
-        ::  sends message.
-        ::
-        |=  sep/(list speech)
-        ^+  ..sh-work
-        (sh-act %phrase active.she sep)
-      ::
-      ++  eval
-        ::    run
-        ::
-        ::  executes {exe} and sends both its code and
-        ::  result.
-        ::
-        |=  {txt/cord exe/hoon}
-        =>  |.([(sell (slap (slop hoon-head seed) exe))]~)
-        =+  tan=p:(mule .)
-        (say [%exp txt tan] ~)
-      ::
-      ++  target
-        ::    %target
-        ::
-        ::  sets messaging target, then execute {woe}.
-        ::
-        |=  {aud/audience woe/(unit ^work)}
-        ^+  ..sh-work
-        =.  ..sh-pact  (sh-pact aud)
-        ?~(woe ..sh-work work(job u.woe))
-      ::
-      ++  reply
-        ::    %reply
-        ::
-        ::  send a reply to the selected message.
-        ::
-        |=  {num/$@(@ud {p/@u q/@ud}) sep/(list speech)}
-        ^+  ..sh-work
-        ::  =- (say (turn ... [%ire - s])) nest-fails on the - ???
-        ::TODO  what's friendlier, reply-to-null or error?
-        =/  ser/serial
-          ?@  num
-            ?:  (gte num count)  0v0
-            uid:(snag num grams)
-          ?:  (gth q.num count)  0v0
-          ?:  =(count 0)  0v0
-          =+  msg=(deli (dec count) num)
-          uid:(snag (sub count +(msg)) grams)
-        (say (turn sep |=(s/speech [%ire ser s])))
-      ::
-      ::  #
-      ::  #  %displaying-info
-      ::  #
-      +|  %displaying-info
-      ::
-      ++  who
-        ::    %who
-        ::
-        ::  prints presence lists for {cis} or all.
-        ::
-        |=  cis/(set circle)  ^+  ..sh-work
-        =<  (sh-fact %mor (murn (sort ~(tap by remotes) aor) .))
-        |=  {cir/circle gop/group}  ^-  (unit sole-effect:sole-sur)
-        ?.  |(=(~ cis) (~(has in cis) cir))  ~
-        ?:  =(%mailbox sec.con:(fall (~(get by mirrors) cir) *config))  ~
-        ?.  (~(has in sources) cir)  ~
-        =-  `[%tan rose+[", " `~]^- leaf+~(cr-full cr cir) ~]
-        =<  (murn (sort ~(tap by gop) aor) .)
-        |=  {a/ship b/presence c/human}  ^-  (unit tank)
-        =?  c  =(han.c `(scot %p a))  [~ tru.c]
-        ?-  b
-          $gone  ~
-          $idle  `leaf+:(weld "idle " (scow %p a) " " (trip (fall han.c '')))
-          $hear  `leaf+:(weld "hear " (scow %p a) " " (trip (fall han.c '')))
-          $talk  `leaf+:(weld "talk " (scow %p a) " " (trip (fall han.c '')))
+        |=  {CHA/CHAR AUD/(UNIT AUDIENCE)}
+        =/  OLE/(SET AUDIENCE)
+          ?^  AUD  [U.AUD ~ ~]
+          (~(GET JU BINDS) CHA)
+        =.  ..SH-WORK  (SH-ACT %GLYPH CHA (FALL AUD ~) |)
+        |-  ^+  ..SH-WORK
+        ?~  OLE  ..SH-WORK
+        =.  ..SH-WORK  $(OLE L.OLE)
+        =.  ..SH-WORK  $(OLE R.OLE)
+        %=  ..SH-WORK
+          BOUND  (~(DEL BY BOUND) N.OLE)
+          BINDS  (~(DEL JU BINDS) CHA N.OLE)
         ==
       ::
-      ++  what
-        ::    %what
+      ++  REVERSE-NICKS
+        ::  FINDS ALL SHIPS WHOSE HANDLE MATCHES {NYM}.
         ::
-        ::  prints binding details. goes both ways.
+        |=  NYM/^NICK
+        ^-  (LIST SHIP)
+        %+  MURN  ~(TAP BY NICKS)
+        |=  {P/SHIP Q/^NICK}
+        ?.  =(Q NYM)  ~
+        [~ U=P]
+      ::
+      ++  HOON-HEAD
+        ::    EVAL DATA
         ::
-        |=  qur/(unit $@(char audience))
-        ^+  ..sh-work
-        ?^  qur
-          ?^  u.qur
-            =+  cha=(~(get by bound) u.qur)
-            (sh-fact %txt ?~(cha "none" [u.cha]~))
-          =+  pan=~(tap in (~(get ju binds) u.qur))
-          ?:  =(~ pan)  (sh-fact %txt "~")
-          =<  (sh-fact %mor (turn pan .))
-          |=(a/audience [%txt ~(ar-phat ar a)])
-        %+  sh-fact  %mor
-        %-  ~(rep by binds)
-        |=  $:  {gyf/char aus/(set audience)}
-                lis/(list sole-effect:sole-sur)
+        ::  MAKES A VASE OF ENVIRONMENT DATA TO EVALUATE
+        ::  AGAINST (FOR #-MESSAGES).
+        ::
+        ^-  VASE
+        !>  ^-  {OUR/@P NOW/@DA ENY/@UVI}
+        [SELF NOW.BOL (SHAS %ENY ENY.BOL)]
+      ::
+      ::  #
+      ::  #  %CIRCLE-MANAGEMENT
+      ::  #
+      +|  %CIRCLE-MANAGEMENT
+      ::
+      ++  JOIN
+        ::    %JOIN
+        ::
+        ::  CHANGE LOCAL MAILBOX CONFIG TO INCLUDE
+        ::  SUBSCRIPTIONS TO {PAS}.
+        ::
+        |=  POS/(MAP CIRCLE RANGE)
+        ^+  ..SH-WORK
+        =+  PAS=~(KEY BY POS)
+        =.  ..SH-WORK
+          SH-PROD(ACTIVE.SHE PAS)
+        ::  DEFAULT TO A DAY OF BACKLOG
+        =.  POS
+          %-  ~(RUN BY POS)
+          |=  R/RANGE
+          ?~(R `[DA+(SUB NOW.BOL ~D1) ~] R)
+        (SH-ACT %SOURCE INBOX & POS)
+      ::
+      ++  LEAVE
+        ::    %LEAVE
+        ::
+        ::  CHANGE LOCAL MAILBOX CONFIG TO EXCLUDE
+        ::  SUBSCRIPTIONS TO {PAS}.
+        ::
+        |=  PAS/(SET CIRCLE)
+        ^+  ..SH-WORK
+        ::  REMOVE *ALL* SOURCES RELATING TO {PAS}.
+        =/  POS
+          %-  ~(GAS IN *(SET ^SOURCE))
+          %-  ZING
+          =/  SOS
+            =-  ~(TAP IN SRC:-)
+            (FALL (~(GET BY MIRRORS) INCIR) *CONFIG)
+          %+  TURN  ~(TAP IN PAS)
+          |=  C/CIRCLE
+          %+  SKIM  SOS
+          |=(S/^SOURCE =(CIR.S C))
+        =.  ..SH-WORK
+          (SH-ACT %SOURCE INBOX | POS)
+        (SH-ACT %NOTIFY PAS ~)
+      ::
+      ++  CREATE
+        ::    %CREATE
+        ::
+        ::  CREATES CIRCLE {NOM} WITH SPECIFIED CONFIG.
+        ::
+        |=  {SEC/SECURITY NOM/NAME TXT/CORD}
+        ^+  ..SH-WORK
+        =.  ..SH-WORK
+          (SH-ACT %CREATE NOM TXT SEC)
+        (JOIN [[[SELF NOM] ~] ~ ~])
+      ::
+      ++  DELETE
+        ::    %DELETE
+        ::
+        ::  DELETES OUR CIRCLE {NOM}, AFTER OPTIONALLY
+        ::  SENDING A LAST ANNOUNCE MESSAGE {SAY}.
+        ::
+        |=  {NOM/NAME SAY/(UNIT CORD)}
+        ^+  ..SH-WORK
+        (SH-ACT %DELETE NOM SAY)
+      ::
+      ++  DEPICT
+        ::    %DEPICT
+        ::
+        ::  CHANGES THE DESCRIPTION OF {NOM} TO {TXT}.
+        ::
+        |=  {NOM/NAME TXT/CORD}
+        ^+  ..SH-WORK
+        (SH-ACT %DEPICT NOM TXT)
+      ::
+      ++  PERMIT
+        ::    %INVITE / %BANISH
+        ::
+        ::  INVITES OR BANISHES {SIS} TO/FROM OUR
+        ::  CIRCLE {NOM}.
+        ::
+        |=  {INV/? NOM/NAME SIS/(SET SHIP)}
+        ^+  ..SH-WORK
+        =.  ..SH-WORK  (SH-ACT %PERMIT NOM INV SIS)
+        =-  (SH-ACT %PHRASE - [%INV INV [SELF NOM]]~)
+        %-  ~(REP IN SIS)
+        |=  {S/SHIP A/AUDIENCE}
+        (~(PUT IN A) [S %I])
+      ::
+      ++  FILTER
+        |=  {NOM/NAME CUS/? UTF/?}
+        ^+  ..SH-WORK
+        (SH-ACT %FILTER NOM CUS UTF)
+      ::
+      ++  SOURCE
+        ::    %SOURCE
+        ::
+        ::  ADDS {PAS} TO {NOM}'S SRC.
+        ::
+        |=  {SUB/? NOM/NAME POS/(MAP CIRCLE RANGE)}
+        ^+  ..SH-WORK
+        (SH-ACT %SOURCE NOM SUB POS)
+      ::
+      ++  READ
+        ::    %READ
+        ::
+        ::  SET {RED} FOR {NOM}
+        ::
+        |=  {NOM/NAME RED/@UD}
+        ^+  ..SH-WORK
+        (SH-ACT %READ NOM RED)
+      ::
+      ::  #
+      ::  #  %PERSONAL-METADATA
+      ::  #
+      +|  %PERSONAL-METADATA
+      ::
+      ++  ATTEND
+        ::  SETS OUR PRESENCE TO {PEC} FOR {AUD}.
+        ::
+        |=  {AUD/AUDIENCE PEC/(UNIT PRESENCE)}
+        ^+  ..SH-WORK
+        (SH-ACT %NOTIFY AUD PEC)
+      ::
+      ++  SET-NAME
+        ::  SETS OUR NAME TO {MAN} FOR {AUD}.
+        ::
+        |=  {AUD/AUDIENCE MAN/HUMAN}
+        ^+  ..SH-WORK
+        (SH-ACT %NAMING AUD MAN)
+      ::
+      ::  #
+      ::  #  %MESSAGING
+      ::  #
+      +|  %MESSAGING
+      ::
+      ++  SAY
+        ::  SENDS MESSAGE.
+        ::
+        |=  SEP/(LIST SPEECH)
+        ^+  ..SH-WORK
+        (SH-ACT %PHRASE ACTIVE.SHE SEP)
+      ::
+      ++  EVAL
+        ::    RUN
+        ::
+        ::  EXECUTES {EXE} AND SENDS BOTH ITS CODE AND
+        ::  RESULT.
+        ::
+        |=  {TXT/CORD EXE/HOON}
+        =>  |.([(SELL (SLAP (SLOP HOON-HEAD SEED) EXE))]~)
+        =+  TAN=P:(MULE .)
+        (SAY [%EXP TXT TAN] ~)
+      ::
+      ++  TARGET
+        ::    %TARGET
+        ::
+        ::  SETS MESSAGING TARGET, THEN EXECUTE {WOE}.
+        ::
+        |=  {AUD/AUDIENCE WOE/(UNIT ^WORK)}
+        ^+  ..SH-WORK
+        =.  ..SH-PACT  (SH-PACT AUD)
+        ?~(WOE ..SH-WORK WORK(JOB U.WOE))
+      ::
+      ++  REPLY
+        ::    %REPLY
+        ::
+        ::  SEND A REPLY TO THE SELECTED MESSAGE.
+        ::
+        |=  {NUM/$@(@UD {P/@U Q/@UD}) SEP/(LIST SPEECH)}
+        ^+  ..SH-WORK
+        ::  =- (SAY (TURN ... [%IRE - S])) NEST-FAILS ON THE - ???
+        ::TODO  WHAT'S FRIENDLIER, REPLY-TO-NULL OR ERROR?
+        =/  SER/SERIAL
+          ?@  NUM
+            ?:  (GTE NUM COUNT)  0V0
+            UID:(SNAG NUM GRAMS)
+          ?:  (GTH Q.NUM COUNT)  0V0
+          ?:  =(COUNT 0)  0V0
+          =+  MSG=(DELI (DEC COUNT) NUM)
+          UID:(SNAG (SUB COUNT +(MSG)) GRAMS)
+        (SAY (TURN SEP |=(S/SPEECH [%IRE SER S])))
+      ::
+      ::  #
+      ::  #  %DISPLAYING-INFO
+      ::  #
+      +|  %DISPLAYING-INFO
+      ::
+      ++  WHO
+        ::    %WHO
+        ::
+        ::  PRINTS PRESENCE LISTS FOR {CIS} OR ALL.
+        ::
+        |=  CIS/(SET CIRCLE)  ^+  ..SH-WORK
+        =<  (SH-FACT %MOR (MURN (SORT ~(TAP BY REMOTES) AOR) .))
+        |=  {CIR/CIRCLE GOP/GROUP}  ^-  (UNIT SOLE-EFFECT:SOLE-SUR)
+        ?.  |(=(~ CIS) (~(HAS IN CIS) CIR))  ~
+        ?:  =(%MAILBOX SEC.CON:(FALL (~(GET BY MIRRORS) CIR) *CONFIG))  ~
+        ?.  (~(HAS IN SOURCES) CIR)  ~
+        =-  `[%TAN ROSE+[", " `~]^- LEAF+~(CR-FULL CR CIR) ~]
+        =<  (MURN (SORT ~(TAP BY GOP) AOR) .)
+        |=  {A/SHIP B/PRESENCE C/HUMAN}  ^-  (UNIT TANK)
+        =?  C  =(HAN.C `(SCOT %P A))  [~ TRU.C]
+        ?-  B
+          $GONE  ~
+          $IDLE  `LEAF+:(WELD "IDLE " (SCOW %P A) " " (TRIP (FALL HAN.C '')))
+          $HEAR  `LEAF+:(WELD "HEAR " (SCOW %P A) " " (TRIP (FALL HAN.C '')))
+          $TALK  `LEAF+:(WELD "TALK " (SCOW %P A) " " (TRIP (FALL HAN.C '')))
+        ==
+      ::
+      ++  WHAT
+        ::    %WHAT
+        ::
+        ::  PRINTS BINDING DETAILS. GOES BOTH WAYS.
+        ::
+        |=  QUR/(UNIT $@(CHAR AUDIENCE))
+        ^+  ..SH-WORK
+        ?^  QUR
+          ?^  U.QUR
+            =+  CHA=(~(GET BY BOUND) U.QUR)
+            (SH-FACT %TXT ?~(CHA "NONE" [U.CHA]~))
+          =+  PAN=~(TAP IN (~(GET JU BINDS) U.QUR))
+          ?:  =(~ PAN)  (SH-FACT %TXT "~")
+          =<  (SH-FACT %MOR (TURN PAN .))
+          |=(A/AUDIENCE [%TXT ~(AR-PHAT AR A)])
+        %+  SH-FACT  %MOR
+        %-  ~(REP BY BINDS)
+        |=  $:  {GYF/CHAR AUS/(SET AUDIENCE)}
+                LIS/(LIST SOLE-EFFECT:SOLE-SUR)
             ==
-        %+  weld  lis
-        ^-  (list sole-effect:sole-sur)
-        %-  ~(rep in aus)
-        |=  {a/audience l/(list sole-effect:sole-sur)}
-        %+  weld  l
-        ^-  (list sole-effect:sole-sur)
-        [%txt [gyf ' ' ~(ar-phat ar a)]]~
+        %+  WELD  LIS
+        ^-  (LIST SOLE-EFFECT:SOLE-SUR)
+        %-  ~(REP IN AUS)
+        |=  {A/AUDIENCE L/(LIST SOLE-EFFECT:SOLE-SUR)}
+        %+  WELD  L
+        ^-  (LIST SOLE-EFFECT:SOLE-SUR)
+        [%TXT [GYF ' ' ~(AR-PHAT AR A)]]~
       ::
-      ++  number
-        ::    %number
+      ++  NUMBER
+        ::    %NUMBER
         ::
-        ::  finds selected message, expand it.
+        ::  FINDS SELECTED MESSAGE, EXPAND IT.
         ::
-        |=  num/$@(@ud {p/@u q/@ud})
-        ^+  ..sh-work
+        |=  NUM/$@(@UD {P/@U Q/@UD})
+        ^+  ..SH-WORK
         |-
-        ?@  num
-          ?:  (gte num count)
-            (sh-lame "{(scow %s (new:si | +(num)))}: no such telegram")
-          =.  ..sh-fact  (sh-fact %txt "? {(scow %s (new:si | +(num)))}")
-          (activate (snag num grams))
-        ?.  (gte q.num count)
-          ?:  =(count 0)
-            (sh-lame "0: no messages")
-          =+  msg=(deli (dec count) num)
-          =.  ..sh-fact  (sh-fact %txt "? {(scow %ud msg)}")
-          (activate (snag (sub count +(msg)) grams))
-        (sh-lame "…{(reap p.num '0')}{(scow %ud q.num)}: no such telegram")
+        ?@  NUM
+          ?:  (GTE NUM COUNT)
+            (SH-LAME "{(SCOW %S (NEW:SI | +(NUM)))}: NO SUCH TELEGRAM")
+          =.  ..SH-FACT  (SH-FACT %TXT "? {(SCOW %S (NEW:SI | +(NUM)))}")
+          (ACTIVATE (SNAG NUM GRAMS))
+        ?.  (GTE Q.NUM COUNT)
+          ?:  =(COUNT 0)
+            (SH-LAME "0: NO MESSAGES")
+          =+  MSG=(DELI (DEC COUNT) NUM)
+          =.  ..SH-FACT  (SH-FACT %TXT "? {(SCOW %UD MSG)}")
+          (ACTIVATE (SNAG (SUB COUNT +(MSG)) GRAMS))
+        (SH-LAME "…{(REAP P.NUM '0')}{(SCOW %UD Q.NUM)}: NO SUCH TELEGRAM")
       ::
-      ++  circles
-        ::    %circles
+      ++  CIRCLES
+        ::    %CIRCLES
         ::
-        ::  list all local circles.
+        ::  LIST ALL LOCAL CIRCLES.
         ::
-        ^+  ..sh-work
-        =/  piz
-          =-  .^(prize %gx -)
-          %+  weld  /(scot %p our.bol)/hall/(scot %da now.bol)
-          /circles/(scot %p our.bol)/hall-prize
-        ?>  ?=($circles -.piz)
-        %+  sh-fact  %mor
-        %+  turn  (sort ~(tap in cis.piz) lth)
-        |=  a/name  [%txt "%{(trip a)}"]
+        ^+  ..SH-WORK
+        =/  PIZ
+          =-  .^(PRIZE %GX -)
+          %+  WELD  /(SCOT %P OUR.BOL)/HALL/(SCOT %DA NOW.BOL)
+          /CIRCLES/(SCOT %P OUR.BOL)/HALL-PRIZE
+        ?>  ?=($CIRCLES -.PIZ)
+        %+  SH-FACT  %MOR
+        %+  TURN  (SORT ~(TAP IN CIS.PIZ) LTH)
+        |=  A/NAME  [%TXT "%{(TRIP A)}"]
       ::
-      ++  list-sources
-        ::    %sources
+      ++  LIST-SOURCES
+        ::    %SOURCES
         ::
-        ::  display the active sources for our circle.
+        ::  DISPLAY THE ACTIVE SOURCES FOR OUR CIRCLE.
         ::
-        |=  cir/circle
-        ^+  ..sh-work
-        %+  sh-fact  %mor
-        %+  turn
-          ::  make sure to exclude {nom} itself.
-          =-  ~(tap in (~(del in src:-) [cir ~]))
-          (fall (~(get by mirrors) cir) *config)
-        |=  s/^source
-        ^-  sole-effect:sole-sur
-        :-  %txt
-        %+  weld  ~(cr-phat cr cir.s)
-        %+  roll  (range-to-path ran.s)
-        |=  {a/@ta b/tape}
-        :(weld b "/" (trip a))
+        |=  CIR/CIRCLE
+        ^+  ..SH-WORK
+        %+  SH-FACT  %MOR
+        %+  TURN
+          ::  MAKE SURE TO EXCLUDE {NOM} ITSELF.
+          =-  ~(TAP IN (~(DEL IN SRC:-) [CIR ~]))
+          (FALL (~(GET BY MIRRORS) CIR) *CONFIG)
+        |=  S/^SOURCE
+        ^-  SOLE-EFFECT:SOLE-SUR
+        :-  %TXT
+        %+  WELD  ~(CR-PHAT CR CIR.S)
+        %+  ROLL  (RANGE-TO-PATH RAN.S)
+        |=  {A/@TA B/TAPE}
+        :(WELD B "/" (TRIP A))
       ::
       ::  #
-      ::  #  %ui-settings
+      ::  #  %UI-SETTINGS
       ::  #
-      +|  %ui-settings
+      +|  %UI-SETTINGS
       ::
-      ++  bind
-        ::    %bind
+      ++  BIND
+        ::    %BIND
         ::
-        ::  binds targets {aud} to the glyph {cha}.
+        ::  BINDS TARGETS {AUD} TO THE GLYPH {CHA}.
         ::
-        |=  {cha/char aud/(unit audience)}
-        ^+  ..sh-work
-        ?~  aud  $(aud `active.she)
-        =+  ole=(~(get by bound) u.aud)
-        ?:  =(ole [~ cha])  ..sh-work
-        %.  "bound {<cha>} {<u.aud>}"
-        sh-note:sh-prod:(set-glyph cha u.aud)
+        |=  {CHA/CHAR AUD/(UNIT AUDIENCE)}
+        ^+  ..SH-WORK
+        ?~  AUD  $(AUD `ACTIVE.SHE)
+        =+  OLE=(~(GET BY BOUND) U.AUD)
+        ?:  =(OLE [~ CHA])  ..SH-WORK
+        %.  "BOUND {<CHA>} {<U.AUD>}"
+        SH-NOTE:SH-PROD:(SET-GLYPH CHA U.AUD)
       ::
-      ++  unbind
-        ::    %unbind
+      ++  UNBIND
+        ::    %UNBIND
         ::
-        ::  unbinds targets {aud} to glyph {cha}.
+        ::  UNBINDS TARGETS {AUD} TO GLYPH {CHA}.
         ::
-        |=  {cha/char aud/(unit audience)}
-        ^+  ..sh-work
-        ?.  ?|  &(?=(^ aud) (~(has by bound) u.aud))
-                &(?=(~ aud) (~(has by binds) cha))
+        |=  {CHA/CHAR AUD/(UNIT AUDIENCE)}
+        ^+  ..SH-WORK
+        ?.  ?|  &(?=(^ AUD) (~(HAS BY BOUND) U.AUD))
+                &(?=(~ AUD) (~(HAS BY BINDS) CHA))
             ==
-          ..sh-work
-        %.  "unbound {<cha>}"
-        sh-note:sh-prod:(unset-glyph cha aud)
+          ..SH-WORK
+        %.  "UNBOUND {<CHA>}"
+        SH-NOTE:SH-PROD:(UNSET-GLYPH CHA AUD)
       ::
-      ++  nick
-        ::    %nick
+      ++  NICK
+        ::    %NICK
         ::
-        ::  either shows, sets or unsets nicknames
-        ::  depending on arguments.
+        ::  EITHER SHOWS, SETS OR UNSETS NICKNAMES
+        ::  DEPENDING ON ARGUMENTS.
         ::
-        |=  {her/(unit ship) nym/(unit ^nick)}
-        ^+  ..sh-work
-        ::  no arguments, show all
+        |=  {HER/(UNIT SHIP) NYM/(UNIT ^NICK)}
+        ^+  ..SH-WORK
+        ::  NO ARGUMENTS, SHOW ALL
         ?:  ?=({~ ~} +<)
-          %+  sh-fact  %mor
-          %+  turn  ~(tap by nicks)
-          |=  {p/ship q/^nick}
-          :-  %txt
-          "{<p>}: {<q>}"
-        ::  show her nick
-        ?~  nym
-          ?>  ?=(^ her)
-          =+  asc=(~(get by nicks) u.her)
-          %+  sh-fact  %txt
-          ?~  asc  "{<u.her>} unbound"
-          "{<u.her>}: {<u.asc>}"
-        ::  show nick ship
-        ?~  her
-          %+  sh-fact  %mor
-          %+  turn  (reverse-nicks u.nym)
-          |=  p/ship
-          [%txt "{<p>}: {<u.nym>}"]
-        %.  [%nick u.her (fall nym '')]
-        %=  sh-act
-            nicks
-          ?~  u.nym
-            ::  unset nickname
-            (~(del by nicks) u.her)
-          ::  set nickname
-          (~(put by nicks) u.her u.nym)
+          %+  SH-FACT  %MOR
+          %+  TURN  ~(TAP BY NICKS)
+          |=  {P/SHIP Q/^NICK}
+          :-  %TXT
+          "{<P>}: {<Q>}"
+        ::  SHOW HER NICK
+        ?~  NYM
+          ?>  ?=(^ HER)
+          =+  ASC=(~(GET BY NICKS) U.HER)
+          %+  SH-FACT  %TXT
+          ?~  ASC  "{<U.HER>} UNBOUND"
+          "{<U.HER>}: {<U.ASC>}"
+        ::  SHOW NICK SHIP
+        ?~  HER
+          %+  SH-FACT  %MOR
+          %+  TURN  (REVERSE-NICKS U.NYM)
+          |=  P/SHIP
+          [%TXT "{<P>}: {<U.NYM>}"]
+        %.  [%NICK U.HER (FALL NYM '')]
+        %=  SH-ACT
+            NICKS
+          ?~  U.NYM
+            ::  UNSET NICKNAME
+            (~(DEL BY NICKS) U.HER)
+          ::  SET NICKNAME
+          (~(PUT BY NICKS) U.HER U.NYM)
         ==
       ::
-      ++  wo-set
-        ::    %set
+      ++  WO-SET
+        ::    %SET
         ::
-        ::  enables ui setting flag.
+        ::  ENABLES UI SETTING FLAG.
         ::
-        |=  seg/term
-        ^+  ..sh-work
-        ?~  seg
-          %+  sh-fact  %mor
-          %+  turn  ~(tap in settings.she)
-          |=  s/term
-          [%txt (trip s)]
-        %=  ..sh-work
-          settings.she  (~(put in settings.she) seg)
+        |=  SEG/TERM
+        ^+  ..SH-WORK
+        ?~  SEG
+          %+  SH-FACT  %MOR
+          %+  TURN  ~(TAP IN SETTINGS.SHE)
+          |=  S/TERM
+          [%TXT (TRIP S)]
+        %=  ..SH-WORK
+          SETTINGS.SHE  (~(PUT IN SETTINGS.SHE) SEG)
         ==
       ::
-      ++  unset
-        ::    %unset
+      ++  UNSET
+        ::    %UNSET
         ::
-        ::  disables ui setting flag.
+        ::  DISABLES UI SETTING FLAG.
         ::
-        |=  neg/term
-        ^+  ..sh-work
-        %=  ..sh-work
-          settings.she  (~(del in settings.she) neg)
+        |=  NEG/TERM
+        ^+  ..SH-WORK
+        %=  ..SH-WORK
+          SETTINGS.SHE  (~(DEL IN SETTINGS.SHE) NEG)
         ==
       ::
-      ++  width
-        ::    ;set width
+      ++  WIDTH
+        ::    ;SET WIDTH
         ::
-        ::  change the display width in cli.
+        ::  CHANGE THE DISPLAY WIDTH IN CLI.
         ::
-        |=  wid/@ud
-        ^+  ..sh-work
-        ..sh-work(width.she (max 30 wid))
+        |=  WID/@UD
+        ^+  ..SH-WORK
+        ..SH-WORK(WIDTH.SHE (MAX 30 WID))
       ::
-      ++  timez
-        ::    ;set timezone
+      ++  TIMEZ
+        ::    ;SET TIMEZONE
         ::
-        ::  adjust the displayed timestamp.
+        ::  ADJUST THE DISPLAYED TIMESTAMP.
         ::
-        |=  tim/(pair ? @ud)
-        ^+  ..sh-work
-        ..sh-work(timez.she tim)
+        |=  TIM/(PAIR ? @UD)
+        ^+  ..SH-WORK
+        ..SH-WORK(TIMEZ.SHE TIM)
       ::
       ::  #
-      ::  #  %miscellaneous
+      ::  #  %MISCELLANEOUS
       ::  #
-      +|  %miscellaneous
+      +|  %MISCELLANEOUS
       ::
-      ++  public
-        ::    show/hide membership
+      ++  PUBLIC
+        ::    SHOW/HIDE MEMBERSHIP
         ::
-        ::  adds or removes the circle from the public
-        ::  membership list.
+        ::  ADDS OR REMOVES THE CIRCLE FROM THE PUBLIC
+        ::  MEMBERSHIP LIST.
         ::
-        |=  {add/? cir/circle}
-        (sh-act %public add cir)
+        |=  {ADD/? CIR/CIRCLE}
+        (SH-ACT %PUBLIC ADD CIR)
       ::
-      ++  help
-        ::    %help
+      ++  HELP
+        ::    %HELP
         ::
-        ::  prints help message
+        ::  PRINTS HELP MESSAGE
         ::
-        (sh-fact %txt "see https://urbit.org/docs/learn/arvo/arvo-internals/messaging/")
+        (SH-FACT %TXT "SEE HTTPS://URBIT.ORG/DOCS/LEARN/ARVO/ARVO-INTERNALS/MESSAGING/")
       --
     ::
-    ++  sh-pact
-      ::    update active aud
+    ++  SH-PACT
+      ::    UPDATE ACTIVE AUD
       ::
-      ::  change currently selected audience to {aud}
-      ::  and update the prompt.
+      ::  CHANGE CURRENTLY SELECTED AUDIENCE TO {AUD}
+      ::  AND UPDATE THE PROMPT.
       ::
-      |=  aud/audience
+      |=  AUD/AUDIENCE
       ^+  +>
-      ::  ensure we can see what we send.
-      =+  act=(sh-pare aud)
-      ?:  =(active.she act)  +>.$
-      sh-prod(active.she act)
+      ::  ENSURE WE CAN SEE WHAT WE SEND.
+      =+  ACT=(SH-PARE AUD)
+      ?:  =(ACTIVE.SHE ACT)  +>.$
+      SH-PROD(ACTIVE.SHE ACT)
     ::
-    ++  sh-pare
-      ::    adjust target list
+    ++  SH-PARE
+      ::    ADJUST TARGET LIST
       ::
-      ::  if the audience {aud} does not contain a
-      ::  circle we're subscribed to, add our mailbox
-      ::  to the audience (so that we can see our own
-      ::  message).
+      ::  IF THE AUDIENCE {AUD} DOES NOT CONTAIN A
+      ::  CIRCLE WE'RE SUBSCRIBED TO, ADD OUR MAILBOX
+      ::  TO THE AUDIENCE (SO THAT WE CAN SEE OUR OWN
+      ::  MESSAGE).
       ::
-      |=  aud/audience
-      ?:  (sh-pear aud)  aud
-      (~(put in aud) incir)
+      |=  AUD/AUDIENCE
+      ?:  (SH-PEAR AUD)  AUD
+      (~(PUT IN AUD) INCIR)
     ::
-    ++  sh-pear
-      ::    hearback
+    ++  SH-PEAR
+      ::    HEARBACK
       ::
-      ::  produces true if any circle is included in
-      ::  our subscriptions, meaning, we hear messages
-      ::  sent to {aud}.
+      ::  PRODUCES TRUE IF ANY CIRCLE IS INCLUDED IN
+      ::  OUR SUBSCRIPTIONS, MEANING, WE HEAR MESSAGES
+      ::  SENT TO {AUD}.
       ::
-      |=  aud/audience
-      ?~  aud  |
-      ?|  (~(has in sources) `circle`n.aud)
-          $(aud l.aud)
-          $(aud r.aud)
+      |=  AUD/AUDIENCE
+      ?~  AUD  |
+      ?|  (~(HAS IN SOURCES) `CIRCLE`N.AUD)
+          $(AUD L.AUD)
+          $(AUD R.AUD)
       ==
     ::
-    ++  sh-glyf
-      ::    decode glyph
+    ++  SH-GLYF
+      ::    DECODE GLYPH
       ::
-      ::  finds the circle(s) that match a glyph.
+      ::  FINDS THE CIRCLE(S) THAT MATCH A GLYPH.
       ::
-      |=  cha/char  ^-  (unit audience)
-      =+  lax=(~(get ju binds) cha)
-      ::  no circle.
-      ?:  =(~ lax)  ~
-      ::  single circle.
-      ?:  ?=({* ~ ~} lax)  `n.lax
-      ::  in case of multiple audiences, pick the most recently active one.
-      |-  ^-  (unit audience)
-      ?~  grams  ~
-      ::  get first circle from a telegram's audience.
-      =+  pan=(silt ~(tap in aud.i.grams))
-      ?:  (~(has in lax) pan)  `pan
-      $(grams t.grams)
+      |=  CHA/CHAR  ^-  (UNIT AUDIENCE)
+      =+  LAX=(~(GET JU BINDS) CHA)
+      ::  NO CIRCLE.
+      ?:  =(~ LAX)  ~
+      ::  SINGLE CIRCLE.
+      ?:  ?=({* ~ ~} LAX)  `N.LAX
+      ::  IN CASE OF MULTIPLE AUDIENCES, PICK THE MOST RECENTLY ACTIVE ONE.
+      |-  ^-  (UNIT AUDIENCE)
+      ?~  GRAMS  ~
+      ::  GET FIRST CIRCLE FROM A TELEGRAM'S AUDIENCE.
+      =+  PAN=(SILT ~(TAP IN AUD.I.GRAMS))
+      ?:  (~(HAS IN LAX) PAN)  `PAN
+      $(GRAMS T.GRAMS)
     ::
     ::  #
-    ::  #  %differs
+    ::  #  %DIFFERS
     ::  #
-    ::    arms that calculate differences between datasets.
-    +|  %differs
+    ::    ARMS THAT CALCULATE DIFFERENCES BETWEEN DATASETS.
+    +|  %DIFFERS
     ::
-    ++  sh-group-diff
-      ::    group diff parts
+    ++  SH-GROUP-DIFF
+      ::    GROUP DIFF PARTS
       ::
-      ::  calculates the difference between two presence
-      ::  lists, producing lists of removed, added and
-      ::  changed presences.
+      ::  CALCULATES THE DIFFERENCE BETWEEN TWO PRESENCE
+      ::  LISTS, PRODUCING LISTS OF REMOVED, ADDED AND
+      ::  CHANGED PRESENCES.
       ::
-      |=  {one/group two/group}
-      =|  $=  ret
-          $:  old/(list (pair ship status))
-              new/(list (pair ship status))
-              cha/(list (pair ship status))
+      |=  {ONE/GROUP TWO/GROUP}
+      =|  $=  RET
+          $:  OLD/(LIST (PAIR SHIP STATUS))
+              NEW/(LIST (PAIR SHIP STATUS))
+              CHA/(LIST (PAIR SHIP STATUS))
           ==
-      ^+  ret
-      =.  ret
-        =+  eno=~(tap by one)
-        |-  ^+  ret
-        ?~  eno  ret
-        =.  ret  $(eno t.eno)
-        ?:  =(%gone pec.q.i.eno)  ret
-        =+  unt=(~(get by two) p.i.eno)
-        ?~  unt
-          ret(old [i.eno old.ret])
-        ?:  =(%gone pec.u.unt)
-          ret(old [i.eno old.ret])
-        ?:  =(q.i.eno u.unt)  ret
-        ret(cha [[p.i.eno u.unt] cha.ret])
-      =.  ret
-        =+  owt=~(tap by two)
-        |-  ^+  ret
-        ?~  owt  ret
-        =.  ret  $(owt t.owt)
-        ?:  =(%gone pec.q.i.owt)  ret
-        ?.  (~(has by one) p.i.owt)
-          ret(new [i.owt new.ret])
-        ?:  =(%gone pec:(~(got by one) p.i.owt))
-          ret(new [i.owt new.ret])
-        ret
-      ret
+      ^+  RET
+      =.  RET
+        =+  ENO=~(TAP BY ONE)
+        |-  ^+  RET
+        ?~  ENO  RET
+        =.  RET  $(ENO T.ENO)
+        ?:  =(%GONE PEC.Q.I.ENO)  RET
+        =+  UNT=(~(GET BY TWO) P.I.ENO)
+        ?~  UNT
+          RET(OLD [I.ENO OLD.RET])
+        ?:  =(%GONE PEC.U.UNT)
+          RET(OLD [I.ENO OLD.RET])
+        ?:  =(Q.I.ENO U.UNT)  RET
+        RET(CHA [[P.I.ENO U.UNT] CHA.RET])
+      =.  RET
+        =+  OWT=~(TAP BY TWO)
+        |-  ^+  RET
+        ?~  OWT  RET
+        =.  RET  $(OWT T.OWT)
+        ?:  =(%GONE PEC.Q.I.OWT)  RET
+        ?.  (~(HAS BY ONE) P.I.OWT)
+          RET(NEW [I.OWT NEW.RET])
+        ?:  =(%GONE PEC:(~(GOT BY ONE) P.I.OWT))
+          RET(NEW [I.OWT NEW.RET])
+        RET
+      RET
     ::
-    ++  sh-rempe-diff
-      ::    remotes diff
+    ++  SH-REMPE-DIFF
+      ::    REMOTES DIFF
       ::
-      ::  calculates the difference between two remote
-      ::  presence maps, producing a list of removed,
-      ::  added and changed presences maps.
+      ::  CALCULATES THE DIFFERENCE BETWEEN TWO REMOTE
+      ::  PRESENCE MAPS, PRODUCING A LIST OF REMOVED,
+      ::  ADDED AND CHANGED PRESENCES MAPS.
       ::
-      |=  {one/(map circle group) two/(map circle group)}
-      =|  $=  ret
-          $:  old/(list (pair circle group))
-              new/(list (pair circle group))
-              cha/(list (pair circle group))
+      |=  {ONE/(MAP CIRCLE GROUP) TWO/(MAP CIRCLE GROUP)}
+      =|  $=  RET
+          $:  OLD/(LIST (PAIR CIRCLE GROUP))
+              NEW/(LIST (PAIR CIRCLE GROUP))
+              CHA/(LIST (PAIR CIRCLE GROUP))
           ==
-      ^+  ret
-      =.  ret
-        =+  eno=~(tap by one)
-        |-  ^+  ret
-        ?~  eno  ret
-        =.  ret  $(eno t.eno)
-        =+  unt=(~(get by two) p.i.eno)
-        ?~  unt
-          ret(old [i.eno old.ret])
-        ?:  =(q.i.eno u.unt)  ret
-        ret(cha [[p.i.eno u.unt] cha.ret])
-      =.  ret
-        =+  owt=~(tap by two)
-        |-  ^+  ret
-        ?~  owt  ret
-        =.  ret  $(owt t.owt)
-        ?:  (~(has by one) p.i.owt)
-          ret
-        ret(new [i.owt new.ret])
-      ret
+      ^+  RET
+      =.  RET
+        =+  ENO=~(TAP BY ONE)
+        |-  ^+  RET
+        ?~  ENO  RET
+        =.  RET  $(ENO T.ENO)
+        =+  UNT=(~(GET BY TWO) P.I.ENO)
+        ?~  UNT
+          RET(OLD [I.ENO OLD.RET])
+        ?:  =(Q.I.ENO U.UNT)  RET
+        RET(CHA [[P.I.ENO U.UNT] CHA.RET])
+      =.  RET
+        =+  OWT=~(TAP BY TWO)
+        |-  ^+  RET
+        ?~  OWT  RET
+        =.  RET  $(OWT T.OWT)
+        ?:  (~(HAS BY ONE) P.I.OWT)
+          RET
+        RET(NEW [I.OWT NEW.RET])
+      RET
     ::
-    ++  sh-remco-diff
-      ::    config diff parts
+    ++  SH-REMCO-DIFF
+      ::    CONFIG DIFF PARTS
       ::
-      ::  calculates the difference between two config
-      ::  maps, producing lists of removed, added and
-      ::  changed configs.
+      ::  CALCULATES THE DIFFERENCE BETWEEN TWO CONFIG
+      ::  MAPS, PRODUCING LISTS OF REMOVED, ADDED AND
+      ::  CHANGED CONFIGS.
       ::
-      |=  {one/(map circle config) two/(map circle config)}
-      =|  $=  ret
-          $:  old/(list (pair circle config))
-              new/(list (pair circle config))
-              cha/(list (pair circle config))
+      |=  {ONE/(MAP CIRCLE CONFIG) TWO/(MAP CIRCLE CONFIG)}
+      =|  $=  RET
+          $:  OLD/(LIST (PAIR CIRCLE CONFIG))
+              NEW/(LIST (PAIR CIRCLE CONFIG))
+              CHA/(LIST (PAIR CIRCLE CONFIG))
           ==
-      ^+  ret
-      =.  ret
-        =+  eno=~(tap by one)
-        |-  ^+  ret
-        ?~  eno  ret
-        =.  ret  $(eno t.eno)
-        =+  unt=(~(get by two) p.i.eno)
-        ?~  unt
-          ret(old [i.eno old.ret])
-        ?:  =(q.i.eno u.unt)  ret
-        ret(cha [[p.i.eno u.unt] cha.ret])
-      =.  ret
-        =+  owt=~(tap by two)
-        |-  ^+  ret
-        ?~  owt  ret
-        =.  ret  $(owt t.owt)
-        ?:  (~(has by one) p.i.owt)
-          ret
-        ret(new [i.owt new.ret])
-      ret
+      ^+  RET
+      =.  RET
+        =+  ENO=~(TAP BY ONE)
+        |-  ^+  RET
+        ?~  ENO  RET
+        =.  RET  $(ENO T.ENO)
+        =+  UNT=(~(GET BY TWO) P.I.ENO)
+        ?~  UNT
+          RET(OLD [I.ENO OLD.RET])
+        ?:  =(Q.I.ENO U.UNT)  RET
+        RET(CHA [[P.I.ENO U.UNT] CHA.RET])
+      =.  RET
+        =+  OWT=~(TAP BY TWO)
+        |-  ^+  RET
+        ?~  OWT  RET
+        =.  RET  $(OWT T.OWT)
+        ?:  (~(HAS BY ONE) P.I.OWT)
+          RET
+        RET(NEW [I.OWT NEW.RET])
+      RET
     ::
-    ++  sh-set-diff
-      ::    set diff
+    ++  SH-SET-DIFF
+      ::    SET DIFF
       ::
-      ::  calculates the difference between two sets,
-      ::  procuding lists of removed and added items.
+      ::  CALCULATES THE DIFFERENCE BETWEEN TWO SETS,
+      ::  PROCUDING LISTS OF REMOVED AND ADDED ITEMS.
       ::
-      |*  {one/(set *) two/(set *)}
-      :-  ^=  old  ~(tap in (~(dif in one) two))
-          ^=  new  ~(tap in (~(dif in two) one))
+      |*  {ONE/(SET *) TWO/(SET *)}
+      :-  ^=  OLD  ~(TAP IN (~(DIF IN ONE) TWO))
+          ^=  NEW  ~(TAP IN (~(DIF IN TWO) ONE))
     ::
     ::  #
-    ::  #  %printers
+    ::  #  %PRINTERS
     ::  #
-    ::    arms for printing data to the cli.
-    +|  %printers
+    ::    ARMS FOR PRINTING DATA TO THE CLI.
+    +|  %PRINTERS
     ::
-    ++  sh-lame
-      ::    send error
+    ++  SH-LAME
+      ::    SEND ERROR
       ::
-      ::  just puts some text into the cli as-is.
+      ::  JUST PUTS SOME TEXT INTO THE CLI AS-IS.
       ::
-      |=  txt/tape
-      (sh-fact [%txt txt])
+      |=  TXT/TAPE
+      (SH-FACT [%TXT TXT])
     ::
-    ++  sh-note
-      ::    shell message
+    ++  SH-NOTE
+      ::    SHELL MESSAGE
       ::
-      ::  left-pads {txt} with heps and prints it.
+      ::  LEFT-PADS {TXT} WITH HEPS AND PRINTS IT.
       ::
-      |=  txt/tape
+      |=  TXT/TAPE
       ^+  +>
-      =+  lis=(simple-wrap txt (sub width.she 16))
-      %+  sh-fact  %mor
-      =+  ?:((gth (lent lis) 0) (snag 0 lis) "")
-      :-  txt+(runt [14 '-'] '|' ' ' -)
-      %+  turn  (slag 1 lis)
-      |=(a/tape txt+(runt [14 ' '] '|' ' ' a))
+      =+  LIS=(SIMPLE-WRAP TXT (SUB WIDTH.SHE 16))
+      %+  SH-FACT  %MOR
+      =+  ?:((GTH (LENT LIS) 0) (SNAG 0 LIS) "")
+      :-  TXT+(RUNT [14 '-'] '|' ' ' -)
+      %+  TURN  (SLAG 1 LIS)
+      |=(A/TAPE TXT+(RUNT [14 ' '] '|' ' ' A))
     ::
-    ++  sh-prod
-      ::    show prompt
+    ++  SH-PROD
+      ::    SHOW PROMPT
       ::
-      ::  makes and stores a move to modify the cli
-      ::  prompt to display the current audience.
+      ::  MAKES AND STORES A MOVE TO MODIFY THE CLI
+      ::  PROMPT TO DISPLAY THE CURRENT AUDIENCE.
       ::
       ^+  .
-      %+  sh-fact  %pro
-      :+  &  %talk-line
-      ^-  tape
-      =/  rew/(pair (pair cord cord) audience)
-          [['[' ']'] active.she]
-      =+  cha=(~(get by bound) q.rew)
-      ?^  cha  ~[u.cha ' ']
-      =+  por=~(ar-prom ar q.rew)
-      (weld `tape`[p.p.rew por] `tape`[q.p.rew ' ' ~])
+      %+  SH-FACT  %PRO
+      :+  &  %TALK-LINE
+      ^-  TAPE
+      =/  REW/(PAIR (PAIR CORD CORD) AUDIENCE)
+          [['[' ']'] ACTIVE.SHE]
+      =+  CHA=(~(GET BY BOUND) Q.REW)
+      ?^  CHA  ~[U.CHA ' ']
+      =+  POR=~(AR-PROM AR Q.REW)
+      (WELD `TAPE`[P.P.REW POR] `TAPE`[Q.P.REW ' ' ~])
     ::
-    ++  sh-rend
-      ::  prints a telegram as rendered by ++tr-rend.
+    ++  SH-REND
+      ::  PRINTS A TELEGRAM AS RENDERED BY ++TR-REND.
       ::
-      |=  gam/telegram
+      |=  GAM/TELEGRAM
       ^+  +>
-      =+  lis=~(tr-rend tr settings.she gam)
-      ?~  lis  +>.$
-      %+  sh-fact  %mor
-      %+  turn  `(list tape)`lis
-      =+  nom=(scag 7 (cite:title self))
-      |=  t/tape
-      ?.  ?&  (~(has in settings.she) %notify)
-              ?=(^ (find nom (slag 15 t)))
+      =+  LIS=~(TR-REND TR SETTINGS.SHE GAM)
+      ?~  LIS  +>.$
+      %+  SH-FACT  %MOR
+      %+  TURN  `(LIST TAPE)`LIS
+      =+  NOM=(SCAG 7 (CITE:TITLE SELF))
+      |=  T/TAPE
+      ?.  ?&  (~(HAS IN SETTINGS.SHE) %NOTIFY)
+              ?=(^ (FIND NOM (SLAG 15 T)))
           ==
-        [%txt t]
-      [%mor [%txt t] [%bel ~] ~]
+        [%TXT T]
+      [%MOR [%TXT T] [%BEL ~] ~]
     ::
-    ++  sh-numb
-      ::  prints a message number, left-padded by heps.
+    ++  SH-NUMB
+      ::  PRINTS A MESSAGE NUMBER, LEFT-PADDED BY HEPS.
       ::
-      |=  num/@ud
+      |=  NUM/@UD
       ^+  +>
-      =+  bun=(scow %ud num)
-      %+  sh-fact  %txt
-      (runt [(sub 13 (lent bun)) '-'] "[{bun}]")
+      =+  BUN=(SCOW %UD NUM)
+      %+  SH-FACT  %TXT
+      (RUNT [(SUB 13 (LENT BUN)) '-'] "[{BUN}]")
     ::
-    ++  sh-cure
-      ::  renders a security kind.
+    ++  SH-CURE
+      ::  RENDERS A SECURITY KIND.
       ::
-      |=  a/security
-      ^-  tape
-      (scow %tas a)
+      |=  A/SECURITY
+      ^-  TAPE
+      (SCOW %TAS A)
     ::
-    ++  sh-scis
-      ::    render status
+    ++  SH-SCIS
+      ::    RENDER STATUS
       ::
-      ::  gets the presence of {saz} as a tape.
+      ::  GETS THE PRESENCE OF {SAZ} AS A TAPE.
       ::
-      |=  sat/status
-      ^-  tape
-      ['%' (trip pec.sat)]
+      |=  SAT/STATUS
+      ^-  TAPE
+      ['%' (TRIP PEC.SAT)]
     ::
-    ++  sh-show-status
-      ::  prints presence changes to the cli.
+    ++  SH-SHOW-STATUS
+      ::  PRINTS PRESENCE CHANGES TO THE CLI.
       ::
-      |=  {cir/circle who/ship cur/status dif/diff-status}
+      |=  {CIR/CIRCLE WHO/SHIP CUR/STATUS DIF/DIFF-STATUS}
       ^+  +>
-      ?:  (~(has in settings.she) %quiet)  +>
-      %-  sh-note
-      %+  weld
-        (weld ~(cr-phat cr cir) ": ")
-      ?-  -.dif
-          $full
-        "hey {(scow %p who)} {(scow %tas pec.sat.dif)}"
+      ?:  (~(HAS IN SETTINGS.SHE) %QUIET)  +>
+      %-  SH-NOTE
+      %+  WELD
+        (WELD ~(CR-PHAT CR CIR) ": ")
+      ?-  -.DIF
+          $FULL
+        "HEY {(SCOW %P WHO)} {(SCOW %TAS PEC.SAT.DIF)}"
       ::
-          $presence
-        "see {(scow %p who)} {(scow %tas pec.dif)}"
+          $PRESENCE
+        "SEE {(SCOW %P WHO)} {(SCOW %TAS PEC.DIF)}"
       ::
-          $human
-        %+  weld  "nom {(scow %p who)}"
-        ?:  ?=($true -.dif.dif)  ~
-        =-  " '{(trip (fall han.man.cur ''))}' -> '{-}'"
-        %-  trip
-        =-  (fall - '')
-        ?-  -.dif.dif
-          $full     han.man.dif.dif
-          $handle   han.dif.dif
+          $HUMAN
+        %+  WELD  "NOM {(SCOW %P WHO)}"
+        ?:  ?=($TRUE -.DIF.DIF)  ~
+        =-  " '{(TRIP (FALL HAN.MAN.CUR ''))}' -> '{-}'"
+        %-  TRIP
+        =-  (FALL - '')
+        ?-  -.DIF.DIF
+          $FULL     HAN.MAN.DIF.DIF
+          $HANDLE   HAN.DIF.DIF
         ==
       ::
-          $remove
-        "bye {(scow %p who)}"
+          $REMOVE
+        "BYE {(SCOW %P WHO)}"
       ==
     ::
-    ++  sh-show-config
-      ::  prints config changes to the cli.
+    ++  SH-SHOW-CONFIG
+      ::  PRINTS CONFIG CHANGES TO THE CLI.
       ::
-      |=  {cir/circle cur/config dif/diff-config}
+      |=  {CIR/CIRCLE CUR/CONFIG DIF/DIFF-CONFIG}
       ^+  +>
-      ?:  (~(has in settings.she) %quiet)  +>
-      ?:  ?=($full -.dif)
+      ?:  (~(HAS IN SETTINGS.SHE) %QUIET)  +>
+      ?:  ?=($FULL -.DIF)
         =.  +>
-          (sh-note (weld "new " (~(cr-show cr cir) ~)))
-        =.  +>  $(dif [%caption cap.cof.dif])
-        $(dif [%filter fit.cof.dif])
-      ?:  ?=($remove -.dif)
-        (sh-note (weld "rip " (~(cr-show cr cir) ~)))
-      ?:  ?=($usage -.dif)  +>
-      %-  sh-note
-      %+  weld
-        (weld ~(cr-phat cr cir) ": ")
-      ?-  -.dif
-          $source
-        %+  weld  ?:(add.dif "onn " "off ")
-        ~(cr-full cr cir.src.dif)
+          (SH-NOTE (WELD "NEW " (~(CR-SHOW CR CIR) ~)))
+        =.  +>  $(DIF [%CAPTION CAP.COF.DIF])
+        $(DIF [%FILTER FIT.COF.DIF])
+      ?:  ?=($REMOVE -.DIF)
+        (SH-NOTE (WELD "RIP " (~(CR-SHOW CR CIR) ~)))
+      ?:  ?=($USAGE -.DIF)  +>
+      %-  SH-NOTE
+      %+  WELD
+        (WELD ~(CR-PHAT CR CIR) ": ")
+      ?-  -.DIF
+          $SOURCE
+        %+  WELD  ?:(ADD.DIF "ONN " "OFF ")
+        ~(CR-FULL CR CIR.SRC.DIF)
       ::
-          $caption
-        "cap: {(trip cap.dif)}"
+          $CAPTION
+        "CAP: {(TRIP CAP.DIF)}"
       ::
-          $read
-        "red: {(scow %ud red.dif)}"
+          $READ
+        "RED: {(SCOW %UD RED.DIF)}"
       ::
-          $filter
-        ;:  weld
-          "fit: caps:"
-          ?:(cas.fit.dif "Y" "n")
-          " unic:"
-          ?:(utf.fit.dif "✔" "n")
+          $FILTER
+        ;:  WELD
+          "FIT: CAPS:"
+          ?:(CAS.FIT.DIF "Y" "N")
+          " UNIC:"
+          ?:(UTF.FIT.DIF "✔" "N")
         ==
       ::
-          $secure
-        "sec {(trip sec.con.cur)} -> {(trip sec.dif)}"
+          $SECURE
+        "SEC {(TRIP SEC.CON.CUR)} -> {(TRIP SEC.DIF)}"
       ::
-          $permit
-        %+  weld
-          =?  add.dif
-              ?=(?($channel $mailbox) sec.con.cur)
-            !add.dif
-          ?:(add.dif "inv " "ban ")
-        ^-  tape
-        %-  ~(rep in sis.dif)
-        |=  {s/ship t/tape}
-        =?  t  ?=(^ t)  (weld t ", ")
-        (weld t (cite:title s))
+          $PERMIT
+        %+  WELD
+          =?  ADD.DIF
+              ?=(?($CHANNEL $MAILBOX) SEC.CON.CUR)
+            !ADD.DIF
+          ?:(ADD.DIF "INV " "BAN ")
+        ^-  TAPE
+        %-  ~(REP IN SIS.DIF)
+        |=  {S/SHIP T/TAPE}
+        =?  T  ?=(^ T)  (WELD T ", ")
+        (WELD T (CITE:TITLE S))
       ==
     ::
-    ++  sh-gram
-      ::    show telegram
+    ++  SH-GRAM
+      ::    SHOW TELEGRAM
       ::
-      ::  prints the telegram. every fifth message,
-      ::  print the message number also.
+      ::  PRINTS THE TELEGRAM. EVERY FIFTH MESSAGE,
+      ::  PRINT THE MESSAGE NUMBER ALSO.
       ::
-      |=  gam/telegram
+      |=  GAM/TELEGRAM
       ^+  +>
-      =+  num=(~(got by known) uid.gam)
+      =+  NUM=(~(GOT BY KNOWN) UID.GAM)
       =.  +>.$
-        ::  if the number isn't directly after latest, print it always.
-        ?.  =(num +(latest.she))
-          (sh-numb num)
-        ::  if the number is directly after latest, print every fifth.
-        ?.  =(0 (mod num 5))  +>.$
-        (sh-numb num)
-      (sh-rend(latest.she num) gam)
+        ::  IF THE NUMBER ISN'T DIRECTLY AFTER LATEST, PRINT IT ALWAYS.
+        ?.  =(NUM +(LATEST.SHE))
+          (SH-NUMB NUM)
+        ::  IF THE NUMBER IS DIRECTLY AFTER LATEST, PRINT EVERY FIFTH.
+        ?.  =(0 (MOD NUM 5))  +>.$
+        (SH-NUMB NUM)
+      (SH-REND(LATEST.SHE NUM) GAM)
     ::
-    ++  sh-grams
-      ::  prints multiple telegrams.
+    ++  SH-GRAMS
+      ::  PRINTS MULTIPLE TELEGRAMS.
       ::
-      |=  gaz/(list telegram)
+      |=  GAZ/(LIST TELEGRAM)
       ^+  +>
-      ?~  gaz  +>
-      $(gaz t.gaz, +> (sh-gram i.gaz))
+      ?~  GAZ  +>
+      $(GAZ T.GAZ, +> (SH-GRAM I.GAZ))
     --
   --
 ::
 ::  #
-::  #  %renderers
+::  #  %RENDERERS
 ::  #
-::    rendering cores.
-+|  %renderers
+::    RENDERING CORES.
++|  %RENDERERS
 ::
-++  cr
-  ::    circle renderer
+++  CR
+  ::    CIRCLE RENDERER
   ::
-  ::  used in both circle and ship rendering.
+  ::  USED IN BOTH CIRCLE AND SHIP RENDERING.
   ::
-  |_  ::  one: the circle.
+  |_  ::  ONE: THE CIRCLE.
       ::
-      one/circle
+      ONE/CIRCLE
   ::
-  ++  cr-beat
-    ::    {one} more relevant?
+  ++  CR-BEAT
+    ::    {ONE} MORE RELEVANT?
     ::
-    ::  returns true if one is better to show, false
-    ::  otherwise. prioritizes: our > main > size.
+    ::  RETURNS TRUE IF ONE IS BETTER TO SHOW, FALSE
+    ::  OTHERWISE. PRIORITIZES: OUR > MAIN > SIZE.
     ::
-    |=  two/circle
+    |=  TWO/CIRCLE
     ^-  ?
-    ::  the circle that's ours is better.
-    ?:  =(self hos.one)
-      ?.  =(self hos.two)  &
-      ?<  =(nom.one nom.two)
-      ::  if both circles are ours, the main story is better.
-      ?:  =(%inbox nom.one)  &
-      ?:  =(%inbox nom.two)  |
-      ::  if neither are, pick the "larger" one.
-      (lth nom.one nom.two)
-    ::  if one isn't ours but two is, two is better.
-    ?:  =(self hos.two)  |
-    ?:  =(hos.one hos.two)
-      ::  if they're from the same ship, pick the "larger" one.
-      (lth nom.one nom.two)
-    ::  if they're from different ships, neither ours, pick hierarchically.
-    (lth (xeb hos.one) (xeb hos.two))
+    ::  THE CIRCLE THAT'S OURS IS BETTER.
+    ?:  =(SELF HOS.ONE)
+      ?.  =(SELF HOS.TWO)  &
+      ?<  =(NOM.ONE NOM.TWO)
+      ::  IF BOTH CIRCLES ARE OURS, THE MAIN STORY IS BETTER.
+      ?:  =(%INBOX NOM.ONE)  &
+      ?:  =(%INBOX NOM.TWO)  |
+      ::  IF NEITHER ARE, PICK THE "LARGER" ONE.
+      (LTH NOM.ONE NOM.TWO)
+    ::  IF ONE ISN'T OURS BUT TWO IS, TWO IS BETTER.
+    ?:  =(SELF HOS.TWO)  |
+    ?:  =(HOS.ONE HOS.TWO)
+      ::  IF THEY'RE FROM THE SAME SHIP, PICK THE "LARGER" ONE.
+      (LTH NOM.ONE NOM.TWO)
+    ::  IF THEY'RE FROM DIFFERENT SHIPS, NEITHER OURS, PICK HIERARCHICALLY.
+    (LTH (XEB HOS.ONE) (XEB HOS.TWO))
   ::
-  ++  cr-best
-    ::  returns the most relevant circle.
+  ++  CR-BEST
+    ::  RETURNS THE MOST RELEVANT CIRCLE.
     ::
-    |=  two/circle
-    ?:((cr-beat two) one two)
+    |=  TWO/CIRCLE
+    ?:((CR-BEAT TWO) ONE TWO)
   ::
-  ++  cr-curt
-    ::    prints a ship name in 14 characters.
+  ++  CR-CURT
+    ::    PRINTS A SHIP NAME IN 14 CHARACTERS.
     ::
-    ::  left-pads with spaces. {mup} signifies
-    ::  "are there other targets besides this one?"
+    ::  LEFT-PADS WITH SPACES. {MUP} SIGNIFIES
+    ::  "ARE THERE OTHER TARGETS BESIDES THIS ONE?"
     ::
-    |=  mup/?
-    ^-  tape
-    =+  raw=(cite:title hos.one)
-    (runt [(sub 14 (lent raw)) ' '] raw)
+    |=  MUP/?
+    ^-  TAPE
+    =+  RAW=(CITE:TITLE HOS.ONE)
+    (RUNT [(SUB 14 (LENT RAW)) ' '] RAW)
   ::
-  ++  cr-nick
-    ::    get nick for ship, or shortname if no nick.
+  ++  CR-NICK
+    ::    GET NICK FOR SHIP, OR SHORTNAME IF NO NICK.
     ::
-    ::  left-pads with spaces.
+    ::  LEFT-PADS WITH SPACES.
     ::
-    |=  aud/audience
-    ^-  tape
-    =/  nic/(unit cord)
-      ?:  (~(has by nicks) hos.one)
-        (~(get by nicks) hos.one)
-      %-  ~(rep in aud)
-      |=  {cir/circle han/(unit cord)}
-      ?^  han  han
-      =+  gop=(~(get by remotes) cir)
-      ?~  gop  ~
-      han.man:(fall (~(get by u.gop) hos.one) *status)
-    ?~  nic  (cr-curt |)
-    =+  raw=(scag 14 (trip u.nic))
-    =+  len=(sub 14 (lent raw))
-    (weld (reap len ' ') raw)
+    |=  AUD/AUDIENCE
+    ^-  TAPE
+    =/  NIC/(UNIT CORD)
+      ?:  (~(HAS BY NICKS) HOS.ONE)
+        (~(GET BY NICKS) HOS.ONE)
+      %-  ~(REP IN AUD)
+      |=  {CIR/CIRCLE HAN/(UNIT CORD)}
+      ?^  HAN  HAN
+      =+  GOP=(~(GET BY REMOTES) CIR)
+      ?~  GOP  ~
+      HAN.MAN:(FALL (~(GET BY U.GOP) HOS.ONE) *STATUS)
+    ?~  NIC  (CR-CURT |)
+    =+  RAW=(SCAG 14 (TRIP U.NIC))
+    =+  LEN=(SUB 14 (LENT RAW))
+    (WELD (REAP LEN ' ') RAW)
   ::
-  ::  todo: figure out why enabling the doccord causes a nest fail, even when
-  ::  attached to the arm instead of the product.
+  ::  TODO: FIGURE OUT WHY ENABLING THE DOCCORD CAUSES A NEST FAIL, EVEN WHEN
+  ::  ATTACHED TO THE ARM INSTEAD OF THE PRODUCT.
   ::
-  ++  cr-phat                                           :::  render accurately
-    :::  prints a circle fully, but still taking
-    :::  "shortcuts" where possible:
-    :::  ":" for local mailbox, "~ship" for foreign
-    :::  mailbox, "%channel" for local circle,
-    :::  "/channel" for parent circle.
+  ++  CR-PHAT                                           :::  RENDER ACCURATELY
+    :::  PRINTS A CIRCLE FULLY, BUT STILL TAKING
+    :::  "SHORTCUTS" WHERE POSSIBLE:
+    :::  ":" FOR LOCAL MAILBOX, "~SHIP" FOR FOREIGN
+    :::  MAILBOX, "%CHANNEL" FOR LOCAL CIRCLE,
+    :::  "/CHANNEL" FOR PARENT CIRCLE.
     ::
-    ^-  tape
-    ?:  =(hos.one self)
-      ?:  =(nom.one inbox)
+    ^-  TAPE
+    ?:  =(HOS.ONE SELF)
+      ?:  =(NOM.ONE INBOX)
         ":"
-      ['%' (trip nom.one)]
-    =+  wun=(cite:title hos.one)
-    ?:  =(nom.one %inbox)
-      wun
-    ?:  =(hos.one (^sein:title self))
-      ['/' (trip nom.one)]
-    :(welp wun "/" (trip nom.one))
+      ['%' (TRIP NOM.ONE)]
+    =+  WUN=(CITE:TITLE HOS.ONE)
+    ?:  =(NOM.ONE %INBOX)
+      WUN
+    ?:  =(HOS.ONE (^SEIN:TITLE SELF))
+      ['/' (TRIP NOM.ONE)]
+    :(WELP WUN "/" (TRIP NOM.ONE))
   ::
-  ++  cr-full  (cr-show ~)                              ::  render full width
+  ++  CR-FULL  (CR-SHOW ~)                              ::  RENDER FULL WIDTH
   ::
-  ++  cr-show
-    ::  renders a circle as text.
+  ++  CR-SHOW
+    ::  RENDERS A CIRCLE AS TEXT.
     ::
-    ::  moy:  multiple circles in audience?
-    |=  moy/(unit ?)
-    ^-  tape
-    ::  render circle (as glyph if we can).
-    ?~  moy
-      =+  cha=(~(get by bound) one ~ ~)
-      =-  ?~(cha - "{u.cha ~} {-}")
-      ~(cr-phat cr one)
-    (~(cr-curt cr one) u.moy)
+    ::  MOY:  MULTIPLE CIRCLES IN AUDIENCE?
+    |=  MOY/(UNIT ?)
+    ^-  TAPE
+    ::  RENDER CIRCLE (AS GLYPH IF WE CAN).
+    ?~  MOY
+      =+  CHA=(~(GET BY BOUND) ONE ~ ~)
+      =-  ?~(CHA - "{U.CHA ~} {-}")
+      ~(CR-PHAT CR ONE)
+    (~(CR-CURT CR ONE) U.MOY)
   --
 ::
-++  ar
-  ::    audience renderer
+++  AR
+  ::    AUDIENCE RENDERER
   ::
-  ::  used for representing audiences (sets of circles)
-  ::  as tapes.
+  ::  USED FOR REPRESENTING AUDIENCES (SETS OF CIRCLES)
+  ::  AS TAPES.
   ::
-  |_  ::  aud: members of the audience.
+  |_  ::  AUD: MEMBERS OF THE AUDIENCE.
       ::
-      aud/audience
+      AUD/AUDIENCE
   ::
-  ++  ar-best
-    ::  find the most relevant circle in the set.
+  ++  AR-BEST
+    ::  FIND THE MOST RELEVANT CIRCLE IN THE SET.
     ::
-    ^-  (unit circle)
-    ?~  aud  ~
+    ^-  (UNIT CIRCLE)
+    ?~  AUD  ~
     :-  ~
-    |-  ^-  circle
-    =+  lef=`(unit circle)`ar-best(aud l.aud)
-    =+  rit=`(unit circle)`ar-best(aud r.aud)
-    =?  n.aud  ?=(^ lef)  (~(cr-best cr n.aud) u.lef)
-    =?  n.aud  ?=(^ rit)  (~(cr-best cr n.aud) u.rit)
-    n.aud
+    |-  ^-  CIRCLE
+    =+  LEF=`(UNIT CIRCLE)`AR-BEST(AUD L.AUD)
+    =+  RIT=`(UNIT CIRCLE)`AR-BEST(AUD R.AUD)
+    =?  N.AUD  ?=(^ LEF)  (~(CR-BEST CR N.AUD) U.LEF)
+    =?  N.AUD  ?=(^ RIT)  (~(CR-BEST CR N.AUD) U.RIT)
+    N.AUD
   ::
-  ++  ar-deaf
-    ::  remove ourselves from the audience.
+  ++  AR-DEAF
+    ::  REMOVE OURSELVES FROM THE AUDIENCE.
     ::
     ^+  .
-    .(aud (~(del in aud) `circle`incir))
+    .(AUD (~(DEL IN AUD) `CIRCLE`INCIR))
   ::
-  ++  ar-maud
-    ::    multiple audience
+  ++  AR-MAUD
+    ::    MULTIPLE AUDIENCE
     ::
-    ::  checks if there's multiple circles in the
-    ::  audience via pattern matching.
+    ::  CHECKS IF THERE'S MULTIPLE CIRCLES IN THE
+    ::  AUDIENCE VIA PATTERN MATCHING.
     ::
     ^-  ?
-    =.  .  ar-deaf
-    !?=($@(~ {* ~ ~}) aud)
+    =.  .  AR-DEAF
+    !?=($@(~ {* ~ ~}) AUD)
   ::
-  ++  ar-phat
-    ::  render all circles, no glyphs.
+  ++  AR-PHAT
+    ::  RENDER ALL CIRCLES, NO GLYPHS.
     ::
-    ^-  tape
-    %-  ~(rep in aud)
-    |=  {c/circle t/tape}
-    =?  t  ?=(^ t)
-      (weld t ", ")
-    (weld t ~(cr-phat cr c))
+    ^-  TAPE
+    %-  ~(REP IN AUD)
+    |=  {C/CIRCLE T/TAPE}
+    =?  T  ?=(^ T)
+      (WELD T ", ")
+    (WELD T ~(CR-PHAT CR C))
   ::
-  ++  ar-prom
-    ::  render all circles, ordered by relevance.
+  ++  AR-PROM
+    ::  RENDER ALL CIRCLES, ORDERED BY RELEVANCE.
     ::
-    ^-  tape
-    =.  .  ar-deaf
-    =/  all
-      %+  sort  `(list circle)`~(tap in aud)
-      |=  {a/circle b/circle}
-      (~(cr-beat cr a) b)
-    =+  fir=&
-    |-  ^-  tape
-    ?~  all  ~
-    ;:  welp
-      ?:(fir "" " ")
-      (~(cr-show cr i.all) ~)
-      $(all t.all, fir |)
+    ^-  TAPE
+    =.  .  AR-DEAF
+    =/  ALL
+      %+  SORT  `(LIST CIRCLE)`~(TAP IN AUD)
+      |=  {A/CIRCLE B/CIRCLE}
+      (~(CR-BEAT CR A) B)
+    =+  FIR=&
+    |-  ^-  TAPE
+    ?~  ALL  ~
+    ;:  WELP
+      ?:(FIR "" " ")
+      (~(CR-SHOW CR I.ALL) ~)
+      $(ALL T.ALL, FIR |)
     ==
   ::
-  ++  ar-whom
-    ::  render sender as the most relevant circle.
+  ++  AR-WHOM
+    ::  RENDER SENDER AS THE MOST RELEVANT CIRCLE.
     ::
-    (~(cr-show cr (need ar-best)) ~ ar-maud)
+    (~(CR-SHOW CR (NEED AR-BEST)) ~ AR-MAUD)
   ::
-  ++  ar-dire
-    ::  returns true if circle is a mailbox of ours.
+  ++  AR-DIRE
+    ::  RETURNS TRUE IF CIRCLE IS A MAILBOX OF OURS.
     ::
-    |=  cir/circle  ^-  ?
-    ?&  =(hos.cir self)
-        =+  sot=(~(get by mirrors) cir)
-        &(?=(^ sot) ?=($mailbox sec.con.u.sot))
+    |=  CIR/CIRCLE  ^-  ?
+    ?&  =(HOS.CIR SELF)
+        =+  SOT=(~(GET BY MIRRORS) CIR)
+        &(?=(^ SOT) ?=($MAILBOX SEC.CON.U.SOT))
     ==
   ::
-  ++  ar-glyf
-    ::  todo: another place where doccords break things.
+  ++  AR-GLYF
+    ::  TODO: ANOTHER PLACE WHERE DOCCORDS BREAK THINGS.
     ::
-    :::    audience glyph
+    :::    AUDIENCE GLYPH
     :::
-    :::  get the glyph that corresponds to the audience.
-    :::  for mailbox messages and complex audiences, use
-    :::  reserved "glyphs".
+    :::  GET THE GLYPH THAT CORRESPONDS TO THE AUDIENCE.
+    :::  FOR MAILBOX MESSAGES AND COMPLEX AUDIENCES, USE
+    :::  RESERVED "GLYPHS".
     ::
-    ^-  tape
-    =+  cha=(~(get by bound) aud)
-    ?^  cha  ~[u.cha]
-    ?.  (lien ~(tap by aud) ar-dire)
+    ^-  TAPE
+    =+  CHA=(~(GET BY BOUND) AUD)
+    ?^  CHA  ~[U.CHA]
+    ?.  (LIEN ~(TAP BY AUD) AR-DIRE)
       "*"
-    ?:  ?=({^ ~ ~} aud)
+    ?:  ?=({^ ~ ~} AUD)
       ":"
     ";"
   --
 ::
-++  tr
-  ::    telegram renderer
+++  TR
+  ::    TELEGRAM RENDERER
   ::
-  ::  responsible for converting telegrams and
-  ::  everything relating to them to text to be
-  ::  displayed in the cli.
+  ::  RESPONSIBLE FOR CONVERTING TELEGRAMS AND
+  ::  EVERYTHING RELATING TO THEM TO TEXT TO BE
+  ::  DISPLAYED IN THE CLI.
   ::
-  |_  $:  ::  sef: settings flags.
-          ::  who: author.
-          ::  sen: unique identifier.
-          ::  aud: audience.
-          ::  wen: timestamp.
-          ::  sep: message contents.
+  |_  $:  ::  SEF: SETTINGS FLAGS.
+          ::  WHO: AUTHOR.
+          ::  SEN: UNIQUE IDENTIFIER.
+          ::  AUD: AUDIENCE.
+          ::  WEN: TIMESTAMP.
+          ::  SEP: MESSAGE CONTENTS.
           ::
-          sef/(set term)
-          who/ship
-          sen/serial
-          aud/audience
-          wen/@da
-          sep/speech
+          SEF/(SET TERM)
+          WHO/SHIP
+          SEN/SERIAL
+          AUD/AUDIENCE
+          WEN/@DA
+          SEP/SPEECH
       ==
   ::
-  ++  tr-fact
-    ::    activate effect
+  ++  TR-FACT
+    ::    ACTIVATE EFFECT
     ::
-    ::  produces sole-effect for printing message
-    ::  details.
+    ::  PRODUCES SOLE-EFFECT FOR PRINTING MESSAGE
+    ::  DETAILS.
     ::
-    ^-  sole-effect:sole-sur
-    ~[%mor [%tan tr-meta] tr-body]
+    ^-  SOLE-EFFECT:SOLE-SUR
+    ~[%MOR [%TAN TR-META] TR-BODY]
   ::
-  ++  tr-rend
-    ::    renders a telegram
+  ++  TR-REND
+    ::    RENDERS A TELEGRAM
     ::
-    ::  the first line will contain the author and
-    ::  optional timestamp.
+    ::  THE FIRST LINE WILL CONTAIN THE AUTHOR AND
+    ::  OPTIONAL TIMESTAMP.
     ::
-    ^-  (list tape)
-    =/  wyd
-      %+  sub  width.cli                                ::  termwidth,
-      %+  add  14                                       ::  minus author,
-      ?:((~(has in sef) %showtime) 10 0)                ::  minus timestamp.
-    =+  txs=(tr-text wyd)
-    ?~  txs  ~
-    ::  render the author.
-    =/  nom/tape
-      ?:  (~(has in sef) %nicks)
-        (~(cr-nick cr [who %inbox]) aud)
-      (~(cr-curt cr [who %inbox]) |)
-    ::  regular indent.
-    =/  den/tape
-      (reap (lent nom) ' ')
-    ::  timestamp, if desired.
-    =/  tam/tape
-      ?.  (~(has in sef) %showtime)  ""
-      =.  wen
-        %.  [wen (mul q.timez.cli ~h1)]
-        ?:(p.timez.cli add sub)
-      =+  dat=(yore wen)
-      =/  t
-        |=  a/@
-        %+  weld
-          ?:((lth a 10) "0" ~)
-        (scow %ud a)
-      =/  time
-        ;:  weld
-          "~"  (t h.t.dat)
-          "."  (t m.t.dat)
-          "."  (t s.t.dat)
+    ^-  (LIST TAPE)
+    =/  WYD
+      %+  SUB  WIDTH.CLI                                ::  TERMWIDTH,
+      %+  ADD  14                                       ::  MINUS AUTHOR,
+      ?:((~(HAS IN SEF) %SHOWTIME) 10 0)                ::  MINUS TIMESTAMP.
+    =+  TXS=(TR-TEXT WYD)
+    ?~  TXS  ~
+    ::  RENDER THE AUTHOR.
+    =/  NOM/TAPE
+      ?:  (~(HAS IN SEF) %NICKS)
+        (~(CR-NICK CR [WHO %INBOX]) AUD)
+      (~(CR-CURT CR [WHO %INBOX]) |)
+    ::  REGULAR INDENT.
+    =/  DEN/TAPE
+      (REAP (LENT NOM) ' ')
+    ::  TIMESTAMP, IF DESIRED.
+    =/  TAM/TAPE
+      ?.  (~(HAS IN SEF) %SHOWTIME)  ""
+      =.  WEN
+        %.  [WEN (MUL Q.TIMEZ.CLI ~H1)]
+        ?:(P.TIMEZ.CLI ADD SUB)
+      =+  DAT=(YORE WEN)
+      =/  T
+        |=  A/@
+        %+  WELD
+          ?:((LTH A 10) "0" ~)
+        (SCOW %UD A)
+      =/  TIME
+        ;:  WELD
+          "~"  (T H.T.DAT)
+          "."  (T M.T.DAT)
+          "."  (T S.T.DAT)
         ==
-      %+  weld
-        (reap (sub +(wyd) (min wyd (lent (tuba i.txs)))) ' ')
-      time
-    %-  flop
-    %+  roll  `(list tape)`txs
-    |=  {t/tape l/(list tape)}
-    ?~  l  [:(weld nom t tam) ~]
-    [(weld den t) l]
+      %+  WELD
+        (REAP (SUB +(WYD) (MIN WYD (LENT (TUBA I.TXS)))) ' ')
+      TIME
+    %-  FLOP
+    %+  ROLL  `(LIST TAPE)`TXS
+    |=  {T/TAPE L/(LIST TAPE)}
+    ?~  L  [:(WELD NOM T TAM) ~]
+    [(WELD DEN T) L]
   ::
-  ++  tr-meta
-    ::    metadata
+  ++  TR-META
+    ::    METADATA
     ::
-    ::  builds string that display metadata, including
-    ::  message serial, timestamp, author and audience.
+    ::  BUILDS STRING THAT DISPLAY METADATA, INCLUDING
+    ::  MESSAGE SERIAL, TIMESTAMP, AUTHOR AND AUDIENCE.
     ::
-    ^-  tang
-    =.  wen  (sub wen (mod wen (div wen ~s0..0001)))    :: round
-    =+  hed=leaf+"{(scow %uv sen)} at {(scow %da wen)}"
-    =/  cis
-      %+  turn  ~(tap in aud)
-      |=  a/circle
-      leaf+~(cr-full cr a)
-    [%rose [" " ~ ~] [hed >who< [%rose [", " "to " ~] cis] ~]]~
+    ^-  TANG
+    =.  WEN  (SUB WEN (MOD WEN (DIV WEN ~S0..0001)))    :: ROUND
+    =+  HED=LEAF+"{(SCOW %UV SEN)} AT {(SCOW %DA WEN)}"
+    =/  CIS
+      %+  TURN  ~(TAP IN AUD)
+      |=  A/CIRCLE
+      LEAF+~(CR-FULL CR A)
+    [%ROSE [" " ~ ~] [HED >WHO< [%ROSE [", " "TO " ~] CIS] ~]]~
   ::
-  ++  tr-body
-    ::    message content
+  ++  TR-BODY
+    ::    MESSAGE CONTENT
     ::
-    ::  long-form display of message contents, specific
-    ::  to each speech type.
+    ::  LONG-FORM DISPLAY OF MESSAGE CONTENTS, SPECIFIC
+    ::  TO EACH SPEECH TYPE.
     ::
-    |-  ^-  sole-effect:sole-sur
-    ?-  -.sep
-        $lin
-      tan+~[leaf+"{?:(pat.sep "@ " "")}{(trip msg.sep)}"]
+    |-  ^-  SOLE-EFFECT:SOLE-SUR
+    ?-  -.SEP
+        $LIN
+      TAN+~[LEAF+"{?:(PAT.SEP "@ " "")}{(TRIP MSG.SEP)}"]
     ::
-        $url
-      url+(crip (apix:en-purl:html url.sep))
+        $URL
+      URL+(CRIP (APIX:EN-PURL:HTML URL.SEP))
     ::
-        $exp
-      mor+~[txt+"# {(trip exp.sep)}" tan+res.sep]
+        $EXP
+      MOR+~[TXT+"# {(TRIP EXP.SEP)}" TAN+RES.SEP]
     ::
-        $ire
-      =+  num=(~(get by known) top.sep)
-      ?~  num  $(sep sep.sep)
-      =+  gam=(snag (sub count +(u.num)) grams)
-      =-  mor+[tan+- $(sep sep.sep) ~]
-      %-  flop  %+  weld
-        :_  ~  :-  %leaf
-        %+  weld  "in reply to: {(cite:title aut.gam)}: "
-        "[{(scow %ud u.num)}]"
-      %+  turn  (~(tr-text tr sef gam) width.cli)
-      |=(t/tape [%leaf t])
+        $IRE
+      =+  NUM=(~(GET BY KNOWN) TOP.SEP)
+      ?~  NUM  $(SEP SEP.SEP)
+      =+  GAM=(SNAG (SUB COUNT +(U.NUM)) GRAMS)
+      =-  MOR+[TAN+- $(SEP SEP.SEP) ~]
+      %-  FLOP  %+  WELD
+        :_  ~  :-  %LEAF
+        %+  WELD  "IN REPLY TO: {(CITE:TITLE AUT.GAM)}: "
+        "[{(SCOW %UD U.NUM)}]"
+      %+  TURN  (~(TR-TEXT TR SEF GAM) WIDTH.CLI)
+      |=(T/TAPE [%LEAF T])
     ::
-        $fat
-      [%mor $(sep sep.sep) tan+(tr-tach tac.sep) ~]
+        $FAT
+      [%MOR $(SEP SEP.SEP) TAN+(TR-TACH TAC.SEP) ~]
     ::
-        $inv
-      :-  %tan
+        $INV
+      :-  %TAN
       :_  ~
-      :-  %leaf
-      %+  weld
-        ?:  inv.sep
-          "you have been invited to "
-        "you have been banished from "
-      ~(cr-phat cr cir.sep)
+      :-  %LEAF
+      %+  WELD
+        ?:  INV.SEP
+          "YOU HAVE BEEN INVITED TO "
+        "YOU HAVE BEEN BANISHED FROM "
+      ~(CR-PHAT CR CIR.SEP)
     ::
-        $app
-      [%mor tan+~[leaf+"[{(trip app.sep)}]: "] $(sep sep.sep) ~]
+        $APP
+      [%MOR TAN+~[LEAF+"[{(TRIP APP.SEP)}]: "] $(SEP SEP.SEP) ~]
     ==
   ::
-  ++  tr-tach
-    ::  renders an attachment.
+  ++  TR-TACH
+    ::  RENDERS AN ATTACHMENT.
     ::
-    |=  att/attache
-    ^-  tang
-    ?-  -.att
-      $name  (welp $(att tac.att) leaf+"= {(trip nom.att)}" ~)
-      $tank  +.att
-      $text  (turn (flop `(list cord)`+.att) |=(b/cord leaf+(trip b)))
+    |=  ATT/ATTACHE
+    ^-  TANG
+    ?-  -.ATT
+      $NAME  (WELP $(ATT TAC.ATT) LEAF+"= {(TRIP NOM.ATT)}" ~)
+      $TANK  +.ATT
+      $TEXT  (TURN (FLOP `(LIST CORD)`+.ATT) |=(B/CORD LEAF+(TRIP B)))
     ==
   ::
-  ++  tr-chow
-    ::    truncate
+  ++  TR-CHOW
+    ::    TRUNCATE
     ::
-    ::  truncates the {txt} to be of max {len}
-    ::  characters. if it does truncate, indicates it
-    ::  did so by appending _ or ….
+    ::  TRUNCATES THE {TXT} TO BE OF MAX {LEN}
+    ::  CHARACTERS. IF IT DOES TRUNCATE, INDICATES IT
+    ::  DID SO BY APPENDING _ OR ….
     ::
-    |=  {len/@u txt/tape}
-    ^-  tape
-    ?:  (gth len (lent txt))  txt
-    =.  txt  (scag len txt)
+    |=  {LEN/@U TXT/TAPE}
+    ^-  TAPE
+    ?:  (GTH LEN (LENT TXT))  TXT
+    =.  TXT  (SCAG LEN TXT)
     |-
-    ?~  txt  txt
-    ?:  =(' ' i.txt)
+    ?~  TXT  TXT
+    ?:  =(' ' I.TXT)
       |-
       :-  '_'
-      ?.  ?=({$' ' *} t.txt)
-        t.txt
-      $(txt t.txt)
-    ?~  t.txt  "…"
-    [i.txt $(txt t.txt)]
+      ?.  ?=({$' ' *} T.TXT)
+        T.TXT
+      $(TXT T.TXT)
+    ?~  T.TXT  "…"
+    [I.TXT $(TXT T.TXT)]
   ::
-  ++  tr-text
-    ::    compact contents
+  ++  TR-TEXT
+    ::    COMPACT CONTENTS
     ::
-    ::  renders just the most important data of the
-    ::  message. if possible, these stay within a single
-    ::  line.
+    ::  RENDERS JUST THE MOST IMPORTANT DATA OF THE
+    ::  MESSAGE. IF POSSIBLE, THESE STAY WITHIN A SINGLE
+    ::  LINE.
     ::
-    ::  pre:  replace/append line prefix
-    ::TODO  this should probably be redone someday.
-    =|  pre/(unit (pair ? tape))
-    |=  wyd/@ud
-    ^-  (list tape)
-    ?-  -.sep
-        $fat
-      %+  weld  $(sep sep.sep)
-      ^-  (list tape)
-      ?+  -.tac.sep  [" attached: ..." ~]
-        $name  [(scag wyd " attached: {(trip nom.tac.sep)}") ~]
+    ::  PRE:  REPLACE/APPEND LINE PREFIX
+    ::TODO  THIS SHOULD PROBABLY BE REDONE SOMEDAY.
+    =|  PRE/(UNIT (PAIR ? TAPE))
+    |=  WYD/@UD
+    ^-  (LIST TAPE)
+    ?-  -.SEP
+        $FAT
+      %+  WELD  $(SEP SEP.SEP)
+      ^-  (LIST TAPE)
+      ?+  -.TAC.SEP  [" ATTACHED: ..." ~]
+        $NAME  [(SCAG WYD " ATTACHED: {(TRIP NOM.TAC.SEP)}") ~]
       ==
     ::
-        $exp
-      :-  (tr-chow wyd '#' ' ' (trip exp.sep))
-      ?~  res.sep  ~
-      =-  [' ' (tr-chow (dec wyd) ' ' -)]~
-      ~(ram re (snag 0 `(list tank)`res.sep))
+        $EXP
+      :-  (TR-CHOW WYD '#' ' ' (TRIP EXP.SEP))
+      ?~  RES.SEP  ~
+      =-  [' ' (TR-CHOW (DEC WYD) ' ' -)]~
+      ~(RAM RE (SNAG 0 `(LIST TANK)`RES.SEP))
     ::
-        $ire
-      $(sep sep.sep, pre `[| "^ "])
+        $IRE
+      $(SEP SEP.SEP, PRE `[| "^ "])
     ::
-        $url
+        $URL
       :_  ~
-      =+  ful=(apix:en-purl:html url.sep)
-      =+  pef=q:(fall pre [p=| q=""])
-      ::  clean up prefix if needed.
-      =?  pef  =((scag 1 (flop pef)) " ")
-        (scag (dec (lent pef)) pef)
-      =.  pef  (weld "/" pef)
-      =.  wyd  (sub wyd +((lent pef)))  ::  account for prefix.
-      ::  if the full url fits, just render it.
-      ?:  (gte wyd (lent ful))  :(weld pef " " ful)
-      ::  if it doesn't, prefix with _ and render just (the tail of) the domain.
-      %+  weld  (weld pef "_")
-      =+  hok=r.p.p.url.sep
-      =-  (swag [a=(sub (max wyd (lent -)) wyd) b=wyd] -)
-      ^-  tape
-      =<  ?:  ?=(%& -.hok)
-            (reel p.hok .)
-          +:(scow %if p.hok)
-      |=  {a/knot b/tape}
-      ?~  b  (trip a)
-      (welp b '.' (trip a))
+      =+  FUL=(APIX:EN-PURL:HTML URL.SEP)
+      =+  PEF=Q:(FALL PRE [P=| Q=""])
+      ::  CLEAN UP PREFIX IF NEEDED.
+      =?  PEF  =((SCAG 1 (FLOP PEF)) " ")
+        (SCAG (DEC (LENT PEF)) PEF)
+      =.  PEF  (WELD "/" PEF)
+      =.  WYD  (SUB WYD +((LENT PEF)))  ::  ACCOUNT FOR PREFIX.
+      ::  IF THE FULL URL FITS, JUST RENDER IT.
+      ?:  (GTE WYD (LENT FUL))  :(WELD PEF " " FUL)
+      ::  IF IT DOESN'T, PREFIX WITH _ AND RENDER JUST (THE TAIL OF) THE DOMAIN.
+      %+  WELD  (WELD PEF "_")
+      =+  HOK=R.P.P.URL.SEP
+      =-  (SWAG [A=(SUB (MAX WYD (LENT -)) WYD) B=WYD] -)
+      ^-  TAPE
+      =<  ?:  ?=(%& -.HOK)
+            (REEL P.HOK .)
+          +:(SCOW %IF P.HOK)
+      |=  {A/KNOT B/TAPE}
+      ?~  B  (TRIP A)
+      (WELP B '.' (TRIP A))
     ::
-        $lin
-      ::  glyph prefix
-      =/  pef/tape
-        ?:  &(?=(^ pre) p.u.pre)  q.u.pre
-        ?:  pat.sep  " "
-        =-  (weld - q:(fall pre [p=| q=" "]))
-        %~  ar-glyf  ar
-        ?:  =(who self)  aud
-        (~(del in aud) [who %inbox])
-      =/  lis/(list tape)
-        %+  simple-wrap
-          `tape``(list @)`(tuba (trip msg.sep))
-        (sub wyd (min (div wyd 2) (lent pef)))
-      =+  lef=(lent pef)
-      =+  ?:((gth (lent lis) 0) (snag 0 lis) "")
-      :-  (weld pef -)
-      %+  turn  (slag 1 lis)
-      |=(a/tape (runt [lef ' '] a))
+        $LIN
+      ::  GLYPH PREFIX
+      =/  PEF/TAPE
+        ?:  &(?=(^ PRE) P.U.PRE)  Q.U.PRE
+        ?:  PAT.SEP  " "
+        =-  (WELD - Q:(FALL PRE [P=| Q=" "]))
+        %~  AR-GLYF  AR
+        ?:  =(WHO SELF)  AUD
+        (~(DEL IN AUD) [WHO %INBOX])
+      =/  LIS/(LIST TAPE)
+        %+  SIMPLE-WRAP
+          `TAPE``(LIST @)`(TUBA (TRIP MSG.SEP))
+        (SUB WYD (MIN (DIV WYD 2) (LENT PEF)))
+      =+  LEF=(LENT PEF)
+      =+  ?:((GTH (LENT LIS) 0) (SNAG 0 LIS) "")
+      :-  (WELD PEF -)
+      %+  TURN  (SLAG 1 LIS)
+      |=(A/TAPE (RUNT [LEF ' '] A))
     ::
-        $inv
+        $INV
       :_  ~
-      %+  tr-chow  wyd
-      %+  weld
-        ?:  inv.sep
-          " invited you to "
-        " banished you from "
-      ~(cr-phat cr cir.sep)
+      %+  TR-CHOW  WYD
+      %+  WELD
+        ?:  INV.SEP
+          " INVITED YOU TO "
+        " BANISHED YOU FROM "
+      ~(CR-PHAT CR CIR.SEP)
     ::
-        $app
-      $(sep sep.sep, pre `[& "[{(trip app.sep)}]: "])
+        $APP
+      $(SEP SEP.SEP, PRE `[& "[{(TRIP APP.SEP)}]: "])
     ==
   --
 ::
 ::  #
-::  #  %events
+::  #  %EVENTS
 ::  #
-+|  %events
++|  %EVENTS
 ::
-++  quit-server-client
-  |=  wir/wire
-  ^-  (quip move _+>)
-  [[peer-client]~ +>]
+++  QUIT-SERVER-CLIENT
+  |=  WIR/WIRE
+  ^-  (QUIP MOVE _+>)
+  [[PEER-CLIENT]~ +>]
 ::
-++  quit-server-inbox
-  |=  wir/wire
-  ^-  (quip move _+>)
-  [[peer-inbox]~ +>]
+++  QUIT-SERVER-INBOX
+  |=  WIR/WIRE
+  ^-  (QUIP MOVE _+>)
+  [[PEER-INBOX]~ +>]
 ::
-++  peer
-  ::  incoming subscription on pax.
+++  PEER
+  ::  INCOMING SUBSCRIPTION ON PAX.
   ::
-  |=  pax/path
-  ^-  (quip move _+>)
-  ?.  =(src.bol our.bol)
-    ~!  [%peer-talk-stranger src.bol]
+  |=  PAX/PATH
+  ^-  (QUIP MOVE _+>)
+  ?.  =(SRC.BOL OUR.BOL)
+    ~!  [%PEER-TALK-STRANGER SRC.BOL]
     !!
-  ?.  ?=({$sole *} pax)
-    ~!  [%peer-talk-strange pax]
+  ?.  ?=({$SOLE *} PAX)
+    ~!  [%PEER-TALK-STRANGE PAX]
     !!
-  ta-done:ta-console:ta
+  TA-DONE:TA-CONSOLE:TA
 ::
-++  diff-hall-prize
-  ::  accept query answer
+++  DIFF-HALL-PRIZE
+  ::  ACCEPT QUERY ANSWER
   ::
-  |=  {way/wire piz/prize}
-  ^-  (quip move _+>)
-  ta-done:(ta-take:ta piz)
+  |=  {WAY/WIRE PIZ/PRIZE}
+  ^-  (QUIP MOVE _+>)
+  TA-DONE:(TA-TAKE:TA PIZ)
 ::
-++  diff-hall-rumor
-  ::  accept query change
+++  DIFF-HALL-RUMOR
+  ::  ACCEPT QUERY CHANGE
   ::
-  |=  {way/wire rum/rumor}
-  ^-  (quip move _+>)
-  ta-done:(ta-hear:ta rum)
+  |=  {WAY/WIRE RUM/RUMOR}
+  ^-  (QUIP MOVE _+>)
+  TA-DONE:(TA-HEAR:TA RUM)
 ::
-++  poke-sole-action
-  ::  incoming sole action. process it.
+++  POKE-SOLE-ACTION
+  ::  INCOMING SOLE ACTION. PROCESS IT.
   ::
-  |=  act/sole-action:sole-sur
-  ta-done:(ta-sole:ta act)
+  |=  ACT/SOLE-ACTION:SOLE-SUR
+  TA-DONE:(TA-SOLE:TA ACT)
 ::
-::TODO  for debug purposes. remove eventually.
-::  users beware, here be dragons.
-++  poke-noun
-  |=  a/@t
-  ^-  (quip move _+>)
-  ?:  =(a 'check')
-    ~&  'verifying message reference integrity...'
+::TODO  FOR DEBUG PURPOSES. REMOVE EVENTUALLY.
+::  USERS BEWARE, HERE BE DRAGONS.
+++  POKE-NOUN
+  |=  A/@T
+  ^-  (QUIP MOVE _+>)
+  ?:  =(A 'CHECK')
+    ~&  'VERIFYING MESSAGE REFERENCE INTEGRITY...'
     =-  ~&(- [~ +>.$])
-    ~&  [%count--lent count (lent grams)]
-    =+  %-  ~(rep by known)
-      |=  {{u/serial a/@ud} k/@ud m/@ud}
-      :-  ?:((gth a k) a k)
-      ?:  =(u uid:(snag (sub count +(a)) grams))  m  +(m)
-    :-  %check-talk
-    [known=k mismatch=m]
-  ?:  =(a 'rebuild')
-    ~&  'rebuilding message references...'
-    =+  %+  reel  grams
-      |=  {t/telegram c/@ud k/(map serial @ud)}
-      [+(c) (~(put by k) uid.t c)]
-    [~ +>.$(count c, known k)]
-  ?:  =(a 'reconnect')
-    ~&  'disconnecting and reconnecting to hall...'
+    ~&  [%COUNT--LENT COUNT (LENT GRAMS)]
+    =+  %-  ~(REP BY KNOWN)
+      |=  {{U/SERIAL A/@UD} K/@UD M/@UD}
+      :-  ?:((GTH A K) A K)
+      ?:  =(U UID:(SNAG (SUB COUNT +(A)) GRAMS))  M  +(M)
+    :-  %CHECK-TALK
+    [KNOWN=K MISMATCH=M]
+  ?:  =(A 'REBUILD')
+    ~&  'REBUILDING MESSAGE REFERENCES...'
+    =+  %+  REEL  GRAMS
+      |=  {T/TELEGRAM C/@UD K/(MAP SERIAL @UD)}
+      [+(C) (~(PUT BY K) UID.T C)]
+    [~ +>.$(COUNT C, KNOWN K)]
+  ?:  =(A 'RECONNECT')
+    ~&  'DISCONNECTING AND RECONNECTING TO HALL...'
     :_  +>
-    :~  [ost.bol %pull /server/client server ~]
-        [ost.bol %pull /server/inbox server ~]
-        peer-client
-        peer-inbox
+    :~  [OST.BOL %PULL /SERVER/CLIENT SERVER ~]
+        [OST.BOL %PULL /SERVER/INBOX SERVER ~]
+        PEER-CLIENT
+        PEER-INBOX
     ==
-  ?:  =(a 'reset')
-    ~&  'full reset incoming, hold on to your cli...'
-    :_  +>(grams ~, known ~, count 0, last 0)
-    :~  [ost.bol %pull /server/client server ~]
-        [ost.bol %pull /server/inbox server ~]
-        peer-client
-        peer-inbox
+  ?:  =(A 'RESET')
+    ~&  'FULL RESET INCOMING, HOLD ON TO YOUR CLI...'
+    :_  +>(GRAMS ~, KNOWN ~, COUNT 0, LAST 0)
+    :~  [OST.BOL %PULL /SERVER/CLIENT SERVER ~]
+        [OST.BOL %PULL /SERVER/INBOX SERVER ~]
+        PEER-CLIENT
+        PEER-INBOX
     ==
-  ::  this deletes a message from your backlog, and may
-  ::  make talk throw stack traces.
-  ::  **aka don't run this!**
-  ?:  =(a 'screw')
-    ~&  'screwing things up...'
+  ::  THIS DELETES A MESSAGE FROM YOUR BACKLOG, AND MAY
+  ::  MAKE TALK THROW STACK TRACES.
+  ::  **AKA DON'T RUN THIS!**
+  ?:  =(A 'SCREW')
+    ~&  'SCREWING THINGS UP...'
     :-  ~
-    +>(grams (oust [0 1] grams))
+    +>(GRAMS (OUST [0 1] GRAMS))
   [~ +>]
 ::
-++  coup-client-action
-  ::  accept n/ack
+++  COUP-CLIENT-ACTION
+  ::  ACCEPT N/ACK
   ::
-  |=  {wir/wire fal/(unit tang)}
-  ^-  (quip move _+>)
-  ?~  fal  [~ +>]
-  %-  (slog leaf+"action failed: " u.fal)
+  |=  {WIR/WIRE FAL/(UNIT TANG)}
+  ^-  (QUIP MOVE _+>)
+  ?~  FAL  [~ +>]
+  %-  (SLOG LEAF+"ACTION FAILED: " U.FAL)
   [~ +>]
 --

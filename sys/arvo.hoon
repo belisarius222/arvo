@@ -1,926 +1,926 @@
 ::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::::::  ::::::    Postface                              ::::::
+::::::  ::::::    POSTFACE                              ::::::
 ::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
-~>  %slog.[0 leaf+"%arvo-assembly"]
-=-  ~>  %slog.[0 leaf+"%arvo-assembled"]
+~>  %SLOG.[0 LEAF+"%ARVO-ASSEMBLY"]
+=-  ~>  %SLOG.[0 LEAF+"%ARVO-ASSEMBLED"]
     -
 =<  ::
-    ::  Arvo formal interface
+    ::  ARVO FORMAL INTERFACE
     ::
-    ::    this lifecycle wrapper makes the arvo door (multi-armed core)
-    ::    look like a gate (function or single-armed core), to fit
-    ::    urbit's formal lifecycle function. a practical interpreter
-    ::    can ignore it.
+    ::    THIS LIFECYCLE WRAPPER MAKES THE ARVO DOOR (MULTI-ARMED CORE)
+    ::    LOOK LIKE A GATE (FUNCTION OR SINGLE-ARMED CORE), TO FIT
+    ::    URBIT'S FORMAL LIFECYCLE FUNCTION. A PRACTICAL INTERPRETER
+    ::    CAN IGNORE IT.
     ::
-    |=  [now=@da ovo=*]
+    |=  [NOW=@DA OVO=*]
     ^-  *
-    ~>  %slog.[0 leaf+"arvo-event"]
-    .(+> +:(poke now ovo))
+    ~>  %SLOG.[0 LEAF+"ARVO-EVENT"]
+    .(+> +:(POKE NOW OVO))
 ::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::::::  ::::::    volume 3, Arvo models and skeleton    ::::::
+::::::  ::::::    VOLUME 3, ARVO MODELS AND SKELETON    ::::::
 ::::::  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 =>
 |%
-++  arch  {fil/(unit @uvI) dir/(map @ta $~)}            ::  fundamental node
-++  arvo  (wind {p/term q/mill} mill)                   ::  arvo card
-++  beam  {{p/ship q/desk r/case} s/path}               ::  global name
-++  beak  {p/ship q/desk r/case}                        ::  garnish with beak
-++  bone  @ud                                           ::  opaque duct
-++  case                                                ::  version
-          $%  {$da p/@da}                               ::  date
-              {$tas p/@tas}                             ::  label
-              {$ud p/@ud}                               ::  sequence
+++  ARCH  {FIL/(UNIT @UVI) DIR/(MAP @TA $~)}            ::  FUNDAMENTAL NODE
+++  ARVO  (WIND {P/TERM Q/MILL} MILL)                   ::  ARVO CARD
+++  BEAM  {{P/SHIP Q/DESK R/CASE} S/PATH}               ::  GLOBAL NAME
+++  BEAK  {P/SHIP Q/DESK R/CASE}                        ::  GARNISH WITH BEAK
+++  BONE  @UD                                           ::  OPAQUE DUCT
+++  CASE                                                ::  VERSION
+          $%  {$DA P/@DA}                               ::  DATE
+              {$TAS P/@TAS}                             ::  LABEL
+              {$UD P/@UD}                               ::  SEQUENCE
           ==                                            ::
-++  desk  @tas                                          ::  ship desk case spur
-++  dock  (pair @p term)                                ::  message target
-++  cage  (cask vase)                                   ::  global metadata
-++  cask  |*(a/mold (pair mark a))                      ::  global data
-++  curd  {p/@tas q/*}                                  ::  typeless card
-++  duct  (list wire)                                   ::  causal history
-++  hypo  |*(a/mold (pair type a))                      ::  type associated
-++  hobo  |*  a/mold                                    ::  kiss wrapper
-          $?  $%  {$soft p/*}                           ::
+++  DESK  @TAS                                          ::  SHIP DESK CASE SPUR
+++  DOCK  (PAIR @P TERM)                                ::  MESSAGE TARGET
+++  CAGE  (CASK VASE)                                   ::  GLOBAL METADATA
+++  CASK  |*(A/MOLD (PAIR MARK A))                      ::  GLOBAL DATA
+++  CURD  {P/@TAS Q/*}                                  ::  TYPELESS CARD
+++  DUCT  (LIST WIRE)                                   ::  CAUSAL HISTORY
+++  HYPO  |*(A/MOLD (PAIR TYPE A))                      ::  TYPE ASSOCIATED
+++  HOBO  |*  A/MOLD                                    ::  KISS WRAPPER
+          $?  $%  {$SOFT P/*}                           ::
               ==                                        ::
-              a                                         ::
+              A                                         ::
           ==                                            ::
-++  mark  @tas                                          ::  content type
-++  mash  |=(* (mass +<))                               ::  producing mass
-++  mass  $~  [%$ [%& ~]]                               ::  memory usage
-          (pair cord (each noun (list mash)))           ::
-++  mill  (each vase milt)                              ::  vase+metavase
-++  milt  {p/* q/*}                                     ::  metavase
-++  monk  (each ship {p/@tas q/@ta})                    ::  general identity
-++  muse  {p/@tas q/duct r/arvo s/@ud}                  ::  sourced move
-++  move  {p/duct q/arvo}                               ::  arvo move
-++  ovum  {p/wire q/curd}                               ::  typeless ovum
-++  pane  (list {p/@tas q/vase})                        ::  kernel modules
-++  pone  (list {p/@tas q/vise})                        ::  kernel modules old
-+$  scry-sample
-  [fur=(unit (set monk)) ren=@tas why=shop syd=desk lot=coin tyl=path]
-+$  vane-sample
-  [our=ship now=@da eny=@uvJ ski=slyd]
-++  ship  @p                                            ::  network identity
-++  sink  (trel bone ship path)                         ::  subscription
-++  sley  $-  {* (unit (set monk)) term beam}           ::  namespace function
-          (unit (unit cage))                            ::
-++  slyd  $-  {* (unit (set monk)) term beam}           ::  super advanced
-          (unit (unit (cask)))                          ::
-++  slyt  $-({* *} (unit (unit)))                       ::  old namespace
-+$  vane  [=vase =worm]
-++  vile                                                ::  reflexive constants
-          $:  typ/type                                  ::  -:!>(*type)
-              duc/type                                  ::  -:!>(*duct)
-              pah/type                                  ::  -:!>(*path)
-              mev/type                                  ::  -:!>([%meta *vase])
+++  MARK  @TAS                                          ::  CONTENT TYPE
+++  MASH  |=(* (MASS +<))                               ::  PRODUCING MASS
+++  MASS  $~  [%$ [%& ~]]                               ::  MEMORY USAGE
+          (PAIR CORD (EACH NOUN (LIST MASH)))           ::
+++  MILL  (EACH VASE MILT)                              ::  VASE+METAVASE
+++  MILT  {P/* Q/*}                                     ::  METAVASE
+++  MONK  (EACH SHIP {P/@TAS Q/@TA})                    ::  GENERAL IDENTITY
+++  MUSE  {P/@TAS Q/DUCT R/ARVO S/@UD}                  ::  SOURCED MOVE
+++  MOVE  {P/DUCT Q/ARVO}                               ::  ARVO MOVE
+++  OVUM  {P/WIRE Q/CURD}                               ::  TYPELESS OVUM
+++  PANE  (LIST {P/@TAS Q/VASE})                        ::  KERNEL MODULES
+++  PONE  (LIST {P/@TAS Q/VISE})                        ::  KERNEL MODULES OLD
++$  SCRY-SAMPLE
+  [FUR=(UNIT (SET MONK)) REN=@TAS WHY=SHOP SYD=DESK LOT=COIN TYL=PATH]
++$  VANE-SAMPLE
+  [OUR=SHIP NOW=@DA ENY=@UVJ SKI=SLYD]
+++  SHIP  @P                                            ::  NETWORK IDENTITY
+++  SINK  (TREL BONE SHIP PATH)                         ::  SUBSCRIPTION
+++  SLEY  $-  {* (UNIT (SET MONK)) TERM BEAM}           ::  NAMESPACE FUNCTION
+          (UNIT (UNIT CAGE))                            ::
+++  SLYD  $-  {* (UNIT (SET MONK)) TERM BEAM}           ::  SUPER ADVANCED
+          (UNIT (UNIT (CASK)))                          ::
+++  SLYT  $-({* *} (UNIT (UNIT)))                       ::  OLD NAMESPACE
++$  VANE  [=VASE =WORM]
+++  VILE                                                ::  REFLEXIVE CONSTANTS
+          $:  TYP/TYPE                                  ::  -:!>(*TYPE)
+              DUC/TYPE                                  ::  -:!>(*DUCT)
+              PAH/TYPE                                  ::  -:!>(*PATH)
+              MEV/TYPE                                  ::  -:!>([%META *VASE])
           ==                                            ::
-++  wind                                                ::  new kernel action
-          |*  {a/mold b/mold}                           ::  forward+reverse
-          $%  {$pass p/path q/a}                        ::  advance
-              {$slip p/a}                               ::  lateral
-              {$give p/b}                               ::  retreat
+++  WIND                                                ::  NEW KERNEL ACTION
+          |*  {A/MOLD B/MOLD}                           ::  FORWARD+REVERSE
+          $%  {$PASS P/PATH Q/A}                        ::  ADVANCE
+              {$SLIP P/A}                               ::  LATERAL
+              {$GIVE P/B}                               ::  RETREAT
           ==                                            ::
-++  wire  path                                          ::  event pretext
+++  WIRE  PATH                                          ::  EVENT PRETEXT
 --
 =>
-~%  %hex  +>  ~
+~%  %HEX  +>  ~
 |%
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::                section 3bE, Arvo core                ::
+::                SECTION 3BE, ARVO CORE                ::
 ::
-++  sloy
-  ::  +sloy: adapter from old style scrys to new style scrys
+++  SLOY
+  ::  +SLOY: ADAPTER FROM OLD STYLE SCRYS TO NEW STYLE SCRYS
   ::
-  ::    This does path parsing which shows up hot, but removing the last +slay
-  ::    here requires deeper interface changes.
+  ::    THIS DOES PATH PARSING WHICH SHOWS UP HOT, BUT REMOVING THE LAST +SLAY
+  ::    HERE REQUIRES DEEPER INTERFACE CHANGES.
   ::
   !:
-  ~/  %sloy
-  |=  sod/slyd
-  ^-  slyt
-  |=  {ref/* raw/*}
-  =+  pux=((soft path) raw)
-  ?~  pux  ~
-  ?.  ?=({@ @ @ @ *} u.pux)  ~
-  =+  :*  hyr=(slaw %tas i.u.pux)
-          fal=(slaw %p i.t.u.pux)
-          dyc=(slaw %tas i.t.t.u.pux)
-          ved=(slay i.t.t.t.u.pux)
-          tyl=t.t.t.t.u.pux
+  ~/  %SLOY
+  |=  SOD/SLYD
+  ^-  SLYT
+  |=  {REF/* RAW/*}
+  =+  PUX=((SOFT PATH) RAW)
+  ?~  PUX  ~
+  ?.  ?=({@ @ @ @ *} U.PUX)  ~
+  =+  :*  HYR=(SLAW %TAS I.U.PUX)
+          FAL=(SLAW %P I.T.U.PUX)
+          DYC=(SLAW %TAS I.T.T.U.PUX)
+          VED=(SLAY I.T.T.T.U.PUX)
+          TYL=T.T.T.T.U.PUX
       ==
-  ?~  hyr  ~
-  ?~  fal  ~
-  ?~  dyc  ~
-  ?.  ?=(^ ved)  ~
-  =/  ron=@tas  u.hyr
-  =+  bed=[[u.fal u.dyc (case p.u.ved)] (flop tyl)]
-  =+  bop=(sod ref ~ ron bed)
-  ?~  bop  ~
-  ?~  u.bop  [~ ~]
-  [~ ~ +.q.u.u.bop]
-::  +sloy-light: minimal parsing version of sloy
+  ?~  HYR  ~
+  ?~  FAL  ~
+  ?~  DYC  ~
+  ?.  ?=(^ VED)  ~
+  =/  RON=@TAS  U.HYR
+  =+  BED=[[U.FAL U.DYC (CASE P.U.VED)] (FLOP TYL)]
+  =+  BOP=(SOD REF ~ RON BED)
+  ?~  BOP  ~
+  ?~  U.BOP  [~ ~]
+  [~ ~ +.Q.U.U.BOP]
+::  +SLOY-LIGHT: MINIMAL PARSING VERSION OF SLOY
 ::
-::    There are several places inside vanes where we manually call the scry
-::    function raw, instead of passing it into +mink. In those cases, we're
-::    paying the price to render the arguments as text, and then are
-::    immediately parsing the passed in data. We can avoid that.
+::    THERE ARE SEVERAL PLACES INSIDE VANES WHERE WE MANUALLY CALL THE SCRY
+::    FUNCTION RAW, INSTEAD OF PASSING IT INTO +MINK. IN THOSE CASES, WE'RE
+::    PAYING THE PRICE TO RENDER THE ARGUMENTS AS TEXT, AND THEN ARE
+::    IMMEDIATELY PARSING THE PASSED IN DATA. WE CAN AVOID THAT.
 ::
-::    TODO: The entire scrying system needs to be cleaned up in a more
-::    permanent way. This hack fixes up some print/parse costs, but doesn't
-::    recover the print/parse costs of the scry itself, which we could prevent
-::    if we didn't send (list @ta), but instead sent (list dime).
+::    TODO: THE ENTIRE SCRYING SYSTEM NEEDS TO BE CLEANED UP IN A MORE
+::    PERMANENT WAY. THIS HACK FIXES UP SOME PRINT/PARSE COSTS, BUT DOESN'T
+::    RECOVER THE PRINT/PARSE COSTS OF THE SCRY ITSELF, WHICH WE COULD PREVENT
+::    IF WE DIDN'T SEND (LIST @TA), BUT INSTEAD SENT (LIST DIME).
 ::
-++  sloy-light
-  ~/  %sloy-light
-  |=  sod/slyd
-  |=  [ref=* ron=@tas fal=@p dyc=@tas ved=case tyl=path]
-  ::  we do not flop tyl because tyl wouldn't have been flopped by +en-beam
+++  SLOY-LIGHT
+  ~/  %SLOY-LIGHT
+  |=  SOD/SLYD
+  |=  [REF=* RON=@TAS FAL=@P DYC=@TAS VED=CASE TYL=PATH]
+  ::  WE DO NOT FLOP TYL BECAUSE TYL WOULDN'T HAVE BEEN FLOPPED BY +EN-BEAM
   ::
-  =+  bed=[[fal dyc ved] tyl]
-  =+  bop=(sod ref ~ ron bed)
-  ?~  bop  ~
-  ?~  u.bop  [~ ~]
-  [~ ~ +.q.u.u.bop]
+  =+  BED=[[FAL DYC VED] TYL]
+  =+  BOP=(SOD REF ~ RON BED)
+  ?~  BOP  ~
+  ?~  U.BOP  [~ ~]
+  [~ ~ +.Q.U.U.BOP]
 ::
-++  symp                                                ::  symbol or empty
-  |=  a=*  ^-  @tas
-  ?.(&(?=(@ a) ((sane %tas) a)) %$ a)
+++  SYMP                                                ::  SYMBOL OR EMPTY
+  |=  A=*  ^-  @TAS
+  ?.(&(?=(@ A) ((SANE %TAS) A)) %$ A)
 ::
-++  vent                                                ::  vane core
-  |=  [who=ship lal=@tas vil=vile bud=vase =vane]
-  ~%  %vent  +>+  ~
+++  VENT                                                ::  VANE CORE
+  |=  [WHO=SHIP LAL=@TAS VIL=VILE BUD=VASE =VANE]
+  ~%  %VENT  +>+  ~
   |%
-  ++  ruck                                              ::  update vase
-    |=  {pax/path txt/@ta}
+  ++  RUCK                                              ::  UPDATE VASE
+    |=  {PAX/PATH TXT/@TA}
     ^+  +>
-    =-  ?:(?=(%| -.res) ((slog p.res) +>.$) p.res)
-    ^=  res  %-  mule  |.
-    ::  XX should use real entropy and the real date
+    =-  ?:(?=(%| -.RES) ((SLOG P.RES) +>.$) P.RES)
+    ^=  RES  %-  MULE  |.
+    ::  XX SHOULD USE REAL ENTROPY AND THE REAL DATE
     ::
-    =/  arg=vane-sample
-      [who ~2000.1.1 *@uvJ =>(~ |~(* ~))]
-    =+  rig=(slym vase.vane arg)
-    =+  gen=(rain pax txt)
-    =+  rev=(slym (slap bud gen) bud)
-    =+  syg=(slym rev arg)
-    ::  update the vane itself
+    =/  ARG=VANE-SAMPLE
+      [WHO ~2000.1.1 *@UVJ =>(~ |~(* ~))]
+    =+  RIG=(SLYM VASE.VANE ARG)
+    =+  GEN=(RAIN PAX TXT)
+    =+  REV=(SLYM (SLAP BUD GEN) BUD)
+    =+  SYG=(SLYM REV ARG)
+    ::  UPDATE THE VANE ITSELF
     ::
-    ::    We don't cache the +slap/+slam types because they're only used once
-    ::    right here; they'll never be used again.
+    ::    WE DON'T CACHE THE +SLAP/+SLAM TYPES BECAUSE THEY'RE ONLY USED ONCE
+    ::    RIGHT HERE; THEY'LL NEVER BE USED AGAIN.
     ::
-    =.  vase.vane
-      ~|  %load-lost
-      (slam (slap syg [%limb %load]) (slap rig [%limb %stay]))
-    ::  prime the new compiler cache
+    =.  VASE.VANE
+      ~|  %LOAD-LOST
+      (SLAM (SLAP SYG [%LIMB %LOAD]) (SLAP RIG [%LIMB %STAY]))
+    ::  PRIME THE NEW COMPILER CACHE
     ::
-    prime
-  ::  reset and prime the worm cache for scrys
+    PRIME
+  ::  RESET AND PRIME THE WORM CACHE FOR SCRYS
   ::
-  ::    If the +slap/+slym in scry isn't cached, we spend the majority of
-  ::    the time in a scry in the compiler. The +scry gate cannot have side
-  ::    effects so we can't modify the cache at access time. So we seed the
-  ::    cache with all the things +scry will need when we install the vane
+  ::    IF THE +SLAP/+SLYM IN SCRY ISN'T CACHED, WE SPEND THE MAJORITY OF
+  ::    THE TIME IN A SCRY IN THE COMPILER. THE +SCRY GATE CANNOT HAVE SIDE
+  ::    EFFECTS SO WE CAN'T MODIFY THE CACHE AT ACCESS TIME. SO WE SEED THE
+  ::    CACHE WITH ALL THE THINGS +SCRY WILL NEED WHEN WE INSTALL THE VANE
   ::
-  ++  prime
-    ^+  ..prime
+  ++  PRIME
+    ^+  ..PRIME
     ::
-    %_    ..prime
-        worm.vane
-      ::  reset cache and add in vane activation entry
+    %_    ..PRIME
+        WORM.VANE
+      ::  RESET CACHE AND ADD IN VANE ACTIVATION ENTRY
       ::
-      =^  rig  worm.vane
-        (~(slym wa *worm) vase.vane *vane-sample)
-      ::  cache the access of the %scry arm
+      =^  RIG  WORM.VANE
+        (~(SLYM WA *WORM) VASE.VANE *VANE-SAMPLE)
+      ::  CACHE THE ACCESS OF THE %SCRY ARM
       ::
-      +:(~(slap wa worm.vane) rig [%limb %scry])
+      +:(~(SLAP WA WORM.VANE) RIG [%LIMB %SCRY])
     ==
   ::
-  ++  wink                                              ::  deploy
-    |=  {now/@da eny/@ ski/slyd}
-    =^  rig  worm.vane
-      ~|  [%failed-vane-activation-for lal]
-      (~(slym wa worm.vane) vase.vane `vane-sample`[who +<])  ::  activate vane
-    ~%  %wink  +>+>  ~
+  ++  WINK                                              ::  DEPLOY
+    |=  {NOW/@DA ENY/@ SKI/SLYD}
+    =^  RIG  WORM.VANE
+      ~|  [%FAILED-VANE-ACTIVATION-FOR LAL]
+      (~(SLYM WA WORM.VANE) VASE.VANE `VANE-SAMPLE`[WHO +<])  ::  ACTIVATE VANE
+    ~%  %WINK  +>+>  ~
     |%
-    ++  slid
-      |=  {hed/mill tal/mill}
-      ^-  mill
-      ?:  &(?=(%& -.hed) ?=(%& -.tal))
-        [%& (slop p.hed p.tal)]
-      [%| [%cell p.p.hed p.p.tal] [q.p.hed q.p.tal]]
+    ++  SLID
+      |=  {HED/MILL TAL/MILL}
+      ^-  MILL
+      ?:  &(?=(%& -.HED) ?=(%& -.TAL))
+        [%& (SLOP P.HED P.TAL)]
+      [%| [%CELL P.P.HED P.P.TAL] [Q.P.HED Q.P.TAL]]
     ::
-    ++  slix
-      |=  hil/mill
-      ^-  mill
-      ?-  -.hil
-        %&  [%& (slop [typ.vil p.p.hil] p.hil)]
-        %|  [%| [%cell typ.vil p.p.hil] p.hil]
+    ++  SLIX
+      |=  HIL/MILL
+      ^-  MILL
+      ?-  -.HIL
+        %&  [%& (SLOP [TYP.VIL P.P.HIL] P.HIL)]
+        %|  [%| [%CELL TYP.VIL P.P.HIL] P.HIL]
       ==
     ::
-    ++  slur                                            ::  call gate on
-      |=  {gat/vase hil/mill}
-      ^-  (unit (pair vase worm))
-      =^  sam  worm.vane
-        ~|  [%failed-slot-in lal]
-        (~(slot wa worm.vane) 6 gat)
-      =^  hig  worm.vane
-        ~|  [%failed-nest-in lal]
-        ?-  -.hil
-          %&  (~(nest wa worm.vane) p.sam p.p.hil)
-          %|  (~(nets wa worm.vane) p.sam p.p.hil)
+    ++  SLUR                                            ::  CALL GATE ON
+      |=  {GAT/VASE HIL/MILL}
+      ^-  (UNIT (PAIR VASE WORM))
+      =^  SAM  WORM.VANE
+        ~|  [%FAILED-SLOT-IN LAL]
+        (~(SLOT WA WORM.VANE) 6 GAT)
+      =^  HIG  WORM.VANE
+        ~|  [%FAILED-NEST-IN LAL]
+        ?-  -.HIL
+          %&  (~(NEST WA WORM.VANE) P.SAM P.P.HIL)
+          %|  (~(NETS WA WORM.VANE) P.SAM P.P.HIL)
         ==
-      ?.  hig
+      ?.  HIG
         ~
-      ~|  [%failed-slym-in lal]
-      `(~(slym wa worm.vane) gat +>.hil)
+      ~|  [%FAILED-SLYM-IN LAL]
+      `(~(SLYM WA WORM.VANE) GAT +>.HIL)
     ::
-    ++  slur-a  ~/(%slur-a |=({gat/vase hil/mill} =+(%a (slur gat hil))))
-    ++  slur-b  ~/(%slur-b |=({gat/vase hil/mill} =+(%b (slur gat hil))))
-    ++  slur-c  ~/(%slur-c |=({gat/vase hil/mill} =+(%c (slur gat hil))))
-    ++  slur-d  ~/(%slur-d |=({gat/vase hil/mill} =+(%d (slur gat hil))))
-    ++  slur-e  ~/(%slur-e |=({gat/vase hil/mill} =+(%e (slur gat hil))))
-    ++  slur-f  ~/(%slur-f |=({gat/vase hil/mill} =+(%f (slur gat hil))))
-    ++  slur-g  ~/(%slur-g |=({gat/vase hil/mill} =+(%g (slur gat hil))))
-    ++  slur-j  ~/(%slur-j |=({gat/vase hil/mill} =+(%j (slur gat hil))))
-    ++  slur-z  ~/(%slur-z |=({gat/vase hil/mill} =+(%z (slur gat hil))))
+    ++  SLUR-A  ~/(%SLUR-A |=({GAT/VASE HIL/MILL} =+(%A (SLUR GAT HIL))))
+    ++  SLUR-B  ~/(%SLUR-B |=({GAT/VASE HIL/MILL} =+(%B (SLUR GAT HIL))))
+    ++  SLUR-C  ~/(%SLUR-C |=({GAT/VASE HIL/MILL} =+(%C (SLUR GAT HIL))))
+    ++  SLUR-D  ~/(%SLUR-D |=({GAT/VASE HIL/MILL} =+(%D (SLUR GAT HIL))))
+    ++  SLUR-E  ~/(%SLUR-E |=({GAT/VASE HIL/MILL} =+(%E (SLUR GAT HIL))))
+    ++  SLUR-F  ~/(%SLUR-F |=({GAT/VASE HIL/MILL} =+(%F (SLUR GAT HIL))))
+    ++  SLUR-G  ~/(%SLUR-G |=({GAT/VASE HIL/MILL} =+(%G (SLUR GAT HIL))))
+    ++  SLUR-J  ~/(%SLUR-J |=({GAT/VASE HIL/MILL} =+(%J (SLUR GAT HIL))))
+    ++  SLUR-Z  ~/(%SLUR-Z |=({GAT/VASE HIL/MILL} =+(%Z (SLUR GAT HIL))))
     ::
-    ++  slur-pro                                        ::  profiling slur
-      ~/  %slur-pro
-      |=  {lal/@tas gat/vase hil/mill}
-      ?+  lal  (slur-z gat hil)
-        $a  (slur-a gat hil)
-        $b  (slur-b gat hil)
-        $c  (slur-c gat hil)
-        $d  (slur-d gat hil)
-        $e  (slur-e gat hil)
-        $f  (slur-f gat hil)
-        $g  (slur-g gat hil)
-        $j  (slur-j gat hil)
+    ++  SLUR-PRO                                        ::  PROFILING SLUR
+      ~/  %SLUR-PRO
+      |=  {LAL/@TAS GAT/VASE HIL/MILL}
+      ?+  LAL  (SLUR-Z GAT HIL)
+        $A  (SLUR-A GAT HIL)
+        $B  (SLUR-B GAT HIL)
+        $C  (SLUR-C GAT HIL)
+        $D  (SLUR-D GAT HIL)
+        $E  (SLUR-E GAT HIL)
+        $F  (SLUR-F GAT HIL)
+        $G  (SLUR-G GAT HIL)
+        $J  (SLUR-J GAT HIL)
       ==
     ::
-    ++  song                                            ::  reduce metacard
-      ~/  %song                                         ::
-      |=  mex/vase                                      ::  mex: vase of card
-      ^-  (unit (pair mill worm))                       ::
-      =^  hip  worm.vane  (~(nell wa worm.vane) p.mex)          ::
-      ?.  hip  ~                                        ::  a card is a cell
-      ?.  ?=($meta -.q.mex)  `[[%& mex] worm.vane]          ::  ordinary card
-      =^  tiv  worm.vane  (~(slot wa worm.vane) 3 mex)          ::
-      =^  hip  worm.vane  (~(nell wa worm.vane) p.tiv)          ::
-      ?.  hip  ~                                        ::  a vase is a cell
-      =^  vax  worm.vane  (~(slot wa worm.vane) 2 tiv)          ::
-      =^  hip  worm.vane  (~(nest wa worm.vane) typ.vil p.vax)  ::
-      ?.  hip  ~                                        ::  vase head is type
-      %+  biff                                          ::
-        =+  mut=(milt q.tiv)                            ::  card type, value
-        |-  ^-  (unit (pair milt worm))                 ::
-        ?.  ?=({$meta p/* q/milt} q.mut)  `[mut worm.vane]  ::  ordinary metacard
-        =^  hip  worm.vane  (~(nets wa worm.vane) mev.vil p.mut)::
-        ?.  hip  ~                                      ::  meta-metacard
-        $(mut +.q.mut)                                  ::  descend into meta
-      |=(a/(pair milt worm) `[[%| p.a] q.a])            ::  milt to mill
+    ++  SONG                                            ::  REDUCE METACARD
+      ~/  %SONG                                         ::
+      |=  MEX/VASE                                      ::  MEX: VASE OF CARD
+      ^-  (UNIT (PAIR MILL WORM))                       ::
+      =^  HIP  WORM.VANE  (~(NELL WA WORM.VANE) P.MEX)          ::
+      ?.  HIP  ~                                        ::  A CARD IS A CELL
+      ?.  ?=($META -.Q.MEX)  `[[%& MEX] WORM.VANE]          ::  ORDINARY CARD
+      =^  TIV  WORM.VANE  (~(SLOT WA WORM.VANE) 3 MEX)          ::
+      =^  HIP  WORM.VANE  (~(NELL WA WORM.VANE) P.TIV)          ::
+      ?.  HIP  ~                                        ::  A VASE IS A CELL
+      =^  VAX  WORM.VANE  (~(SLOT WA WORM.VANE) 2 TIV)          ::
+      =^  HIP  WORM.VANE  (~(NEST WA WORM.VANE) TYP.VIL P.VAX)  ::
+      ?.  HIP  ~                                        ::  VASE HEAD IS TYPE
+      %+  BIFF                                          ::
+        =+  MUT=(MILT Q.TIV)                            ::  CARD TYPE, VALUE
+        |-  ^-  (UNIT (PAIR MILT WORM))                 ::
+        ?.  ?=({$META P/* Q/MILT} Q.MUT)  `[MUT WORM.VANE]  ::  ORDINARY METACARD
+        =^  HIP  WORM.VANE  (~(NETS WA WORM.VANE) MEV.VIL P.MUT)::
+        ?.  HIP  ~                                      ::  META-METACARD
+        $(MUT +.Q.MUT)                                  ::  DESCEND INTO META
+      |=(A/(PAIR MILT WORM) `[[%| P.A] Q.A])            ::  MILT TO MILL
     ::
-    ++  sump                                            ::  vase to move
-      ~/  %sump
-      |=  wec/vase
-      ^-  (unit (pair move worm))
-      %+  biff  ((soft duct) -.q.wec)
-      |=  a/duct
-      %+  bind
-        =-  ?-  -.har
-              %|  ~&  [%dead-card p.har]  ~             ::  XX properly log?
-              %&  (some p.har)
+    ++  SUMP                                            ::  VASE TO MOVE
+      ~/  %SUMP
+      |=  WEC/VASE
+      ^-  (UNIT (PAIR MOVE WORM))
+      %+  BIFF  ((SOFT DUCT) -.Q.WEC)
+      |=  A/DUCT
+      %+  BIND
+        =-  ?-  -.HAR
+              %|  ~&  [%DEAD-CARD P.HAR]  ~             ::  XX PROPERLY LOG?
+              %&  (SOME P.HAR)
             ==
-        ^=  har  ^-  (each (pair arvo worm) term)
-        =^  caq  worm.vane  (~(spot wa worm.vane) 3 wec)
-        ?+    q.caq   [%| (cat 3 %funk (symp q.caq))]
+        ^=  HAR  ^-  (EACH (PAIR ARVO WORM) TERM)
+        =^  CAQ  WORM.VANE  (~(SPOT WA WORM.VANE) 3 WEC)
+        ?+    Q.CAQ   [%| (CAT 3 %FUNK (SYMP Q.CAQ))]
         ::
-            {$pass p/* q/@tas r/{p/@tas q/*}}
-          %-  (bond |.([%| p.r.q.caq]))
-          %+  biff  ((soft @) q.q.caq)
-          |=  lal/@tas
-          ?.  ((sane %tas) lal)  ~
-          %+  biff  ((soft path) p.q.caq)
-          |=  pax/path
-          =^  yav  worm.vane  (~(spot wa worm.vane) 15 caq)
-          %+  bind  (song yav)
-          |=  {hil/mill vel/worm}
-          [%& [%pass pax lal hil] vel]
+            {$PASS P/* Q/@TAS R/{P/@TAS Q/*}}
+          %-  (BOND |.([%| P.R.Q.CAQ]))
+          %+  BIFF  ((SOFT @) Q.Q.CAQ)
+          |=  LAL/@TAS
+          ?.  ((SANE %TAS) LAL)  ~
+          %+  BIFF  ((SOFT PATH) P.Q.CAQ)
+          |=  PAX/PATH
+          =^  YAV  WORM.VANE  (~(SPOT WA WORM.VANE) 15 CAQ)
+          %+  BIND  (SONG YAV)
+          |=  {HIL/MILL VEL/WORM}
+          [%& [%PASS PAX LAL HIL] VEL]
         ::
-            {$give p/{p/@tas q/*}}
-          %-  (bond |.([%| p.p.q.caq]))
-          =^  yav  worm.vane  (~(spot wa worm.vane) 3 caq)
-          %+  bind  (song yav)
-          |=  {hil/mill vel/worm}
-          [%& [%give hil] vel]
+            {$GIVE P/{P/@TAS Q/*}}
+          %-  (BOND |.([%| P.P.Q.CAQ]))
+          =^  YAV  WORM.VANE  (~(SPOT WA WORM.VANE) 3 CAQ)
+          %+  BIND  (SONG YAV)
+          |=  {HIL/MILL VEL/WORM}
+          [%& [%GIVE HIL] VEL]
         ::
-            {$slip p/@tas q/{p/@tas q/*}}
-          %-  (bond |.([%| p.q.q.caq]))
-          %+  biff  ((soft @) p.q.caq)
-          |=  lal/@tas
-          ?.  ((sane %tas) lal)  ~
-          =^  yav  worm.vane  (~(spot wa worm.vane) 7 caq)
-          %+  bind  (song yav)
-          |=  {hil/mill vel/worm}
-          [%& [%slip lal hil] vel]
+            {$SLIP P/@TAS Q/{P/@TAS Q/*}}
+          %-  (BOND |.([%| P.Q.Q.CAQ]))
+          %+  BIFF  ((SOFT @) P.Q.CAQ)
+          |=  LAL/@TAS
+          ?.  ((SANE %TAS) LAL)  ~
+          =^  YAV  WORM.VANE  (~(SPOT WA WORM.VANE) 7 CAQ)
+          %+  BIND  (SONG YAV)
+          |=  {HIL/MILL VEL/WORM}
+          [%& [%SLIP LAL HIL] VEL]
         ==
-      |=(b/(pair arvo worm) [`move`[a p.b] q.b])
+      |=(B/(PAIR ARVO WORM) [`MOVE`[A P.B] Q.B])
     ::
-    ++  said                                            ::  vase to (list move)
-      |=  vud/vase
-      |-  ^-  (pair (list move) worm)
-      ?:  =(~ q.vud)  [~ worm.vane]
-      =^  hed  worm.vane  (~(slot wa worm.vane) 2 vud)
-      =^  tal  worm.vane  (~(slot wa worm.vane) 3 vud)
-      =^  mov  worm.vane  (need (sump hed))
-      =^  moz  worm.vane  $(vud tal)
-      [[mov moz] worm.vane]
+    ++  SAID                                            ::  VASE TO (LIST MOVE)
+      |=  VUD/VASE
+      |-  ^-  (PAIR (LIST MOVE) WORM)
+      ?:  =(~ Q.VUD)  [~ WORM.VANE]
+      =^  HED  WORM.VANE  (~(SLOT WA WORM.VANE) 2 VUD)
+      =^  TAL  WORM.VANE  (~(SLOT WA WORM.VANE) 3 VUD)
+      =^  MOV  WORM.VANE  (NEED (SUMP HED))
+      =^  MOZ  WORM.VANE  $(VUD TAL)
+      [[MOV MOZ] WORM.VANE]
     ::
-    ++  scry                                            ::  read namespace
-      ~/  %scry
-      |=  $:  fur/(unit (set monk))
-              ren/@t
-              bed/beam
+    ++  SCRY                                            ::  READ NAMESPACE
+      ~/  %SCRY
+      |=  $:  FUR/(UNIT (SET MONK))
+              REN/@T
+              BED/BEAM
           ==
-      ^-  (unit (unit (cask)))
-      ::  ~&  [%arvo-scry ren bed]
-      =/  old=scry-sample
-        :*  fur
-            ren
-            [%& p.bed]
-            q.bed
-            `coin`[%$ r.bed]
-            (flop s.bed)
+      ^-  (UNIT (UNIT (CASK)))
+      ::  ~&  [%ARVO-SCRY REN BED]
+      =/  OLD=SCRY-SAMPLE
+        :*  FUR
+            REN
+            [%& P.BED]
+            Q.BED
+            `COIN`[%$ R.BED]
+            (FLOP S.BED)
         ==
-      ^-  (unit (unit (cask)))
-      =+  fun=-:(~(slap wa worm.vane) rig [%limb %scry])
+      ^-  (UNIT (UNIT (CASK)))
+      =+  FUN=-:(~(SLAP WA WORM.VANE) RIG [%LIMB %SCRY])
       ::
-      %-  (unit (unit (cask)))
-      (slum q.fun old)
+      %-  (UNIT (UNIT (CASK)))
+      (SLUM Q.FUN OLD)
     ::
-    ++  soar                                            ::  scrub vane
-      |=  sev/vase
-      ^-  vase
-      ?:  &(=(-.q.vase.vane -.q.sev) =(+>.q.vase.vane +>.q.sev))
-        vase.vane                                           ::  unchanged, use old
-      =|  sam=vane-sample
-      sev(+<.q sam(ski =>(~ |~(* ~))))                      ::  clear to stop leak
+    ++  SOAR                                            ::  SCRUB VANE
+      |=  SEV/VASE
+      ^-  VASE
+      ?:  &(=(-.Q.VASE.VANE -.Q.SEV) =(+>.Q.VASE.VANE +>.Q.SEV))
+        VASE.VANE                                           ::  UNCHANGED, USE OLD
+      =|  SAM=VANE-SAMPLE
+      SEV(+<.Q SAM(SKI =>(~ |~(* ~))))                      ::  CLEAR TO STOP LEAK
     ::
-    ++  swim
-      ~/  %swim
-      |=  $:  org/@tas
-              pux/(unit wire)
-              hen/duct
-              hil/mill
+    ++  SWIM
+      ~/  %SWIM
+      |=  $:  ORG/@TAS
+              PUX/(UNIT WIRE)
+              HEN/DUCT
+              HIL/MILL
           ==
-      ^-  [(list move) _vane]
-      ~|  [%failed-swim lal org pux]
-      ::  ~&  [%swim-wyt `@ud`~(wyt in worm.vane)]
-      =+  ^=  pru
-          ?~  pux
-            ~|  [%swim-call-vane lal (symp ?@(+.p.hil +.p.hil +<.p.hil))]
-            =^  vax  worm.vane  (~(slap wa worm.vane) rig [%limb %call])
-            %^  slur-pro  lal  vax
-            (slid [%& duc.vil hen] (slix hil))
-          ~|  [%swim-take-vane lal (symp ?@(+.p.hil +.p.hil +<.p.hil))]
-          =^  vax  worm.vane  (~(slap wa worm.vane) rig [%limb %take])
-          %^  slur-pro  lal   vax
-          ;:  slid
-            [%& pah.vil u.pux]
-            [%& duc.vil hen]
-            (slix (slid [%& [%atom %tas `org] org] hil))
+      ^-  [(LIST MOVE) _VANE]
+      ~|  [%FAILED-SWIM LAL ORG PUX]
+      ::  ~&  [%SWIM-WYT `@UD`~(WYT IN WORM.VANE)]
+      =+  ^=  PRU
+          ?~  PUX
+            ~|  [%SWIM-CALL-VANE LAL (SYMP ?@(+.P.HIL +.P.HIL +<.P.HIL))]
+            =^  VAX  WORM.VANE  (~(SLAP WA WORM.VANE) RIG [%LIMB %CALL])
+            %^  SLUR-PRO  LAL  VAX
+            (SLID [%& DUC.VIL HEN] (SLIX HIL))
+          ~|  [%SWIM-TAKE-VANE LAL (SYMP ?@(+.P.HIL +.P.HIL +<.P.HIL))]
+          =^  VAX  WORM.VANE  (~(SLAP WA WORM.VANE) RIG [%LIMB %TAKE])
+          %^  SLUR-PRO  LAL   VAX
+          ;:  SLID
+            [%& PAH.VIL U.PUX]
+            [%& DUC.VIL HEN]
+            (SLIX (SLID [%& [%ATOM %TAS `ORG] ORG] HIL))
           ==
-      ?~  pru
-        ~&  [%swim-lost lal (symp +>-.hil)]
-        [~ [vase.vane worm.vane]]
-      =^  pro  worm.vane  (need pru)
-      =^  moz  worm.vane  (~(slot wa worm.vane) 2 pro)
-      =^  vem  worm.vane  (~(slot wa worm.vane) 3 pro)
-      =^  sad  worm.vane  (said moz)
-      [sad [(soar vem) worm.vane]]
+      ?~  PRU
+        ~&  [%SWIM-LOST LAL (SYMP +>-.HIL)]
+        [~ [VASE.VANE WORM.VANE]]
+      =^  PRO  WORM.VANE  (NEED PRU)
+      =^  MOZ  WORM.VANE  (~(SLOT WA WORM.VANE) 2 PRO)
+      =^  VEM  WORM.VANE  (~(SLOT WA WORM.VANE) 3 PRO)
+      =^  SAD  WORM.VANE  (SAID MOZ)
+      [SAD [(SOAR VEM) WORM.VANE]]
     --
   --
 ::
-++  vint                                                ::  create vane
-  |=  $:  who=ship
-          lal=@tas
-          vil=vile
-          bud=vase
-          pax=path
-          txt=@ta
+++  VINT                                                ::  CREATE VANE
+  |=  $:  WHO=SHIP
+          LAL=@TAS
+          VIL=VILE
+          BUD=VASE
+          PAX=PATH
+          TXT=@TA
       ==
-  =-  ?:(?=(%| -.res) ((slog p.res) ~) (some p.res))
-  ^=  res  %-  mule  |.
-  ~|  [%failed-vint lal]
-  =+  gen=(rain pax txt)
-  ~&  [%vane-parsed `@p`(mug gen)]
-  =+  pro=(vent who lal vil bud [(slym (slap bud gen) bud) *worm])
-  ~&  [%vane-compiled `@p`(mug pro)]
-  prime:pro
+  =-  ?:(?=(%| -.RES) ((SLOG P.RES) ~) (SOME P.RES))
+  ^=  RES  %-  MULE  |.
+  ~|  [%FAILED-VINT LAL]
+  =+  GEN=(RAIN PAX TXT)
+  ~&  [%VANE-PARSED `@P`(MUG GEN)]
+  =+  PRO=(VENT WHO LAL VIL BUD [(SLYM (SLAP BUD GEN) BUD) *WORM])
+  ~&  [%VANE-COMPILED `@P`(MUG PRO)]
+  PRIME:PRO
 ::
-++  viol                                                ::  vane tools
-  |=  but/type
-  ^-  vile
-  =+  pal=|=(a/@t ^-(type (~(play ut but) (vice a))))
-  :*  typ=(pal '$:type')
-      duc=(pal '$:duct')
-      pah=(pal '$:path')
-      mev=(pal '$:{$meta $vase}')
+++  VIOL                                                ::  VANE TOOLS
+  |=  BUT/TYPE
+  ^-  VILE
+  =+  PAL=|=(A/@T ^-(TYPE (~(PLAY UT BUT) (VICE A))))
+  :*  TYP=(PAL '$:TYPE')
+      DUC=(PAL '$:DUCT')
+      PAH=(PAL '$:PATH')
+      MEV=(PAL '$:{$META $VASE}')
   ==
 ::
-++  is                                                  ::  operate in time
-  |=  [who=ship vil=vile eny=@ bud=vase vanes=(list [label=@tas =vane])]
-  |_  now/@da
-  ++  beck
-    ^-  slyd
-    |=  {* fur/(unit (set monk)) ron/term bed/beam}
-    ^-  (unit (unit (cask)))
-    =>  .(fur ?^(fur fur `[[%& p.bed] ~ ~]))            ::  XX heinous
-    =+  lal=(end 3 1 ron)
-    =+  ren=(@t (rsh 3 1 ron))
-    |-  ^-  (unit (unit (cask)))
-    ?~  vanes  ~
-    ?.  =(lal label.i.vanes)  $(vanes t.vanes)
-    ~|  [%failed-scry ron bed]
-    %-  scry:(wink:(vent who lal vil bud vane.i.vanes) now eny ..^$)
-    [fur ren bed]
+++  IS                                                  ::  OPERATE IN TIME
+  |=  [WHO=SHIP VIL=VILE ENY=@ BUD=VASE VANES=(LIST [LABEL=@TAS =VANE])]
+  |_  NOW/@DA
+  ++  BECK
+    ^-  SLYD
+    |=  {* FUR/(UNIT (SET MONK)) RON/TERM BED/BEAM}
+    ^-  (UNIT (UNIT (CASK)))
+    =>  .(FUR ?^(FUR FUR `[[%& P.BED] ~ ~]))            ::  XX HEINOUS
+    =+  LAL=(END 3 1 RON)
+    =+  REN=(@T (RSH 3 1 RON))
+    |-  ^-  (UNIT (UNIT (CASK)))
+    ?~  VANES  ~
+    ?.  =(LAL LABEL.I.VANES)  $(VANES T.VANES)
+    ~|  [%FAILED-SCRY RON BED]
+    %-  SCRY:(WINK:(VENT WHO LAL VIL BUD VANE.I.VANES) NOW ENY ..^$)
+    [FUR REN BED]
   ::
-  ++  dink                                              ::  vase by char
-    |=  din/@tas  ^-  vase
-    ?~(vanes !! ?:(=(din label.i.vanes) vase.vane.i.vanes $(vanes t.vanes)))
+  ++  DINK                                              ::  VASE BY CHAR
+    |=  DIN/@TAS  ^-  VASE
+    ?~(VANES !! ?:(=(DIN LABEL.I.VANES) VASE.VANE.I.VANES $(VANES T.VANES)))
   ::
-  ++  dint                                              ::  input routing
-    |=  hap/path  ^-  @tas
-    ?+  hap  !!
-      {@ $ames *}  %a
-      {@ $boat *}  %c
-      {@ $newt *}  %a
-      {@ $sync *}  %c
-      {@ $term *}  %d
-      {@ $http *}  %e
-      {@ $behn *}  %b
+  ++  DINT                                              ::  INPUT ROUTING
+    |=  HAP/PATH  ^-  @TAS
+    ?+  HAP  !!
+      {@ $AMES *}  %A
+      {@ $BOAT *}  %C
+      {@ $NEWT *}  %A
+      {@ $SYNC *}  %C
+      {@ $TERM *}  %D
+      {@ $HTTP *}  %E
+      {@ $BEHN *}  %B
     ==
   ::
-  ++  hurl                                              ::  start loop
-    |=  {lac/? ovo/ovum}
-    ~?  &(!lac !=(%belt -.q.ovo))  ["" %unix -.q.ovo p.ovo]
-    ::  ^-  {p/(list ovum) q/(pair worm (list {p/@tas q/vase}))}
-    ^-  {p/(list ovum) q=(list [label=@tas =vane])}
-    ?>  ?=(^ p.ovo)
-    %+  kick  lac
-    :~  :*  i.p.ovo
+  ++  HURL                                              ::  START LOOP
+    |=  {LAC/? OVO/OVUM}
+    ~?  &(!LAC !=(%BELT -.Q.OVO))  ["" %UNIX -.Q.OVO P.OVO]
+    ::  ^-  {P/(LIST OVUM) Q/(PAIR WORM (LIST {P/@TAS Q/VASE}))}
+    ^-  {P/(LIST OVUM) Q=(LIST [LABEL=@TAS =VANE])}
+    ?>  ?=(^ P.OVO)
+    %+  KICK  LAC
+    :~  :*  I.P.OVO
             ~
-            :^  %pass  t.p.ovo
-              (dint p.ovo)
+            :^  %PASS  T.P.OVO
+              (DINT P.OVO)
             :+  %&
-              [%cell [%atom %tas `%soft] %noun]
-            [%soft q.ovo]
+              [%CELL [%ATOM %TAS `%SOFT] %NOUN]
+            [%SOFT Q.OVO]
             0
         ==
     ==
   ::
-  ++  race                                              ::  take
-    |=  {org/@tas lal/@tas pux/(unit wire) hen/duct hil/mill =vane}
-    ^-  [p=(list move) q=_vane]
-    =+  ven=(vent who lal vil bud vane)
-    ~|  [%failed-take lal]
-    =+  win=(wink:ven now eny beck)
-    (swim:win org pux hen hil)
+  ++  RACE                                              ::  TAKE
+    |=  {ORG/@TAS LAL/@TAS PUX/(UNIT WIRE) HEN/DUCT HIL/MILL =VANE}
+    ^-  [P=(LIST MOVE) Q=_VANE]
+    =+  VEN=(VENT WHO LAL VIL BUD VANE)
+    ~|  [%FAILED-TAKE LAL]
+    =+  WIN=(WINK:VEN NOW ENY BECK)
+    (SWIM:WIN ORG PUX HEN HIL)
   ::
-  ++  fire                                              ::  execute
-    |=  {org/term deh/@ud lal/term pux/(unit wire) hen/duct hil/mill}
-    ^-  {{p/(list ovum) q/(list muse)} _vanes}
-    ?:  &(?=(^ pux) ?=($~ hen))
-      [[[[lal u.pux] (curd +>.hil)]~ ~] vanes]
-    =+  naf=vanes
-    |-  ^-  {{p/(list ovum) q/(list muse)} _vanes}
-    ?~  naf  [[~ ~] ~]
-    ?.  =(lal label.i.naf)
-      =+  tuh=$(naf t.naf)
-      [-.tuh [+<.tuh [i.naf +>.tuh]]]
+  ++  FIRE                                              ::  EXECUTE
+    |=  {ORG/TERM DEH/@UD LAL/TERM PUX/(UNIT WIRE) HEN/DUCT HIL/MILL}
+    ^-  {{P/(LIST OVUM) Q/(LIST MUSE)} _VANES}
+    ?:  &(?=(^ PUX) ?=($~ HEN))
+      [[[[LAL U.PUX] (CURD +>.HIL)]~ ~] VANES]
+    =+  NAF=VANES
+    |-  ^-  {{P/(LIST OVUM) Q/(LIST MUSE)} _VANES}
+    ?~  NAF  [[~ ~] ~]
+    ?.  =(LAL LABEL.I.NAF)
+      =+  TUH=$(NAF T.NAF)
+      [-.TUH [+<.TUH [I.NAF +>.TUH]]]
     ::
-    =+  fiq=(race org lal pux hen hil vane.i.naf)
-    :-  [~ (turn p.fiq |=(a/move [lal p.a q.a +(deh)]))]
-    [[label.i.naf q.fiq] t.naf]
+    =+  FIQ=(RACE ORG LAL PUX HEN HIL VANE.I.NAF)
+    :-  [~ (TURN P.FIQ |=(A/MOVE [LAL P.A Q.A +(DEH)]))]
+    [[LABEL.I.NAF Q.FIQ] T.NAF]
   ::
-  ++  jack                                              ::  dispatch card
-    |=  {lac/? gum/muse}
-    ^-  {{p/(list ovum) q/(list muse)} _vanes}
-    ~|  %failed-jack
-    ::  =.  lac  |(lac ?=(?(%g %f) p.gum))
-    ::  =.  lac  &(lac !?=($b p.gum))
-    %^    fire
-        p.gum
-      s.gum
-    ?-    -.r.gum
-        $pass
-      ~?  &(!lac !=(%$ p.gum))
-        :-  (runt [s.gum '|'] "")
-        :^  %pass  [p.gum p.q.r.gum]
-          [(symp +>-.q.q.r.gum) p.r.gum]
-        q.gum
-      [p.q.r.gum ~ [[p.gum p.r.gum] q.gum] q.q.r.gum]
+  ++  JACK                                              ::  DISPATCH CARD
+    |=  {LAC/? GUM/MUSE}
+    ^-  {{P/(LIST OVUM) Q/(LIST MUSE)} _VANES}
+    ~|  %FAILED-JACK
+    ::  =.  LAC  |(LAC ?=(?(%G %F) P.GUM))
+    ::  =.  LAC  &(LAC !?=($B P.GUM))
+    %^    FIRE
+        P.GUM
+      S.GUM
+    ?-    -.R.GUM
+        $PASS
+      ~?  &(!LAC !=(%$ P.GUM))
+        :-  (RUNT [S.GUM '|'] "")
+        :^  %PASS  [P.GUM P.Q.R.GUM]
+          [(SYMP +>-.Q.Q.R.GUM) P.R.GUM]
+        Q.GUM
+      [P.Q.R.GUM ~ [[P.GUM P.R.GUM] Q.GUM] Q.Q.R.GUM]
     ::
-        $give
-      ?.  &(?=(^ q.gum) ?=(^ i.q.gum))
-        ~|  [%jack-bad-duct q.gum]
-        ~|  [%jack-bad-card p.gum (symp +>-.p.r.gum)]
+        $GIVE
+      ?.  &(?=(^ Q.GUM) ?=(^ I.Q.GUM))
+        ~|  [%JACK-BAD-DUCT Q.GUM]
+        ~|  [%JACK-BAD-CARD P.GUM (SYMP +>-.P.R.GUM)]
         !!
-      ~?  &(!lac |(!=(%blit +>-.p.r.gum) !=(%d p.gum)))
-        :-  (runt [s.gum '|'] "")
-        [%give p.gum (symp +>-.p.r.gum) `duct`q.gum]
-      [i.i.q.gum [~ t.i.q.gum] t.q.gum p.r.gum]
+      ~?  &(!LAC |(!=(%BLIT +>-.P.R.GUM) !=(%D P.GUM)))
+        :-  (RUNT [S.GUM '|'] "")
+        [%GIVE P.GUM (SYMP +>-.P.R.GUM) `DUCT`Q.GUM]
+      [I.I.Q.GUM [~ T.I.Q.GUM] T.Q.GUM P.R.GUM]
     ::
-        $slip
-      ~?  !lac
-        :-  (runt [s.gum '|'] "")
-        [%slip p.gum (symp +>-.q.p.r.gum) q.gum]
-      [p.p.r.gum ~ q.gum q.p.r.gum]
+        $SLIP
+      ~?  !LAC
+        :-  (RUNT [S.GUM '|'] "")
+        [%SLIP P.GUM (SYMP +>-.Q.P.R.GUM) Q.GUM]
+      [P.P.R.GUM ~ Q.GUM Q.P.R.GUM]
     ==
   ::
-  ++  kick                                              ::  new main loop
-    |=  {lac/? mor/(list muse)}
-    =|  ova/(list ovum)
-    |-  ^-  {p/(list ovum) q=(list [label=@tas =vane])}
-    ?~  mor
-      [ova vanes]
-    =^  nyx  vanes  (jack lac i.mor)
-    ::  we emit ova to unix in fifo order, but emit internal moves depth-first
+  ++  KICK                                              ::  NEW MAIN LOOP
+    |=  {LAC/? MOR/(LIST MUSE)}
+    =|  OVA/(LIST OVUM)
+    |-  ^-  {P/(LIST OVUM) Q=(LIST [LABEL=@TAS =VANE])}
+    ?~  MOR
+      [OVA VANES]
+    =^  NYX  VANES  (JACK LAC I.MOR)
+    ::  WE EMIT OVA TO UNIX IN FIFO ORDER, BUT EMIT INTERNAL MOVES DEPTH-FIRST
     ::
-    $(ova (weld ova p.nyx), mor (weld q.nyx t.mor))
-  ::  +spam: kick every vane with :ovum
+    $(OVA (WELD OVA P.NYX), MOR (WELD Q.NYX T.MOR))
+  ::  +SPAM: KICK EVERY VANE WITH :OVUM
   ::
-  ++  spam
-    |=  [lac=? ovo=ovum]
-    ^-  [(list ovum) (list [label=@tas =vane])]
-    =/  card
+  ++  SPAM
+    |=  [LAC=? OVO=OVUM]
+    ^-  [(LIST OVUM) (LIST [LABEL=@TAS =VANE])]
+    =/  CARD
       :+  %&
-        [%cell [%atom %tas `%soft] %noun]
-      [%soft q.ovo]
-    %+  kick  lac
-    %+  turn  vanes
-    |=([label=@tas *] [label ~ [%pass p.ovo label card] 0])
+        [%CELL [%ATOM %TAS `%SOFT] %NOUN]
+      [%SOFT Q.OVO]
+    %+  KICK  LAC
+    %+  TURN  VANES
+    |=([LABEL=@TAS *] [LABEL ~ [%PASS P.OVO LABEL CARD] 0])
   --
 --
-=<  ::  Arvo larval stage
+=<  ::  ARVO LARVAL STAGE
     ::
-    ::    The true Arvo kernel knows who it is. It should not *maybe*
-    ::    have an identity, nor should it contain multitudes. This outer
-    ::    kernel exists to accumulate identity, entropy, and the
-    ::    standard library. Upon having done so, it upgrades itself into
-    ::    the true Arvo kernel. Subsequent upgrades will fall through
-    ::    the larval stage directly into the actual kernel.
+    ::    THE TRUE ARVO KERNEL KNOWS WHO IT IS. IT SHOULD NOT *MAYBE*
+    ::    HAVE AN IDENTITY, NOR SHOULD IT CONTAIN MULTITUDES. THIS OUTER
+    ::    KERNEL EXISTS TO ACCUMULATE IDENTITY, ENTROPY, AND THE
+    ::    STANDARD LIBRARY. UPON HAVING DONE SO, IT UPGRADES ITSELF INTO
+    ::    THE TRUE ARVO KERNEL. SUBSEQUENT UPGRADES WILL FALL THROUGH
+    ::    THE LARVAL STAGE DIRECTLY INTO THE ACTUAL KERNEL.
     ::
-    ::    For convenience, this larval stage also supports hoon compilation
-    ::    with +wish and vane installation with the %veer event.
+    ::    FOR CONVENIENCE, THIS LARVAL STAGE ALSO SUPPORTS HOON COMPILATION
+    ::    WITH +WISH AND VANE INSTALLATION WITH THE %VEER EVENT.
     ::
-    =/  pit=vase  !>(..is)
-    =|  $:  ::  who: our identity once we know it
-            ::  eny: entropy once we learn it
-            ::  bod: %zuse once we receive it
+    =/  PIT=VASE  !>(..IS)
+    =|  $:  ::  WHO: OUR IDENTITY ONCE WE KNOW IT
+            ::  ENY: ENTROPY ONCE WE LEARN IT
+            ::  BOD: %ZUSE ONCE WE RECEIVE IT
             ::
-            who=(unit ship)
-            eny=(unit @)
-            bod=(unit vase)
+            WHO=(UNIT SHIP)
+            ENY=(UNIT @)
+            BOD=(UNIT VASE)
         ==
-    ::  larval Arvo structural interface
+    ::  LARVAL ARVO STRUCTURAL INTERFACE
     ::
     |%
-    ++  come  ^come                                     ::   4
-    ++  load  ^load                                     ::  10
-    ++  peek  |=(* ~)                                   ::  46
+    ++  COME  ^COME                                     ::   4
+    ++  LOAD  ^LOAD                                     ::  10
+    ++  PEEK  |=(* ~)                                   ::  46
     ::
-    ++  poke  |=  *                                     ::  47
-              ^-  [(list ovum) *]
-              =>  .(+< ((hard ,[now=@da ovo=ovum]) +<))
-              ^-  [(list ovum) *]
+    ++  POKE  |=  *                                     ::  47
+              ^-  [(LIST OVUM) *]
+              =>  .(+< ((HARD ,[NOW=@DA OVO=OVUM]) +<))
+              ^-  [(LIST OVUM) *]
               =.  +>.$
-                ?+  -.q.ovo
-                  ::  ignore unrecognized
+                ?+  -.Q.OVO
+                  ::  IGNORE UNRECOGNIZED
                   ::
-                  ~&  [%larval-ignore p.ovo -.q.ovo]
+                  ~&  [%LARVAL-IGNORE P.OVO -.Q.OVO]
                   +>.$
-                ::  install %zuse or vane
+                ::  INSTALL %ZUSE OR VANE
                 ::
-                    %veer
+                    %VEER
                   ^+  +>.$
-                  ::  use the maximum comet if we don't know who we are yet
+                  ::  USE THE MAXIMUM COMET IF WE DON'T KNOW WHO WE ARE YET
                   ::
-                  =/  our
-                    ?^  who
-                      u.who
-                    =/  fip=ship  (dec (bex 128))
-                    ~>(%slog.[0 leaf+"arvo: larval identity {(scow %p fip)}"] fip)
-                  =.  ..veer  (veer our now q.ovo)
-                  +>.$(bod ?^(bod bod `bud.^poke))
-                ::  add entropy
+                  =/  OUR
+                    ?^  WHO
+                      U.WHO
+                    =/  FIP=SHIP  (DEC (BEX 128))
+                    ~>(%SLOG.[0 LEAF+"ARVO: LARVAL IDENTITY {(SCOW %P FIP)}"] FIP)
+                  =.  ..VEER  (VEER OUR NOW Q.OVO)
+                  +>.$(BOD ?^(BOD BOD `BUD.^POKE))
+                ::  ADD ENTROPY
                 ::
-                    %wack
+                    %WACK
                   ^+  +>.$
-                  ?>  ?=(@ q.q.ovo)
-                  +>.$(eny `q.q.ovo)
-                ::  become who you were born to be
+                  ?>  ?=(@ Q.Q.OVO)
+                  +>.$(ENY `Q.Q.OVO)
+                ::  BECOME WHO YOU WERE BORN TO BE
                 ::
-                    %whom
+                    %WHOM
                   ^+  +>.$
-                  ?>  ?=(@ q.q.ovo)
-                  +>.$(who `q.q.ovo)
+                  ?>  ?=(@ Q.Q.OVO)
+                  +>.$(WHO `Q.Q.OVO)
                 ==
-              ::  upgrade once we've accumulated identity, entropy, and %zuse
+              ::  UPGRADE ONCE WE'VE ACCUMULATED IDENTITY, ENTROPY, AND %ZUSE
               ::
-              ?.  &(?=(^ who) ?=(^ eny) ?=(^ bod))
+              ?.  &(?=(^ WHO) ?=(^ ENY) ?=(^ BOD))
                 [~ +>.$]
-              ~>  %slog.[0 leaf+"arvo: metamorphosis"]
-              =/  nyf
-                (turn vanes.^poke |=([label=@tas =vane] [label vase.vane]))
-              (load u.who now u.eny ova=~ u.bod nyf)
+              ~>  %SLOG.[0 LEAF+"ARVO: METAMORPHOSIS"]
+              =/  NYF
+                (TURN VANES.^POKE |=([LABEL=@TAS =VANE] [LABEL VASE.VANE]))
+              (LOAD U.WHO NOW U.ENY OVA=~ U.BOD NYF)
     ::
-    ++  wish  |=  txt=*                                 ::  22
-              ?>  ?=(@ txt)
-              q:(slap ?~(bod pit u.bod) (ream txt))
+    ++  WISH  |=  TXT=*                                 ::  22
+              ?>  ?=(@ TXT)
+              Q:(SLAP ?~(BOD PIT U.BOD) (REAM TXT))
     --
 ::
-::  persistent arvo state
+::  PERSISTENT ARVO STATE
 ::
-=/  pit=vase  !>(..is)                                  ::
-=/  vil=vile  (viol p.pit)                              ::  cached reflexives
-=|  $:  lac=?                                           ::  laconic bit
-        eny=@                                           ::  entropy
-        our=ship                                        ::  identity
-        bud=vase                                        ::  %zuse
-        vanes=(list [label=@tas =vane])                 ::  modules
+=/  PIT=VASE  !>(..IS)                                  ::
+=/  VIL=VILE  (VIOL P.PIT)                              ::  CACHED REFLEXIVES
+=|  $:  LAC=?                                           ::  LACONIC BIT
+        ENY=@                                           ::  ENTROPY
+        OUR=SHIP                                        ::  IDENTITY
+        BUD=VASE                                        ::  %ZUSE
+        VANES=(LIST [LABEL=@TAS =VANE])                 ::  MODULES
     ==                                                  ::
-=<  ::  Arvo structural interface
+=<  ::  ARVO STRUCTURAL INTERFACE
     ::
     |%
-    ++  come  |=  {@ @ @ (list ovum) vise pone}         ::   4
-              ^-  {(list ovum) _+>}
-              ~&  %hoon-come
-              =^  rey  +>+  (^come +<)
-              [rey +>.$]
+    ++  COME  |=  {@ @ @ (LIST OVUM) VISE PONE}         ::   4
+              ^-  {(LIST OVUM) _+>}
+              ~&  %HOON-COME
+              =^  REY  +>+  (^COME +<)
+              [REY +>.$]
     ::
-    ++  load  |=  {@ @ @ (list ovum) vase pane}         ::  10
-              ^-  {(list ovum) _+>}
-              ~&  %hoon-load
-              =^  rey  +>+  (^load +<)
-              [rey +>.$]
+    ++  LOAD  |=  {@ @ @ (LIST OVUM) VASE PANE}         ::  10
+              ^-  {(LIST OVUM) _+>}
+              ~&  %HOON-LOAD
+              =^  REY  +>+  (^LOAD +<)
+              [REY +>.$]
     ::
-    ++  peek  |=(* (^peek ((hard {@da path}) +<)))      ::  46
+    ++  PEEK  |=(* (^PEEK ((HARD {@DA PATH}) +<)))      ::  46
     ::
-    ++  poke  |=  *                                     ::  47
-              ^-  [(list ovum) *]
-              =>  .(+< ((hard ,[now=@da ovo=ovum]) +<))
-              =^  ova  +>+.$  (^poke now ovo)
-              =|  out=(list ovum)
-              |-  ^-  [(list ovum) *]
-              ?~  ova
-                [(flop out) +>.^$]
-              ::  upgrade the kernel
+    ++  POKE  |=  *                                     ::  47
+              ^-  [(LIST OVUM) *]
+              =>  .(+< ((HARD ,[NOW=@DA OVO=OVUM]) +<))
+              =^  OVA  +>+.$  (^POKE NOW OVO)
+              =|  OUT=(LIST OVUM)
+              |-  ^-  [(LIST OVUM) *]
+              ?~  OVA
+                [(FLOP OUT) +>.^$]
+              ::  UPGRADE THE KERNEL
               ::
-              ?:  ?=(%lyra -.q.i.ova)
-                %+  fall
-                  (vega now t.ova ({@ @} +.q.i.ova))
+              ?:  ?=(%LYRA -.Q.I.OVA)
+                %+  FALL
+                  (VEGA NOW T.OVA ({@ @} +.Q.I.OVA))
                 [~ +>.^$]
-              ::  iterate over effects, handling those on arvo proper
-              ::  and passing the rest through as output
+              ::  ITERATE OVER EFFECTS, HANDLING THOSE ON ARVO PROPER
+              ::  AND PASSING THE REST THROUGH AS OUTPUT
               ::
-              =^  vov  +>+.^$  (feck now i.ova)
-              =?  out  ?=(^ vov)  [+.vov out]
-              $(ova t.ova)
+              =^  VOV  +>+.^$  (FECK NOW I.OVA)
+              =?  OUT  ?=(^ VOV)  [+.VOV OUT]
+              $(OVA T.OVA)
     ::
-    ++  wish  |=(* (^wish ((hard @ta) +<)))             ::  22
+    ++  WISH  |=(* (^WISH ((HARD @TA) +<)))             ::  22
     --
-::  Arvo implementation core
+::  ARVO IMPLEMENTATION CORE
 ::
 |%
-++  come                                                ::  load incompatible
-  |=  [who=ship now=@da yen=@ ova=(list ovum) dub=vise nyf=pone]
-  ^+  [ova +>]
-  =/  fyn  (turn nyf |=([a=@tas b=vise] [a (slim b)]))
-  (load who now yen ova (slim dub) fyn)
+++  COME                                                ::  LOAD INCOMPATIBLE
+  |=  [WHO=SHIP NOW=@DA YEN=@ OVA=(LIST OVUM) DUB=VISE NYF=PONE]
+  ^+  [OVA +>]
+  =/  FYN  (TURN NYF |=([A=@TAS B=VISE] [A (SLIM B)]))
+  (LOAD WHO NOW YEN OVA (SLIM DUB) FYN)
 ::
-++  load                                                ::  load compatible
-  |=  [who=ship now=@da yen=@ ova=(list ovum) dub=vase nyf=pane]
-  ^+  [ova +>]
-  =:  our  who
-      eny  yen
-      bud  dub
-      vanes  (turn nyf |=({a/@tas b/vise} [a [b *worm]]))
+++  LOAD                                                ::  LOAD COMPATIBLE
+  |=  [WHO=SHIP NOW=@DA YEN=@ OVA=(LIST OVUM) DUB=VASE NYF=PANE]
+  ^+  [OVA +>]
+  =:  OUR  WHO
+      ENY  YEN
+      BUD  DUB
+      VANES  (TURN NYF |=({A/@TAS B/VISE} [A [B *WORM]]))
     ==
-  =|  out=(list ovum)
-  |-  ^-  [(list ovum) _+>.^$]
-  ?~  ova
-    [(flop out) +>.^$]
-  ::  iterate over effects, handling those on arvo proper
-  ::  and passing the rest through as output
+  =|  OUT=(LIST OVUM)
+  |-  ^-  [(LIST OVUM) _+>.^$]
+  ?~  OVA
+    [(FLOP OUT) +>.^$]
+  ::  ITERATE OVER EFFECTS, HANDLING THOSE ON ARVO PROPER
+  ::  AND PASSING THE REST THROUGH AS OUTPUT
   ::
-  ::    In practice, the pending effects after an upgrade
-  ::    are the %veer moves to install %zuse and the vanes,
-  ::    plus a %vega notification that the upgrade is complete.
+  ::    IN PRACTICE, THE PENDING EFFECTS AFTER AN UPGRADE
+  ::    ARE THE %VEER MOVES TO INSTALL %ZUSE AND THE VANES,
+  ::    PLUS A %VEGA NOTIFICATION THAT THE UPGRADE IS COMPLETE.
   ::
-  ::    N.B. this implementation assumes that %vega will be
-  ::    at the end of :ova.
+  ::    N.B. THIS IMPLEMENTATION ASSUMES THAT %VEGA WILL BE
+  ::    AT THE END OF :OVA.
   ::
-  ?:  ?=(%vega -.q.i.ova)
-    =^  zef  vanes
-      (~(spam (is our vil eny bud vanes) now) lac i.ova)
-    $(out [i.ova out], ova (weld t.ova zef))
+  ?:  ?=(%VEGA -.Q.I.OVA)
+    =^  ZEF  VANES
+      (~(SPAM (IS OUR VIL ENY BUD VANES) NOW) LAC I.OVA)
+    $(OUT [I.OVA OUT], OVA (WELD T.OVA ZEF))
   ::
-  =^  vov  +>.^$  (feck now i.ova)
-  =?  out  ?=(^ vov)  [+.vov out]
-  $(ova t.ova)
+  =^  VOV  +>.^$  (FECK NOW I.OVA)
+  =?  OUT  ?=(^ VOV)  [+.VOV OUT]
+  $(OVA T.OVA)
 ::
-++  peek                                                ::  external inspect
-  |=  {now/@da hap/path}
-  ^-  (unit)
-  ?~  hap  [~ hoon-version]
-  =+  rob=((sloy ~(beck (is our vil eny bud vanes) now)) [151 %noun] hap)
-  ?~  rob  ~
-  ?~  u.rob  ~
-  [~ u.u.rob]
+++  PEEK                                                ::  EXTERNAL INSPECT
+  |=  {NOW/@DA HAP/PATH}
+  ^-  (UNIT)
+  ?~  HAP  [~ HOON-VERSION]
+  =+  ROB=((SLOY ~(BECK (IS OUR VIL ENY BUD VANES) NOW)) [151 %NOUN] HAP)
+  ?~  ROB  ~
+  ?~  U.ROB  ~
+  [~ U.U.ROB]
 ::
-++  poke                                                ::  external apply
-  |=  [now=@da ovo=ovum]
-  =.  eny  (shaz (cat 3 eny now))
-  ^-  [(list ovum) _+>.$]
+++  POKE                                                ::  EXTERNAL APPLY
+  |=  [NOW=@DA OVO=OVUM]
+  =.  ENY  (SHAZ (CAT 3 ENY NOW))
+  ^-  [(LIST OVUM) _+>.$]
   ::
-  ::  These external events are actually effects on arvo proper.
-  ::  They can also be produced as the effects of other events.
-  ::  In either case, they fall through here to be handled
-  ::  after the fact in +feck.
+  ::  THESE EXTERNAL EVENTS ARE ACTUALLY EFFECTS ON ARVO PROPER.
+  ::  THEY CAN ALSO BE PRODUCED AS THE EFFECTS OF OTHER EVENTS.
+  ::  IN EITHER CASE, THEY FALL THROUGH HERE TO BE HANDLED
+  ::  AFTER THE FACT IN +FECK.
   ::
-  ?:  ?=(?(%veer %verb %wack) -.q.ovo)
-    [[ovo ~] +>.$]
+  ?:  ?=(?(%VEER %VERB %WACK) -.Q.OVO)
+    [[OVO ~] +>.$]
   ::
-  =^  zef  vanes
-    (~(hurl (is our vil eny bud vanes) now) lac ovo)
-  [zef +>.$]
-::  +feck: handle an arvo effect
+  =^  ZEF  VANES
+    (~(HURL (IS OUR VIL ENY BUD VANES) NOW) LAC OVO)
+  [ZEF +>.$]
+::  +FECK: HANDLE AN ARVO EFFECT
 ::
-++  feck
-  |=  [now=@da ovo=ovum]
-  ^-  [(unit ovum) _+>.$]
-  ?+  -.q.ovo
-      ::  pass through unrecognized effect
+++  FECK
+  |=  [NOW=@DA OVO=OVUM]
+  ^-  [(UNIT OVUM) _+>.$]
+  ?+  -.Q.OVO
+      ::  PASS THROUGH UNRECOGNIZED EFFECT
       ::
-      [[~ ovo] +>.$]
-  ::  toggle event verbose event printfs
+      [[~ OVO] +>.$]
+  ::  TOGGLE EVENT VERBOSE EVENT PRINTFS
   ::
-      %verb
-    [~ +>.$(lac !lac)]
-  ::  install %zuse or vane
+      %VERB
+    [~ +>.$(LAC !LAC)]
+  ::  INSTALL %ZUSE OR VANE
   ::
-      %veer
-    [~ (veer our now q.ovo)]
-  ::  add data to memory profile
+      %VEER
+    [~ (VEER OUR NOW Q.OVO)]
+  ::  ADD DATA TO MEMORY PROFILE
   ::
-      %mass
-    =.  q.q.ovo
-      :-  %userspace
+      %MASS
+    =.  Q.Q.OVO
+      :-  %USERSPACE
       :-  %|
-      :~  hoon+&+pit
-          zuse+&+bud
-          :+  %caches  %|
-          %+  turn
-            %+  sort  vanes
-            |=([a=[lab=@tas *] b=[lab=@tas *]] (aor lab.a lab.b))
-          |=([label=@tas =vane] [(cat 3 %vane- label) %& worm.vane])
-          q.q.ovo
-          :+  %vases  %|
-          %+  turn
-            %+  sort  vanes
-            |=([a=[lab=@tas *] b=[lab=@tas *]] (aor lab.a lab.b))
-          |=([label=@tas =vane] [(cat 3 %vane- label) %& vase.vane])
-          dot+&+.
+      :~  HOON+&+PIT
+          ZUSE+&+BUD
+          :+  %CACHES  %|
+          %+  TURN
+            %+  SORT  VANES
+            |=([A=[LAB=@TAS *] B=[LAB=@TAS *]] (AOR LAB.A LAB.B))
+          |=([LABEL=@TAS =VANE] [(CAT 3 %VANE- LABEL) %& WORM.VANE])
+          Q.Q.OVO
+          :+  %VASES  %|
+          %+  TURN
+            %+  SORT  VANES
+            |=([A=[LAB=@TAS *] B=[LAB=@TAS *]] (AOR LAB.A LAB.B))
+          |=([LABEL=@TAS =VANE] [(CAT 3 %VANE- LABEL) %& VASE.VANE])
+          DOT+&+.
       ==
-    [[~ ovo] +>.$]
-  ::  add entropy
+    [[~ OVO] +>.$]
+  ::  ADD ENTROPY
   ::
-      %wack
-    ?>  ?=(@ q.q.ovo)
-    =.  eny  (shaz (cat 3 eny q.q.ovo))
+      %WACK
+    ?>  ?=(@ Q.Q.OVO)
+    =.  ENY  (SHAZ (CAT 3 ENY Q.Q.OVO))
     [~ +>.$]
   ==
 ::
-++  vega                                                ::  reboot kernel
-  |=  $:  ::  now: current date
-          ::  ova: actions to process after reboot
-          ::  hun: hoon.hoon source
-          ::  arv: arvo.hoon source
+++  VEGA                                                ::  REBOOT KERNEL
+  |=  $:  ::  NOW: CURRENT DATE
+          ::  OVA: ACTIONS TO PROCESS AFTER REBOOT
+          ::  HUN: HOON.HOON SOURCE
+          ::  ARV: ARVO.HOON SOURCE
           ::
-          now=@da
-          ova=(list ovum)
-          hun=@t
-          van=@t
+          NOW=@DA
+          OVA=(LIST OVUM)
+          HUN=@T
+          VAN=@T
       ==
-  ^-  (unit (pair (list ovum) *))
-  ::  virtualize; dump error if we fail
+  ^-  (UNIT (PAIR (LIST OVUM) *))
+  ::  VIRTUALIZE; DUMP ERROR IF WE FAIL
   ::
-  =-  ?:(?=(%| -.res) ((slog p.res) ~) `p.res)
-  ^=  res  %-  mule  |.
-  ::  produce a new kernel and an effect list
+  =-  ?:(?=(%| -.RES) ((SLOG P.RES) ~) `P.RES)
+  ^=  RES  %-  MULE  |.
+  ::  PRODUCE A NEW KERNEL AND AN EFFECT LIST
   ::
-  ^-  (pair (list ovum) *)
-  ::  compile the hoon.hoon source with the current compiler
+  ^-  (PAIR (LIST OVUM) *)
+  ::  COMPILE THE HOON.HOON SOURCE WITH THE CURRENT COMPILER
   ::
-  =/  raw
-    ~&  [%hoon-compile `@p`(mug hun)]
-    (ride %noun hun)
-  ::  activate the new compiler gate, producing +ride
+  =/  RAW
+    ~&  [%HOON-COMPILE `@P`(MUG HUN)]
+    (RIDE %NOUN HUN)
+  ::  ACTIVATE THE NEW COMPILER GATE, PRODUCING +RIDE
   ::
-  =/  cop  .*(0 +.raw)
-  ::  find the hoon version number of the new kernel
+  =/  COP  .*(0 +.RAW)
+  ::  FIND THE HOON VERSION NUMBER OF THE NEW KERNEL
   ::
-  =/  nex
-    (@ .*(cop q:(~(mint ut p.raw) %noun [%limb %hoon-version])))
-  ?>  |(=(nex hoon-version) =(+(nex) hoon-version))
-  ::  if we're upgrading language versions, recompile the compiler
+  =/  NEX
+    (@ .*(COP Q:(~(MINT UT P.RAW) %NOUN [%LIMB %HOON-VERSION])))
+  ?>  |(=(NEX HOON-VERSION) =(+(NEX) HOON-VERSION))
+  ::  IF WE'RE UPGRADING LANGUAGE VERSIONS, RECOMPILE THE COMPILER
   ::
-  ::    hot: raw compiler formula
+  ::    HOT: RAW COMPILER FORMULA
   ::
-  =>  ?:  =(nex hoon-version)
-        [hot=`*`raw .]
-      ~&  [%hoon-compile-upgrade nex]
-      =/  hot  (slum cop [%noun hun])
-      .(cop .*(0 +.hot))
-  ::  extract the hoon core from the outer gate (+ride)
+  =>  ?:  =(NEX HOON-VERSION)
+        [HOT=`*`RAW .]
+      ~&  [%HOON-COMPILE-UPGRADE NEX]
+      =/  HOT  (SLUM COP [%NOUN HUN])
+      .(COP .*(0 +.HOT))
+  ::  EXTRACT THE HOON CORE FROM THE OUTER GATE (+RIDE)
   ::
-  =/  hoc  .*(cop [%0 7])
-  ::  compute the type of the hoon.hoon core
+  =/  HOC  .*(COP [%0 7])
+  ::  COMPUTE THE TYPE OF THE HOON.HOON CORE
   ::
-  =/  hyp  -:(slum cop [-.hot '+>'])
-  ::  compile arvo
+  =/  HYP  -:(SLUM COP [-.HOT '+>'])
+  ::  COMPILE ARVO
   ::
-  =/  rav
-    ~&  [%arvo-compile `@p`(mug hyp) `@p`(mug van)]
-    (slum cop [hyp van])
-  ::  activate arvo, and extract the arvo core from the outer gate
+  =/  RAV
+    ~&  [%ARVO-COMPILE `@P`(MUG HYP) `@P`(MUG VAN)]
+    (SLUM COP [HYP VAN])
+  ::  ACTIVATE ARVO, AND EXTRACT THE ARVO CORE FROM THE OUTER GATE
   ::
-  =/  voc  .*(hoc [%7 +.rav %0 7])
-  ::  entry gate: ++load for the normal case, ++come for upgrade
+  =/  VOC  .*(HOC [%7 +.RAV %0 7])
+  ::  ENTRY GATE: ++LOAD FOR THE NORMAL CASE, ++COME FOR UPGRADE
   ::
-  =/  gat
-    =/  arm  ?:(=(nex hoon-version) 'load' 'come')
-    ::  compute the type of the arvo.hoon core
+  =/  GAT
+    =/  ARM  ?:(=(NEX HOON-VERSION) 'LOAD' 'COME')
+    ::  COMPUTE THE TYPE OF THE ARVO.HOON CORE
     ::
-    =/  vip  -:(slum cop [-.rav '+>'])
-    ::  compute the formula for the upgrade gate
+    =/  VIP  -:(SLUM COP [-.RAV '+>'])
+    ::  COMPUTE THE FORMULA FOR THE UPGRADE GATE
     ::
-    =/  fol  +:(slum cop [vip arm])
-    ::  produce the upgrade gate
+    =/  FOL  +:(SLUM COP [VIP ARM])
+    ::  PRODUCE THE UPGRADE GATE
     ::
-    .*(voc fol)
-  ::  upgrade gate sample
+    .*(VOC FOL)
+  ::  UPGRADE GATE SAMPLE
   ::
-  =/  sam
-    :*  our
-        now
-        eny
-        ::  tack a notification onto the pending effects
+  =/  SAM
+    :*  OUR
+        NOW
+        ENY
+        ::  TACK A NOTIFICATION ONTO THE PENDING EFFECTS
         ::
-        (weld ova [`ovum`[/ %vega ~] ~])
-        bud
-        (turn vanes |=([label=@tas =vane] [label vase.vane]))
+        (WELD OVA [`OVUM`[/ %VEGA ~] ~])
+        BUD
+        (TURN VANES |=([LABEL=@TAS =VANE] [LABEL VASE.VANE]))
     ==
-  ::  call into the new kernel
+  ::  CALL INTO THE NEW KERNEL
   ::
-  =/  out  (slum gat sam)
-  ::  add types to the product
+  =/  OUT  (SLUM GAT SAM)
+  ::  ADD TYPES TO THE PRODUCT
   ::
-  [((list ovum) -.out) +.out]
-::  +veer: install %zuse or a vane
+  [((LIST OVUM) -.OUT) +.OUT]
+::  +VEER: INSTALL %ZUSE OR A VANE
 ::
-::    Identity is in the sample so the larval stage
-::    can use this as well.
+::    IDENTITY IS IN THE SAMPLE SO THE LARVAL STAGE
+::    CAN USE THIS AS WELL.
 ::
-++  veer
-  |=  [who=ship now=@da fav=curd]
-  =>  .(fav ((hard {$veer lal/@ta pax/path txt/@t}) fav))
-  =-  ?:(?=(%| -.res) ((slog p.res) +>.$) p.res)
-  ^=  res  %-  mule  |.
-  ?:  =(%$ lal.fav)
-    ~&  [%tang pax.fav `@p`(mug txt.fav)]
-    =+  gen=(rain pax.fav txt.fav)
-    =+  vax=(slap pit gen)
-    +>.^$(bud vax)
+++  VEER
+  |=  [WHO=SHIP NOW=@DA FAV=CURD]
+  =>  .(FAV ((HARD {$VEER LAL/@TA PAX/PATH TXT/@T}) FAV))
+  =-  ?:(?=(%| -.RES) ((SLOG P.RES) +>.$) P.RES)
+  ^=  RES  %-  MULE  |.
+  ?:  =(%$ LAL.FAV)
+    ~&  [%TANG PAX.FAV `@P`(MUG TXT.FAV)]
+    =+  GEN=(RAIN PAX.FAV TXT.FAV)
+    =+  VAX=(SLAP PIT GEN)
+    +>.^$(BUD VAX)
   %_    +>.^$
-      vanes
-    |-  ^+  vanes
-    ?~  vanes
-      ~&  [%vane `@tas`lal.fav pax.fav `@p`(mug txt.fav)]
-      =+  vin=(vint who lal.fav vil bud pax.fav txt.fav)
-      ?~  vin
-        vanes
-      [[lal.fav vane:u.vin] vanes]
-    ?.  =(lal.fav label.i.vanes)
-      [i.vanes $(vanes t.vanes)]
-    ~&  [%vane `@tas`lal.fav pax.fav `@p`(mug txt.fav)]
-    :_  t.vanes
-    :-  label.i.vanes
-    ~|  [%failed-vane-activation now lal.fav]
-    vane:(ruck:(vent who lal.fav vil bud [vase.vane.i.vanes *worm]) pax.fav txt.fav)
+      VANES
+    |-  ^+  VANES
+    ?~  VANES
+      ~&  [%VANE `@TAS`LAL.FAV PAX.FAV `@P`(MUG TXT.FAV)]
+      =+  VIN=(VINT WHO LAL.FAV VIL BUD PAX.FAV TXT.FAV)
+      ?~  VIN
+        VANES
+      [[LAL.FAV VANE:U.VIN] VANES]
+    ?.  =(LAL.FAV LABEL.I.VANES)
+      [I.VANES $(VANES T.VANES)]
+    ~&  [%VANE `@TAS`LAL.FAV PAX.FAV `@P`(MUG TXT.FAV)]
+    :_  T.VANES
+    :-  LABEL.I.VANES
+    ~|  [%FAILED-VANE-ACTIVATION NOW LAL.FAV]
+    VANE:(RUCK:(VENT WHO LAL.FAV VIL BUD [VASE.VANE.I.VANES *WORM]) PAX.FAV TXT.FAV)
   ==
 ::
-++  wish                                                ::  external compute
-  |=  txt/@
-  q:(slap bud (ream txt))
+++  WISH                                                ::  EXTERNAL COMPUTE
+  |=  TXT/@
+  Q:(SLAP BUD (REAM TXT))
 --

@@ -1,9 +1,9 @@
-::   hoon data to json
+::   HOON DATA TO JSON
 ::
-::::  /hoon/map-to-json/lib
+::::  /HOON/MAP-TO-JSON/LIB
   ::
 /?    310
-=,  format
-|*  {a/_cord b/_json}                 ::  XX {a/$-(* cord) b/$-(* json)}
-|=  c/(map _+<.a _+<.b)
-(pairs:enjs (turn ~(tap by c) |*(d/^ [(a -.d) (b +.d)])))
+=,  FORMAT
+|*  {A/_CORD B/_JSON}                 ::  XX {A/$-(* CORD) B/$-(* JSON)}
+|=  C/(MAP _+<.A _+<.B)
+(PAIRS:ENJS (TURN ~(TAP BY C) |*(D/^ [(A -.D) (B +.D)])))

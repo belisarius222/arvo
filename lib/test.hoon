@@ -1,45 +1,45 @@
-::  testing utilities meant to be directly used from files in %/tests
+::  TESTING UTILITIES MEANT TO BE DIRECTLY USED FROM FILES IN %/TESTS
 ::
 |%
-::  +expect-eq: compares :expected and :actual and pretty-prints the result
+::  +EXPECT-EQ: COMPARES :EXPECTED AND :ACTUAL AND PRETTY-PRINTS THE RESULT
 ::
-++  expect-eq
-  |=  [expected=vase actual=vase]
-  ^-  tang
+++  EXPECT-EQ
+  |=  [EXPECTED=VASE ACTUAL=VASE]
+  ^-  TANG
   ::
-  =|  result=tang
+  =|  RESULT=TANG
   ::
-  =?  result  !=(q.expected q.actual)
-    %+  weld  result
-    ^-  tang
-    :~  [%palm [": " ~ ~ ~] [leaf+"expected" (sell expected) ~]]
-        [%palm [": " ~ ~ ~] [leaf+"actual" (sell actual) ~]]
+  =?  RESULT  !=(Q.EXPECTED Q.ACTUAL)
+    %+  WELD  RESULT
+    ^-  TANG
+    :~  [%PALM [": " ~ ~ ~] [LEAF+"EXPECTED" (SELL EXPECTED) ~]]
+        [%PALM [": " ~ ~ ~] [LEAF+"ACTUAL" (SELL ACTUAL) ~]]
     ==
   ::
-  =?  result  !(~(nest ut p.actual) | p.expected)
-    %+  weld  result
-    ^-  tang
-    :~  :+  %palm  [": " ~ ~ ~]
-        :~  [%leaf "failed to nest"]
-            (~(dunk ut p.actual) %actual)
-            (~(dunk ut p.expected) %expected)
+  =?  RESULT  !(~(NEST UT P.ACTUAL) | P.EXPECTED)
+    %+  WELD  RESULT
+    ^-  TANG
+    :~  :+  %PALM  [": " ~ ~ ~]
+        :~  [%LEAF "FAILED TO NEST"]
+            (~(DUNK UT P.ACTUAL) %ACTUAL)
+            (~(DUNK UT P.EXPECTED) %EXPECTED)
     ==  ==
-  result
-::  +expect-fail: kicks a trap, expecting crash. pretty-prints if succeeds
+  RESULT
+::  +EXPECT-FAIL: KICKS A TRAP, EXPECTING CRASH. PRETTY-PRINTS IF SUCCEEDS
 ::
-++  expect-fail
-  |=  a=(trap)
-  ^-  tang
-  =/  b  (mule a)
-  ?-  -.b
+++  EXPECT-FAIL
+  |=  A=(TRAP)
+  ^-  TANG
+  =/  B  (MULE A)
+  ?-  -.B
     %|  ~
-    %&  [leaf+"expected failure - succeeded" ~]
+    %&  [LEAF+"EXPECTED FAILURE - SUCCEEDED" ~]
   ==
-::  +category: prepends a name to an error result; passes successes unchanged
+::  +CATEGORY: PREPENDS A NAME TO AN ERROR RESULT; PASSES SUCCESSES UNCHANGED
 ::
-++  category
-  |=  [a=tape b=tang]  ^-  tang
-  ?:  =(~ b)  ~  :: test OK
-  :-  leaf+"in: '{a}'"
-  (turn b |=(c=tank rose+[~ "  " ~]^~[c]))
+++  CATEGORY
+  |=  [A=TAPE B=TANG]  ^-  TANG
+  ?:  =(~ B)  ~  :: TEST OK
+  :-  LEAF+"IN: '{A}'"
+  (TURN B |=(C=TANK ROSE+[~ "  " ~]^~[C]))
 --

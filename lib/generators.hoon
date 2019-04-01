@@ -1,33 +1,33 @@
-/-  sole
-=,  sole
+/-  SOLE
+=,  SOLE
 |%
-++  produce                                             ::  construct result
-  |*  pro/*                                             ::
-  [p=*(list tank) q=[%& p=[~ u=pro]]]                   ::
+++  PRODUCE                                             ::  CONSTRUCT RESULT
+  |*  PRO/*                                             ::
+  [P=*(LIST TANK) Q=[%& P=[~ U=PRO]]]                   ::
 ::                                                      ::
-++  print                                               ::  add output tank
-  |*  {tan/tank res/(sole-result)}                      ::
-  ?@  res  res                                          ::
-  [p=[i=tan t=p.res] q=q.res]                           ::
+++  PRINT                                               ::  ADD OUTPUT TANK
+  |*  {TAN/TANK RES/(SOLE-RESULT)}                      ::
+  ?@  RES  RES                                          ::
+  [P=[I=TAN T=P.RES] Q=Q.RES]                           ::
 ::                                                      ::
-++  prompt                                              ::  construct prompt
-  |*  {pom/sole-prompt mor/(sole-dialog)}               ::
-  [p=*(list tank) q=[%| p=pom q=mor]]                   ::
+++  PROMPT                                              ::  CONSTRUCT PROMPT
+  |*  {POM/SOLE-PROMPT MOR/(SOLE-DIALOG)}               ::
+  [P=*(LIST TANK) Q=[%| P=POM Q=MOR]]                   ::
 ::                                                      ::
-++  curl                                                ::  fetch url
-  =|  usr/knot                                          ::
-  |*  {pul/_purl:eyre fun/$-(httr:eyre *)}              ::
-  :-  p=*(list tank)                                    ::
-  q=[%| p=`usr q=[pul %get ~ ~] r=fun]                  ::
+++  CURL                                                ::  FETCH URL
+  =|  USR/KNOT                                          ::
+  |*  {PUL/_PURL:EYRE FUN/$-(HTTR:EYRE *)}              ::
+  :-  P=*(LIST TANK)                                    ::
+  Q=[%| P=`USR Q=[PUL %GET ~ ~] R=FUN]                  ::
 ::                                                      ::
-++  no-product                                          ::  empty result
-  [p=*(list tank) q=[%& ~]]                             ::
+++  NO-PRODUCT                                          ::  EMPTY RESULT
+  [P=*(LIST TANK) Q=[%& ~]]                             ::
 ::                                                      ::
-++  parse                                               ::  parse by rule
-  |*  {sef/rule fun/$-(* *)}                            ::
-  |=  txt/sole-input                                    ::
-  =+  vex=(sef [0 0] txt)                               ::
-  ?:  |(!=((lent txt) q.p.vex) ?=($~ q.vex))            ::
-    q.p.vex                                             ::
-  (fun p.u.q.vex)                                       ::
+++  PARSE                                               ::  PARSE BY RULE
+  |*  {SEF/RULE FUN/$-(* *)}                            ::
+  |=  TXT/SOLE-INPUT                                    ::
+  =+  VEX=(SEF [0 0] TXT)                               ::
+  ?:  |(!=((LENT TXT) Q.P.VEX) ?=($~ Q.VEX))            ::
+    Q.P.VEX                                             ::
+  (FUN P.U.Q.VEX)                                       ::
 --

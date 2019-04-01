@@ -1,106 +1,106 @@
-::  urbit-style key generation and derivation functions
+::  URBIT-STYLE KEY GENERATION AND DERIVATION FUNCTIONS
 ::
-/-  keygen
+/-  KEYGEN
 ::
-/+  bip32, bip39
+/+  BIP32, BIP39
 ::
-=,  keygen
+=,  KEYGEN
 ::
 |%
-++  argon2u
-  |=  [who=ship tic=byts]
+++  ARGON2U
+  |=  [WHO=SHIP TIC=BYTS]
   ^-  @
-  ~|  [%who who (met 3 who)]
-  :: ?>  (lte (met 3 who) 4)
-  %-  (argon2-urbit:argon2:crypto 32)
-  :-  tic
-  =-  [(met 3 -) (swp 3 -)]
-  %-  crip
-  (weld "urbitkeygen" (a-co:co who))
+  ~|  [%WHO WHO (MET 3 WHO)]
+  :: ?>  (LTE (MET 3 WHO) 4)
+  %-  (ARGON2-URBIT:ARGON2:CRYPTO 32)
+  :-  TIC
+  =-  [(MET 3 -) (SWP 3 -)]
+  %-  CRIP
+  (WELD "URBITKEYGEN" (A-CO:CO WHO))
 ::
-++  child-node-from-seed
-  |=  [seed=@ typ=tape pass=(unit @t)]
-  ^-  node
-  =+  sed=(seed:ds 32^seed typ)
-  =+  nom=(from-entropy:bip39 32^sed)
-  :+  typ  nom
-  %-  wallet:ds
-  %+  to-seed:bip39  nom
-  (trip (fall pass ''))
+++  CHILD-NODE-FROM-SEED
+  |=  [SEED=@ TYP=TAPE PASS=(UNIT @T)]
+  ^-  NODE
+  =+  SED=(SEED:DS 32^SEED TYP)
+  =+  NOM=(FROM-ENTROPY:BIP39 32^SED)
+  :+  TYP  NOM
+  %-  WALLET:DS
+  %+  TO-SEED:BIP39  NOM
+  (TRIP (FALL PASS ''))
 ::
-++  derive-network-seed
-  |=  [mngs=@ rev=@ud]
-  ^-  @ux
-  =+  (seed:ds 64^mngs (weld "network" (a-co:co rev)))
-  ?:  =(0 rev)  -
-  ::  hash again to prevent length extension attacks
-  (sha-256l:sha 32 -)
+++  DERIVE-NETWORK-SEED
+  |=  [MNGS=@ REV=@UD]
+  ^-  @UX
+  =+  (SEED:DS 64^MNGS (WELD "NETWORK" (A-CO:CO REV)))
+  ?:  =(0 REV)  -
+  ::  HASH AGAIN TO PREVENT LENGTH EXTENSION ATTACKS
+  (SHA-256L:SHA 32 -)
 ::
-++  full-wallet-from-ticket
-  ::  who:    username
-  ::  ticket: password
-  ::  rev:    network key revision
-  ::  pass:   optional passphrase
+++  FULL-WALLET-FROM-TICKET
+  ::  WHO:    USERNAME
+  ::  TICKET: PASSWORD
+  ::  REV:    NETWORK KEY REVISION
+  ::  PASS:   OPTIONAL PASSPHRASE
   ::
-  |=  [who=ship ticket=byts rev=@ud pass=(unit @t)]
-  ^-  vault
-  =+  master-seed=(argon2u who ticket)
-  =/  cn  ::  child node
-    |=  typ=nodetype
-    (child-node-from-seed master-seed typ pass)
+  |=  [WHO=SHIP TICKET=BYTS REV=@UD PASS=(UNIT @T)]
+  ^-  VAULT
+  =+  MASTER-SEED=(ARGON2U WHO TICKET)
+  =/  CN  ::  CHILD NODE
+    |=  TYP=NODETYPE
+    (CHILD-NODE-FROM-SEED MASTER-SEED TYP PASS)
   ::
-  :-  ^=  ownership  ^-  node
-      (cn "ownership")
+  :-  ^=  OWNERSHIP  ^-  NODE
+      (CN "OWNERSHIP")
   ::
-  :-  ^=  voting  ^-  node
-      (cn "voting")
+  :-  ^=  VOTING  ^-  NODE
+      (CN "VOTING")
   ::
-  =/  management=node
-    (cn "management")
-  :-  management=management
+  =/  MANAGEMENT=NODE
+    (CN "MANAGEMENT")
+  :-  MANAGEMENT=MANAGEMENT
   ::
-  :-  ^=  transfer  ^-  node
-      (cn "transfer")
+  :-  ^=  TRANSFER  ^-  NODE
+      (CN "TRANSFER")
   ::
-  :-  ^=  spawn  ^-  node
-      (cn "spawn")
+  :-  ^=  SPAWN  ^-  NODE
+      (CN "SPAWN")
   ::
-  ^=  network  ^-  uode
-  =/  mad  ::  management seed
-    %+  to-seed:bip39
-      seed:management
-    (trip (fall pass ''))
-  =+  sed=(derive-network-seed mad rev)
-  [rev sed (urbit:ds sed)]
+  ^=  NETWORK  ^-  UODE
+  =/  MAD  ::  MANAGEMENT SEED
+    %+  TO-SEED:BIP39
+      SEED:MANAGEMENT
+    (TRIP (FALL PASS ''))
+  =+  SED=(DERIVE-NETWORK-SEED MAD REV)
+  [REV SED (URBIT:DS SED)]
 ::
-++  ds                                                  ::  derive from raw seed
+++  DS                                                  ::  DERIVE FROM RAW SEED
   |%
-  ++  wallet
-    |=  seed=@
-    ^-  ^wallet
-    =+  =>  (from-seed:bip32 64^seed)
-        (derive-path "m/44'/60'/0'/0/0")
-    :+  [public-key private-key]
-      (address-from-prv:key:ethereum private-key)
-    chain-code
+  ++  WALLET
+    |=  SEED=@
+    ^-  ^WALLET
+    =+  =>  (FROM-SEED:BIP32 64^SEED)
+        (DERIVE-PATH "M/44'/60'/0'/0/0")
+    :+  [PUBLIC-KEY PRIVATE-KEY]
+      (ADDRESS-FROM-PRV:KEY:ETHEREUM PRIVATE-KEY)
+    CHAIN-CODE
   ::
-  ++  urbit
-    |=  seed=@
-    ^-  edkeys
-    =+  =<  [pub=pub:ex sec=sec:ex]
-        (pit:nu:crub:crypto 256 seed)
-    :-  ^=  auth
-        :-  (rsh 3 1 (end 3 33 pub))
-            (rsh 3 1 (end 3 33 sec))
-    ^=  crypt
-    :-  (rsh 3 33 pub)
-        (rsh 3 33 sec)
+  ++  URBIT
+    |=  SEED=@
+    ^-  EDKEYS
+    =+  =<  [PUB=PUB:EX SEC=SEC:EX]
+        (PIT:NU:CRUB:CRYPTO 256 SEED)
+    :-  ^=  AUTH
+        :-  (RSH 3 1 (END 3 33 PUB))
+            (RSH 3 1 (END 3 33 SEC))
+    ^=  CRYPT
+    :-  (RSH 3 33 PUB)
+        (RSH 3 33 SEC)
   ::
-  ++  seed
-    |=  [seed=byts salt=tape]
-    ^-  @ux
-    %-  sha-256l:sha
-    :-  (add wid.seed (lent salt))
-    (cat 3 (crip (flop salt)) dat.seed)
+  ++  SEED
+    |=  [SEED=BYTS SALT=TAPE]
+    ^-  @UX
+    %-  SHA-256L:SHA
+    :-  (ADD WID.SEED (LENT SALT))
+    (CAT 3 (CRIP (FLOP SALT)) DAT.SEED)
   --
 --

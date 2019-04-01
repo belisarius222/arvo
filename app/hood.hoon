@@ -1,206 +1,206 @@
 ::                                                      ::  ::
-::::  /hoon/hood/app                                    ::  ::
+::::  /HOON/HOOD/APP                                    ::  ::
   ::                                                    ::  ::
-/?    310                                               ::  zuse version
-/+  sole,                                               ::  libraries
-    ::  XX these should really be separate apps, as
-    ::     none of them interact with each other in
-    ::     any fashion; however, to reduce boot-time
-    ::     complexity and work around the current
-    ::     non-functionality of end-to-end acknowledgments,
-    ::     they have been bundled into :hood
+/?    310                                               ::  ZUSE VERSION
+/+  SOLE,                                               ::  LIBRARIES
+    ::  XX THESE SHOULD REALLY BE SEPARATE APPS, AS
+    ::     NONE OF THEM INTERACT WITH EACH OTHER IN
+    ::     ANY FASHION; HOWEVER, TO REDUCE BOOT-TIME
+    ::     COMPLEXITY AND WORK AROUND THE CURRENT
+    ::     NON-FUNCTIONALITY OF END-TO-END ACKNOWLEDGMENTS,
+    ::     THEY HAVE BEEN BUNDLED INTO :HOOD
     ::
-    ::  |command handlers
-    hood-helm, hood-kiln, hood-drum, hood-write
+    ::  |COMMAND HANDLERS
+    HOOD-HELM, HOOD-KILN, HOOD-DRUM, HOOD-WRITE
 ::                                                      ::  ::
 ::::                                                    ::  ::
   ::                                                    ::  ::
 |%
-++  hood-module
-  ::  each hood module follows this general shape
+++  HOOD-MODULE
+  ::  EACH HOOD MODULE FOLLOWS THIS GENERAL SHAPE
   =>  |%
-      +$  part  [%module %0 pith]
-      +$  pith  ~
+      +$  PART  [%MODULE %0 PITH]
+      +$  PITH  ~
       ::
-      +$  move  [bone card]
-      +$  card  $%  [%fake ~]
+      +$  MOVE  [BONE CARD]
+      +$  CARD  $%  [%FAKE ~]
                 ==
       --
-  |=  [bowl:gall own=part]
-  |_  moz=(list move)
-  ++  abet  [(flop moz) own]
+  |=  [BOWL:GALL OWN=PART]
+  |_  MOZ=(LIST MOVE)
+  ++  ABET  [(FLOP MOZ) OWN]
   --
 --
 ::                                                      ::  ::
-::::                                                    ::  ::  state handling
+::::                                                    ::  ::  STATE HANDLING
   ::                                                    ::  ::
 !:
 =>  |%                                                  ::
-    ++  hood-old                                        ::  unified old-state
-      {?($0 $1) lac/(map @tas hood-part-old)}           ::
-    ++  hood-1                                          ::  unified state
-      {$1 lac/(map @tas hood-part)}                     ::
-    ++  hood-good                                       ::  extract specific
-      =+  hed=$:hood-head
+    ++  HOOD-OLD                                        ::  UNIFIED OLD-STATE
+      {?($0 $1) LAC/(MAP @TAS HOOD-PART-OLD)}           ::
+    ++  HOOD-1                                          ::  UNIFIED STATE
+      {$1 LAC/(MAP @TAS HOOD-PART)}                     ::
+    ++  HOOD-GOOD                                       ::  EXTRACT SPECIFIC
+      =+  HED=$:HOOD-HEAD
       |@  ++  $
-            |:  paw=$:hood-part
-            ?-  hed
-              $drum  ?>(?=($drum -.paw) `part:hood-drum`paw)
-              $helm  ?>(?=($helm -.paw) `part:hood-helm`paw)
-              $kiln  ?>(?=($kiln -.paw) `part:hood-kiln`paw)
-              $write  ?>(?=($write -.paw) `part:hood-write`paw)
+            |:  PAW=$:HOOD-PART
+            ?-  HED
+              $DRUM  ?>(?=($DRUM -.PAW) `PART:HOOD-DRUM`PAW)
+              $HELM  ?>(?=($HELM -.PAW) `PART:HOOD-HELM`PAW)
+              $KILN  ?>(?=($KILN -.PAW) `PART:HOOD-KILN`PAW)
+              $WRITE  ?>(?=($WRITE -.PAW) `PART:HOOD-WRITE`PAW)
             ==
       --
-    ++  hood-head  _-:$:hood-part                       ::  initialize state
-    ++  hood-make                                       ::
-      =+  $:{our/@p hed/hood-head}                      ::
+    ++  HOOD-HEAD  _-:$:HOOD-PART                       ::  INITIALIZE STATE
+    ++  HOOD-MAKE                                       ::
+      =+  $:{OUR/@P HED/HOOD-HEAD}                      ::
       |@  ++  $
-            ?-  hed
-              $drum  (make:hood-drum our)
-              $helm  *part:hood-helm
-              $kiln  *part:hood-kiln
-              $write  *part:hood-write
+            ?-  HED
+              $DRUM  (MAKE:HOOD-DRUM OUR)
+              $HELM  *PART:HOOD-HELM
+              $KILN  *PART:HOOD-KILN
+              $WRITE  *PART:HOOD-WRITE
             ==
       --
-    ++  hood-part-old  hood-part                        ::  old state for ++prep
-    ++  hood-port                                       ::  state transition
-      |:  paw=$:hood-part-old  ^-  hood-part            ::
-      paw                                               ::
+    ++  HOOD-PART-OLD  HOOD-PART                        ::  OLD STATE FOR ++PREP
+    ++  HOOD-PORT                                       ::  STATE TRANSITION
+      |:  PAW=$:HOOD-PART-OLD  ^-  HOOD-PART            ::
+      PAW                                               ::
     ::                                                  ::
-    ++  hood-part                                       ::  current module state
-      $%  {$drum $2 pith-2:hood-drum}                   ::
-          {$helm $0 pith:hood-helm}                     ::
-          {$kiln $0 pith:hood-kiln}                     ::
-          {$write $0 pith:hood-write}                   ::
+    ++  HOOD-PART                                       ::  CURRENT MODULE STATE
+      $%  {$DRUM $2 PITH-2:HOOD-DRUM}                   ::
+          {$HELM $0 PITH:HOOD-HELM}                     ::
+          {$KILN $0 PITH:HOOD-KILN}                     ::
+          {$WRITE $0 PITH:HOOD-WRITE}                   ::
       ==                                                ::
     --                                                  ::
 ::                                                      ::  ::
-::::                                                    ::  ::  app proper
+::::                                                    ::  ::  APP PROPER
   ::                                                    ::  ::
-=,  gall
-|_  $:  hid/bowl                                        ::  gall environment
-        hood-1                                          ::  module states
+=,  GALL
+|_  $:  HID/BOWL                                        ::  GALL ENVIRONMENT
+        HOOD-1                                          ::  MODULE STATES
     ==                                                  ::
-++  able                                                ::  find+make part
-  =+  hed=$:hood-head
+++  ABLE                                                ::  FIND+MAKE PART
+  =+  HED=$:HOOD-HEAD
   |@  ++  $
-        =+  rep=(~(get by lac) hed)
-        =+  par=?^(rep u.rep `hood-part`(hood-make our.hid hed))
-        ((hood-good hed) par)
+        =+  REP=(~(GET BY LAC) HED)
+        =+  PAR=?^(REP U.REP `HOOD-PART`(HOOD-MAKE OUR.HID HED))
+        ((HOOD-GOOD HED) PAR)
   --
 ::
-++  ably                                                ::  save part
-  =+  $:{(list) hood-part}
+++  ABLY                                                ::  SAVE PART
+  =+  $:{(LIST) HOOD-PART}
   |@  ++  $
-        [(flop +<-) %_(+> lac (~(put by lac) +<+< +<+))]
+        [(FLOP +<-) %_(+> LAC (~(PUT BY LAC) +<+< +<+))]
   --
 ::                                                      ::  ::
-::::                                                    ::  ::  generic handling
+::::                                                    ::  ::  GENERIC HANDLING
   ::                                                    ::  ::
-++  prep
-  |=  old/(unit hood-old)  ^-  (quip _!! _+>)
+++  PREP
+  |=  OLD/(UNIT HOOD-OLD)  ^-  (QUIP _!! _+>)
   :-  ~
-  ?~  old  +>
-  +>(lac (~(run by lac.u.old) hood-port))
+  ?~  OLD  +>
+  +>(LAC (~(RUN BY LAC.U.OLD) HOOD-PORT))
 ::
-++  poke-hood-load                                      ::  recover lost brain
-  |=  dat/hood-part
-  ?>  =(our.hid src.hid)
-  ~&  loaded+-.dat
-  [~ %_(+> lac (~(put by lac) -.dat dat))]
+++  POKE-HOOD-LOAD                                      ::  RECOVER LOST BRAIN
+  |=  DAT/HOOD-PART
+  ?>  =(OUR.HID SRC.HID)
+  ~&  LOADED+-.DAT
+  [~ %_(+> LAC (~(PUT BY LAC) -.DAT DAT))]
 ::
 ::
-++  from-module                                         ::  create wrapper
-  |*  _[identity=%module start=..$ finish=_abet]:(hood-module)
-  =-  [wrap=- *start]                 ::  usage (wrap handle-arm):from-foo
-  |*  handle/_finish
-  |=  a=_+<.handle
-  =.  +>.handle  (start hid (able identity))
-  (ably (handle a))
+++  FROM-MODULE                                         ::  CREATE WRAPPER
+  |*  _[IDENTITY=%MODULE START=..$ FINISH=_ABET]:(HOOD-MODULE)
+  =-  [WRAP=- *START]                 ::  USAGE (WRAP HANDLE-ARM):FROM-FOO
+  |*  HANDLE/_FINISH
+  |=  A=_+<.HANDLE
+  =.  +>.HANDLE  (START HID (ABLE IDENTITY))
+  (ABLY (HANDLE A))
 ::
-::  per-module interface wrappers
-++  from-drum  (from-module %drum [..$ _se-abet]:(hood-drum))
-++  from-helm  (from-module %helm [..$ _abet]:(hood-helm))
-++  from-kiln  (from-module %kiln [..$ _abet]:(hood-kiln))
-++  from-write  (from-module %write [..$ _abet]:(hood-write))
+::  PER-MODULE INTERFACE WRAPPERS
+++  FROM-DRUM  (FROM-MODULE %DRUM [..$ _SE-ABET]:(HOOD-DRUM))
+++  FROM-HELM  (FROM-MODULE %HELM [..$ _ABET]:(HOOD-HELM))
+++  FROM-KILN  (FROM-MODULE %KILN [..$ _ABET]:(HOOD-KILN))
+++  FROM-WRITE  (FROM-MODULE %WRITE [..$ _ABET]:(HOOD-WRITE))
 ::
 ::                                                      ::  ::
-::::                                                    ::  ::  switchboard
+::::                                                    ::  ::  SWITCHBOARD
   ::                                                    ::  ::
-++  coup-drum-phat            (wrap take-coup-phat):from-drum
-++  coup-helm-hi              (wrap coup-hi):from-helm
-++  coup-helm-ask             (wrap coup-ask):from-helm
-++  coup-kiln-fancy           (wrap take-coup-fancy):from-kiln
-++  coup-kiln-reload          (wrap take-coup-reload):from-kiln
-++  coup-kiln-spam            (wrap take-coup-spam):from-kiln
-++  diff-sole-effect-drum-phat  (wrap diff-sole-effect-phat):from-drum
-++  init-helm                 |=({way/wire *} [~ +>])
-++  mack-kiln                 (wrap mack):from-kiln
-++  made-write                (wrap made):from-write
-++  made-kiln                 (wrap take-made):from-kiln
-++  mere-kiln                 (wrap take-mere):from-kiln
-++  mere-kiln-sync            (wrap take-mere-sync):from-kiln
-++  wake-kiln-overload        (wrap take-wake-overload):from-kiln
-++  wake-helm-automass        (wrap take-wake-automass):from-helm
-++  onto-drum                 (wrap take-onto):from-drum
-++  peer-drum                 (wrap peer):from-drum
-++  poke-atom                 (wrap poke-atom):from-helm
-++  poke-dill-belt            (wrap poke-dill-belt):from-drum
-++  poke-dill-blit            (wrap poke-dill-blit):from-drum
-++  poke-drum-put             (wrap poke-put):from-drum
-++  poke-drum-link            (wrap poke-link):from-drum
-++  poke-drum-unlink          (wrap poke-unlink):from-drum
-++  poke-drum-exit            (wrap poke-exit):from-drum
-++  poke-drum-start           (wrap poke-start):from-drum
-++  poke-helm-hi              (wrap poke-hi):from-helm
-::++  poke-helm-invite          (wrap poke-invite):from-helm
-++  poke-helm-mass            (wrap poke-mass):from-helm
-++  poke-helm-reload          (wrap poke-reload):from-helm
-++  poke-helm-reload-desk     (wrap poke-reload-desk):from-helm
-++  poke-helm-reset           (wrap poke-reset):from-helm
-++  poke-helm-serve           (wrap poke-serve):from-helm
-++  poke-helm-send-hi         (wrap poke-send-hi):from-helm
-++  poke-helm-send-ask        (wrap poke-send-ask):from-helm
-++  poke-helm-verb            (wrap poke-verb):from-helm
-++  poke-helm-rekey           (wrap poke-rekey):from-helm
-++  poke-helm-nuke            (wrap poke-nuke):from-helm
-++  poke-helm-tlon-add-fora   (wrap poke-tlon-add-fora):from-helm
-++  poke-helm-tlon-add-stream  (wrap poke-tlon-add-stream):from-helm
-++  poke-helm-tlon-init-stream  (wrap poke-tlon-init-stream):from-helm
-++  poke-helm-automass        (wrap poke-automass):from-helm
-++  poke-helm-cancel-automass  (wrap poke-cancel-automass):from-helm
-++  poke-helm-bonk            (wrap poke-bonk):from-helm
-++  poke-hood-sync            (wrap poke-sync):from-kiln
-++  poke-kiln-commit          (wrap poke-commit):from-kiln
-++  poke-kiln-info            (wrap poke-info):from-kiln
-++  poke-kiln-label           (wrap poke-label):from-kiln
-++  poke-kiln-merge           (wrap poke-merge):from-kiln
-++  poke-kiln-cancel          (wrap poke-cancel):from-kiln
-++  poke-kiln-mount           (wrap poke-mount):from-kiln
-++  poke-kiln-rm              (wrap poke-rm):from-kiln
-++  poke-kiln-schedule        (wrap poke-schedule):from-kiln
-++  poke-kiln-track           (wrap poke-track):from-kiln
-++  poke-kiln-sync            (wrap poke-sync):from-kiln
-++  poke-kiln-syncs           (wrap poke-syncs):from-kiln
-++  poke-kiln-start-autoload  (wrap poke-start-autoload):from-kiln
-++  poke-kiln-wipe-ford       (wrap poke-wipe-ford):from-kiln
-++  poke-kiln-keep-ford       (wrap poke-keep-ford):from-kiln
-++  poke-kiln-autoload        (wrap poke-autoload):from-kiln
-++  poke-kiln-overload        (wrap poke-overload):from-kiln
-++  poke-kiln-unmount         (wrap poke-unmount):from-kiln
-++  poke-kiln-unsync          (wrap poke-unsync):from-kiln
-++  poke-kiln-permission      (wrap poke-permission):from-kiln
-++  poke-write-sec-atom       (wrap poke-sec-atom):from-write
-++  poke-write-paste          (wrap poke-paste):from-write
-++  poke-write-comment        (wrap poke-comment):from-write
-++  poke-write-fora-post      (wrap poke-fora-post):from-write
-++  poke-write-plan-info      (wrap poke-plan-info):from-write
-++  poke-write-plan-account   (wrap poke-plan-account):from-write
-++  poke-write-tree           (wrap poke-tree):from-write
-++  poke-write-wipe           (wrap poke-wipe):from-write
-++  quit-drum-phat            (wrap quit-phat):from-drum
-++  reap-drum-phat            (wrap reap-phat):from-drum
-++  woot-helm                 (wrap take-woot):from-helm
-++  writ-kiln-autoload        (wrap take-writ-autoload):from-kiln
-++  writ-kiln-sync            (wrap take-writ-sync):from-kiln
+++  COUP-DRUM-PHAT            (WRAP TAKE-COUP-PHAT):FROM-DRUM
+++  COUP-HELM-HI              (WRAP COUP-HI):FROM-HELM
+++  COUP-HELM-ASK             (WRAP COUP-ASK):FROM-HELM
+++  COUP-KILN-FANCY           (WRAP TAKE-COUP-FANCY):FROM-KILN
+++  COUP-KILN-RELOAD          (WRAP TAKE-COUP-RELOAD):FROM-KILN
+++  COUP-KILN-SPAM            (WRAP TAKE-COUP-SPAM):FROM-KILN
+++  DIFF-SOLE-EFFECT-DRUM-PHAT  (WRAP DIFF-SOLE-EFFECT-PHAT):FROM-DRUM
+++  INIT-HELM                 |=({WAY/WIRE *} [~ +>])
+++  MACK-KILN                 (WRAP MACK):FROM-KILN
+++  MADE-WRITE                (WRAP MADE):FROM-WRITE
+++  MADE-KILN                 (WRAP TAKE-MADE):FROM-KILN
+++  MERE-KILN                 (WRAP TAKE-MERE):FROM-KILN
+++  MERE-KILN-SYNC            (WRAP TAKE-MERE-SYNC):FROM-KILN
+++  WAKE-KILN-OVERLOAD        (WRAP TAKE-WAKE-OVERLOAD):FROM-KILN
+++  WAKE-HELM-AUTOMASS        (WRAP TAKE-WAKE-AUTOMASS):FROM-HELM
+++  ONTO-DRUM                 (WRAP TAKE-ONTO):FROM-DRUM
+++  PEER-DRUM                 (WRAP PEER):FROM-DRUM
+++  POKE-ATOM                 (WRAP POKE-ATOM):FROM-HELM
+++  POKE-DILL-BELT            (WRAP POKE-DILL-BELT):FROM-DRUM
+++  POKE-DILL-BLIT            (WRAP POKE-DILL-BLIT):FROM-DRUM
+++  POKE-DRUM-PUT             (WRAP POKE-PUT):FROM-DRUM
+++  POKE-DRUM-LINK            (WRAP POKE-LINK):FROM-DRUM
+++  POKE-DRUM-UNLINK          (WRAP POKE-UNLINK):FROM-DRUM
+++  POKE-DRUM-EXIT            (WRAP POKE-EXIT):FROM-DRUM
+++  POKE-DRUM-START           (WRAP POKE-START):FROM-DRUM
+++  POKE-HELM-HI              (WRAP POKE-HI):FROM-HELM
+::++  POKE-HELM-INVITE          (WRAP POKE-INVITE):FROM-HELM
+++  POKE-HELM-MASS            (WRAP POKE-MASS):FROM-HELM
+++  POKE-HELM-RELOAD          (WRAP POKE-RELOAD):FROM-HELM
+++  POKE-HELM-RELOAD-DESK     (WRAP POKE-RELOAD-DESK):FROM-HELM
+++  POKE-HELM-RESET           (WRAP POKE-RESET):FROM-HELM
+++  POKE-HELM-SERVE           (WRAP POKE-SERVE):FROM-HELM
+++  POKE-HELM-SEND-HI         (WRAP POKE-SEND-HI):FROM-HELM
+++  POKE-HELM-SEND-ASK        (WRAP POKE-SEND-ASK):FROM-HELM
+++  POKE-HELM-VERB            (WRAP POKE-VERB):FROM-HELM
+++  POKE-HELM-REKEY           (WRAP POKE-REKEY):FROM-HELM
+++  POKE-HELM-NUKE            (WRAP POKE-NUKE):FROM-HELM
+++  POKE-HELM-TLON-ADD-FORA   (WRAP POKE-TLON-ADD-FORA):FROM-HELM
+++  POKE-HELM-TLON-ADD-STREAM  (WRAP POKE-TLON-ADD-STREAM):FROM-HELM
+++  POKE-HELM-TLON-INIT-STREAM  (WRAP POKE-TLON-INIT-STREAM):FROM-HELM
+++  POKE-HELM-AUTOMASS        (WRAP POKE-AUTOMASS):FROM-HELM
+++  POKE-HELM-CANCEL-AUTOMASS  (WRAP POKE-CANCEL-AUTOMASS):FROM-HELM
+++  POKE-HELM-BONK            (WRAP POKE-BONK):FROM-HELM
+++  POKE-HOOD-SYNC            (WRAP POKE-SYNC):FROM-KILN
+++  POKE-KILN-COMMIT          (WRAP POKE-COMMIT):FROM-KILN
+++  POKE-KILN-INFO            (WRAP POKE-INFO):FROM-KILN
+++  POKE-KILN-LABEL           (WRAP POKE-LABEL):FROM-KILN
+++  POKE-KILN-MERGE           (WRAP POKE-MERGE):FROM-KILN
+++  POKE-KILN-CANCEL          (WRAP POKE-CANCEL):FROM-KILN
+++  POKE-KILN-MOUNT           (WRAP POKE-MOUNT):FROM-KILN
+++  POKE-KILN-RM              (WRAP POKE-RM):FROM-KILN
+++  POKE-KILN-SCHEDULE        (WRAP POKE-SCHEDULE):FROM-KILN
+++  POKE-KILN-TRACK           (WRAP POKE-TRACK):FROM-KILN
+++  POKE-KILN-SYNC            (WRAP POKE-SYNC):FROM-KILN
+++  POKE-KILN-SYNCS           (WRAP POKE-SYNCS):FROM-KILN
+++  POKE-KILN-START-AUTOLOAD  (WRAP POKE-START-AUTOLOAD):FROM-KILN
+++  POKE-KILN-WIPE-FORD       (WRAP POKE-WIPE-FORD):FROM-KILN
+++  POKE-KILN-KEEP-FORD       (WRAP POKE-KEEP-FORD):FROM-KILN
+++  POKE-KILN-AUTOLOAD        (WRAP POKE-AUTOLOAD):FROM-KILN
+++  POKE-KILN-OVERLOAD        (WRAP POKE-OVERLOAD):FROM-KILN
+++  POKE-KILN-UNMOUNT         (WRAP POKE-UNMOUNT):FROM-KILN
+++  POKE-KILN-UNSYNC          (WRAP POKE-UNSYNC):FROM-KILN
+++  POKE-KILN-PERMISSION      (WRAP POKE-PERMISSION):FROM-KILN
+++  POKE-WRITE-SEC-ATOM       (WRAP POKE-SEC-ATOM):FROM-WRITE
+++  POKE-WRITE-PASTE          (WRAP POKE-PASTE):FROM-WRITE
+++  POKE-WRITE-COMMENT        (WRAP POKE-COMMENT):FROM-WRITE
+++  POKE-WRITE-FORA-POST      (WRAP POKE-FORA-POST):FROM-WRITE
+++  POKE-WRITE-PLAN-INFO      (WRAP POKE-PLAN-INFO):FROM-WRITE
+++  POKE-WRITE-PLAN-ACCOUNT   (WRAP POKE-PLAN-ACCOUNT):FROM-WRITE
+++  POKE-WRITE-TREE           (WRAP POKE-TREE):FROM-WRITE
+++  POKE-WRITE-WIPE           (WRAP POKE-WIPE):FROM-WRITE
+++  QUIT-DRUM-PHAT            (WRAP QUIT-PHAT):FROM-DRUM
+++  REAP-DRUM-PHAT            (WRAP REAP-PHAT):FROM-DRUM
+++  WOOT-HELM                 (WRAP TAKE-WOOT):FROM-HELM
+++  WRIT-KILN-AUTOLOAD        (WRAP TAKE-WRIT-AUTOLOAD):FROM-KILN
+++  WRIT-KILN-SYNC            (WRAP TAKE-WRIT-SYNC):FROM-KILN
 --

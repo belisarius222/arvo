@@ -1,21 +1,21 @@
 /?  310
-|_  [hed=marl tal=marl]
-++  grow
+|_  [HED=MARL TAL=MARL]
+++  GROW
   |%
-  ++  mime
-    =<  mime
+  ++  MIME
+    =<  MIME
     |%
-    ++  elem  ;div:(h1:"*{hed}" div:"*{tal}")           ::  convert to %elem
-    ++  hymn  ;html:(head:title:"snip" body:"+{elem}")  ::  convert to %hymn
-    ++  html  (crip (en-xml:^html hymn))                      ::  convert to %html
-    ++  mime  [/text/html (as-octs:mimes:^html html)]               ::  convert to %mime
+    ++  ELEM  ;DIV:(H1:"*{HED}" DIV:"*{TAL}")           ::  CONVERT TO %ELEM
+    ++  HYMN  ;HTML:(HEAD:TITLE:"SNIP" BODY:"+{ELEM}")  ::  CONVERT TO %HYMN
+    ++  HTML  (CRIP (EN-XML:^HTML HYMN))                      ::  CONVERT TO %HTML
+    ++  MIME  [/TEXT/HTML (AS-OCTS:MIMES:^HTML HTML)]               ::  CONVERT TO %MIME
     --
-  ++  collections-snip  [hed tal]
+  ++  COLLECTIONS-SNIP  [HED TAL]
   --
 ::
-++  grab
+++  GRAB
   |%
-  +$  noun  [marl marl]
+  +$  NOUN  [MARL MARL]
   --
 --
 

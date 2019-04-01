@@ -1,216 +1,216 @@
-::  bip32 implementation in hoon
+::  BIP32 IMPLEMENTATION IN HOON
 ::
-::  to use, call one of the core initialization arms.
-::  using the produced core, derive as needed and take out the data you want.
+::  TO USE, CALL ONE OF THE CORE INITIALIZATION ARMS.
+::  USING THE PRODUCED CORE, DERIVE AS NEEDED AND TAKE OUT THE DATA YOU WANT.
 ::
-::NOTE  tested to be correct against
-::      https://en.bitcoin.it/wiki/BIP_0032_TestVectors
+::NOTE  TESTED TO BE CORRECT AGAINST
+::      HTTPS://EN.BITCOIN.IT/WIKI/BIP_0032_TESTVECTORS
 ::
-=,  hmac:crypto
-=,  secp:crypto
-=+  ecc=secp256k1
+=,  HMAC:CRYPTO
+=,  SECP:CRYPTO
+=+  ECC=SECP256K1
 ::
-::  prv:  private key
-::  pub:  public key
-::  cad:  chain code
-::  dep:  depth in chain
-::  ind:  index at depth
-::  pif:  parent fingerprint (4 bytes)
-|_  [prv=@ pub=pont cad=@ dep=@ud ind=@ud pif=@]
+::  PRV:  PRIVATE KEY
+::  PUB:  PUBLIC KEY
+::  CAD:  CHAIN CODE
+::  DEP:  DEPTH IN CHAIN
+::  IND:  INDEX AT DEPTH
+::  PIF:  PARENT FINGERPRINT (4 BYTES)
+|_  [PRV=@ PUB=PONT CAD=@ DEP=@UD IND=@UD PIF=@]
 ::
-+=  keyc  [key=@ cai=@]  ::  prv/pub key + chain code
++=  KEYC  [KEY=@ CAI=@]  ::  PRV/PUB KEY + CHAIN CODE
 ::
-::  elliptic curve operations and values
+::  ELLIPTIC CURVE OPERATIONS AND VALUES
 ::
-++  point  priv-to-pub.ecc
+++  POINT  PRIV-TO-PUB.ECC
 ::
-++  ser-p  compress-point.ecc
+++  SER-P  COMPRESS-POINT.ECC
 ::
-++  n      ^n:ecc
+++  N      ^N:ECC
 ::
-::  core initialization
+::  CORE INITIALIZATION
 ::
-++  from-seed
-  |=  byts
+++  FROM-SEED
+  |=  BYTS
   ^+  +>
-  =+  der=(hmac-sha512l [12 'dees nioctiB'] [wid dat])
-  =+  pri=(cut 3 [32 32] der)
-  +>.$(prv pri, pub (point pri), cad (cut 3 [0 32] der))
+  =+  DER=(HMAC-SHA512L [12 'DEES NIOCTIB'] [WID DAT])
+  =+  PRI=(CUT 3 [32 32] DER)
+  +>.$(PRV PRI, PUB (POINT PRI), CAD (CUT 3 [0 32] DER))
 ::
-++  from-private
-  |=  keyc
-  +>(prv key, pub (point key), cad cai)
+++  FROM-PRIVATE
+  |=  KEYC
+  +>(PRV KEY, PUB (POINT KEY), CAD CAI)
 ::
-++  from-public
-  |=  keyc
-  +>(pub (decompress-point.ecc key), cad cai)
+++  FROM-PUBLIC
+  |=  KEYC
+  +>(PUB (DECOMPRESS-POINT.ECC KEY), CAD CAI)
 ::
-++  from-public-point
-  |=  [pon=pont cai=@]
-  +>(pub pon, cad cai)
+++  FROM-PUBLIC-POINT
+  |=  [PON=PONT CAI=@]
+  +>(PUB PON, CAD CAI)
 ::
-++  from-extended
-  |=  t=tape
-  =+  x=(de-base58check 4 t)
+++  FROM-EXTENDED
+  |=  T=TAPE
+  =+  X=(DE-BASE58CHECK 4 T)
   =>  |%
-      ++  take
-        |=  b=@ud
-        ^-  [v=@ x=@]
-        :-  (end 3 b x)
-        (rsh 3 b x)
+      ++  TAKE
+        |=  B=@UD
+        ^-  [V=@ X=@]
+        :-  (END 3 B X)
+        (RSH 3 B X)
       --
-  =^  k  x  (take 33)
-  =^  c  x  (take 32)
-  =^  i  x  (take 4)
-  =^  p  x  (take 4)
-  =^  d  x  (take 1)
-  ?>  =(0 x)  ::  sanity check
-  %.  [d i p]
-  =<  set-metadata
-  =+  v=(scag 4 t)
-  ?:  =("xprv" v)  (from-private k c)
-  ?:  =("xpub" v)  (from-public k c)
+  =^  K  X  (TAKE 33)
+  =^  C  X  (TAKE 32)
+  =^  I  X  (TAKE 4)
+  =^  P  X  (TAKE 4)
+  =^  D  X  (TAKE 1)
+  ?>  =(0 X)  ::  SANITY CHECK
+  %.  [D I P]
+  =<  SET-METADATA
+  =+  V=(SCAG 4 T)
+  ?:  =("XPRV" V)  (FROM-PRIVATE K C)
+  ?:  =("XPUB" V)  (FROM-PUBLIC K C)
   !!
 ::
-++  set-metadata
-  |=  [d=@ud i=@ud p=@]
-  +>(dep d, ind i, pif p)
+++  SET-METADATA
+  |=  [D=@UD I=@UD P=@]
+  +>(DEP D, IND I, PIF P)
 ::
-::  derivation
+::  DERIVATION
 ::
-++  derivation-path
-  ;~  pfix
-    ;~(pose (jest 'm/') (easy ~))
-  %+  most  net
-  ;~  pose
-    %+  cook
-      |=(i=@ (add i (bex 31)))
-    ;~(sfix dem say)
+++  DERIVATION-PATH
+  ;~  PFIX
+    ;~(POSE (JEST 'M/') (EASY ~))
+  %+  MOST  NET
+  ;~  POSE
+    %+  COOK
+      |=(I=@ (ADD I (BEX 31)))
+    ;~(SFIX DEM SAY)
   ::
-    dem
+    DEM
   ==  ==
 ::
-++  derive-path
-  |=  t=tape
-  %-  derive-sequence
-  (scan t derivation-path)
+++  DERIVE-PATH
+  |=  T=TAPE
+  %-  DERIVE-SEQUENCE
+  (SCAN T DERIVATION-PATH)
 ::
-++  derive-sequence
-  |=  j=(list @u)
-  ?~  j  +>
-  =.  +>  (derive i.j)
-  $(j t.j)
+++  DERIVE-SEQUENCE
+  |=  J=(LIST @U)
+  ?~  J  +>
+  =.  +>  (DERIVE I.J)
+  $(J T.J)
 ::
-++  derive
-  ?:  =(0 prv)
-    derive-public
-  derive-private
+++  DERIVE
+  ?:  =(0 PRV)
+    DERIVE-PUBLIC
+  DERIVE-PRIVATE
 ::
-++  derive-private
-  |=  i=@u
+++  DERIVE-PRIVATE
+  |=  I=@U
   ^+  +>
-  ::  we must have a private key to derive the next one
-  ?:  =(0 prv)
-    ~|  %know-no-private-key
+  ::  WE MUST HAVE A PRIVATE KEY TO DERIVE THE NEXT ONE
+  ?:  =(0 PRV)
+    ~|  %KNOW-NO-PRIVATE-KEY
     !!
-  ::  derive child at i
-  =+  ^-  [left=@ right=@]  ::TODO  =/ w/o face
-    =-  [(cut 3 [32 32] -) (cut 3 [0 32] -)]
-    %+  hmac-sha512l  [32 cad]
+  ::  DERIVE CHILD AT I
+  =+  ^-  [LEFT=@ RIGHT=@]  ::TODO  =/ W/O FACE
+    =-  [(CUT 3 [32 32] -) (CUT 3 [0 32] -)]
+    %+  HMAC-SHA512L  [32 CAD]
     :-  37
-    ?:  (gte i (bex 31))
-      ::  hardened child
-      (can 3 ~[4^i 32^prv 1^0])
-    ::  normal child
-    (can 3 ~[4^i 33^(ser-p (point prv))])
-  =+  key=(mod (add left prv) n)
-  ::  rare exception, invalid key, go to the next one
-  ?:  |(=(0 key) (gte left n))  $(i +(i))
+    ?:  (GTE I (BEX 31))
+      ::  HARDENED CHILD
+      (CAN 3 ~[4^I 32^PRV 1^0])
+    ::  NORMAL CHILD
+    (CAN 3 ~[4^I 33^(SER-P (POINT PRV))])
+  =+  KEY=(MOD (ADD LEFT PRV) N)
+  ::  RARE EXCEPTION, INVALID KEY, GO TO THE NEXT ONE
+  ?:  |(=(0 KEY) (GTE LEFT N))  $(I +(I))
   %_  +>.$
-    prv   key
-    pub   (point key)
-    cad   right
-    dep   +(dep)
-    ind   i
-    pif   fingerprint
+    PRV   KEY
+    PUB   (POINT KEY)
+    CAD   RIGHT
+    DEP   +(DEP)
+    IND   I
+    PIF   FINGERPRINT
   ==
 ::
-++  derive-public
-  |=  i=@u
+++  DERIVE-PUBLIC
+  |=  I=@U
   ^+  +>
-  ::  public keys can't be hardened
-  ?:  (gte i (bex 31))
-    ~|  %cant-derive-hardened-public-key
+  ::  PUBLIC KEYS CAN'T BE HARDENED
+  ?:  (GTE I (BEX 31))
+    ~|  %CANT-DERIVE-HARDENED-PUBLIC-KEY
     !!
-  ::  derive child at i
-  =+  ^-  [left=@ right=@]  ::TODO  =/  w/o face
-    =-  [(cut 3 [32 32] -) (cut 3 [0 32] -)]
-    %+  hmac-sha512l  [32 cad]
-    37^(can 3 ~[4^i 33^(ser-p pub)])
-  ::  rare exception, invalid key, go to the next one
-  ?:  (gte left n)  $(i +(i))  ::TODO  or child key is "point at infinity"
+  ::  DERIVE CHILD AT I
+  =+  ^-  [LEFT=@ RIGHT=@]  ::TODO  =/  W/O FACE
+    =-  [(CUT 3 [32 32] -) (CUT 3 [0 32] -)]
+    %+  HMAC-SHA512L  [32 CAD]
+    37^(CAN 3 ~[4^I 33^(SER-P PUB)])
+  ::  RARE EXCEPTION, INVALID KEY, GO TO THE NEXT ONE
+  ?:  (GTE LEFT N)  $(I +(I))  ::TODO  OR CHILD KEY IS "POINT AT INFINITY"
   %_  +>.$
-    pub   (jc-add.ecc (point left) pub)
-    cad   right
-    dep   +(dep)
-    ind   i
-    pif   fingerprint
+    PUB   (JC-ADD.ECC (POINT LEFT) PUB)
+    CAD   RIGHT
+    DEP   +(DEP)
+    IND   I
+    PIF   FINGERPRINT
   ==
 ::
-::  rendering
+::  RENDERING
 ::
-++  private-key     ?.(=(0 prv) prv ~|(%know-no-private-key !!))
-++  public-key      (ser-p pub)
-++  chain-code      cad
-++  private-chain   [private-key cad]
-++  public-chain    [public-key cad]
+++  PRIVATE-KEY     ?.(=(0 PRV) PRV ~|(%KNOW-NO-PRIVATE-KEY !!))
+++  PUBLIC-KEY      (SER-P PUB)
+++  CHAIN-CODE      CAD
+++  PRIVATE-CHAIN   [PRIVATE-KEY CAD]
+++  PUBLIC-CHAIN    [PUBLIC-KEY CAD]
 ::
-++  identity        (hash160 public-key)
-++  fingerprint     (cut 3 [16 4] identity)
+++  IDENTITY        (HASH160 PUBLIC-KEY)
+++  FINGERPRINT     (CUT 3 [16 4] IDENTITY)
 ::
-++  prv-extended
-  %+  en-b58c-bip32  0x488.ade4
-  (build-extended private-key)
+++  PRV-EXTENDED
+  %+  EN-B58C-BIP32  0X488.ADE4
+  (BUILD-EXTENDED PRIVATE-KEY)
 ::
-++  pub-extended
-  %+  en-b58c-bip32  0x488.b21e
-  (build-extended public-key)
+++  PUB-EXTENDED
+  %+  EN-B58C-BIP32  0X488.B21E
+  (BUILD-EXTENDED PUBLIC-KEY)
 ::
-++  build-extended
-  |=  key=@
-  %+  can  3
-  :~  33^key
-      32^cad
-      4^ind
-      4^pif
-      1^dep
+++  BUILD-EXTENDED
+  |=  KEY=@
+  %+  CAN  3
+  :~  33^KEY
+      32^CAD
+      4^IND
+      4^PIF
+      1^DEP
   ==
 ::
-++  en-b58c-bip32
-  |=  [v=@ k=@]
-  (en-base58check [4 v] [74 k])
+++  EN-B58C-BIP32
+  |=  [V=@ K=@]
+  (EN-BASE58CHECK [4 V] [74 K])
 ::
-::  base58check
+::  BASE58CHECK
 ::
-++  en-base58check
-  ::  v: version bytes
-  ::  d: data
-  |=  [v=byts d=byts]
-  %-  en-base58:mimes:html
-  =+  p=[(add wid.v wid.d) (can 3 ~[d v])]
-  =-  (can 3 ~[4^- p])
-  %^  rsh  3  28
-  (sha-256l:sha 32 (sha-256l:sha p))
+++  EN-BASE58CHECK
+  ::  V: VERSION BYTES
+  ::  D: DATA
+  |=  [V=BYTS D=BYTS]
+  %-  EN-BASE58:MIMES:HTML
+  =+  P=[(ADD WID.V WID.D) (CAN 3 ~[D V])]
+  =-  (CAN 3 ~[4^- P])
+  %^  RSH  3  28
+  (SHA-256L:SHA 32 (SHA-256L:SHA P))
 ::
-++  de-base58check
-  ::  vw: amount of version bytes
-  |=  [vw=@u t=tape]
-  =+  x=(de-base58:mimes:html t)
-  =+  hash=(sha-256l:sha 32 (sha-256:sha (rsh 3 4 x)))
-  ?>  =((end 3 4 x) (rsh 3 28 hash))
-  (cut 3 [vw (sub (met 3 x) (add 4 vw))] x)
+++  DE-BASE58CHECK
+  ::  VW: AMOUNT OF VERSION BYTES
+  |=  [VW=@U T=TAPE]
+  =+  X=(DE-BASE58:MIMES:HTML T)
+  =+  HASH=(SHA-256L:SHA 32 (SHA-256:SHA (RSH 3 4 X)))
+  ?>  =((END 3 4 X) (RSH 3 28 HASH))
+  (CUT 3 [VW (SUB (MET 3 X) (ADD 4 VW))] X)
 ::
-++  hash160
-  |=  d=@
-  (ripemd-160:ripemd:crypto 256 (sha-256:sha d))
+++  HASH160
+  |=  D=@
+  (RIPEMD-160:RIPEMD:CRYPTO 256 (SHA-256:SHA D))
 --

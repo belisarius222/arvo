@@ -1,23 +1,23 @@
 ::
-::::  /hoon/httr/mar
+::::  /HOON/HTTR/MAR
   ::
 /?    310
 ::
-=,  eyre
-=,  format
-=,  html
-|_  hit/httr
-++  grow  |%  ++  wall  (turn wain trip)
-              ++  wain  (to-wain cord)
-              ++  json  (need (de-json cord))
-              ++  cord  q:octs
-              ++  octs
-                ~|  hit
-                ?>  =(2 (div p.hit 100))
-                (need r.hit)
+=,  EYRE
+=,  FORMAT
+=,  HTML
+|_  HIT/HTTR
+++  GROW  |%  ++  WALL  (TURN WAIN TRIP)
+              ++  WAIN  (TO-WAIN CORD)
+              ++  JSON  (NEED (DE-JSON CORD))
+              ++  CORD  Q:OCTS
+              ++  OCTS
+                ~|  HIT
+                ?>  =(2 (DIV P.HIT 100))
+                (NEED R.HIT)
           --
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  httr                                        ::  clam from %noun
+  ++  NOUN  HTTR                                        ::  CLAM FROM %NOUN
   --
 --

@@ -1,46 +1,46 @@
-::  bip39 implementation in hoon
+::  BIP39 IMPLEMENTATION IN HOON
 ::
-/+  bip39-english
+/+  BIP39-ENGLISH
 ::
 |%
-++  from-entropy
-  |=  byts
-  ^-  tape
-  =.  wid  (mul wid 8)
-  ~|  [%unsupported-entropy-bit-length wid]
-  ?>  &((gte wid 128) (lte wid 256))
+++  FROM-ENTROPY
+  |=  BYTS
+  ^-  TAPE
+  =.  WID  (MUL WID 8)
+  ~|  [%UNSUPPORTED-ENTROPY-BIT-LENGTH WID]
+  ?>  &((GTE WID 128) (LTE WID 256))
   ::
-  =+  cs=(div wid 32)
-  =/  check=@
-    %^  rsh  0  (sub 256 cs)
-    (sha-256l:sha (div wid 8) dat)
-  =/  bits=byts
-    :-  (add wid cs)
-    %+  can  0
-    :~  cs^check
-        wid^dat
+  =+  CS=(DIV WID 32)
+  =/  CHECK=@
+    %^  RSH  0  (SUB 256 CS)
+    (SHA-256L:SHA (DIV WID 8) DAT)
+  =/  BITS=BYTS
+    :-  (ADD WID CS)
+    %+  CAN  0
+    :~  CS^CHECK
+        WID^DAT
     ==
   ::
-  =/  pieces
-    |-  ^-  (list @)
-    :-  (end 0 11 dat.bits)
-    ?:  (lte wid.bits 11)  ~
-    $(bits [(sub wid.bits 11) (rsh 0 11 dat.bits)])
+  =/  PIECES
+    |-  ^-  (LIST @)
+    :-  (END 0 11 DAT.BITS)
+    ?:  (LTE WID.BITS 11)  ~
+    $(BITS [(SUB WID.BITS 11) (RSH 0 11 DAT.BITS)])
   ::
-  =/  words=(list tape)
-    %+  turn  pieces
-    |=  ind=@ud
-    (snag ind `(list tape)`bip39-english)
+  =/  WORDS=(LIST TAPE)
+    %+  TURN  PIECES
+    |=  IND=@UD
+    (SNAG IND `(LIST TAPE)`BIP39-ENGLISH)
   ::
-  %+  roll  (flop words)
-  |=  [nex=tape all=tape]
-  ?~  all  nex
-  :(weld all " " nex)
+  %+  ROLL  (FLOP WORDS)
+  |=  [NEX=TAPE ALL=TAPE]
+  ?~  ALL  NEX
+  :(WELD ALL " " NEX)
 ::
-::NOTE  always produces a 512-bit result
-++  to-seed
-  |=  [mnem=tape pass=tape]
+::NOTE  ALWAYS PRODUCES A 512-BIT RESULT
+++  TO-SEED
+  |=  [MNEM=TAPE PASS=TAPE]
   ^-  @
-  %-  hmac-sha512t:pbkdf:crypto
-  [(crip mnem) (crip (weld "mnemonic" pass)) 2.048 64]
+  %-  HMAC-SHA512T:PBKDF:CRYPTO
+  [(CRIP MNEM) (CRIP (WELD "MNEMONIC" PASS)) 2.048 64]
 --

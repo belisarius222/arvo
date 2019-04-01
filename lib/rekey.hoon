@@ -1,16 +1,16 @@
-::  Userspace implementation of old  /_  @foo behavior
+::  USERSPACE IMPLEMENTATION OF OLD  /_  @FOO BEHAVIOR
 ::                                                      ::  ::
-::::  /hoon/rekey/lib                                   ::  ::
+::::  /HOON/REKEY/LIB                                   ::  ::
   ::                                                    ::  ::
-/?  310                                                 ::  version
+/?  310                                                 ::  VERSION
 ::                                                      ::  ::
 ::::                                                    ::  ::
   ::                                                    ::  ::
-=,  wired
-|*  typ=@tas
-|*  inp=(map knot *)  ^-  (map (odo:raid typ) _(~(got by inp)))
-=>  .(inp `(map knot _(~(got by inp)))`inp)
-%-  malt
-%+  murn  ~(tap by inp)
-|*  [a=knot b=*]  ^-  (unit [(odo:raid typ) _b])
-(both (slaw typ a) `b)
+=,  WIRED
+|*  TYP=@TAS
+|*  INP=(MAP KNOT *)  ^-  (MAP (ODO:RAID TYP) _(~(GOT BY INP)))
+=>  .(INP `(MAP KNOT _(~(GOT BY INP)))`INP)
+%-  MALT
+%+  MURN  ~(TAP BY INP)
+|*  [A=KNOT B=*]  ^-  (UNIT [(ODO:RAID TYP) _B])
+(BOTH (SLAW TYP A) `B)

@@ -1,21 +1,21 @@
-/-  hall
-=,  eyre
+/-  HALL
+=,  EYRE
 ::
 ::
 |%
-+$  notification
-  $:  token=@t
-      topic=@t
-      payload=(map @t json)
++$  NOTIFICATION
+  $:  TOKEN=@T
+      TOPIC=@T
+      PAYLOAD=(MAP @T JSON)
   ==
 ::
-+$  action
-  $%  [%token tok=@t]               ::  set device token
-      [%king kng=@p]                ::  set ship to route notifications through
-      [%baseurl bur=@t]             ::  set url to send notifications to
-      [%notify not=notification]    ::  send notification
-      [%add-circle nom=name:hall]   ::  send notifications for this circle
-      [%del-circle nom=name:hall]   ::  stop sending for this circle
++$  ACTION
+  $%  [%TOKEN TOK=@T]               ::  SET DEVICE TOKEN
+      [%KING KNG=@P]                ::  SET SHIP TO ROUTE NOTIFICATIONS THROUGH
+      [%BASEURL BUR=@T]             ::  SET URL TO SEND NOTIFICATIONS TO
+      [%NOTIFY NOT=NOTIFICATION]    ::  SEND NOTIFICATION
+      [%ADD-CIRCLE NOM=NAME:HALL]   ::  SEND NOTIFICATIONS FOR THIS CIRCLE
+      [%DEL-CIRCLE NOM=NAME:HALL]   ::  STOP SENDING FOR THIS CIRCLE
   ==
 ::
 --

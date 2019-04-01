@@ -1,9 +1,9 @@
-::  /!js/ in /===web/pack
+::  /!JS/ IN /===WEB/PACK
 ::
-::::  /hoon/js/ren
+::::  /HOON/JS/REN
   ::
 /?    309
-/,  /web/pack/js  /!js/
+/,  /WEB/PACK/JS  /!JS/
     /             /~  !!
 ==
 -.-

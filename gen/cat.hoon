@@ -1,33 +1,33 @@
-::  ConCATenate file listings
+::  CONCATENATE FILE LISTINGS
 ::
-::::  /hoon/cat/gen
+::::  /HOON/CAT/GEN
   ::
 /?    310
-/+    pretty-file, show-dir
+/+    PRETTY-FILE, SHOW-DIR
 ::
 ::::
   ::
-:-  %say
-|=  {^ {arg/(list path)} vane/?($g $c)}
-=-  tang+(flop `tang`(zing -))
-%+  turn  arg
-|=  pax/path
-^-  tang
-=+  ark=.^(arch (cat 3 vane %y) pax)
-?^  fil.ark
-  ?:  =(%sched -:(flop pax))
-    [>.^((map @da cord) (cat 3 vane %x) pax)<]~
-  [leaf+(spud pax) (pretty-file .^(noun (cat 3 vane %x) pax))]
-?-     dir.ark                                          ::  handle ambiguity
+:-  %SAY
+|=  {^ {ARG/(LIST PATH)} VANE/?($G $C)}
+=-  TANG+(FLOP `TANG`(ZING -))
+%+  TURN  ARG
+|=  PAX/PATH
+^-  TANG
+=+  ARK=.^(ARCH (CAT 3 VANE %Y) PAX)
+?^  FIL.ARK
+  ?:  =(%SCHED -:(FLOP PAX))
+    [>.^((MAP @DA CORD) (CAT 3 VANE %X) PAX)<]~
+  [LEAF+(SPUD PAX) (PRETTY-FILE .^(NOUN (CAT 3 VANE %X) PAX))]
+?-     DIR.ARK                                          ::  HANDLE AMBIGUITY
     ~
-  [rose+[" " `~]^~[leaf+"~" (smyt pax)]]~
+  [ROSE+[" " `~]^~[LEAF+"~" (SMYT PAX)]]~
 ::
-    {{@t ~} ~ ~}
-  $(pax (welp pax /[p.n.dir.ark]))
+    {{@T ~} ~ ~}
+  $(PAX (WELP PAX /[P.N.DIR.ARK]))
 ::
     *
-  =-  [palm+[": " ``~]^-]~
-  :~  rose+[" " `~]^~[leaf+"*" (smyt pax)]
-      `tank`(show-dir vane pax dir.ark)
+  =-  [PALM+[": " ``~]^-]~
+  :~  ROSE+[" " `~]^~[LEAF+"*" (SMYT PAX)]
+      `TANK`(SHOW-DIR VANE PAX DIR.ARK)
   ==
 ==

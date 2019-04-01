@@ -1,13 +1,13 @@
 ::
-::::  /hoon/htm/mar
+::::  /HOON/HTM/MAR
   ::
 /?    310
-|_  own/manx
+|_  OWN/MANX
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  hymn  own
+  ++  HYMN  OWN
   --
-++  grab  |%                                            ::  convert from
-          ++  noun  manx                                ::  clam from %noun
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  MANX                                ::  CLAM FROM %NOUN
 --        --

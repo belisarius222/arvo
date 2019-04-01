@@ -1,12 +1,12 @@
-::  "Hello world" sample generator
+::  "HELLO WORLD" SAMPLE GENERATOR
 ::
-::::  /hoon/hello/gen
+::::  /HOON/HELLO/GEN
   ::
 /?    310
 ::
 ::::
   ::
-:-  %say
-|=  {^ {{txt/@tas ~} ~}}
-:-  %noun
-(crip (weld "hello, " (trip txt)))
+:-  %SAY
+|=  {^ {{TXT/@TAS ~} ~}}
+:-  %NOUN
+(CRIP (WELD "HELLO, " (TRIP TXT)))

@@ -1,17 +1,17 @@
-::  Make HTTP request(get only)
+::  MAKE HTTP REQUEST(GET ONLY)
 ::
-::::  /hoon/curl-hiss/gen
+::::  /HOON/CURL-HISS/GEN
   ::
 /?    310
-/-  sole
-/+  generators
-=,  generators
-=,  eyre
-:-  %get  |=  {^ {a/hiss ~} usr/user}
-^-  (sole-request:sole (cask httr))
-?.  ?=($get p.q.a)
-  ~|  %only-get-requests-supported-in-generators  :: XX enforced?
+/-  SOLE
+/+  GENERATORS
+=,  GENERATORS
+=,  EYRE
+:-  %GET  |=  {^ {A/HISS ~} USR/USER}
+^-  (SOLE-REQUEST:SOLE (CASK HTTR))
+?.  ?=($GET P.Q.A)
+  ~|  %ONLY-GET-REQUESTS-SUPPORTED-IN-GENERATORS  :: XX ENFORCED?
   !!
-:-  *tang
-:^  %|  `usr  `hiss`a
-|=(hit/httr (produce %httr hit))
+:-  *TANG
+:^  %|  `USR  `HISS`A
+|=(HIT/HTTR (PRODUCE %HTTR HIT))

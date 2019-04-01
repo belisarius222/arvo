@@ -1,1083 +1,1083 @@
-/-  *dns, hall
+/-  *DNS, HALL
 !:
 ::
-::  moves and state
+::  MOVES AND STATE
 ::
 =>  |%
-+$  move  (pair bone card)
-+$  poke
-  $%  [%dns-command command]
-      [%hall-action %phrase audience:hall (list speech:hall)]
++$  MOVE  (PAIR BONE CARD)
++$  POKE
+  $%  [%DNS-COMMAND COMMAND]
+      [%HALL-ACTION %PHRASE AUDIENCE:HALL (LIST SPEECH:HALL)]
   ==
-+$  card
-  $%  [%hiss wire (unit ~) %httr %hiss hiss:eyre]
-      [%poke wire dock poke]
-      [%rule wire %turf %put turf]
-      [%wait wire @da]
++$  CARD
+  $%  [%HISS WIRE (UNIT ~) %HTTR %HISS HISS:EYRE]
+      [%POKE WIRE DOCK POKE]
+      [%RULE WIRE %TURF %PUT TURF]
+      [%WAIT WIRE @DA]
   ==
-::  +state: complete app state
+::  +STATE: COMPLETE APP STATE
 ::
-+$  state
-  $:  :: dom: the set of our bindings
++$  STATE
+  $:  :: DOM: THE SET OF OUR BINDINGS
       ::
-      dom=(set turf)
-      :: per: per-dependent ips &c
+      DOM=(SET TURF)
+      :: PER: PER-DEPENDENT IPS &C
       ::
-      per=(map ship relay)
-      :: nem: authoritative state
+      PER=(MAP SHIP RELAY)
+      :: NEM: AUTHORITATIVE STATE
       ::
-      nem=(unit nameserver)
+      NEM=(UNIT NAMESERVER)
   ==
 --
 ::
-::  helpers
+::  HELPERS
 ::
 =>  |%
-::  +join: join list of cords with separator
+::  +JOIN: JOIN LIST OF CORDS WITH SEPARATOR
 ::
-::    XX move to zuse?
-::    XX dedup with lib/pkcs
+::    XX MOVE TO ZUSE?
+::    XX DEDUP WITH LIB/PKCS
 ::
-++  join
-  |=  [sep=@t hot=(list @t)]
-  ^-  @t
-  =|  out=(list @t)
-  ?>  ?=(^ hot)
-  |-  ^-  @t
-  ?~  t.hot
-    (rap 3 [i.hot out])
-  $(out [sep i.hot out], hot t.hot)
-::  +name: fully-qualified domain name for :ship
+++  JOIN
+  |=  [SEP=@T HOT=(LIST @T)]
+  ^-  @T
+  =|  OUT=(LIST @T)
+  ?>  ?=(^ HOT)
+  |-  ^-  @T
+  ?~  T.HOT
+    (RAP 3 [I.HOT OUT])
+  $(OUT [SEP I.HOT OUT], HOT T.HOT)
+::  +NAME: FULLY-QUALIFIED DOMAIN NAME FOR :SHIP
 ::
-++  name
-  |=  [=ship =turf]
-  (cat 3 (join '.' (weld turf /(crip +:(scow %p ship)))) '.')
-::  +lame: domain name for :ship (without trailing '.')
+++  NAME
+  |=  [=SHIP =TURF]
+  (CAT 3 (JOIN '.' (WELD TURF /(CRIP +:(SCOW %P SHIP)))) '.')
+::  +LAME: DOMAIN NAME FOR :SHIP (WITHOUT TRAILING '.')
 ::
-++  lame
-  |=  [=ship =turf]
-  (join '.' (weld turf /(crip +:(scow %p ship))))
-::  +endpoint: append :path to :purl
+++  LAME
+  |=  [=SHIP =TURF]
+  (JOIN '.' (WELD TURF /(CRIP +:(SCOW %P SHIP))))
+::  +ENDPOINT: APPEND :PATH TO :PURL
 ::
-++  endpoint
-  |=  [=purl:eyre =path]
-  ^+  purl
-  purl(q.q (weld q.q.purl path))
-::  +params: append :params to :purl
+++  ENDPOINT
+  |=  [=PURL:EYRE =PATH]
+  ^+  PURL
+  PURL(Q.Q (WELD Q.Q.PURL PATH))
+::  +PARAMS: APPEND :PARAMS TO :PURL
 ::
-++  params
-  |=  [=purl:eyre =quay:eyre]
-  ^+  purl
-  purl(r (weld r.purl quay))
-::  +print-path: serialize a +path to a +cord
+++  PARAMS
+  |=  [=PURL:EYRE =QUAY:EYRE]
+  ^+  PURL
+  PURL(R (WELD R.PURL QUAY))
+::  +PRINT-PATH: SERIALIZE A +PATH TO A +CORD
 ::
-++  print-path
-  |=  =path
-  (crip ~(ram re (sell !>(path))))
-::  +json-octs: deserialize json and apply reparser
+++  PRINT-PATH
+  |=  =PATH
+  (CRIP ~(RAM RE (SELL !>(PATH))))
+::  +JSON-OCTS: DESERIALIZE JSON AND APPLY REPARSER
 ::
-++  json-octs
-  |*  [bod=octs wit=fist:dejs:format]
-  =/  jon  (de-json:html q.bod)
-  ?~  jon  ~
-  (wit u.jon)
-::  +ship-turf: parse ship from first subdomain
+++  JSON-OCTS
+  |*  [BOD=OCTS WIT=FIST:DEJS:FORMAT]
+  =/  JON  (DE-JSON:HTML Q.BOD)
+  ?~  JON  ~
+  (WIT U.JON)
+::  +SHIP-TURF: PARSE SHIP FROM FIRST SUBDOMAIN
 ::
-++  ship-turf
-  |=  [nam=@t aut-dom=turf]
-  ^-  (unit ship)
-  =/  dom=(unit host:eyre)
-    (rush nam ;~(sfix thos:de-purl:html dot))
-  ?:  ?|  ?=(~ dom)
-          ?=(%| -.u.dom)
-          ?=(~ p.u.dom)
+++  SHIP-TURF
+  |=  [NAM=@T AUT-DOM=TURF]
+  ^-  (UNIT SHIP)
+  =/  DOM=(UNIT HOST:EYRE)
+    (RUSH NAM ;~(SFIX THOS:DE-PURL:HTML DOT))
+  ?:  ?|  ?=(~ DOM)
+          ?=(%| -.U.DOM)
+          ?=(~ P.U.DOM)
       ==
     ~
-  =/  who
-    (rush (head (flop p.u.dom)) fed:ag)
-  ?~  who  ~
-  ?.  =(aut-dom (flop (tail (flop p.u.dom))))
+  =/  WHO
+    (RUSH (HEAD (FLOP P.U.DOM)) FED:AG)
+  ?~  WHO  ~
+  ?.  =(AUT-DOM (FLOP (TAIL (FLOP P.U.DOM))))
     ~
-  ::  galaxies always excluded
+  ::  GALAXIES ALWAYS EXCLUDED
   ::
-  ?:  ?=(%czar (clan:title u.who))
+  ?:  ?=(%CZAR (CLAN:TITLE U.WHO))
     ~
-  who
+  WHO
 --
 ::
-::  service providers
+::  SERVICE PROVIDERS
 ::
 =>  |%
-::  +provider: initialize provider-specific core
+::  +PROVIDER: INITIALIZE PROVIDER-SPECIFIC CORE
 ::
-++  provider
-  |=  aut=authority
-  ?-  -.pro.aut
-    %fcloud  ~(. fcloud aut)
-    %gcloud  ~(. gcloud aut)
+++  PROVIDER
+  |=  AUT=AUTHORITY
+  ?-  -.PRO.AUT
+    %FCLOUD  ~(. FCLOUD AUT)
+    %GCLOUD  ~(. GCLOUD AUT)
   ==
-::  |fcloud: Cloudflare provider
+::  |FCLOUD: CLOUDFLARE PROVIDER
 ::
-++  fcloud
+++  FCLOUD
   =>  |%
-      ++  headers
-        |=  aut=authority
-        ?>  ?=(%fcloud -.pro.aut)
-        %-  ~(gas by *math:eyre)
-        :~  ['Content-Type' ['application/json' ~]]
-            ['X-Auth-Email' [email.auth.pro.aut ~]]
-            ['X-Auth-Key' [key.auth.pro.aut ~]]
+      ++  HEADERS
+        |=  AUT=AUTHORITY
+        ?>  ?=(%FCLOUD -.PRO.AUT)
+        %-  ~(GAS BY *MATH:EYRE)
+        :~  ['CONTENT-TYPE' ['APPLICATION/JSON' ~]]
+            ['X-AUTH-EMAIL' [EMAIL.AUTH.PRO.AUT ~]]
+            ['X-AUTH-KEY' [KEY.AUTH.PRO.AUT ~]]
         ==
       ::
-      ++  parse-raw-record
-        |=  aut-dom=turf
-        ^-  $-  json
-            (unit [=ship id=@ta tar=target])
-        =,  dejs:format
-        %+  cu
-          |=  [id=@t typ=@t nam=@t dat=@t]
-          ^-  (unit [=ship id=@ta tar=target])
-          ::  XX fix this
+      ++  PARSE-RAW-RECORD
+        |=  AUT-DOM=TURF
+        ^-  $-  JSON
+            (UNIT [=SHIP ID=@TA TAR=TARGET])
+        =,  DEJS:FORMAT
+        %+  CU
+          |=  [ID=@T TYP=@T NAM=@T DAT=@T]
+          ^-  (UNIT [=SHIP ID=@TA TAR=TARGET])
+          ::  XX FIX THIS
           ::
-          =/  him  (ship-turf (cat 3 nam '.') aut-dom)
-          ?:  ?=(~ him)
+          =/  HIM  (SHIP-TURF (CAT 3 NAM '.') AUT-DOM)
+          ?:  ?=(~ HIM)
             ~
-          ?+  typ
+          ?+  TYP
             ~
           ::
               %'A'
-            =/  adr  (rush dat lip:ag)
-            ?~  adr  ~
-            `[u.him `@ta`id %direct %if u.adr]
+            =/  ADR  (RUSH DAT LIP:AG)
+            ?~  ADR  ~
+            `[U.HIM `@TA`ID %DIRECT %IF U.ADR]
           ::
               %'CNAME'
-            ::  XX fix this
+            ::  XX FIX THIS
             ::
-            =/  for  (ship-turf (cat 3 dat '.') aut-dom)
-            ?~  for  ~
-            `[u.him `@ta`id %indirect u.for]
+            =/  FOR  (SHIP-TURF (CAT 3 DAT '.') AUT-DOM)
+            ?~  FOR  ~
+            `[U.HIM `@TA`ID %INDIRECT U.FOR]
           ==
-        ::  XX parse dates, proxied, ttl?
+        ::  XX PARSE DATES, PROXIED, TTL?
         ::
-        %-  ot  :~
-          'id'^so
-          'type'^so
-          'name'^so
-          'content'^so
+        %-  OT  :~
+          'ID'^SO
+          'TYPE'^SO
+          'NAME'^SO
+          'CONTENT'^SO
         ==
       --
   ::
-  |_  aut=authority
-  ::  +base: provider service endpoint
+  |_  AUT=AUTHORITY
+  ::  +BASE: PROVIDER SERVICE ENDPOINT
   ::
-  ++  base
-    ^-  purl:eyre
-    (need (de-purl:html 'https://api.cloudflare.com/client/v4'))
-  ::  +zone: provider-specific zone info request
+  ++  BASE
+    ^-  PURL:EYRE
+    (NEED (DE-PURL:HTML 'HTTPS://API.CLOUDFLARE.COM/CLIENT/V4'))
+  ::  +ZONE: PROVIDER-SPECIFIC ZONE INFO REQUEST
   ::
-  ++  zone
-    ^-  hiss:eyre
-    ?>  ?=(%fcloud -.pro.aut)
-    [(endpoint base /zones/[zone.pro.aut]) %get (headers aut) ~]
-  ::  +record: JSON-formatted provider-specific dns record
+  ++  ZONE
+    ^-  HISS:EYRE
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    [(ENDPOINT BASE /ZONES/[ZONE.PRO.AUT]) %GET (HEADERS AUT) ~]
+  ::  +RECORD: JSON-FORMATTED PROVIDER-SPECIFIC DNS RECORD
   ::
-  ++  record
-    |=  [him=ship tar=target]
-    ^-  json
-    ?>  ?=(%fcloud -.pro.aut)
-    =/  type
-      ?:(?=(%direct -.tar) 'A' 'CNAME')
-    =/  data
-      ?:  ?=(%direct -.tar)
-        (crip +:(scow %if p.tar))
-      (lame p.tar dom.aut)
-    :-  %o
-    %-  ~(gas by *(map @t json))
-    :~  ['name' %s (lame him dom.aut)]
-        ['type' %s type]
-        ['content' %s data]
-        ::  XX make configureable?
+  ++  RECORD
+    |=  [HIM=SHIP TAR=TARGET]
+    ^-  JSON
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    =/  TYPE
+      ?:(?=(%DIRECT -.TAR) 'A' 'CNAME')
+    =/  DATA
+      ?:  ?=(%DIRECT -.TAR)
+        (CRIP +:(SCOW %IF P.TAR))
+      (LAME P.TAR DOM.AUT)
+    :-  %O
+    %-  ~(GAS BY *(MAP @T JSON))
+    :~  ['NAME' %S (LAME HIM DOM.AUT)]
+        ['TYPE' %S TYPE]
+        ['CONTENT' %S DATA]
+        ::  XX MAKE CONFIGUREABLE?
         ::
-        ['ttl' %n ~.1]
-        ['proxied' %b %.n]
+        ['TTL' %N ~.1]
+        ['PROXIED' %B %.N]
     ==
-  ::  +create: provider-specific record-creation request
+  ::  +CREATE: PROVIDER-SPECIFIC RECORD-CREATION REQUEST
   ::
-  ++  create
-    |=  [him=ship tar=target pre=(unit [id=@ta tar=target])]
-    ^-  hiss:eyre
-    ?>  ?=(%fcloud -.pro.aut)
-    =/  bod=octs
-      %-  as-octt:mimes:html
-      %-  en-json:html
-      (record him tar)
-    ?~  pre
-      :-  (endpoint base /zones/[zone.pro.aut]/['dns_records'])
-      [%post (headers aut) `bod]
-    :-  (endpoint base /zones/[zone.pro.aut]/['dns_records']/[id.u.pre])
-    [%put (headers aut) `bod]
-  ::  +existing: list existing records stored by provider
+  ++  CREATE
+    |=  [HIM=SHIP TAR=TARGET PRE=(UNIT [ID=@TA TAR=TARGET])]
+    ^-  HISS:EYRE
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    =/  BOD=OCTS
+      %-  AS-OCTT:MIMES:HTML
+      %-  EN-JSON:HTML
+      (RECORD HIM TAR)
+    ?~  PRE
+      :-  (ENDPOINT BASE /ZONES/[ZONE.PRO.AUT]/['DNS_RECORDS'])
+      [%POST (HEADERS AUT) `BOD]
+    :-  (ENDPOINT BASE /ZONES/[ZONE.PRO.AUT]/['DNS_RECORDS']/[ID.U.PRE])
+    [%PUT (HEADERS AUT) `BOD]
+  ::  +EXISTING: LIST EXISTING RECORDS STORED BY PROVIDER
   ::
-  ++  existing
-    |=  page=(unit @t)
-    ^-  hiss:eyre
-    ?>  ?=(%fcloud -.pro.aut)
-    ::  XX more url params:
-    ::  ?type ?per-page ?order ?direction
+  ++  EXISTING
+    |=  PAGE=(UNIT @T)
+    ^-  HISS:EYRE
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    ::  XX MORE URL PARAMS:
+    ::  ?TYPE ?PER-PAGE ?ORDER ?DIRECTION
     ::
-    :-  %+  params
-          (endpoint base /zones/[zone.pro.aut]/['dns_records'])
-        ?~(page ~ ['page' u.page]~)
-    [%get (headers aut) ~]
-  ::  +parse-list: existing records stored by provider
+    :-  %+  PARAMS
+          (ENDPOINT BASE /ZONES/[ZONE.PRO.AUT]/['DNS_RECORDS'])
+        ?~(PAGE ~ ['PAGE' U.PAGE]~)
+    [%GET (HEADERS AUT) ~]
+  ::  +PARSE-LIST: EXISTING RECORDS STORED BY PROVIDER
   ::
-  ++  parse-list
-    ^-  $-  json
-        (pair (list [=ship id=@ta tar=target]) (unit @t))
-    ?>  ?=(%fcloud -.pro.aut)
-    =,  dejs:format
-    %+  cu
-      |=  $:  success=?
-              response=(list (unit [=ship id=@ta tar=target]))
-              paginate=[page=@ud per-page=@ud count=@ud total-count=@ud]
+  ++  PARSE-LIST
+    ^-  $-  JSON
+        (PAIR (LIST [=SHIP ID=@TA TAR=TARGET]) (UNIT @T))
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    =,  DEJS:FORMAT
+    %+  CU
+      |=  $:  SUCCESS=?
+              RESPONSE=(LIST (UNIT [=SHIP ID=@TA TAR=TARGET]))
+              PAGINATE=[PAGE=@UD PER-PAGE=@UD COUNT=@UD TOTAL-COUNT=@UD]
           ==
-      ^-  (pair (list [=ship id=@ta tar=target]) (unit @t))
-      ?.  success  [~ ~]
-      :-  (murn response same)
-      ::  XX calculate next page number if applicable
+      ^-  (PAIR (LIST [=SHIP ID=@TA TAR=TARGET]) (UNIT @T))
+      ?.  SUCCESS  [~ ~]
+      :-  (MURN RESPONSE SAME)
+      ::  XX CALCULATE NEXT PAGE NUMBER IF APPLICABLE
       ::
       ~
-    ::  XX parse errors and messages?
+    ::  XX PARSE ERRORS AND MESSAGES?
     ::
-    %-  ot  :~
-      'success'^bo
-      'result'^(ar (parse-raw-record dom.aut))
-      :-  'result_info'
-      %-  ot  :~
-        'page'^ni
-        'per_page'^ni
-        'count'^ni
-        'total_count'^ni
+    %-  OT  :~
+      'SUCCESS'^BO
+      'RESULT'^(AR (PARSE-RAW-RECORD DOM.AUT))
+      :-  'RESULT_INFO'
+      %-  OT  :~
+        'PAGE'^NI
+        'PER_PAGE'^NI
+        'COUNT'^NI
+        'TOTAL_COUNT'^NI
       ==
     ==
-  ::  +parse-record: single record stored by provider
+  ::  +PARSE-RECORD: SINGLE RECORD STORED BY PROVIDER
   ::
-  ++  parse-record
-    ^-  $-  json
-        (unit [=ship id=@ta tar=target])
-    ?>  ?=(%fcloud -.pro.aut)
-    =,  dejs:format
-    %+  cu
-      |=  [success=? response=(unit [=ship id=@ta tar=target])]
-      ^-  (unit [=ship id=@ta tar=target])
-      ?.  success  ~
-      response
-    ::  XX parse errors and messages?
+  ++  PARSE-RECORD
+    ^-  $-  JSON
+        (UNIT [=SHIP ID=@TA TAR=TARGET])
+    ?>  ?=(%FCLOUD -.PRO.AUT)
+    =,  DEJS:FORMAT
+    %+  CU
+      |=  [SUCCESS=? RESPONSE=(UNIT [=SHIP ID=@TA TAR=TARGET])]
+      ^-  (UNIT [=SHIP ID=@TA TAR=TARGET])
+      ?.  SUCCESS  ~
+      RESPONSE
+    ::  XX PARSE ERRORS AND MESSAGES?
     ::
-    %-  ot  :~
-      'success'^bo
-      'result'^(parse-raw-record dom.aut)
+    %-  OT  :~
+      'SUCCESS'^BO
+      'RESULT'^(PARSE-RAW-RECORD DOM.AUT)
     ==
   --
-::  |gcloud: GCP provider
+::  |GCLOUD: GCP PROVIDER
 ::
-++  gcloud
-  |_  aut=authority
-  ::  +base: provider service endpoint
+++  GCLOUD
+  |_  AUT=AUTHORITY
+  ::  +BASE: PROVIDER SERVICE ENDPOINT
   ::
-  ++  base
-    ^-  purl:eyre
-    (need (de-purl:html 'https://www.googleapis.com/dns/v1/projects'))
-  ::  +zone: provider-specific zone info request
+  ++  BASE
+    ^-  PURL:EYRE
+    (NEED (DE-PURL:HTML 'HTTPS://WWW.GOOGLEAPIS.COM/DNS/V1/PROJECTS'))
+  ::  +ZONE: PROVIDER-SPECIFIC ZONE INFO REQUEST
   ::
-  ++  zone
-    ^-  hiss:eyre
-    ?>  ?=(%gcloud -.pro.aut)
-    :-  (endpoint base /[project.pro.aut]/['managedZones']/[zone.pro.aut])
-    [%get ~ ~]
-  ::  +record: JSON-formatted provider-specific dns record
+  ++  ZONE
+    ^-  HISS:EYRE
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    :-  (ENDPOINT BASE /[PROJECT.PRO.AUT]/['MANAGEDZONES']/[ZONE.PRO.AUT])
+    [%GET ~ ~]
+  ::  +RECORD: JSON-FORMATTED PROVIDER-SPECIFIC DNS RECORD
   ::
-  ++  record
-    |=  [him=ship tar=target]
-    ^-  json
-    ?>  ?=(%gcloud -.pro.aut)
-    =/  type
-      ?:(?=(%direct -.tar) 'A' 'CNAME')
-    =/  data
-      ?:  ?=(%direct -.tar)
-        [%s (crip +:(scow %if p.tar))]
-      [%s (name p.tar dom.aut)]
-    :-  %o
-    %-  ~(gas by *(map @t json))
-    :~  ['name' %s (name him dom.aut)]
-        ['type' %s type]
-        ::  XX make configureable?
+  ++  RECORD
+    |=  [HIM=SHIP TAR=TARGET]
+    ^-  JSON
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    =/  TYPE
+      ?:(?=(%DIRECT -.TAR) 'A' 'CNAME')
+    =/  DATA
+      ?:  ?=(%DIRECT -.TAR)
+        [%S (CRIP +:(SCOW %IF P.TAR))]
+      [%S (NAME P.TAR DOM.AUT)]
+    :-  %O
+    %-  ~(GAS BY *(MAP @T JSON))
+    :~  ['NAME' %S (NAME HIM DOM.AUT)]
+        ['TYPE' %S TYPE]
+        ::  XX MAKE CONFIGUREABLE?
         ::
-        ['ttl' %n ~.300]
-        ['rrdatas' %a data ~]
+        ['TTL' %N ~.300]
+        ['RRDATAS' %A DATA ~]
     ==
-  ::  +create: provider-specific record-creation request
+  ::  +CREATE: PROVIDER-SPECIFIC RECORD-CREATION REQUEST
   ::
-  ++  create
-    =,  eyre
-    |=  [him=ship tar=target pre=(unit [id=@ta tar=target])]
-    ^-  hiss
-    ?>  ?=(%gcloud -.pro.aut)
-    =/  url=purl
-      %+  endpoint  base
-      /[project.pro.aut]/['managedZones']/[zone.pro.aut]/changes
-    =/  hed=math
-      (my content-type+['application/json' ~] ~)
-    =/  bod=octs
-      %-  as-octt:mimes:html
-      %-  en-json:html
-      :-  %o
-      %-  ~(gas by *(map @t json))
-      :-  ['additions' %a (record him tar) ~]
-      ?~  pre  ~
-      [['deletions' %a (record him tar.u.pre) ~] ~]
-    [url %post hed `bod]
-  ::  +existing: list existing records stored by provider
+  ++  CREATE
+    =,  EYRE
+    |=  [HIM=SHIP TAR=TARGET PRE=(UNIT [ID=@TA TAR=TARGET])]
+    ^-  HISS
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    =/  URL=PURL
+      %+  ENDPOINT  BASE
+      /[PROJECT.PRO.AUT]/['MANAGEDZONES']/[ZONE.PRO.AUT]/CHANGES
+    =/  HED=MATH
+      (MY CONTENT-TYPE+['APPLICATION/JSON' ~] ~)
+    =/  BOD=OCTS
+      %-  AS-OCTT:MIMES:HTML
+      %-  EN-JSON:HTML
+      :-  %O
+      %-  ~(GAS BY *(MAP @T JSON))
+      :-  ['ADDITIONS' %A (RECORD HIM TAR) ~]
+      ?~  PRE  ~
+      [['DELETIONS' %A (RECORD HIM TAR.U.PRE) ~] ~]
+    [URL %POST HED `BOD]
+  ::  +EXISTING: LIST EXISTING RECORDS STORED BY PROVIDER
   ::
-  ++  existing
-    =,  eyre
-    |=  page=(unit @t)
-    ^-  hiss
-    ?>  ?=(%gcloud -.pro.aut)
-    =/  url=purl
-      %+  endpoint  base
-      /[project.pro.aut]/['managedZones']/[zone.pro.aut]/rrsets
-    =/  hed=math
-      ?~  page  ~
-      (~(put by *math) 'pageToken' [u.page]~)
-    [url %get hed ~]
-  ::  +parse-list: existing records stored by provider
+  ++  EXISTING
+    =,  EYRE
+    |=  PAGE=(UNIT @T)
+    ^-  HISS
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    =/  URL=PURL
+      %+  ENDPOINT  BASE
+      /[PROJECT.PRO.AUT]/['MANAGEDZONES']/[ZONE.PRO.AUT]/RRSETS
+    =/  HED=MATH
+      ?~  PAGE  ~
+      (~(PUT BY *MATH) 'PAGETOKEN' [U.PAGE]~)
+    [URL %GET HED ~]
+  ::  +PARSE-LIST: EXISTING RECORDS STORED BY PROVIDER
   ::
-  ++  parse-list
-    ^-  $-  json
-        (pair (list [=ship id=@ta tar=target]) (unit @t))
-    ?>  ?=(%gcloud -.pro.aut)
-    =,  dejs:format
+  ++  PARSE-LIST
+    ^-  $-  JSON
+        (PAIR (LIST [=SHIP ID=@TA TAR=TARGET]) (UNIT @T))
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    =,  DEJS:FORMAT
     =>  |%
-        ++  page  (uf ~ (mu so))
-        ++  records
-          %+  uf  ~
-          %+  cu
-            |*(a=(list (unit)) (murn a same))
-          (ar parse-record)
+        ++  PAGE  (UF ~ (MU SO))
+        ++  RECORDS
+          %+  UF  ~
+          %+  CU
+            |*(A=(LIST (UNIT)) (MURN A SAME))
+          (AR PARSE-RECORD)
         --
-    ::  XX parse but don't produce
-    ::  'kind'^(su (jest "dns#resourceRecordSetsListResponse'))
+    ::  XX PARSE BUT DON'T PRODUCE
+    ::  'KIND'^(SU (JEST "DNS#RESOURCERECORDSETSLISTRESPONSE'))
     ::
-    (ou 'rrsets'^records 'nextPageToken'^page ~)
-  ::  +parse-record: single record stored by provider
+    (OU 'RRSETS'^RECORDS 'NEXTPAGETOKEN'^PAGE ~)
+  ::  +PARSE-RECORD: SINGLE RECORD STORED BY PROVIDER
   ::
-  ++  parse-record
-    ^-  $-  json
-        (unit [=ship id=@ta tar=target])
-    ?>  ?=(%gcloud -.pro.aut)
-    =,  dejs:format
-    %+  cu
-      |=  [typ=@t nam=@t dat=(list @t)]
-      ^-  (unit [=ship id=@ta tar=target])
-      ::  gcloud doesn't expose UUIDs for bindings
+  ++  PARSE-RECORD
+    ^-  $-  JSON
+        (UNIT [=SHIP ID=@TA TAR=TARGET])
+    ?>  ?=(%GCLOUD -.PRO.AUT)
+    =,  DEJS:FORMAT
+    %+  CU
+      |=  [TYP=@T NAM=@T DAT=(LIST @T)]
+      ^-  (UNIT [=SHIP ID=@TA TAR=TARGET])
+      ::  GCLOUD DOESN'T EXPOSE UUIDS FOR BINDINGS
       ::
-      =/  id  %$
-      =/  him  (ship-turf nam dom.aut)
-      ?:  |(?=(~ him) ?=(~ dat) ?=(^ t.dat))
+      =/  ID  %$
+      =/  HIM  (SHIP-TURF NAM DOM.AUT)
+      ?:  |(?=(~ HIM) ?=(~ DAT) ?=(^ T.DAT))
         ~
-      ?+  typ
+      ?+  TYP
         ~
       ::
           %'A'
-        =/  adr  (rush i.dat lip:ag)
-        ?~  adr  ~
-        `[u.him id %direct %if u.adr]
+        =/  ADR  (RUSH I.DAT LIP:AG)
+        ?~  ADR  ~
+        `[U.HIM ID %DIRECT %IF U.ADR]
       ::
           %'CNAME'
-        =/  for  (ship-turf i.dat dom.aut)
-        ?~  for  ~
-        `[u.him id %indirect u.for]
+        =/  FOR  (SHIP-TURF I.DAT DOM.AUT)
+        ?~  FOR  ~
+        `[U.HIM ID %INDIRECT U.FOR]
       ==
     ::
-    %-  ot  :~
-      ::  'kind'^(su (jest "dns#resourceRecordSet'))
+    %-  OT  :~
+      ::  'KIND'^(SU (JEST "DNS#RESOURCERECORDSET'))
       ::
-      'type'^so
-      'name'^so
-      'rrdatas'^(ar so)
+      'TYPE'^SO
+      'NAME'^SO
+      'RRDATAS'^(AR SO)
     ==
   --
 --
 ::
-::  the app itself
+::  THE APP ITSELF
 ::
-|_  [bow=bowl:gall state]
-::  +this: is sparta
+|_  [BOW=BOWL:GALL STATE]
+::  +THIS: IS SPARTA
 ::
-++  this  .
-::  +notify: send :hall notification
+++  THIS  .
+::  +NOTIFY: SEND :HALL NOTIFICATION
 ::
-++  notify
-  |=  [=ship =cord =tang]
-  ^-  card
-  =/  msg=speech:hall
-    :+  %app  dap.bow
-    =/  line  [%lin & cord]
-    ?~(tang line [%fat [%tank tang] line])
-  =/  act
-    [%phrase (sy [ship %inbox] ~) [msg ~]]
-  [%poke / [our.bow %hall] %hall-action act]
-::  +wait: set a timer
+++  NOTIFY
+  |=  [=SHIP =CORD =TANG]
+  ^-  CARD
+  =/  MSG=SPEECH:HALL
+    :+  %APP  DAP.BOW
+    =/  LINE  [%LIN & CORD]
+    ?~(TANG LINE [%FAT [%TANK TANG] LINE])
+  =/  ACT
+    [%PHRASE (SY [SHIP %INBOX] ~) [MSG ~]]
+  [%POKE / [OUR.BOW %HALL] %HALL-ACTION ACT]
+::  +WAIT: SET A TIMER
 ::
-++  wait
-  |=  [=wire lull=@dr]
-  ^-  card
-  [%wait wire (add now.bow lull)]
-::  +backoff: calculate exponential backoff
+++  WAIT
+  |=  [=WIRE LULL=@DR]
+  ^-  CARD
+  [%WAIT WIRE (ADD NOW.BOW LULL)]
+::  +BACKOFF: CALCULATE EXPONENTIAL BACKOFF
 ::
-++  backoff
-  |=  try=@ud
-  ^-  @dr
-  ?:  =(0 try)  ~s0
-  %+  add
-    (mul ~s1 (bex (dec try)))
-  (mul ~s0..0001 (~(rad og eny.bow) 1.000))
-::  +poke-noun: debugging
+++  BACKOFF
+  |=  TRY=@UD
+  ^-  @DR
+  ?:  =(0 TRY)  ~S0
+  %+  ADD
+    (MUL ~S1 (BEX (DEC TRY)))
+  (MUL ~S0..0001 (~(RAD OG ENY.BOW) 1.000))
+::  +POKE-NOUN: DEBUGGING
 ::
-++  poke-noun
-  |=  a=*
-  ^-  (quip move _this)
-  ~&  +<+:this
-  [~ this]
-::  +sigh-httr: accept http response
+++  POKE-NOUN
+  |=  A=*
+  ^-  (QUIP MOVE _THIS)
+  ~&  +<+:THIS
+  [~ THIS]
+::  +SIGH-HTTR: ACCEPT HTTP RESPONSE
 ::
-++  sigh-httr
-  |=  [=wire rep=httr:eyre]
-  ^-  (quip move _this)
-  ?+  wire
-    ~&  [%strange-http-response wire rep]
-    [~ this]
+++  SIGH-HTTR
+  |=  [=WIRE REP=HTTR:EYRE]
+  ^-  (QUIP MOVE _THIS)
+  ?+  WIRE
+    ~&  [%STRANGE-HTTP-RESPONSE WIRE REP]
+    [~ THIS]
   ::
-      [%authority *]
-    ?~  nem
-      ~&  [%not-an-authority %http-response wire rep]
-      [~ this]
-    abet:(~(http-response bind u.nem) t.wire rep)
+      [%AUTHORITY *]
+    ?~  NEM
+      ~&  [%NOT-AN-AUTHORITY %HTTP-RESPONSE WIRE REP]
+      [~ THIS]
+    ABET:(~(HTTP-RESPONSE BIND U.NEM) T.WIRE REP)
   ::
-      [%relay %him @ *]
-    =/  him=ship  (slav %p i.t.t.wire)
-    abet:(http-response:(tell him) t.t.t.wire rep)
+      [%RELAY %HIM @ *]
+    =/  HIM=SHIP  (SLAV %P I.T.T.WIRE)
+    ABET:(HTTP-RESPONSE:(TELL HIM) T.T.T.WIRE REP)
   ==
-::  +sigh-tang: failed to make http request
+::  +SIGH-TANG: FAILED TO MAKE HTTP REQUEST
 ::
-++  sigh-tang
-  |=  [=wire =tang]
-  ^-  (quip move _this)
-  ?+  wire
-    ~&  [%strange-sigh-tang wire]
-    [((slog tang) ~) this]
+++  SIGH-TANG
+  |=  [=WIRE =TANG]
+  ^-  (QUIP MOVE _THIS)
+  ?+  WIRE
+    ~&  [%STRANGE-SIGH-TANG WIRE]
+    [((SLOG TANG) ~) THIS]
   ::
-      [%authority *]
-    ?~  nem
-      ~&  [%not-an-authority %http-crash wire]
-      [((slog tang) ~) this]
-    abet:(~(http-crash bind u.nem) t.wire tang)
+      [%AUTHORITY *]
+    ?~  NEM
+      ~&  [%NOT-AN-AUTHORITY %HTTP-CRASH WIRE]
+      [((SLOG TANG) ~) THIS]
+    ABET:(~(HTTP-CRASH BIND U.NEM) T.WIRE TANG)
   ::
-      [%relay %him @ *]
-    =/  him=ship  (slav %p i.t.t.wire)
-    abet:(http-crash:(tell him) t.t.t.wire tang)
+      [%RELAY %HIM @ *]
+    =/  HIM=SHIP  (SLAV %P I.T.T.WIRE)
+    ABET:(HTTP-CRASH:(TELL HIM) T.T.T.WIRE TANG)
   ==
-::  +wake: timer callback
+::  +WAKE: TIMER CALLBACK
 ::
-++  wake
-  |=  [=wire ~]
-  ^-  (quip move _this)
-  ?+    wire
-      ~&  [%strange-wake wire]
-      [~ this]
+++  WAKE
+  |=  [=WIRE ~]
+  ^-  (QUIP MOVE _THIS)
+  ?+    WIRE
+      ~&  [%STRANGE-WAKE WIRE]
+      [~ THIS]
   ::
-      [%authority *]
-    ?~  nem
-      ~&  [%not-an-authority %wake wire]
-      [~ this]
-    abet:(~(retry bind u.nem) t.wire)
+      [%AUTHORITY *]
+    ?~  NEM
+      ~&  [%NOT-AN-AUTHORITY %WAKE WIRE]
+      [~ THIS]
+    ABET:(~(RETRY BIND U.NEM) T.WIRE)
   ::
-      [%relay %him @ *]
-    =/  him=ship  (slav %p i.t.t.wire)
-    abet:(retry:(tell him) t.t.t.wire)
+      [%RELAY %HIM @ *]
+    =/  HIM=SHIP  (SLAV %P I.T.T.WIRE)
+    ABET:(RETRY:(TELL HIM) T.T.T.WIRE)
   ==
-::  +poke-dns-command: act on command
+::  +POKE-DNS-COMMAND: ACT ON COMMAND
 ::
-++  poke-dns-command
-  |=  com=command
-  ^-  (quip move _this)
-  ?-  -.com
-  ::  configure self as an authority
+++  POKE-DNS-COMMAND
+  |=  COM=COMMAND
+  ^-  (QUIP MOVE _THIS)
+  ?-  -.COM
+  ::  CONFIGURE SELF AS AN AUTHORITY
   ::
-  ::    [%authority authority]
+  ::    [%AUTHORITY AUTHORITY]
   ::
-      %authority
-    ~|  %authority-reset-wat-do
-    ?<  ?=(^ nem)
-    abet:(init:bind aut.com 1)
-  ::  create binding (if authority) and forward request
+      %AUTHORITY
+    ~|  %AUTHORITY-RESET-WAT-DO
+    ?<  ?=(^ NEM)
+    ABET:(INIT:BIND AUT.COM 1)
+  ::  CREATE BINDING (IF AUTHORITY) AND FORWARD REQUEST
   ::
-  ::    [%bind for=ship him=ship target]
+  ::    [%BIND FOR=SHIP HIM=SHIP TARGET]
   ::
-      %bind
-    =/  rac  (clan:title him.com)
-    ?:  ?=(%czar rac)
-      ~|(%bind-galazy !!)
-    ?:  ?&  ?=(%king rac)
-            ?=(%indirect -.tar.com)
+      %BIND
+    =/  RAC  (CLAN:TITLE HIM.COM)
+    ?:  ?=(%CZAR RAC)
+      ~|(%BIND-GALAZY !!)
+    ?:  ?&  ?=(%KING RAC)
+            ?=(%INDIRECT -.TAR.COM)
         ==
-      ~|(%bind-indirect-star !!)
-    ::  always forward, there may be multiple authorities
+      ~|(%BIND-INDIRECT-STAR !!)
+    ::  ALWAYS FORWARD, THERE MAY BE MULTIPLE AUTHORITIES
     ::
-    =^  zom=(list move)  ..this
-      abet:(forward:(tell him.com) [for tar]:com)
-    =^  zam=(list move)  ..this
-      ?~  nem  [~ this]
-      abet:(~(create bind u.nem) [for him tar]:com)
-    [(weld zom zam) this]
-  ::  process established dns binding
+    =^  ZOM=(LIST MOVE)  ..THIS
+      ABET:(FORWARD:(TELL HIM.COM) [FOR TAR]:COM)
+    =^  ZAM=(LIST MOVE)  ..THIS
+      ?~  NEM  [~ THIS]
+      ABET:(~(CREATE BIND U.NEM) [FOR HIM TAR]:COM)
+    [(WELD ZOM ZAM) THIS]
+  ::  PROCESS ESTABLISHED DNS BINDING
   ::
-  ::    [%bond for=ship him=ship turf]
+  ::    [%BOND FOR=SHIP HIM=SHIP TURF]
   ::
-      %bond
-    ?:  ?&  =(our.bow for.com)
-            !=(our.bow src.bow)
+      %BOND
+    ?:  ?&  =(OUR.BOW FOR.COM)
+            !=(OUR.BOW SRC.BOW)
         ==
-      abet:(learn:(tell him.com) dom.com)
+      ABET:(LEARN:(TELL HIM.COM) DOM.COM)
     ::
-    ?:  =(our.bow him.com)
-      =/  msg
-        (cat 3 'domain name established at ' (join '.' dom.com))
-      :_  this(dom (~(put in dom) dom.com))
-      :~  [ost.bow (notify our.bow msg ~)]
-          [ost.bow %rule /bound %turf %put dom.com]
+    ?:  =(OUR.BOW HIM.COM)
+      =/  MSG
+        (CAT 3 'DOMAIN NAME ESTABLISHED AT ' (JOIN '.' DOM.COM))
+      :_  THIS(DOM (~(PUT IN DOM) DOM.COM))
+      :~  [OST.BOW (NOTIFY OUR.BOW MSG ~)]
+          [OST.BOW %RULE /BOUND %TURF %PUT DOM.COM]
       ==
     ::
-    ~&  [%strange-bond com]
-    [~ this]
-  ::  manually set our ip, request direct binding
+    ~&  [%STRANGE-BOND COM]
+    [~ THIS]
+  ::  MANUALLY SET OUR IP, REQUEST DIRECT BINDING
   ::
-  ::    [%ip %if addr=@if]
+  ::    [%IP %IF ADDR=@IF]
   ::
-      %ip
-    ?.  =(our.bow src.bow)
-      ~&  %dns-ip-no-foreign
-      [~ this]
-    abet:(hear:(tell our.bow) `addr.com)
-  ::  meet sponsee, request indirect binding
+      %IP
+    ?.  =(OUR.BOW SRC.BOW)
+      ~&  %DNS-IP-NO-FOREIGN
+      [~ THIS]
+    ABET:(HEAR:(TELL OUR.BOW) `ADDR.COM)
+  ::  MEET SPONSEE, REQUEST INDIRECT BINDING
   ::
-  ::    [%meet him=ship]
+  ::    [%MEET HIM=SHIP]
   ::
-      %meet
-    ?.  =(our.bow (sein:title our.bow now.bow him.com))
-      ~&  [%dns-meet-not-sponsored him.com]
-      [~ this]
-    abet:(hear:(tell him.com) ~)
+      %MEET
+    ?.  =(OUR.BOW (SEIN:TITLE OUR.BOW NOW.BOW HIM.COM))
+      ~&  [%DNS-MEET-NOT-SPONSORED HIM.COM]
+      [~ THIS]
+    ABET:(HEAR:(TELL HIM.COM) ~)
   ==
-::  +coup: general poke acknowledgement or error
+::  +COUP: GENERAL POKE ACKNOWLEDGEMENT OR ERROR
 ::
-++  coup
-  |=  [=wire saw=(unit tang)]
-  ?~  saw  [~ this]
-  ~&  [%coup-fallthru wire]
-  [((slog u.saw) ~) this]
-::  +prep: adapt state
+++  COUP
+  |=  [=WIRE SAW=(UNIT TANG)]
+  ?~  SAW  [~ THIS]
+  ~&  [%COUP-FALLTHRU WIRE]
+  [((SLOG U.SAW) ~) THIS]
+::  +PREP: ADAPT STATE
 ::
-::  ++  prep  _[~ this]
-++  prep
-  |=  old=(unit state)
-  ^-  (quip move _this)
-  ?^  old
-    [~ this(+<+ u.old)]
-  ::  XX print :dns|ip config instructions for stars?
+::  ++  PREP  _[~ THIS]
+++  PREP
+  |=  OLD=(UNIT STATE)
+  ^-  (QUIP MOVE _THIS)
+  ?^  OLD
+    [~ THIS(+<+ U.OLD)]
+  ::  XX PRINT :DNS|IP CONFIG INSTRUCTIONS FOR STARS?
   ::
-  [~ this]
-::  |bind: acting as zone authority
+  [~ THIS]
+::  |BIND: ACTING AS ZONE AUTHORITY
 ::
-++  bind
-  =/  abort=?  |
-  =|  moz=(list move)
-  |_  nam=nameserver
-  ++  this  .
-  ::  +abet: finalize state changes, produce moves
+++  BIND
+  =/  ABORT=?  |
+  =|  MOZ=(LIST MOVE)
+  |_  NAM=NAMESERVER
+  ++  THIS  .
+  ::  +ABET: FINALIZE STATE CHANGES, PRODUCE MOVES
   ::
-  ++  abet
-    ^-  (quip move _^this)
-    :-  (flop moz)
-    ?:  abort
-      ~&  %clearing-authority
-      ^this(nem ~)
-    ^this(nem `nam)
-  ::  +emit: emit a move
+  ++  ABET
+    ^-  (QUIP MOVE _^THIS)
+    :-  (FLOP MOZ)
+    ?:  ABORT
+      ~&  %CLEARING-AUTHORITY
+      ^THIS(NEM ~)
+    ^THIS(NEM `NAM)
+  ::  +EMIT: EMIT A MOVE
   ::
-  ++  emit
-    |=  car=card
-    ^+  this
-    this(moz [[ost.bow car] moz])
-  :: +request: authenticated http request
+  ++  EMIT
+    |=  CAR=CARD
+    ^+  THIS
+    THIS(MOZ [[OST.BOW CAR] MOZ])
+  :: +REQUEST: AUTHENTICATED HTTP REQUEST
   ::
-  ++  request
-    |=  [=wire =hiss:eyre]
-    ^-  card
-    [%hiss wire [~ ~] %httr %hiss hiss]
-  ::  +http-wire: build a wire for a |tell request
+  ++  REQUEST
+    |=  [=WIRE =HISS:EYRE]
+    ^-  CARD
+    [%HISS WIRE [~ ~] %HTTR %HISS HISS]
+  ::  +HTTP-WIRE: BUILD A WIRE FOR A |TELL REQUEST
   ::
-  ++  http-wire
-    |=  [try=@ud =wire]
-    ^-  ^wire
-    (weld /authority/try/(scot %ud try) wire)
-  ::  +http-crash: handle failed http request
+  ++  HTTP-WIRE
+    |=  [TRY=@UD =WIRE]
+    ^-  ^WIRE
+    (WELD /AUTHORITY/TRY/(SCOT %UD TRY) WIRE)
+  ::  +HTTP-CRASH: HANDLE FAILED HTTP REQUEST
   ::
-  ++  http-crash
-    |=  [=wire =tang]
-    ^+  this
-    ?>  ?=([%try @ @ *] wire)
-    =/  try  (slav %ud i.t.wire)
-    ?+  t.t.wire
-      ~&([%bind %unknown-crash wire] this)
+  ++  HTTP-CRASH
+    |=  [=WIRE =TANG]
+    ^+  THIS
+    ?>  ?=([%TRY @ @ *] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    ?+  T.T.WIRE
+      ~&([%BIND %UNKNOWN-CRASH WIRE] THIS)
     ::
-        [%confirm ~]
-      =.  try  +(try)
-      (emit (wait (http-wire try /confirm) (min ~h1 (backoff try))))
+        [%CONFIRM ~]
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY /CONFIRM) (MIN ~H1 (BACKOFF TRY))))
     ::
-        [%create @ %for @ ~]
-      =.  try  +(try)
-      (emit (wait (http-wire try t.t.wire) (min ~h1 (backoff try))))
+        [%CREATE @ %FOR @ ~]
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY T.T.WIRE) (MIN ~H1 (BACKOFF TRY))))
     ::
-        [%update @ ~]
-      =.  try  +(try)
-      (emit (wait (http-wire try t.t.wire) (min ~h1 (backoff try))))
+        [%UPDATE @ ~]
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY T.T.WIRE) (MIN ~H1 (BACKOFF TRY))))
     ==
-  ::  +http-response: handle http response
+  ::  +HTTP-RESPONSE: HANDLE HTTP RESPONSE
   ::
-  ++  http-response
-    |=  [=wire rep=httr:eyre]
-    ^+  this
-    ?>  ?=([%try @ @ *] wire)
-    =/  try  (slav %ud i.t.wire)
-    ?+  t.t.wire
-      ~&([%bind %unknown-response wire rep] this)
-    ::  response confirming a valid nameserver config
+  ++  HTTP-RESPONSE
+    |=  [=WIRE REP=HTTR:EYRE]
+    ^+  THIS
+    ?>  ?=([%TRY @ @ *] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    ?+  T.T.WIRE
+      ~&([%BIND %UNKNOWN-RESPONSE WIRE REP] THIS)
+    ::  RESPONSE CONFIRMING A VALID NAMESERVER CONFIG
     ::
-        [%confirm ~]
-      ?:  =(200 p.rep)
-        (update ~ 1)
-      %-  emit(abort &)
-      ::  XX include response
+        [%CONFIRM ~]
+      ?:  =(200 P.REP)
+        (UPDATE ~ 1)
+      %-  EMIT(ABORT &)
+      ::  XX INCLUDE RESPONSE
       ::
-      =/  =tang  [(sell !>(rep)) ~]
-      (notify our.bow 'authority confirmation failed' tang)
-    ::  response to a binding creation request
+      =/  =TANG  [(SELL !>(REP)) ~]
+      (NOTIFY OUR.BOW 'AUTHORITY CONFIRMATION FAILED' TANG)
+    ::  RESPONSE TO A BINDING CREATION REQUEST
     ::
-        [%create @ %for @ ~]
-      ?.  =(200 p.rep)
-        ::  XX any retry-able errors?
+        [%CREATE @ %FOR @ ~]
+      ?.  =(200 P.REP)
+        ::  XX ANY RETRY-ABLE ERRORS?
         ::
-        =/  msg
-          (cat 3 'failed to create binding: ' (print-path t.t.wire))
-        =/  =tang  [(sell !>(rep)) ~]
-        (emit (notify our.bow msg tang))
+        =/  MSG
+          (CAT 3 'FAILED TO CREATE BINDING: ' (PRINT-PATH T.T.WIRE))
+        =/  =TANG  [(SELL !>(REP)) ~]
+        (EMIT (NOTIFY OUR.BOW MSG TANG))
       ::
-      =/  him=ship  (slav %p i.t.t.t.wire)
-      =/  for=ship  (slav %p i.t.t.t.t.t.wire)
-      =/  id
-        ?.  ?=(%fcloud -.pro.aut.nam)  ~.
-        ~|  [%authority-create-confirm-id rep]
-        ?>  ?=(^ r.rep)
-        =/  dat=(unit [=ship id=@ta tar=target])
-          (json-octs u.r.rep parse-record:(provider aut.nam))
-        id:(need dat)
-      (confirm for him id)
-    ::  response to an existing-binding retrieval request
+      =/  HIM=SHIP  (SLAV %P I.T.T.T.WIRE)
+      =/  FOR=SHIP  (SLAV %P I.T.T.T.T.T.WIRE)
+      =/  ID
+        ?.  ?=(%FCLOUD -.PRO.AUT.NAM)  ~.
+        ~|  [%AUTHORITY-CREATE-CONFIRM-ID REP]
+        ?>  ?=(^ R.REP)
+        =/  DAT=(UNIT [=SHIP ID=@TA TAR=TARGET])
+          (JSON-OCTS U.R.REP PARSE-RECORD:(PROVIDER AUT.NAM))
+        ID:(NEED DAT)
+      (CONFIRM FOR HIM ID)
+    ::  RESPONSE TO AN EXISTING-BINDING RETRIEVAL REQUEST
     ::
-        [%update @ ~]
-      ?.  =(200 p.rep)
-        ?.  (gth try 5)
-          =/  =tang  [(sell !>(rep)) ~]
-          (emit (notify our.bow 'failed to retrieve bindings' tang))
-        =.  try  +(try)
-        (emit (wait (http-wire try t.t.wire) (min ~h1 (backoff try))))
-      ?~  r.rep
-        this
-      (restore u.r.rep)
+        [%UPDATE @ ~]
+      ?.  =(200 P.REP)
+        ?.  (GTH TRY 5)
+          =/  =TANG  [(SELL !>(REP)) ~]
+          (EMIT (NOTIFY OUR.BOW 'FAILED TO RETRIEVE BINDINGS' TANG))
+        =.  TRY  +(TRY)
+        (EMIT (WAIT (HTTP-WIRE TRY T.T.WIRE) (MIN ~H1 (BACKOFF TRY))))
+      ?~  R.REP
+        THIS
+      (RESTORE U.R.REP)
     ==
-  ::  +retry: re-attempt http request after timer
+  ::  +RETRY: RE-ATTEMPT HTTP REQUEST AFTER TIMER
   ::
-  ++  retry
-    |=  =wire
-    ^+  this
-    ?>  ?=([%try @ @ *] wire)
-    =/  try  (slav %ud i.t.wire)
-    ?+  t.t.wire
-      ~&([%bind %unknown-retry wire] this)
+  ++  RETRY
+    |=  =WIRE
+    ^+  THIS
+    ?>  ?=([%TRY @ @ *] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    ?+  T.T.WIRE
+      ~&([%BIND %UNKNOWN-RETRY WIRE] THIS)
     ::
-        [%confirm ~]
-      (init aut.nam try)
+        [%CONFIRM ~]
+      (INIT AUT.NAM TRY)
     ::
-        [%create @ %for @ ~]
-      =/  him=ship  (slav %p i.t.t.t.wire)
-      =/  for=ship  (slav %p i.t.t.t.t.t.wire)
-      (do-create him for try)
+        [%CREATE @ %FOR @ ~]
+      =/  HIM=SHIP  (SLAV %P I.T.T.T.WIRE)
+      =/  FOR=SHIP  (SLAV %P I.T.T.T.T.T.WIRE)
+      (DO-CREATE HIM FOR TRY)
     ::
-        [%update @ ~]
-      =*  page  i.t.t.t.wire
-      (update ?~(page ~ `page) try)
+        [%UPDATE @ ~]
+      =*  PAGE  I.T.T.T.WIRE
+      (UPDATE ?~(PAGE ~ `PAGE) TRY)
     ==
-  ::  +init: establish zone authority (request confirmation)
+  ::  +INIT: ESTABLISH ZONE AUTHORITY (REQUEST CONFIRMATION)
   ::
-  ++  init
-    |=  [aut=authority try=@ud]
-    %-  emit(nam [aut ~ ~ ~])
-    (request (http-wire try /confirm) zone:(provider aut))
-  ::  +update: retrieve existing remote nameserver records
+  ++  INIT
+    |=  [AUT=AUTHORITY TRY=@UD]
+    %-  EMIT(NAM [AUT ~ ~ ~])
+    (REQUEST (HTTP-WIRE TRY /CONFIRM) ZONE:(PROVIDER AUT))
+  ::  +UPDATE: RETRIEVE EXISTING REMOTE NAMESERVER RECORDS
   ::
-  ++  update
-    |=  [page=(unit @t) try=@ud]
-    ^+  this
-    =/  =hiss:eyre
-      (existing:(provider aut.nam) page)
-    =/  =wire
-      (http-wire try /update/[?~(page %$ u.page)])
-    (emit (request wire hiss))
-  ::  +restore: restore existing remote nameserver records
+  ++  UPDATE
+    |=  [PAGE=(UNIT @T) TRY=@UD]
+    ^+  THIS
+    =/  =HISS:EYRE
+      (EXISTING:(PROVIDER AUT.NAM) PAGE)
+    =/  =WIRE
+      (HTTP-WIRE TRY /UPDATE/[?~(PAGE %$ U.PAGE)])
+    (EMIT (REQUEST WIRE HISS))
+  ::  +RESTORE: RESTORE EXISTING REMOTE NAMESERVER RECORDS
   ::
-  ++  restore
-    |=  bod=octs
-    =+  ^-  [dat=(list [=ship id=@ta tar=target]) page=(unit @t)]
-      ::  XX gross
+  ++  RESTORE
+    |=  BOD=OCTS
+    =+  ^-  [DAT=(LIST [=SHIP ID=@TA TAR=TARGET]) PAGE=(UNIT @T)]
+      ::  XX GROSS
       ::
       =-  ?~(- [~ ~] -)
-      (json-octs bod parse-list:(provider aut.nam))
-    |-  ^+  this
-    ?~  dat
-      ?~(page this (update page 1))
-    =/  nob=bound  [now.bow id.i.dat tar.i.dat ~]
-    $(dat t.dat, bon.nam (~(put by bon.nam) ship.i.dat nob))
-  ::  +create: bind :him, on behalf of :for
+      (JSON-OCTS BOD PARSE-LIST:(PROVIDER AUT.NAM))
+    |-  ^+  THIS
+    ?~  DAT
+      ?~(PAGE THIS (UPDATE PAGE 1))
+    =/  NOB=BOUND  [NOW.BOW ID.I.DAT TAR.I.DAT ~]
+    $(DAT T.DAT, BON.NAM (~(PUT BY BON.NAM) SHIP.I.DAT NOB))
+  ::  +CREATE: BIND :HIM, ON BEHALF OF :FOR
   ::
-  ++  create
-    |=  [for=ship him=ship tar=target]
-    ?:  ?&  ?=(%indirect -.tar)
-            !(~(has by bon.nam) p.tar)
+  ++  CREATE
+    |=  [FOR=SHIP HIM=SHIP TAR=TARGET]
+    ?:  ?&  ?=(%INDIRECT -.TAR)
+            !(~(HAS BY BON.NAM) P.TAR)
         ==
-      ::  defer %indirect where target isn't yet bound
+      ::  DEFER %INDIRECT WHERE TARGET ISN'T YET BOUND
       ::
-      this(dep.nam (~(add ja dep.nam) p.tar [him tar]))
-    ::  ignore if binding is pending
+      THIS(DEP.NAM (~(ADD JA DEP.NAM) P.TAR [HIM TAR]))
+    ::  IGNORE IF BINDING IS PENDING
     ::
-    =/  pending  (~(get by pen.nam) him)
-    ?:  ?&  ?=(^ pending)
-            =(tar u.pending)
+    =/  PENDING  (~(GET BY PEN.NAM) HIM)
+    ?:  ?&  ?=(^ PENDING)
+            =(TAR U.PENDING)
         ==
-      this
-    ::  re-notify if binding already exists
+      THIS
+    ::  RE-NOTIFY IF BINDING ALREADY EXISTS
     ::
-    =/  existing  (~(get by bon.nam) him)
-    ?:  ?&  ?=(^ existing)
-            =(tar cur.u.existing)
+    =/  EXISTING  (~(GET BY BON.NAM) HIM)
+    ?:  ?&  ?=(^ EXISTING)
+            =(TAR CUR.U.EXISTING)
       ==
-      (bond for him)
-    ::  XX save :for relay state?
+      (BOND FOR HIM)
+    ::  XX SAVE :FOR RELAY STATE?
     ::
-    =.  pen.nam  (~(put by pen.nam) him tar)
-    (do-create him for 1)
-  ::  +do-create: create new or replace existing binding
+    =.  PEN.NAM  (~(PUT BY PEN.NAM) HIM TAR)
+    (DO-CREATE HIM FOR 1)
+  ::  +DO-CREATE: CREATE NEW OR REPLACE EXISTING BINDING
   ::
-  ++  do-create
-    |=  [him=ship for=ship try=@ud]
-    ^+  this
-    =/  pending  (~(get by pen.nam) him)
-    ?~  pending
-      this
-    =*  tar  u.pending
-    =/  =wire
-      (http-wire try /create/(scot %p him)/for/(scot %p for))
-    =/  pre=(unit [id=@ta tar=target])
-      =/  bon=(unit bound)  (~(get by bon.nam) him)
-      ?~(bon ~ `[id.u.bon cur.u.bon])
-    =/  req=hiss:eyre
-      (create:(provider aut.nam) him tar pre)
-    (emit (request wire req))
-  ::  +dependants: process deferred dependant bindings
+  ++  DO-CREATE
+    |=  [HIM=SHIP FOR=SHIP TRY=@UD]
+    ^+  THIS
+    =/  PENDING  (~(GET BY PEN.NAM) HIM)
+    ?~  PENDING
+      THIS
+    =*  TAR  U.PENDING
+    =/  =WIRE
+      (HTTP-WIRE TRY /CREATE/(SCOT %P HIM)/FOR/(SCOT %P FOR))
+    =/  PRE=(UNIT [ID=@TA TAR=TARGET])
+      =/  BON=(UNIT BOUND)  (~(GET BY BON.NAM) HIM)
+      ?~(BON ~ `[ID.U.BON CUR.U.BON])
+    =/  REQ=HISS:EYRE
+      (CREATE:(PROVIDER AUT.NAM) HIM TAR PRE)
+    (EMIT (REQUEST WIRE REQ))
+  ::  +DEPENDANTS: PROCESS DEFERRED DEPENDANT BINDINGS
   ::
-  ++  dependants
-    |=  for=ship
-    ^+  this
-    =/  dep=(list [him=ship tar=target])
-      (~(get ja dep.nam) for)
-    =.  dep.nam  (~(del by dep.nam) for)
-    |-  ^+  ..this
-    ?~  dep   this
-    $(dep t.dep, ..this (create for him.i.dep tar.i.dep))
-  ::  +confirm: successfully bound
+  ++  DEPENDANTS
+    |=  FOR=SHIP
+    ^+  THIS
+    =/  DEP=(LIST [HIM=SHIP TAR=TARGET])
+      (~(GET JA DEP.NAM) FOR)
+    =.  DEP.NAM  (~(DEL BY DEP.NAM) FOR)
+    |-  ^+  ..THIS
+    ?~  DEP   THIS
+    $(DEP T.DEP, ..THIS (CREATE FOR HIM.I.DEP TAR.I.DEP))
+  ::  +CONFIRM: SUCCESSFULLY BOUND
   ::
-  ++  confirm
-    |=  [for=ship him=ship id=@ta]
-    =/  tar=target  (~(got by pen.nam) him)
-    =/  bon=(unit bound)
-      (~(get by bon.nam) him)
-    =/  nob=bound
-      [now.bow id tar ?~(bon ~ [[wen.u.bon cur.u.bon] hit.u.bon])]
-    =:  pen.nam  (~(del by pen.nam) him)
-        bon.nam  (~(put by bon.nam) him nob)
+  ++  CONFIRM
+    |=  [FOR=SHIP HIM=SHIP ID=@TA]
+    =/  TAR=TARGET  (~(GOT BY PEN.NAM) HIM)
+    =/  BON=(UNIT BOUND)
+      (~(GET BY BON.NAM) HIM)
+    =/  NOB=BOUND
+      [NOW.BOW ID TAR ?~(BON ~ [[WEN.U.BON CUR.U.BON] HIT.U.BON])]
+    =:  PEN.NAM  (~(DEL BY PEN.NAM) HIM)
+        BON.NAM  (~(PUT BY BON.NAM) HIM NOB)
       ==
-    (dependants:(bond for him) him)
-  ::  +bond: send binding confirmation
+    (DEPENDANTS:(BOND FOR HIM) HIM)
+  ::  +BOND: SEND BINDING CONFIRMATION
   ::
-  ++  bond
-    |=  [for=ship him=ship]
-    =/  wir=wire
-      /bound/(scot %p him)/for/(scot %p for)
-    =/  dom=turf
-      (weld dom.aut.nam /(crip +:(scow %p him)))
-    =/  com=command
-      [%bond for him dom]
-    (emit [%poke wir [for dap.bow] %dns-command com])
+  ++  BOND
+    |=  [FOR=SHIP HIM=SHIP]
+    =/  WIR=WIRE
+      /BOUND/(SCOT %P HIM)/FOR/(SCOT %P FOR)
+    =/  DOM=TURF
+      (WELD DOM.AUT.NAM /(CRIP +:(SCOW %P HIM)))
+    =/  COM=COMMAND
+      [%BOND FOR HIM DOM]
+    (EMIT [%POKE WIR [FOR DAP.BOW] %DNS-COMMAND COM])
   --
-::  |tell: acting as planet parent or relay
+::  |TELL: ACTING AS PLANET PARENT OR RELAY
 ::
-++  tell
-  |=  him=ship
-  =|  moz=(list move)
-  =/  rel=(unit relay)  (~(get by per) him)
+++  TELL
+  |=  HIM=SHIP
+  =|  MOZ=(LIST MOVE)
+  =/  REL=(UNIT RELAY)  (~(GET BY PER) HIM)
   |%
-  ++  this  .
-  ::  +abet: finalize state changes, produce moves
+  ++  THIS  .
+  ::  +ABET: FINALIZE STATE CHANGES, PRODUCE MOVES
   ::
-  ++  abet
-    ^-  (quip move _^this)
-    :-  (flop moz)
-    =?  per  ?=(^ rel)
-      (~(put by per) him u.rel)
-    ^this
-  ::  +emit: emit a move
+  ++  ABET
+    ^-  (QUIP MOVE _^THIS)
+    :-  (FLOP MOZ)
+    =?  PER  ?=(^ REL)
+      (~(PUT BY PER) HIM U.REL)
+    ^THIS
+  ::  +EMIT: EMIT A MOVE
   ::
-  ++  emit
-    |=  car=card
-    ^+  this
-    this(moz [[ost.bow car] moz])
-  :: +request: unauthenticated http request
+  ++  EMIT
+    |=  CAR=CARD
+    ^+  THIS
+    THIS(MOZ [[OST.BOW CAR] MOZ])
+  :: +REQUEST: UNAUTHENTICATED HTTP REQUEST
   ::
-  ++  request
-    |=  [=wire =hiss:eyre]
-    ^-  card
-    [%hiss wire ~ %httr %hiss hiss]
-  ::  +http-wire: build a wire for a |tell request
+  ++  REQUEST
+    |=  [=WIRE =HISS:EYRE]
+    ^-  CARD
+    [%HISS WIRE ~ %HTTR %HISS HISS]
+  ::  +HTTP-WIRE: BUILD A WIRE FOR A |TELL REQUEST
   ::
-  ++  http-wire
-    |=  [try=@ud act=@tas]
-    ^-  wire
-    /relay/him/(scot %p him)/try/(scot %ud try)/[act]
-  ::  +http-crash: handle failed http request
+  ++  HTTP-WIRE
+    |=  [TRY=@UD ACT=@TAS]
+    ^-  WIRE
+    /RELAY/HIM/(SCOT %P HIM)/TRY/(SCOT %UD TRY)/[ACT]
+  ::  +HTTP-CRASH: HANDLE FAILED HTTP REQUEST
   ::
-  ++  http-crash
-    |=  [=wire =tang]
-    ^+  this
-    ?>  ?=([%try @ @ ~] wire)
-    =/  try  (slav %ud i.t.wire)
-    =*  act  i.t.t.wire
-    ?+  act
-      ~&([%tell %unknown-crash act] this)
+  ++  HTTP-CRASH
+    |=  [=WIRE =TANG]
+    ^+  THIS
+    ?>  ?=([%TRY @ @ ~] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    =*  ACT  I.T.T.WIRE
+    ?+  ACT
+      ~&([%TELL %UNKNOWN-CRASH ACT] THIS)
     ::
-        %check-before
-      =.  try  +(try)
-      (emit (wait (http-wire try %check-before) (min ~h1 (backoff try))))
+        %CHECK-BEFORE
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY %CHECK-BEFORE) (MIN ~H1 (BACKOFF TRY))))
     ::
-        %check-after
-      =.  try  +(try)
-      (emit (wait (http-wire try %check-after) (min ~h1 (backoff try))))
+        %CHECK-AFTER
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY %CHECK-AFTER) (MIN ~H1 (BACKOFF TRY))))
     ==
-  ::  +http-response: handle http response
+  ::  +HTTP-RESPONSE: HANDLE HTTP RESPONSE
   ::
-  ++  http-response
-    |=  [=wire rep=httr:eyre]
-    ^+  this
-    ?>  ?=([%try @ @ ~] wire)
-    =/  try  (slav %ud i.t.wire)
-    =*  act  i.t.t.wire
-    ?+  act
-      ~&([%tell %unknown-response act rep] this)
-    ::  validating a binding target
+  ++  HTTP-RESPONSE
+    |=  [=WIRE REP=HTTR:EYRE]
+    ^+  THIS
+    ?>  ?=([%TRY @ @ ~] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    =*  ACT  I.T.T.WIRE
+    ?+  ACT
+      ~&([%TELL %UNKNOWN-RESPONSE ACT REP] THIS)
+    ::  VALIDATING A BINDING TARGET
     ::
-        %check-before
-      ?:  =(200 p.rep)
-        bind
-      ?:  (gth try 10)
-        (fail %check-before [(sell !>(rep)) ~])
-      =.  try  +(try)
-      (emit (wait (http-wire try %check-before) (min ~h1 (backoff try))))
-    ::  validating an established binding
+        %CHECK-BEFORE
+      ?:  =(200 P.REP)
+        BIND
+      ?:  (GTH TRY 10)
+        (FAIL %CHECK-BEFORE [(SELL !>(REP)) ~])
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY %CHECK-BEFORE) (MIN ~H1 (BACKOFF TRY))))
+    ::  VALIDATING AN ESTABLISHED BINDING
     ::
-        %check-after
-      ?:  =(200 p.rep)
-        bake
-      ::  no max retries, the binding has been created
-      ::  XX notify after some number of failures
+        %CHECK-AFTER
+      ?:  =(200 P.REP)
+        BAKE
+      ::  NO MAX RETRIES, THE BINDING HAS BEEN CREATED
+      ::  XX NOTIFY AFTER SOME NUMBER OF FAILURES
       ::
-      =.  try  +(try)
-      (emit (wait (http-wire try %check-after) (min ~h1 (backoff try))))
+      =.  TRY  +(TRY)
+      (EMIT (WAIT (HTTP-WIRE TRY %CHECK-AFTER) (MIN ~H1 (BACKOFF TRY))))
     ==
-  ::  +retry: re-attempt http request after timer
+  ::  +RETRY: RE-ATTEMPT HTTP REQUEST AFTER TIMER
   ::
-  ++  retry
-    |=  =wire
-    ^+  this
-    ?>  ?=([%try @ @ ~] wire)
-    =/  try  (slav %ud i.t.wire)
-    =*  act  i.t.t.wire
-    ?+    act
-        ~&([%tell %unknown-wake act] this)
-      %check-before  (check-before try)
-      %check-after   (check-after try)
+  ++  RETRY
+    |=  =WIRE
+    ^+  THIS
+    ?>  ?=([%TRY @ @ ~] WIRE)
+    =/  TRY  (SLAV %UD I.T.WIRE)
+    =*  ACT  I.T.T.WIRE
+    ?+    ACT
+        ~&([%TELL %UNKNOWN-WAKE ACT] THIS)
+      %CHECK-BEFORE  (CHECK-BEFORE TRY)
+      %CHECK-AFTER   (CHECK-AFTER TRY)
     ==
-  ::  +hear: hear ip address, maybe emit binding request
+  ::  +HEAR: HEAR IP ADDRESS, MAYBE EMIT BINDING REQUEST
   ::
-  ++  hear
-    |=  addr=(unit @if)
-    ^+  this
-    =/  tar=target
-      ?:  |(?=(~ addr) ?=(%duke (clan:title him)))
-        [%indirect our.bow]
-      [%direct %if u.addr]
-    ::  re-notify if binding already exists
+  ++  HEAR
+    |=  ADDR=(UNIT @IF)
+    ^+  THIS
+    =/  TAR=TARGET
+      ?:  |(?=(~ ADDR) ?=(%DUKE (CLAN:TITLE HIM)))
+        [%INDIRECT OUR.BOW]
+      [%DIRECT %IF U.ADDR]
+    ::  RE-NOTIFY IF BINDING ALREADY EXISTS
     ::
-    ::    XX deduplicate with +bake:tell and +bond:bind
+    ::    XX DEDUPLICATE WITH +BAKE:TELL AND +BOND:BIND
     ::
-    ?:  ?&  ?=(^ rel)
-            ?=(^ dom.u.rel)
-            =(tar tar.u.rel)
+    ?:  ?&  ?=(^ REL)
+            ?=(^ DOM.U.REL)
+            =(TAR TAR.U.REL)
         ==
-      =/  wir=wire
-        /bound/(scot %p him)/for/(scot %p our.bow)
-      =/  com=command
-        [%bond our.bow him u.dom.u.rel]
-      (emit [%poke wir [him dap.bow] %dns-command com])
-    ::  check binding target validity, store and forward
+      =/  WIR=WIRE
+        /BOUND/(SCOT %P HIM)/FOR/(SCOT %P OUR.BOW)
+      =/  COM=COMMAND
+        [%BOND OUR.BOW HIM U.DOM.U.REL]
+      (EMIT [%POKE WIR [HIM DAP.BOW] %DNS-COMMAND COM])
+    ::  CHECK BINDING TARGET VALIDITY, STORE AND FORWARD
     ::
-    =.  rel  `[wen=now.bow addr dom=~ tar]
-    ?:  ?=(%indirect -.tar)
-      bind
-    (check-before 1)
-  ::  +check-before: confirm %direct target is accessible
+    =.  REL  `[WEN=NOW.BOW ADDR DOM=~ TAR]
+    ?:  ?=(%INDIRECT -.TAR)
+      BIND
+    (CHECK-BEFORE 1)
+  ::  +CHECK-BEFORE: CONFIRM %DIRECT TARGET IS ACCESSIBLE
   ::
-  ++  check-before
-    |=  try=@ud
-    ^+  this
-    ?>  ?=(^ rel)
-    ?>  ?=(%direct -.tar.u.rel)
-    ?:  (reserved:eyre p.tar.u.rel)
-      (fail %reserved-ip ~)
-    =/  =wire  (http-wire try %check-before)
-    =/  url=purl:eyre
-      :-  [sec=| por=~ host=[%| `@if`p.tar.u.rel]]
-      [[ext=`~.udon path=/static] query=~]
-    (emit (request wire url %get ~ ~))
-  ::  +fail: %direct target is invalid or inaccessible
+  ++  CHECK-BEFORE
+    |=  TRY=@UD
+    ^+  THIS
+    ?>  ?=(^ REL)
+    ?>  ?=(%DIRECT -.TAR.U.REL)
+    ?:  (RESERVED:EYRE P.TAR.U.REL)
+      (FAIL %RESERVED-IP ~)
+    =/  =WIRE  (HTTP-WIRE TRY %CHECK-BEFORE)
+    =/  URL=PURL:EYRE
+      :-  [SEC=| POR=~ HOST=[%| `@IF`P.TAR.U.REL]]
+      [[EXT=`~.UDON PATH=/STATIC] QUERY=~]
+    (EMIT (REQUEST WIRE URL %GET ~ ~))
+  ::  +FAIL: %DIRECT TARGET IS INVALID OR INACCESSIBLE
   ::
-  ++  fail
-    |=  [err=@tas =tang]
-    ^+  this
-    ?>  ?=(^ rel)
-    ::  XX add failure-specific messages
+  ++  FAIL
+    |=  [ERR=@TAS =TANG]
+    ^+  THIS
+    ?>  ?=(^ REL)
+    ::  XX ADD FAILURE-SPECIFIC MESSAGES
     ::
-    =/  msg
-      ?+  err
-          'dns binding failed'
+    =/  MSG
+      ?+  ERR
+          'DNS BINDING FAILED'
       ::
-          %check-before
-        ?>  ?=(%direct -.tar.u.rel)
-        =/  addr  (scot %if p.tar.u.rel)
-        %+  rap  3
-        :~  'dns binding failed: '
-            'unable to reach you at '  addr  ' on port 80, '
-            'please confirm or correct your ipv4 address '
-            'and re-enter it with :dns|ip'
+          %CHECK-BEFORE
+        ?>  ?=(%DIRECT -.TAR.U.REL)
+        =/  ADDR  (SCOT %IF P.TAR.U.REL)
+        %+  RAP  3
+        :~  'DNS BINDING FAILED: '
+            'UNABLE TO REACH YOU AT '  ADDR  ' ON PORT 80, '
+            'PLEASE CONFIRM OR CORRECT YOUR IPV4 ADDRESS '
+            'AND RE-ENTER IT WITH :DNS|IP'
         ==
       ::
-          %reserved-ip
-        ?>  ?=(%direct -.tar.u.rel)
-        =/  addr  (scot %if p.tar.u.rel)
-        (cat 3 'unable to create dns binding for reserved ip address' addr)
+          %RESERVED-IP
+        ?>  ?=(%DIRECT -.TAR.U.REL)
+        =/  ADDR  (SCOT %IF P.TAR.U.REL)
+        (CAT 3 'UNABLE TO CREATE DNS BINDING FOR RESERVED IP ADDRESS' ADDR)
       ==
-    ::  XX save failed bindings somewhere?
+    ::  XX SAVE FAILED BINDINGS SOMEWHERE?
     ::
-    %-  =<  emit(rel ~)
-        (emit (notify him msg ~))
-    (notify our.bow (rap 3 (scot %p him) ' fail: ' err ~) tang)
-  ::  +bind: request binding for target
+    %-  =<  EMIT(REL ~)
+        (EMIT (NOTIFY HIM MSG ~))
+    (NOTIFY OUR.BOW (RAP 3 (SCOT %P HIM) ' FAIL: ' ERR ~) TANG)
+  ::  +BIND: REQUEST BINDING FOR TARGET
   ::
-  ::    Since we may be an authority, we poke ourselves.
+  ::    SINCE WE MAY BE AN AUTHORITY, WE POKE OURSELVES.
   ::
-  ++  bind
-    ^+  this
-    ?>  ?=(^ rel)
-    ::  XX save binding request state?
+  ++  BIND
+    ^+  THIS
+    ?>  ?=(^ REL)
+    ::  XX SAVE BINDING REQUEST STATE?
     ::
-    =/  wir=wire
-      /bind/(scot %p him)/for/(scot %p our.bow)
-    =/  com=command
-      [%bind our.bow him tar.u.rel]
-    (emit [%poke wir [our.bow dap.bow] %dns-command com])
-  ::  +learn: of new binding
+    =/  WIR=WIRE
+      /BIND/(SCOT %P HIM)/FOR/(SCOT %P OUR.BOW)
+    =/  COM=COMMAND
+      [%BIND OUR.BOW HIM TAR.U.REL]
+    (EMIT [%POKE WIR [OUR.BOW DAP.BOW] %DNS-COMMAND COM])
+  ::  +LEARN: OF NEW BINDING
   ::
-  ++  learn
-    |=  dom=turf
-    ^+  this
-    ?>  ?=(^ rel)
-    ::  XX track bound-state per-domain
+  ++  LEARN
+    |=  DOM=TURF
+    ^+  THIS
+    ?>  ?=(^ REL)
+    ::  XX TRACK BOUND-STATE PER-DOMAIN
     ::
-    (check-after(dom.u.rel `dom) 1)
-  ::  +check-after: confirm binding propagation
+    (CHECK-AFTER(DOM.U.REL `DOM) 1)
+  ::  +CHECK-AFTER: CONFIRM BINDING PROPAGATION
   ::
-  ++  check-after
-    |=  try=@ud
-    ^+  this
-    ?>  ?&  ?=(^ rel)
-            ?=(^ dom.u.rel)
+  ++  CHECK-AFTER
+    |=  TRY=@UD
+    ^+  THIS
+    ?>  ?&  ?=(^ REL)
+            ?=(^ DOM.U.REL)
         ==
-    =*  dom  u.dom.u.rel
-    =/  =wire  (http-wire try %check-after)
-    =/  url=purl:eyre
-      :-  [sec=| por=~ host=[%& dom]]
-      [[ext=`~.udon path=/static] query=~]
-    (emit (request wire url %get ~ ~))
-  ::  +bake: successfully bound
+    =*  DOM  U.DOM.U.REL
+    =/  =WIRE  (HTTP-WIRE TRY %CHECK-AFTER)
+    =/  URL=PURL:EYRE
+      :-  [SEC=| POR=~ HOST=[%& DOM]]
+      [[EXT=`~.UDON PATH=/STATIC] QUERY=~]
+    (EMIT (REQUEST WIRE URL %GET ~ ~))
+  ::  +BAKE: SUCCESSFULLY BOUND
   ::
-  ++  bake
-    ^+  this
-    ?>  ?=(^ rel)
-    ?>  ?=(^ dom.u.rel)
-    =/  wir=wire
-      /forward/bound/(scot %p him)/for/(scot %p our.bow)
-    =*  dom  u.dom.u.rel
-    =/  com=command
-      [%bond our.bow him dom]
-    =/  msg
-      (cat 3 'relaying new dns binding: ' (join '.' dom))
-    ::  XX save notification state?
+  ++  BAKE
+    ^+  THIS
+    ?>  ?=(^ REL)
+    ?>  ?=(^ DOM.U.REL)
+    =/  WIR=WIRE
+      /FORWARD/BOUND/(SCOT %P HIM)/FOR/(SCOT %P OUR.BOW)
+    =*  DOM  U.DOM.U.REL
+    =/  COM=COMMAND
+      [%BOND OUR.BOW HIM DOM]
+    =/  MSG
+      (CAT 3 'RELAYING NEW DNS BINDING: ' (JOIN '.' DOM))
+    ::  XX SAVE NOTIFICATION STATE?
     ::
-    %-  emit:(emit (notify our.bow msg ~))
-    [%poke wir [him dap.bow] %dns-command com]
-  ::  +forward: sending binding request up the network
+    %-  EMIT:(EMIT (NOTIFY OUR.BOW MSG ~))
+    [%POKE WIR [HIM DAP.BOW] %DNS-COMMAND COM]
+  ::  +FORWARD: SENDING BINDING REQUEST UP THE NETWORK
   ::
-  ++  forward
-    |=  [for=ship tar=target]
-    ^+  this
-    ?:  ?=(%~zod our.bow)
-      this
-    =/  wir=wire
-      /forward/bind/(scot %p him)/for/(scot %p for)
-    =/  com=command
-      [%bind for him tar]
-    =/  to=ship
-      ?:  ?=(%czar (clan:title our.bow))  ~zod
-      (sein:title [our now our]:bow)
-    (emit [%poke wir [to dap.bow] %dns-command com])
+  ++  FORWARD
+    |=  [FOR=SHIP TAR=TARGET]
+    ^+  THIS
+    ?:  ?=(%~ZOD OUR.BOW)
+      THIS
+    =/  WIR=WIRE
+      /FORWARD/BIND/(SCOT %P HIM)/FOR/(SCOT %P FOR)
+    =/  COM=COMMAND
+      [%BIND FOR HIM TAR]
+    =/  TO=SHIP
+      ?:  ?=(%CZAR (CLAN:TITLE OUR.BOW))  ~ZOD
+      (SEIN:TITLE [OUR NOW OUR]:BOW)
+    (EMIT [%POKE WIR [TO DAP.BOW] %DNS-COMMAND COM])
   --
 --

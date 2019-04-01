@@ -1,11 +1,11 @@
-::  Modified key event
+::  MODIFIED KEY EVENT
 ::
-::::  /hoon/kyev/sur
+::::  /HOON/KYEV/SUR
   ::
 /?    310
-=-  {p/(set ?($ctrl $shift $alt $meta)) q/$@(cord {$act speck})}
-^=  speck
-$?  $ctrl  $shift  $alt   $meta   $entr  $esc  $caps  $uncap
-    $pgup  $pgdn   $home  $end    $baxp  $del  $ins
-    $up    $down   $left  $right
+=-  {P/(SET ?($CTRL $SHIFT $ALT $META)) Q/$@(CORD {$ACT SPECK})}
+^=  SPECK
+$?  $CTRL  $SHIFT  $ALT   $META   $ENTR  $ESC  $CAPS  $UNCAP
+    $PGUP  $PGDN   $HOME  $END    $BAXP  $DEL  $INS
+    $UP    $DOWN   $LEFT  $RIGHT
 ==

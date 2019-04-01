@@ -1,10 +1,10 @@
-::  For testing purposes
+::  FOR TESTING PURPOSES
 ::
-::::  /hoon/run/ren
+::::  /HOON/RUN/REN
   ::
 /?    310
-/,  /ren/run  /~  ~|(%loop !!)
-    /         /!noun/
+/,  /REN/RUN  /~  ~|(%LOOP !!)
+    /         /!NOUN/
 ==
-~&  run+-.-
+~&  RUN+-.-
 ~

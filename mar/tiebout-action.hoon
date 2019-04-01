@@ -1,31 +1,31 @@
-/-  hall, tiebout
-=,  format
+/-  HALL, TIEBOUT
+=,  FORMAT
 ::
-|_  act=action:tiebout
+|_  ACT=ACTION:TIEBOUT
 ::
-++  grow
+++  GROW
   |%
-  ++  tank  >act<
+  ++  TANK  >ACT<
   --
 ::
-++  grab
+++  GRAB
   |%
-  ++  noun  action:tiebout
-  ++  json
-    |=  jon=^json
-    ^-  action:tiebout
-    =<  (action jon)
+  ++  NOUN  ACTION:TIEBOUT
+  ++  JSON
+    |=  JON=^JSON
+    ^-  ACTION:TIEBOUT
+    =<  (ACTION JON)
     |%
-    ++  action
-      %-  of:dejs
-        :~  token+so:dejs
-            add-circle+sa
-            del-circle+sa
+    ++  ACTION
+      %-  OF:DEJS
+        :~  TOKEN+SO:DEJS
+            ADD-CIRCLE+SA
+            DEL-CIRCLE+SA
         ==
-    ++  sa            :: string as ta
-      |=  jon=^json
-      ?>  ?=([%s *] jon)
-      (scot %tas p.jon)
+    ++  SA            :: STRING AS TA
+      |=  JON=^JSON
+      ?>  ?=([%S *] JON)
+      (SCOT %TAS P.JON)
     --
   --
 ::

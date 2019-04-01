@@ -1,20 +1,20 @@
 ::
-::::  /hoon/x-urb/mar
+::::  /HOON/X-URB/MAR
   ::
 /?    310
-=,  format
-=,  mimes:html
-=,  html
+=,  FORMAT
+=,  MIMES:HTML
+=,  HTML
 ::
-|_  max=manx
-++  grow                                                ::  convert to
+|_  MAX=MANX
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  mime  [/text/html (as-octs html)]                 ::  convert to %mime
-  ++  html  (crip (en-xml hymn))                        ::  convert to %html
-  ++  hymn  max
+  ++  MIME  [/TEXT/HTML (AS-OCTS HTML)]                 ::  CONVERT TO %MIME
+  ++  HTML  (CRIP (EN-XML HYMN))                        ::  CONVERT TO %HTML
+  ++  HYMN  MAX
   --
-++  grab
-  |%                                                    ::  convert from
-  ++  noun  manx                                        ::  clam from %noun
+++  GRAB
+  |%                                                    ::  CONVERT FROM
+  ++  NOUN  MANX                                        ::  CLAM FROM %NOUN
   --
 --

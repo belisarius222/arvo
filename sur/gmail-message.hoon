@@ -1,1 +1,1 @@
-{to/@p subj/@t body/wain}
+{TO/@P SUBJ/@T BODY/WAIN}

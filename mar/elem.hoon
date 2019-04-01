@@ -1,18 +1,18 @@
 ::
-::::  /hoon/elem/mar
+::::  /HOON/ELEM/MAR
   ::
 /?    310
-=,  mimes:html
-=,  html
-|_  own/manx
+=,  MIMES:HTML
+=,  HTML
+|_  OWN/MANX
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  hymn  ;html:(head body:"+{own}")                  ::  convert to %hymn
-  ++  html  (crip (en-xml hymn))                        ::  convert to %html
-  ++  mime  [/text/html (as-octs html)]                 ::  convert to %mime
+  ++  HYMN  ;HTML:(HEAD BODY:"+{OWN}")                  ::  CONVERT TO %HYMN
+  ++  HTML  (CRIP (EN-XML HYMN))                        ::  CONVERT TO %HTML
+  ++  MIME  [/TEXT/HTML (AS-OCTS HTML)]                 ::  CONVERT TO %MIME
   --
-++  garb  /snip                                         ::  grabbed by
-++  grab  |%                                            ::  convert from
-          ++  noun  manx                                ::  clam from %noun
+++  GARB  /SNIP                                         ::  GRABBED BY
+++  GRAB  |%                                            ::  CONVERT FROM
+          ++  NOUN  MANX                                ::  CLAM FROM %NOUN
 --        --

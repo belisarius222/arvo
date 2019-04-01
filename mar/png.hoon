@@ -1,12 +1,12 @@
-|_  dat/@t
-++  grow
+|_  DAT/@T
+++  GROW
   |%
-  ++  mime  [/image/png (as-octs:mimes:html dat)]
+  ++  MIME  [/IMAGE/PNG (AS-OCTS:MIMES:HTML DAT)]
   --
-++  grab
+++  GRAB
   |%
-  ++  mime  |=({p/mite q/octs} q.q)
-  ++  noun  @t
+  ++  MIME  |=({P/MITE Q/OCTS} Q.Q)
+  ++  NOUN  @T
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

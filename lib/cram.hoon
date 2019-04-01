@@ -1,61 +1,61 @@
 |%
-++  static                                              :: freeze .mdh hoon subset
-  |=  gen/hoon  ^-  {inf/(map term dime) elm/manx}
-  ?+    -.gen
-      =/  gen  ~(open ap gen)
-      ?:  =(gen ^gen)  ~|([%cram-dynamic -.gen] !!)
-      $(gen gen)
+++  STATIC                                              :: FREEZE .MDH HOON SUBSET
+  |=  GEN/HOON  ^-  {INF/(MAP TERM DIME) ELM/MANX}
+  ?+    -.GEN
+      =/  GEN  ~(OPEN AP GEN)
+      ?:  =(GEN ^GEN)  ~|([%CRAM-DYNAMIC -.GEN] !!)
+      $(GEN GEN)
   ::
-    $xray  [~ (single (shut gen))]
-    ^     [(malt (frontmatter p.gen)) (single (shut q.gen))]
+    $XRAY  [~ (SINGLE (SHUT GEN))]
+    ^     [(MALT (FRONTMATTER P.GEN)) (SINGLE (SHUT Q.GEN))]
   ==
 ::
-++  single                                              :: unwrap one-elem marl
-  |=  xml/marl  ^-  manx
-  ?:  ?=({* ~} xml)  i.xml
-  ~|(%many-elems !!)
+++  SINGLE                                              :: UNWRAP ONE-ELEM MARL
+  |=  XML/MARL  ^-  MANX
+  ?:  ?=({* ~} XML)  I.XML
+  ~|(%MANY-ELEMS !!)
 ::
-++  shut-mart                                           :: xml attrs
-  |=({n/mane v/(list beer:hoot)} [n (turn v |=(a/beer:hoot ?^(a !! a)))])
+++  SHUT-MART                                           :: XML ATTRS
+  |=({N/MANE V/(LIST BEER:HOOT)} [N (TURN V |=(A/BEER:HOOT ?^(A !! A)))])
 ::
-++  shut                                                :: as xml constant
-  |=  gen/hoon  ^-  marl
-  ?+    -.gen  ~|([%bad-xml -.gen] !!)
-      $dbug  $(gen q.gen)
+++  SHUT                                                :: AS XML CONSTANT
+  |=  GEN/HOON  ^-  MARL
+  ?+    -.GEN  ~|([%BAD-XML -.GEN] !!)
+      $DBUG  $(GEN Q.GEN)
   ::
-      $xray
-    [[n.g.p.gen (turn a.g.p.gen shut-mart)] $(gen [%mcts c.p.gen])]~
+      $XRAY
+    [[N.G.P.GEN (TURN A.G.P.GEN SHUT-MART)] $(GEN [%MCTS C.P.GEN])]~
   ::
-      $mcts
-    ?~  p.gen  ~
-    =-  (weld - $(p.gen t.p.gen))
-    ?^  -.i.p.gen  $(gen [%xray i.p.gen])
-    ~|  [%shut-tuna -.i.p.gen]
-    ?+  -.i.p.gen  !!
-      $manx  ?>(?=($xray -.p.i.p.gen) $(gen p.i.p.gen))
-      $marl  ?>(?=($mcts -.p.i.p.gen) $(gen p.i.p.gen))
+      $MCTS
+    ?~  P.GEN  ~
+    =-  (WELD - $(P.GEN T.P.GEN))
+    ?^  -.I.P.GEN  $(GEN [%XRAY I.P.GEN])
+    ~|  [%SHUT-TUNA -.I.P.GEN]
+    ?+  -.I.P.GEN  !!
+      $MANX  ?>(?=($XRAY -.P.I.P.GEN) $(GEN P.I.P.GEN))
+      $MARL  ?>(?=($MCTS -.P.I.P.GEN) $(GEN P.I.P.GEN))
     ==
   ==
 ::
 ::
-++  frontmatter                                         :: parse ~[[%foo 1] [%bar ~s2]]
-  |=  gen/hoon  ^-  (list {term dime})
-  ?:  ?=({$bust $null} gen)  ~
-  ?:  ?=($dbug -.gen)  $(gen q.gen)
-  ?.  ?=($clsg -.gen)  ~|([%bad-frontmatter -.gen] !!)
-  %+  turn  p.gen
-  |=  gen/hoon
-  ?.  ?=(^ -.gen)
-    =/  gen  ~(open ap gen)
-    ?:  =(gen ^gen)  ~|([%bad-frontmatter-elem -.gen] !!)
-    $(gen gen)
-  =/  hed  (as-dime p.gen)
-  ?.  =(%tas p.hed)  ~|([%bad-frontmatter-key-type p.hed] !!)
-  [q.hed (as-dime q.gen)]
+++  FRONTMATTER                                         :: PARSE ~[[%FOO 1] [%BAR ~S2]]
+  |=  GEN/HOON  ^-  (LIST {TERM DIME})
+  ?:  ?=({$BUST $NULL} GEN)  ~
+  ?:  ?=($DBUG -.GEN)  $(GEN Q.GEN)
+  ?.  ?=($CLSG -.GEN)  ~|([%BAD-FRONTMATTER -.GEN] !!)
+  %+  TURN  P.GEN
+  |=  GEN/HOON
+  ?.  ?=(^ -.GEN)
+    =/  GEN  ~(OPEN AP GEN)
+    ?:  =(GEN ^GEN)  ~|([%BAD-FRONTMATTER-ELEM -.GEN] !!)
+    $(GEN GEN)
+  =/  HED  (AS-DIME P.GEN)
+  ?.  =(%TAS P.HED)  ~|([%BAD-FRONTMATTER-KEY-TYPE P.HED] !!)
+  [Q.HED (AS-DIME Q.GEN)]
 ::
-++  as-dime                                            :: %foo ~.foo 0vbar etc
-  |=  gen/hoon  ^-  dime
-  ?:  ?=($dbug -.gen)  $(gen q.gen)
-  ?.  ?=({?($rock $sand) @ @} gen)  ~|([%bad-literal gen] !!)
-  +.gen
+++  AS-DIME                                            :: %FOO ~.FOO 0VBAR ETC
+  |=  GEN/HOON  ^-  DIME
+  ?:  ?=($DBUG -.GEN)  $(GEN Q.GEN)
+  ?.  ?=({?($ROCK $SAND) @ @} GEN)  ~|([%BAD-LITERAL GEN] !!)
+  +.GEN
 --

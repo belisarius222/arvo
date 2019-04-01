@@ -1,22 +1,22 @@
 ::
-::::  /hoon/js/mar
+::::  /HOON/JS/MAR
   ::
 /?    310
 ::
-=,  eyre
-|_  mud/@
-++  grow
+=,  EYRE
+|_  MUD/@
+++  GROW
   |%
-  ++  mime  [/application/javascript (as-octs:mimes:html (@t mud))]
-  ++  elem  ;script
-              ;-  (trip (@t mud))
+  ++  MIME  [/APPLICATION/JAVASCRIPT (AS-OCTS:MIMES:HTML (@T MUD))]
+  ++  ELEM  ;SCRIPT
+              ;-  (TRIP (@T MUD))
             ==
-  ++  hymn  ;html:(head:"+{elem}" body)
+  ++  HYMN  ;HTML:(HEAD:"+{ELEM}" BODY)
   --
-++  grab
-  |%                                                    ::  convert from
-  ++  mime  |=({p/mite q/octs} (@t q.q))
-  ++  noun  cord                                        ::  clam from %noun
+++  GRAB
+  |%                                                    ::  CONVERT FROM
+  ++  MIME  |=({P/MITE Q/OCTS} (@T Q.Q))
+  ++  NOUN  CORD                                        ::  CLAM FROM %NOUN
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

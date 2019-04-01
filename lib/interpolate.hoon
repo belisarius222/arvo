@@ -1,49 +1,49 @@
-::   /foo/:bar/baz interpolation syntax
+::   /FOO/:BAR/BAZ INTERPOLATION SYNTAX
 ::
-::::  /hoon/interpolate/lib
+::::  /HOON/INTERPOLATE/LIB
   ::
 /?    310
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-=,  eyre
+=,  EYRE
 |%
-++  parse-url
-  |=  a/$@(cord:purl purl)  ^-  purl
-  ?^  a  a
-  ~|  bad-url+a
-  (rash a auri:de-purl:html)
+++  PARSE-URL
+  |=  A/$@(CORD:PURL PURL)  ^-  PURL
+  ?^  A  A
+  ~|  BAD-URL+A
+  (RASH A AURI:DE-PURL:HTML)
 ::
-++  add-query
-  |=  {a/$@(@t purl) b/quay}  ^-  purl
-  ?@  a  $(a (parse-url a))  :: deal with cord
-  a(r (weld r.a b))
+++  ADD-QUERY
+  |=  {A/$@(@T PURL) B/QUAY}  ^-  PURL
+  ?@  A  $(A (PARSE-URL A))  :: DEAL WITH CORD
+  A(R (WELD R.A B))
 ::
-++  into-url
-  |=  {a/$@(cord purl) b/(unit hart) c/(list (pair term knot))}
-  ^-  purl
-  ?@  a  $(a (parse-url a))  :: deal with cord
-  %_  a
-    p    ?^(b u.b p.a)
-    q.q  (into-path q.q.a c)
+++  INTO-URL
+  |=  {A/$@(CORD PURL) B/(UNIT HART) C/(LIST (PAIR TERM KNOT))}
+  ^-  PURL
+  ?@  A  $(A (PARSE-URL A))  :: DEAL WITH CORD
+  %_  A
+    P    ?^(B U.B P.A)
+    Q.Q  (INTO-PATH Q.Q.A C)
   ==
 ::
-++  into-path    ::  [/a/:b/c [%b 'foo']~] -> /a/foo/c
-  =+  replacable=|=(a/knot `(unit term)`(rush a ;~(pfix col sym)))
-  |=  {a/path b/(list (pair term knot))}  ^-  path
-  ?~  a  ?~(b ~ ~|(unused-values+b !!))
-  =+  (replacable i.a)
-  ?~  -  [i.a $(a t.a)]  ::  literal value
-  ?~  b  ~|(no-value+u !!)
-  ?.  =(u p.i.b)  ~|(mismatch+[u p.i.b] !!)
-  [q.i.b $(a t.a, b t.b)]
+++  INTO-PATH    ::  [/A/:B/C [%B 'FOO']~] -> /A/FOO/C
+  =+  REPLACABLE=|=(A/KNOT `(UNIT TERM)`(RUSH A ;~(PFIX COL SYM)))
+  |=  {A/PATH B/(LIST (PAIR TERM KNOT))}  ^-  PATH
+  ?~  A  ?~(B ~ ~|(UNUSED-VALUES+B !!))
+  =+  (REPLACABLE I.A)
+  ?~  -  [I.A $(A T.A)]  ::  LITERAL VALUE
+  ?~  B  ~|(NO-VALUE+U !!)
+  ?.  =(U P.I.B)  ~|(MISMATCH+[U P.I.B] !!)
+  [Q.I.B $(A T.A, B T.B)]
 ::
-++  into-path-partial  ::  [/a/:b/c [d+'bar' b+'foo']~] -> [/a/foo/c [d+'bar']~]
-  |=  {pax/path quy/quay}  ^-  {path quay}
-  =+  ^=  inline                                        ::  required names
-      %-  ~(gas in *(set term))
-      (murn pax replacable:into-path)
-  =^  inter  quy
-    (skid quy |=({a/knot @} (~(has in inline) a)))
-  [(into-path pax inter) quy]
+++  INTO-PATH-PARTIAL  ::  [/A/:B/C [D+'BAR' B+'FOO']~] -> [/A/FOO/C [D+'BAR']~]
+  |=  {PAX/PATH QUY/QUAY}  ^-  {PATH QUAY}
+  =+  ^=  INLINE                                        ::  REQUIRED NAMES
+      %-  ~(GAS IN *(SET TERM))
+      (MURN PAX REPLACABLE:INTO-PATH)
+  =^  INTER  QUY
+    (SKID QUY |=({A/KNOT @} (~(HAS IN INLINE) A)))
+  [(INTO-PATH PAX INTER) QUY]
 --

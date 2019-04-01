@@ -1,26 +1,26 @@
 ::
-::::  /hoon/json/mar
+::::  /HOON/JSON/MAR
   ::
 /?    310
   ::
-::::  compute
+::::  COMPUTE
   ::
-=,  eyre
-=,  format
-=,  html
-|_  jon/json
+=,  EYRE
+=,  FORMAT
+=,  HTML
+|_  JON/JSON
 ::
-++  grow                                                ::  convert to
+++  GROW                                                ::  CONVERT TO
   |%
-  ++  mime  [/application/json (as-octs:mimes -:txt)]   ::  convert to %mime
-  ++  txt   [(crip (en-json jon))]~
+  ++  MIME  [/APPLICATION/JSON (AS-OCTS:MIMES -:TXT)]   ::  CONVERT TO %MIME
+  ++  TXT   [(CRIP (EN-JSON JON))]~
   --
-++  grab
-  |%                                                    ::  convert from
-  ++  mime  |=({p/mite q/octs} (fall (rush (@t q.q) apex:de-json) *json))
-  ++  noun  json                                        ::  clam from %noun
-  ++  numb  numb:enjs
-  ++  time  time:enjs
+++  GRAB
+  |%                                                    ::  CONVERT FROM
+  ++  MIME  |=({P/MITE Q/OCTS} (FALL (RUSH (@T Q.Q) APEX:DE-JSON) *JSON))
+  ++  NOUN  JSON                                        ::  CLAM FROM %NOUN
+  ++  NUMB  NUMB:ENJS
+  ++  TIME  TIME:ENJS
   --
-++  grad  %mime
+++  GRAD  %MIME
 --

@@ -1,168 +1,168 @@
-::  This is a library for writing API connectors.
+::  THIS IS A LIBRARY FOR WRITING API CONNECTORS.
 ::
-::  The basic flow is as follows:
-::  --  define a list of `++place`s, which specify the exported
-::      interface.
-::  --  in `++peer-scry` in the connector app, call `++read` in
-::      this library to match to the appropriate place and
-::      produce a move (usually either an immediate response or
-::      an http request to the api).
-::  --  in `++sigh-httr` in the connector app, call `++sigh` in
-::      this library to handle the response according to the
-::      place.
-|*  {move/mold sub-result/mold}
+::  THE BASIC FLOW IS AS FOLLOWS:
+::  --  DEFINE A LIST OF `++PLACE`S, WHICH SPECIFY THE EXPORTED
+::      INTERFACE.
+::  --  IN `++PEER-SCRY` IN THE CONNECTOR APP, CALL `++READ` IN
+::      THIS LIBRARY TO MATCH TO THE APPROPRIATE PLACE AND
+::      PRODUCE A MOVE (USUALLY EITHER AN IMMEDIATE RESPONSE OR
+::      AN HTTP REQUEST TO THE API).
+::  --  IN `++SIGH-HTTR` IN THE CONNECTOR APP, CALL `++SIGH` IN
+::      THIS LIBRARY TO HANDLE THE RESPONSE ACCORDING TO THE
+::      PLACE.
+|*  {MOVE/MOLD SUB-RESULT/MOLD}
 =>  |%
-    ::  A place consists of:
-    ::  --  `guard`, the type of the paths we should match.  For
-    ::      example, to match `/issues/<user>/<repo>` use
-    ::      `{$issues @t @t ~}`.
-    ::  --  `read-x`, called when someone tries to read the
-    ::      place with care `%x`.  Should produce a single move,
-    ::      usually either a `%diff` response if we can
-    ::      immediately answer or a `%hiss` http request if we
-    ::      need to make a request to the api.  See the
-    ::      `++read-*` functions in `++helpers` for some common
-    ::      handlers.
-    ::  --  `read-y`, same as `read-x` except with care `%y`.
-    ::  --  `sigh-x`, called when an http response comes back on
-    ::      this place.  You're given the json of the result, and
-    ::      you should produce either a result or null.  Null
-    ::      represents an error.  If you didn't create an http
-    ::      request in `read-x`, then this should never be
-    ::      called.  Use `++sigh-strange` from `++helpers` to
-    ::      unconditionally signal an error.
-    ::  --  `sigh-y`, same as `sigh-x` except with care `%y`.
-    ::      Note that a `%y` request must produce an arch, unlike
-    ::      a `%x` request, which may produce data of any mark.
+    ::  A PLACE CONSISTS OF:
+    ::  --  `GUARD`, THE TYPE OF THE PATHS WE SHOULD MATCH.  FOR
+    ::      EXAMPLE, TO MATCH `/ISSUES/<USER>/<REPO>` USE
+    ::      `{$ISSUES @T @T ~}`.
+    ::  --  `READ-X`, CALLED WHEN SOMEONE TRIES TO READ THE
+    ::      PLACE WITH CARE `%X`.  SHOULD PRODUCE A SINGLE MOVE,
+    ::      USUALLY EITHER A `%DIFF` RESPONSE IF WE CAN
+    ::      IMMEDIATELY ANSWER OR A `%HISS` HTTP REQUEST IF WE
+    ::      NEED TO MAKE A REQUEST TO THE API.  SEE THE
+    ::      `++READ-*` FUNCTIONS IN `++HELPERS` FOR SOME COMMON
+    ::      HANDLERS.
+    ::  --  `READ-Y`, SAME AS `READ-X` EXCEPT WITH CARE `%Y`.
+    ::  --  `SIGH-X`, CALLED WHEN AN HTTP RESPONSE COMES BACK ON
+    ::      THIS PLACE.  YOU'RE GIVEN THE JSON OF THE RESULT, AND
+    ::      YOU SHOULD PRODUCE EITHER A RESULT OR NULL.  NULL
+    ::      REPRESENTS AN ERROR.  IF YOU DIDN'T CREATE AN HTTP
+    ::      REQUEST IN `READ-X`, THEN THIS SHOULD NEVER BE
+    ::      CALLED.  USE `++SIGH-STRANGE` FROM `++HELPERS` TO
+    ::      UNCONDITIONALLY SIGNAL AN ERROR.
+    ::  --  `SIGH-Y`, SAME AS `SIGH-X` EXCEPT WITH CARE `%Y`.
+    ::      NOTE THAT A `%Y` REQUEST MUST PRODUCE AN ARCH, UNLIKE
+    ::      A `%X` REQUEST, WHICH MAY PRODUCE DATA OF ANY MARK.
     ::
-    ++  place
-      $:  guard/mold
-          read-x/$-(path move)
-          read-y/$-(path move)
-          sigh-x/$-(jon/json (unit sub-result))
-          sigh-y/$-(jon/json (unit arch))
+    ++  PLACE
+      $:  GUARD/MOLD
+          READ-X/$-(PATH MOVE)
+          READ-Y/$-(PATH MOVE)
+          SIGH-X/$-(JON/JSON (UNIT SUB-RESULT))
+          SIGH-Y/$-(JON/JSON (UNIT ARCH))
       ==
     --
 |%
-::  Generic helpers for place definitions
+::  GENERIC HELPERS FOR PLACE DEFINITIONS
 ::
-++  helpers
-  |=  {ost/bone wir/wire api-url/tape}
+++  HELPERS
+  |=  {OST/BONE WIR/WIRE API-URL/TAPE}
   |%
-  ::  Produce null.  Used as `++read-x` in places which are pure
-  ::  directories.  `++sigh-x` should be `++sigh-strange`.
+  ::  PRODUCE NULL.  USED AS `++READ-X` IN PLACES WHICH ARE PURE
+  ::  DIRECTORIES.  `++SIGH-X` SHOULD BE `++SIGH-STRANGE`.
   ::
-  ++  read-null  |=(pax/path [ost %diff %null ~])
+  ++  READ-NULL  |=(PAX/PATH [OST %DIFF %NULL ~])
   ::
-  ::  Produce an arch with the given list of children.  Used as
-  ::  `++read-y` in places which have a static list of (known)
-  ::  children rather than having to ask the api.  `++sigh-y`
-  ::  should be `++sigh-strange`.
+  ::  PRODUCE AN ARCH WITH THE GIVEN LIST OF CHILDREN.  USED AS
+  ::  `++READ-Y` IN PLACES WHICH HAVE A STATIC LIST OF (KNOWN)
+  ::  CHILDREN RATHER THAN HAVING TO ASK THE API.  `++SIGH-Y`
+  ::  SHOULD BE `++SIGH-STRANGE`.
   ::
-  ++  read-static
-    |=  children/(list @t)
-    |=  pax/path
-    [ost %diff %arch ~ (malt (turn children |=(@t [+< ~])))]
+  ++  READ-STATIC
+    |=  CHILDREN/(LIST @T)
+    |=  PAX/PATH
+    [OST %DIFF %ARCH ~ (MALT (TURN CHILDREN |=(@T [+< ~])))]
   ::
-  ::  Produce an api request to the given path.  Use this if the
-  ::  endpoint is static.  If the endpoint depends on parameters
-  ::  in the path, use `++get`.  For example:
-  ::  `|=(pax/path (get /users/[+<.pax]/repos))`.
+  ::  PRODUCE AN API REQUEST TO THE GIVEN PATH.  USE THIS IF THE
+  ::  ENDPOINT IS STATIC.  IF THE ENDPOINT DEPENDS ON PARAMETERS
+  ::  IN THE PATH, USE `++GET`.  FOR EXAMPLE:
+  ::  `|=(PAX/PATH (GET /USERS/[+<.PAX]/REPOS))`.
   ::
-  ++  read-get
-    |=  endpoint/path
-    |=  pax/path
-    (get endpoint)
+  ++  READ-GET
+    |=  ENDPOINT/PATH
+    |=  PAX/PATH
+    (GET ENDPOINT)
   ::
-  ::  Make an api request to the specified endpoint.
+  ::  MAKE AN API REQUEST TO THE SPECIFIED ENDPOINT.
   ::
-  ++  get
-    |=  endpoint/path
-    ^-  move
-    :*  ost  %hiss  wir  `~  %httr  %hiss
-        (endpoint-to-purl endpoint)  %get  ~  ~
+  ++  GET
+    |=  ENDPOINT/PATH
+    ^-  MOVE
+    :*  OST  %HISS  WIR  `~  %HTTR  %HISS
+        (ENDPOINT-TO-PURL ENDPOINT)  %GET  ~  ~
     ==
   ::
-  ::  Convert an endpoint path to a purl.
+  ::  CONVERT AN ENDPOINT PATH TO A PURL.
   ::
-  ++  endpoint-to-purl
-    |=  endpoint/path
-    (scan (weld api-url <`path`endpoint>) auri:de-purl:html)
+  ++  ENDPOINT-TO-PURL
+    |=  ENDPOINT/PATH
+    (SCAN (WELD API-URL <`PATH`ENDPOINT>) AURI:DE-PURL:HTML)
   ::
-  ::  Return error.  Used when no http response is expected.
+  ::  RETURN ERROR.  USED WHEN NO HTTP RESPONSE IS EXPECTED.
   ::
-  ++  sigh-strange  |=(jon/json ~)
+  ++  SIGH-STRANGE  |=(JON/JSON ~)
   --
 ::
-::  Handles one-time requests by mapping them to their handling,
-::  either `read-x` or `read-y`, in `places`.
+::  HANDLES ONE-TIME REQUESTS BY MAPPING THEM TO THEIR HANDLING,
+::  EITHER `READ-X` OR `READ-Y`, IN `PLACES`.
 ::
-++  read
-  |=  {ost/bone places/(list place) ren/care:clay pax/path}
-  ^-  move
-  ?~  places
-    ~&  [%strange-path pax]
-    (move [ost %diff ?+(ren !! $x null+~, $y arch+*arch)])
-  =+  match=((soft guard.i.places) pax)
-  ?~  match
-    $(places t.places)
-  (?+(ren !! $x read-x.i.places, $y read-y.i.places) pax)
+++  READ
+  |=  {OST/BONE PLACES/(LIST PLACE) REN/CARE:CLAY PAX/PATH}
+  ^-  MOVE
+  ?~  PLACES
+    ~&  [%STRANGE-PATH PAX]
+    (MOVE [OST %DIFF ?+(REN !! $X NULL+~, $Y ARCH+*ARCH)])
+  =+  MATCH=((SOFT GUARD.I.PLACES) PAX)
+  ?~  MATCH
+    $(PLACES T.PLACES)
+  (?+(REN !! $X READ-X.I.PLACES, $Y READ-Y.I.PLACES) PAX)
 ::
-::  Handles http responses sent in `++read` by mapping them to
-::  their handling, either `sigh-x` or `sigh-y`, in `places`.
+::  HANDLES HTTP RESPONSES SENT IN `++READ` BY MAPPING THEM TO
+::  THEIR HANDLING, EITHER `SIGH-X` OR `SIGH-Y`, IN `PLACES`.
 ::
-++  sigh
-  =,  html
-  =,  eyre
-  |=  {places/(list place) ren/care:clay pax/path res/httr:eyre}
-  ^-  sub-result
-  =<  ?+(ren ~|([%invalid-care ren] !!) $x sigh-x, $y sigh-y)
+++  SIGH
+  =,  HTML
+  =,  EYRE
+  |=  {PLACES/(LIST PLACE) REN/CARE:CLAY PAX/PATH RES/HTTR:EYRE}
+  ^-  SUB-RESULT
+  =<  ?+(REN ~|([%INVALID-CARE REN] !!) $X SIGH-X, $Y SIGH-Y)
   |%
-  ++  sigh-x
-    ?~  r.res
-      ~&  [err+%empty-response code+p.res]
-      null+~
-    =+  jon=(rush q.u.r.res apex:de-json)
-    ?~  jon
-      ~&  [err+%bad-json code+p.res body+q.u.r.res]
-      null+~
-    ?.  =(2 (div p.res 100))
-      ~&  [err+%request-rejected code+p.res msg+u.jon]
-      null+~
-    |-  ^-  sub-result
-    ?~  places
-      ~&([%sigh-strange-path pax] (sub-result null+~))
-    =+  match=((soft guard.i.places) pax)
-    ?~  match
-      $(places t.places)
-    =+  (sigh-x.i.places u.jon)
+  ++  SIGH-X
+    ?~  R.RES
+      ~&  [ERR+%EMPTY-RESPONSE CODE+P.RES]
+      NULL+~
+    =+  JON=(RUSH Q.U.R.RES APEX:DE-JSON)
+    ?~  JON
+      ~&  [ERR+%BAD-JSON CODE+P.RES BODY+Q.U.R.RES]
+      NULL+~
+    ?.  =(2 (DIV P.RES 100))
+      ~&  [ERR+%REQUEST-REJECTED CODE+P.RES MSG+U.JON]
+      NULL+~
+    |-  ^-  SUB-RESULT
+    ?~  PLACES
+      ~&([%SIGH-STRANGE-PATH PAX] (SUB-RESULT NULL+~))
+    =+  MATCH=((SOFT GUARD.I.PLACES) PAX)
+    ?~  MATCH
+      $(PLACES T.PLACES)
+    =+  (SIGH-X.I.PLACES U.JON)
     ?~  -
-      ~&  [err+s+%response-not-valid pax+pax code+(numb:enjs:format p.res) msg+u.jon]
-      (sub-result null+~)
-    u.-
+      ~&  [ERR+S+%RESPONSE-NOT-VALID PAX+PAX CODE+(NUMB:ENJS:FORMAT P.RES) MSG+U.JON]
+      (SUB-RESULT NULL+~)
+    U.-
   ::
-  ++  sigh-y
-    ?~  r.res
-      ~&  [err+s+%empty-response code+(numb:enjs:format p.res)]
-      arch+*arch
-    =+  jon=(rush q.u.r.res apex:de-json)
-    ?~  jon
-      ~&  [err+s+%bad-json code+(numb:enjs:format p.res) body+s+q.u.r.res]
-      arch+*arch
-    ?.  =(2 (div p.res 100))
-      ~&  [err+s+%request-rejected code+(numb:enjs:format p.res) msg+u.jon]
-      arch+*arch
-    %-  sub-result
-    |-  ^-  {$arch arch}
-    ?~  places
-      ~&([%sigh-strange-path pax] arch+*arch)
-    =+  match=((soft guard.i.places) pax)
-    ?~  match
-      $(places t.places)
-    =+  (sigh-y.i.places u.jon)
+  ++  SIGH-Y
+    ?~  R.RES
+      ~&  [ERR+S+%EMPTY-RESPONSE CODE+(NUMB:ENJS:FORMAT P.RES)]
+      ARCH+*ARCH
+    =+  JON=(RUSH Q.U.R.RES APEX:DE-JSON)
+    ?~  JON
+      ~&  [ERR+S+%BAD-JSON CODE+(NUMB:ENJS:FORMAT P.RES) BODY+S+Q.U.R.RES]
+      ARCH+*ARCH
+    ?.  =(2 (DIV P.RES 100))
+      ~&  [ERR+S+%REQUEST-REJECTED CODE+(NUMB:ENJS:FORMAT P.RES) MSG+U.JON]
+      ARCH+*ARCH
+    %-  SUB-RESULT
+    |-  ^-  {$ARCH ARCH}
+    ?~  PLACES
+      ~&([%SIGH-STRANGE-PATH PAX] ARCH+*ARCH)
+    =+  MATCH=((SOFT GUARD.I.PLACES) PAX)
+    ?~  MATCH
+      $(PLACES T.PLACES)
+    =+  (SIGH-Y.I.PLACES U.JON)
     ?~  -
-      ~&  [err+s+%response-not-valid pax+pax code+(numb:enjs:format p.res) msg+u.jon]
-      arch+*arch
-    arch+u.-
+      ~&  [ERR+S+%RESPONSE-NOT-VALID PAX+PAX CODE+(NUMB:ENJS:FORMAT P.RES) MSG+U.JON]
+      ARCH+*ARCH
+    ARCH+U.-
   --
 --

@@ -1,21 +1,21 @@
 ::
-::::  /hoon/tang/mar
+::::  /HOON/TANG/MAR
   ::
 /?    310
 ::
-=,  format
-|_  tan/(list tank)
+=,  FORMAT
+|_  TAN/(LIST TANK)
 ::
-++  grow
+++  GROW
   |%
-  ++  elem
-    =-  ;pre:code:"{(of-wall -)}"
-    ^-  wall  %-  zing  ^-  (list wall)
-    (turn (flop tan) |=(a/tank (wash 0^160 a)))
+  ++  ELEM
+    =-  ;PRE:CODE:"{(OF-WALL -)}"
+    ^-  WALL  %-  ZING  ^-  (LIST WALL)
+    (TURN (FLOP TAN) |=(A/TANK (WASH 0^160 A)))
   --
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  (list ^tank)                                ::  clam from %noun
-  ++  tank  |=(a/^tank [a]~)
+  ++  NOUN  (LIST ^TANK)                                ::  CLAM FROM %NOUN
+  ++  TANK  |=(A/^TANK [A]~)
   --
 --

@@ -1,57 +1,57 @@
-::  Serialize &elem as &json, with special handling for urb:* attributes
+::  SERIALIZE &ELEM AS &JSON, WITH SPECIAL HANDLING FOR URB:* ATTRIBUTES
 ::
-::::  /hoon/elem-to-react-json/lib
+::::  /HOON/ELEM-TO-REACT-JSON/LIB
   ::
 /?    310
-=,  format
+=,  FORMAT
 |%
-++  react-attrs                                         ::  uppercase mapping
-  ~+  ^-  (map term cord)
-  %-  molt  ^-  (list (pair term cord))
-  :-  [%class 'className']
-  =-  (rash - (more next (cook |=(a/tape [(crip (cass a)) (crip a)]) (star alf))))
+++  REACT-ATTRS                                         ::  UPPERCASE MAPPING
+  ~+  ^-  (MAP TERM CORD)
+  %-  MOLT  ^-  (LIST (PAIR TERM CORD))
+  :-  [%CLASS 'CLASSNAME']
+  =-  (RASH - (MORE NEXT (COOK |=(A/TAPE [(CRIP (CASS A)) (CRIP A)]) (STAR ALF))))
   '''
-  accept acceptCharset accessKey action allowFullScreen allowTransparency alt
-  async autoComplete autoFocus autoPlay cellPadding cellSpacing charSet checked
-  classID className colSpan cols content contentEditable contextMenu controls
-  coords crossOrigin data dateTime defer dir disabled download draggable encType
-  form formAction formEncType formMethod formNoValidate formTarget frameBorder
-  headers height hidden high href hrefLang htmlFor httpEquiv icon id label lang
-  list loop low manifest marginHeight marginWidth max maxLength media mediaGroup
-  method min multiple muted name noValidate open optimum pattern placeholder
-  poster preload radioGroup readOnly rel required role rowSpan rows sandbox
-  scope scoped scrolling seamless selected shape size sizes span spellCheck
-  src srcDoc srcSet start step style tabIndex target title type useMap value
-  width wmode
+  ACCEPT ACCEPTCHARSET ACCESSKEY ACTION ALLOWFULLSCREEN ALLOWTRANSPARENCY ALT
+  ASYNC AUTOCOMPLETE AUTOFOCUS AUTOPLAY CELLPADDING CELLSPACING CHARSET CHECKED
+  CLASSID CLASSNAME COLSPAN COLS CONTENT CONTENTEDITABLE CONTEXTMENU CONTROLS
+  COORDS CROSSORIGIN DATA DATETIME DEFER DIR DISABLED DOWNLOAD DRAGGABLE ENCTYPE
+  FORM FORMACTION FORMENCTYPE FORMMETHOD FORMNOVALIDATE FORMTARGET FRAMEBORDER
+  HEADERS HEIGHT HIDDEN HIGH HREF HREFLANG HTMLFOR HTTPEQUIV ICON ID LABEL LANG
+  LIST LOOP LOW MANIFEST MARGINHEIGHT MARGINWIDTH MAX MAXLENGTH MEDIA MEDIAGROUP
+  METHOD MIN MULTIPLE MUTED NAME NOVALIDATE OPEN OPTIMUM PATTERN PLACEHOLDER
+  POSTER PRELOAD RADIOGROUP READONLY REL REQUIRED ROLE ROWSPAN ROWS SANDBOX
+  SCOPE SCOPED SCROLLING SEAMLESS SELECTED SHAPE SIZE SIZES SPAN SPELLCHECK
+  SRC SRCDOC SRCSET START STEP STYLE TABINDEX TARGET TITLE TYPE USEMAP VALUE
+  WIDTH WMODE
   '''
 ::
-::  special handling for <pre urb:codemirror>foo</pre>
-++  urb-codemirror                                      ::  render code blocks
-  |=  src/manx  ^-  manx
-  ?>  ?=({{$pre *} _;/(**) ~} src)
-  ;codemirror(value "{v.i.a.g.i.c.src}");
+::  SPECIAL HANDLING FOR <PRE URB:CODEMIRROR>FOO</PRE>
+++  URB-CODEMIRROR                                      ::  RENDER CODE BLOCKS
+  |=  SRC/MANX  ^-  MANX
+  ?>  ?=({{$PRE *} _;/(**) ~} SRC)
+  ;CODEMIRROR(VALUE "{V.I.A.G.I.C.SRC}");
 ::
-++  elem-to-react-json                                  ::  serialize DOM as json
-  |=  src/manx  ^-  json
-  ?:  ?=(_;/(**) src)
-    (tape:enjs v.i.a.g.src)
-  =+  atr=(molt `(list (pair mane tape))`a.g.src)
-  ?:  (~(has by atr) [%urb %codemirror])
-    $(src (urb-codemirror src))
-  %-  pairs:enjs  :~
-    c+a+(turn c.src ..$)
-    gn+s+(mane-to-cord n.g.src)
-    =<  ga+(pairs:enjs (turn a.g.src .))
-    |=  {a/mane b/tape}  ^-  {cord json}
-    :_  (tape:enjs b)
-    ?^  a  (mane-to-cord a)
-    (fall (~(get by react-attrs) a) a)
+++  ELEM-TO-REACT-JSON                                  ::  SERIALIZE DOM AS JSON
+  |=  SRC/MANX  ^-  JSON
+  ?:  ?=(_;/(**) SRC)
+    (TAPE:ENJS V.I.A.G.SRC)
+  =+  ATR=(MOLT `(LIST (PAIR MANE TAPE))`A.G.SRC)
+  ?:  (~(HAS BY ATR) [%URB %CODEMIRROR])
+    $(SRC (URB-CODEMIRROR SRC))
+  %-  PAIRS:ENJS  :~
+    C+A+(TURN C.SRC ..$)
+    GN+S+(MANE-TO-CORD N.G.SRC)
+    =<  GA+(PAIRS:ENJS (TURN A.G.SRC .))
+    |=  {A/MANE B/TAPE}  ^-  {CORD JSON}
+    :_  (TAPE:ENJS B)
+    ?^  A  (MANE-TO-CORD A)
+    (FALL (~(GET BY REACT-ATTRS) A) A)
   ==
 ::
-++  mane-to-cord                                        ::  namespaced xml names
-  |=(a/mane `cord`?@(a a (rap 3 -.a ':' +.a ~)))
+++  MANE-TO-CORD                                        ::  NAMESPACED XML NAMES
+  |=(A/MANE `CORD`?@(A A (RAP 3 -.A ':' +.A ~)))
 --
 ::
 ::::
   ::
-elem-to-react-json                                      ::  export conversion gate
+ELEM-TO-REACT-JSON                                      ::  EXPORT CONVERSION GATE

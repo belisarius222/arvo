@@ -1,337 +1,337 @@
-::  OAuth 1.0 %authorization header
+::  OAUTH 1.0 %AUTHORIZATION HEADER
 ::
-::::  /hoon/oauth1/lib
+::::  /HOON/OAUTH1/LIB
   ::
-/+    interpolate, hep-to-cab
-=,  mimes:html
-=,  eyre
+/+    INTERPOLATE, HEP-TO-CAB
+=,  MIMES:HTML
+=,  EYRE
 |%
-++  keys  cord:{key/@t sec/@t}                          ::  app key pair
-++  token                                               ::  user keys
-  $@  ~                                                ::  none
-  $%  {$request-token oauth-token/@t token-secret/@t}   ::  intermediate
-      {$access-token oauth-token/@t token-secret/@t}    ::  full
+++  KEYS  CORD:{KEY/@T SEC/@T}                          ::  APP KEY PAIR
+++  TOKEN                                               ::  USER KEYS
+  $@  ~                                                ::  NONE
+  $%  {$REQUEST-TOKEN OAUTH-TOKEN/@T TOKEN-SECRET/@T}   ::  INTERMEDIATE
+      {$ACCESS-TOKEN OAUTH-TOKEN/@T TOKEN-SECRET/@T}    ::  FULL
   ==
-++  quay-enc  (list tape)              ::  partially rendered query string
+++  QUAY-ENC  (LIST TAPE)              ::  PARTIALLY RENDERED QUERY STRING
 --
 ::
 ::::
   ::
 |%
-++  parse-url  parse-url:interpolate
-++  join
-  |=  {a/cord b/(list cord)}
-  ?~  b  ''
-  (rap 3 |-([i.b ?~(t.b ~ [a $(b t.b)])]))
+++  PARSE-URL  PARSE-URL:INTERPOLATE
+++  JOIN
+  |=  {A/CORD B/(LIST CORD)}
+  ?~  B  ''
+  (RAP 3 |-([I.B ?~(T.B ~ [A $(B T.B)])]))
 ::
-++  joint                                              ::  between every pair
-  |=  {a/tape b/wall}  ^-  tape
-  ?~  b  b
-  |-  ^-  tape
-  ?~  t.b  i.b
-  :(weld i.b a $(b t.b))
+++  JOINT                                              ::  BETWEEN EVERY PAIR
+  |=  {A/TAPE B/WALL}  ^-  TAPE
+  ?~  B  B
+  |-  ^-  TAPE
+  ?~  T.B  I.B
+  :(WELD I.B A $(B T.B))
 ::
-++  join-en-urle  |=(a/(list tape) (joint "&" (turn a en-urlt:html)))
-::   query string in oauth1 'k1="v1", k2="v2"' form
-++  to-header
-  |=  a/quay  ^-  tape
-  %+  joint  ", "
-  (turn a |=({k/@t v/@t} `tape`~[k '="' v '"']))        ::  normalized later
+++  JOIN-EN-URLE  |=(A/(LIST TAPE) (JOINT "&" (TURN A EN-URLT:HTML)))
+::   QUERY STRING IN OAUTH1 'K1="V1", K2="V2"' FORM
+++  TO-HEADER
+  |=  A/QUAY  ^-  TAPE
+  %+  JOINT  ", "
+  (TURN A |=({K/@T V/@T} `TAPE`~[K '="' V '"']))        ::  NORMALIZED LATER
 ::
-::   partial tail:en-purl:html for sorting
-++  encode-pairs
-  |=  a/quay  ^-  quay-enc
-  %+  turn  a
-  |=  {k/@t v/@t}  ^-  tape
-  :(weld (en-urlt:html (trip k)) "=" (en-urlt:html (trip v)))
+::   PARTIAL TAIL:EN-PURL:HTML FOR SORTING
+++  ENCODE-PAIRS
+  |=  A/QUAY  ^-  QUAY-ENC
+  %+  TURN  A
+  |=  {K/@T V/@T}  ^-  TAPE
+  :(WELD (EN-URLT:HTML (TRIP K)) "=" (EN-URLT:HTML (TRIP V)))
 ::
-++  parse-pairs                                         ::  x-form-en-urlt:htmlncoded
-  |=  bod/(unit octs)  ^-  quay-enc
-  ~|  %parsing-body
-  ?~  bod  ~
-  (rash q.u.bod (more pad (plus ;~(less pad prn))))
+++  PARSE-PAIRS                                         ::  X-FORM-EN-URLT:HTMLNCODED
+  |=  BOD/(UNIT OCTS)  ^-  QUAY-ENC
+  ~|  %PARSING-BODY
+  ?~  BOD  ~
+  (RASH Q.U.BOD (MORE PAD (PLUS ;~(LESS PAD PRN))))
 ::
-++  post-quay
-  |=  {a/purl b/quay}  ^-  hiss
-  =.  b  (quay:hep-to-cab b)
-  =-  [a %post - ?~(b ~ (some (as-octt +:(tail:en-purl:html b))))]
-  (my content-type+['application/x-www-form-urlencoded']~ ~)
+++  POST-QUAY
+  |=  {A/PURL B/QUAY}  ^-  HISS
+  =.  B  (QUAY:HEP-TO-CAB B)
+  =-  [A %POST - ?~(B ~ (SOME (AS-OCTT +:(TAIL:EN-PURL:HTML B))))]
+  (MY CONTENT-TYPE+['APPLICATION/X-WWW-FORM-URLENCODED']~ ~)
 ::
 ::
-++  mean-wall  !.
-  |=  {a/term b/tape}  ^+  !!
-  =-  (mean (flop `tang`[>a< -]))
-  (turn (to-wain:format (crip b)) |=(c/cord leaf+(trip c)))
+++  MEAN-WALL  !.
+  |=  {A/TERM B/TAPE}  ^+  !!
+  =-  (MEAN (FLOP `TANG`[>A< -]))
+  (TURN (TO-WAIN:FORMAT (CRIP B)) |=(C/CORD LEAF+(TRIP C)))
 ::
-++  bad-response  |=(a/@u ?:(=(2 (div a 100)) | ~&(bad-httr+a &)))
-++  quay-keys  |-($@(knot {$ $}))  :: improper tree
-++  grab-quay  :: ?=({@t @t @t} (grab-quay r:*httr %key1 %key2 %key3))
-  |*  {a/(unit octs) b/quay-keys}
-  =+  ~|  bad-quay+a
-      c=(rash q:(need `(unit octs)`a) yquy:de-purl:html)
-  ~|  grab-quay+[c b]
-  =+  all=(malt c)
-  %.  b
-  |*  b/quay-keys
-  ?@  b  ~|(b (~(got by all) b))
-  [(..$ -.b) (..$ +.b)]
+++  BAD-RESPONSE  |=(A/@U ?:(=(2 (DIV A 100)) | ~&(BAD-HTTR+A &)))
+++  QUAY-KEYS  |-($@(KNOT {$ $}))  :: IMPROPER TREE
+++  GRAB-QUAY  :: ?=({@T @T @T} (GRAB-QUAY R:*HTTR %KEY1 %KEY2 %KEY3))
+  |*  {A/(UNIT OCTS) B/QUAY-KEYS}
+  =+  ~|  BAD-QUAY+A
+      C=(RASH Q:(NEED `(UNIT OCTS)`A) YQUY:DE-PURL:HTML)
+  ~|  GRAB-QUAY+[C B]
+  =+  ALL=(MALT C)
+  %.  B
+  |*  B/QUAY-KEYS
+  ?@  B  ~|(B (~(GOT BY ALL) B))
+  [(..$ -.B) (..$ +.B)]
 --
 ::
 ::::
   ::
-|_  {(bale keys) tok/token}
-++  consumer-key     key:decode-keys
-++  consumer-secret  sec:decode-keys
-++  decode-keys                       :: XX from bale w/ typed %jael
-  ^-  {key/@t sec/@t ~}
-  ?.  =(~ `@`key)
-    ~|  %oauth-bad-keys
-    ((hard {key/@t sec/@t ~}) (to-wain:format key))
-  %+  mean-wall  %oauth-no-keys
+|_  {(BALE KEYS) TOK/TOKEN}
+++  CONSUMER-KEY     KEY:DECODE-KEYS
+++  CONSUMER-SECRET  SEC:DECODE-KEYS
+++  DECODE-KEYS                       :: XX FROM BALE W/ TYPED %JAEL
+  ^-  {KEY/@T SEC/@T ~}
+  ?.  =(~ `@`KEY)
+    ~|  %OAUTH-BAD-KEYS
+    ((HARD {KEY/@T SEC/@T ~}) (TO-WAIN:FORMAT KEY))
+  %+  MEAN-WALL  %OAUTH-NO-KEYS
   """
-  Run |init-oauth1 {<`path`dom>}
-  If necessary, obtain consumer keys configured for a oauth_callback of
-    {(trip oauth-callback)}
+  RUN |INIT-OAUTH1 {<`PATH`DOM>}
+  IF NECESSARY, OBTAIN CONSUMER KEYS CONFIGURED FOR A OAUTH_CALLBACK OF
+    {(TRIP OAUTH-CALLBACK)}
   """
 ::
-++  exchange-token
-  |=  a/$@(@t purl)  ^-  hiss
-  (post-quay (parse-url a) ~)
+++  EXCHANGE-TOKEN
+  |=  A/$@(@T PURL)  ^-  HISS
+  (POST-QUAY (PARSE-URL A) ~)
 ::
-++  request-token
-  |=  a/$@(@t purl)  ^-  hiss
-  (post-quay (parse-url a) oauth-callback+oauth-callback ~)
+++  REQUEST-TOKEN
+  |=  A/$@(@T PURL)  ^-  HISS
+  (POST-QUAY (PARSE-URL A) OAUTH-CALLBACK+OAUTH-CALLBACK ~)
 ::
-++  our-host  .^(hart %e /(scot %p our)/host/real)
-++  oauth-callback
-  ~&  [%oauth-warning "Make sure this urbit ".
-                      "is running on {(en-purl:html our-host `~ ~)}"]
-  %-    crip    %-  en-purl:html
-  %^  into-url:interpolate  'https://our-host/~/ac/:domain/:user/in'
-    `our-host
-  :~  domain+(join '.' (flop dom))
-      user+(scot %ta usr)
+++  OUR-HOST  .^(HART %E /(SCOT %P OUR)/HOST/REAL)
+++  OAUTH-CALLBACK
+  ~&  [%OAUTH-WARNING "MAKE SURE THIS URBIT ".
+                      "IS RUNNING ON {(EN-PURL:HTML OUR-HOST `~ ~)}"]
+  %-    CRIP    %-  EN-PURL:HTML
+  %^  INTO-URL:INTERPOLATE  'HTTPS://OUR-HOST/~/AC/:DOMAIN/:USER/IN'
+    `OUR-HOST
+  :~  DOMAIN+(JOIN '.' (FLOP DOM))
+      USER+(SCOT %TA USR)
   ==
 ::
-++  auth-url
-  |=  url/$@(@t purl)  ^-  purl
-  %+  add-query:interpolate  url
-  %-  quay:hep-to-cab
-  ?.  ?=({$request-token ^} tok)
-    ~|(%no-token-for-dialog !!)
-  :-  oauth-token+oauth-token.tok
-  ?~(usr ~ [screen-name+usr]~)
+++  AUTH-URL
+  |=  URL/$@(@T PURL)  ^-  PURL
+  %+  ADD-QUERY:INTERPOLATE  URL
+  %-  QUAY:HEP-TO-CAB
+  ?.  ?=({$REQUEST-TOKEN ^} TOK)
+    ~|(%NO-TOKEN-FOR-DIALOG !!)
+  :-  OAUTH-TOKEN+OAUTH-TOKEN.TOK
+  ?~(USR ~ [SCREEN-NAME+USR]~)
 ::
-++  grab-token-response
-  |=  a/httr  ^-  {tok/@t sec/@t}
-  (grab-quay r.a 'oauth_token' 'oauth_token_secret')
+++  GRAB-TOKEN-RESPONSE
+  |=  A/HTTR  ^-  {TOK/@T SEC/@T}
+  (GRAB-QUAY R.A 'OAUTH_TOKEN' 'OAUTH_TOKEN_SECRET')
 ::
-++  identity
-  %+  weld
-    ?~(usr "default identity for " "{(trip usr)}@")
-  (trip (join '.' (flop dom)))
+++  IDENTITY
+  %+  WELD
+    ?~(USR "DEFAULT IDENTITY FOR " "{(TRIP USR)}@")
+  (TRIP (JOIN '.' (FLOP DOM)))
 ::
-++  check-screen-name
-  |=  a/httr  ^-  ?
-  =+  nam=(grab-quay r.a 'screen_name')
-  ?~  usr  &
-  ?:  =(usr nam)  &
+++  CHECK-SCREEN-NAME
+  |=  A/HTTR  ^-  ?
+  =+  NAM=(GRAB-QUAY R.A 'SCREEN_NAME')
+  ?~  USR  &
+  ?:  =(USR NAM)  &
   =<  |
-  %-  %*(. slog pri 1)
-  ::  XX cgyarvin should figure out why we need to cast to ~
-  (flop p:(mule |.(~|(wrong-user+[req=usr got=nam] `~`!!))))
+  %-  %*(. SLOG PRI 1)
+  ::  XX CGYARVIN SHOULD FIGURE OUT WHY WE NEED TO CAST TO ~
+  (FLOP P:(MULE |.(~|(WRONG-USER+[REQ=USR GOT=NAM] `~`!!))))
 ::
-++  check-token-quay
-  |=  a/quay  ^+  %&
-  =.  a  (sort a aor)
-  ?.  ?=({{$'oauth_token' oauth-token/@t} {$'oauth_verifier' @t} ~} a)
-    ~|(no-token+a !!)
-  ?~  tok
-    %+  mean-wall  %no-secret-for-token
+++  CHECK-TOKEN-QUAY
+  |=  A/QUAY  ^+  %&
+  =.  A  (SORT A AOR)
+  ?.  ?=({{$'OAUTH_TOKEN' OAUTH-TOKEN/@T} {$'OAUTH_VERIFIER' @T} ~} A)
+    ~|(NO-TOKEN+A !!)
+  ?~  TOK
+    %+  MEAN-WALL  %NO-SECRET-FOR-TOKEN
     """
-    Attempting to authorize {identity}
+    ATTEMPTING TO AUTHORIZE {IDENTITY}
     """
-  ?.  =(oauth-token.tok oauth-token.q.i.a)
-    ~|  wrong-token+[id=usr q.i.a]
-    ~|(%multiple-tokens-unsupported !!)
+  ?.  =(OAUTH-TOKEN.TOK OAUTH-TOKEN.Q.I.A)
+    ~|  WRONG-TOKEN+[ID=USR Q.I.A]
+    ~|(%MULTIPLE-TOKENS-UNSUPPORTED !!)
   %&
 ::
-++  auth
+++  AUTH
   |%
-  ++  header
-    |=  {auq/quay url/purl med/meth math bod/(unit octs)}
-    ^-  cord
-    =^  quy  url  [r.url url(r ~)]      :: query string handled separately
-    =.  auq  (quay:hep-to-cab (weld auq computed-query))
-    =+  ^-  qen/quay-enc                 :: semi-encoded for sorting
-        %+  weld  (parse-pairs bod)
-        (encode-pairs (weld auq quy))
-    =+  bay=(base-string med url qen)
-    =+  sig=(sign signing-key bay)
-    =.  auq  ['oauth_signature'^(crip (en-urlt:html sig)) auq]
-    (crip "OAuth {(to-header auq)}")
+  ++  HEADER
+    |=  {AUQ/QUAY URL/PURL MED/METH MATH BOD/(UNIT OCTS)}
+    ^-  CORD
+    =^  QUY  URL  [R.URL URL(R ~)]      :: QUERY STRING HANDLED SEPARATELY
+    =.  AUQ  (QUAY:HEP-TO-CAB (WELD AUQ COMPUTED-QUERY))
+    =+  ^-  QEN/QUAY-ENC                 :: SEMI-ENCODED FOR SORTING
+        %+  WELD  (PARSE-PAIRS BOD)
+        (ENCODE-PAIRS (WELD AUQ QUY))
+    =+  BAY=(BASE-STRING MED URL QEN)
+    =+  SIG=(SIGN SIGNING-KEY BAY)
+    =.  AUQ  ['OAUTH_SIGNATURE'^(CRIP (EN-URLT:HTML SIG)) AUQ]
+    (CRIP "OAUTH {(TO-HEADER AUQ)}")
   ::
-  ++  computed-query
-    ^-  quay
-    :~  oauth-consumer-key+consumer-key
-        oauth-nonce+(scot %uw (shaf %non eny))
-        oauth-signature-method+'HMAC-SHA1'
-        oauth-timestamp+(rsh 3 2 (scot %ui (unt:chrono:userlib now)))
-        oauth-version+'1.0'
+  ++  COMPUTED-QUERY
+    ^-  QUAY
+    :~  OAUTH-CONSUMER-KEY+CONSUMER-KEY
+        OAUTH-NONCE+(SCOT %UW (SHAF %NON ENY))
+        OAUTH-SIGNATURE-METHOD+'HMAC-SHA1'
+        OAUTH-TIMESTAMP+(RSH 3 2 (SCOT %UI (UNT:CHRONO:USERLIB NOW)))
+        OAUTH-VERSION+'1.0'
     ==
-  ++  base-string
-    |=  {med/meth url/purl qen/quay-enc}  ^-  tape
-    =.  qen  (sort qen aor)
-    %-  join-en-urle
-    :~  (cuss (trip `@t`med))
-        (en-purl:html url)
-        (joint "&" qen)
+  ++  BASE-STRING
+    |=  {MED/METH URL/PURL QEN/QUAY-ENC}  ^-  TAPE
+    =.  QEN  (SORT QEN AOR)
+    %-  JOIN-EN-URLE
+    :~  (CUSS (TRIP `@T`MED))
+        (EN-PURL:HTML URL)
+        (JOINT "&" QEN)
     ==
-  ++  sign
-    |=  {key/cord bay/tape}  ^-  tape
-    %-  en-base64:mimes:html
-    %+  swp  3
-    (hmac-sha1t:hmac:crypto key (crip bay))
+  ++  SIGN
+    |=  {KEY/CORD BAY/TAPE}  ^-  TAPE
+    %-  EN-BASE64:MIMES:HTML
+    %+  SWP  3
+    (HMAC-SHA1T:HMAC:CRYPTO KEY (CRIP BAY))
   ::
-  ++  signing-key
-    %-  crip
-    %-  join-en-urle  :~
-      (trip consumer-secret)
-      (trip ?^(tok token-secret.tok ''))
+  ++  SIGNING-KEY
+    %-  CRIP
+    %-  JOIN-EN-URLE  :~
+      (TRIP CONSUMER-SECRET)
+      (TRIP ?^(TOK TOKEN-SECRET.TOK ''))
     ==
   --
 ::
-++  add-auth-header
-  |=  {extra/quay request/{url/purl meth hed/math (unit octs)}}
-  ^-  hiss
-  ::  =.  url.request  [| `6.000 [%& /localhost]]       ::  for use with unix nc
-  ~&  add-auth-header+(en-purl:html url.request)
-  %_    request
-      hed
-    (~(add ja hed.request) %authorization (header:auth extra request))
+++  ADD-AUTH-HEADER
+  |=  {EXTRA/QUAY REQUEST/{URL/PURL METH HED/MATH (UNIT OCTS)}}
+  ^-  HISS
+  ::  =.  URL.REQUEST  [| `6.000 [%& /LOCALHOST]]       ::  FOR USE WITH UNIX NC
+  ~&  ADD-AUTH-HEADER+(EN-PURL:HTML URL.REQUEST)
+  %_    REQUEST
+      HED
+    (~(ADD JA HED.REQUEST) %AUTHORIZATION (HEADER:AUTH EXTRA REQUEST))
   ==
-::  expected semantics, to be copied and modified if anything doesn't work
-++  standard
-  |*  {done/* save/$-(token *)}                         ::  save/$-(token _done)
+::  EXPECTED SEMANTICS, TO BE COPIED AND MODIFIED IF ANYTHING DOESN'T WORK
+++  STANDARD
+  |*  {DONE/* SAVE/$-(TOKEN *)}                         ::  SAVE/$-(TOKEN _DONE)
   |%
-  ++  save  ^-($-(token _done) ^save)                   ::  shadow(type canary)
-  ++  core-move  $^({sec-move _done} sec-move)          ::  stateful
+  ++  SAVE  ^-($-(TOKEN _DONE) ^SAVE)                   ::  SHADOW(TYPE CANARY)
+  ++  CORE-MOVE  $^({SEC-MOVE _DONE} SEC-MOVE)          ::  STATEFUL
   ::
-  ::  use token to sign authorization header. expects:
-  ::    ++  res  res-handle-request-token               ::  save request token
-  ::    ++  in   (in-token-exhange 'http://...')        ::  handle callback
-  ++  out-add-header
-    |=  {request-url/$@(@t purl) dialog-url/$@(@t purl)}
+  ::  USE TOKEN TO SIGN AUTHORIZATION HEADER. EXPECTS:
+  ::    ++  RES  RES-HANDLE-REQUEST-TOKEN               ::  SAVE REQUEST TOKEN
+  ::    ++  IN   (IN-TOKEN-EXHANGE 'HTTP://...')        ::  HANDLE CALLBACK
+  ++  OUT-ADD-HEADER
+    |=  {REQUEST-URL/$@(@T PURL) DIALOG-URL/$@(@T PURL)}
     ::
-    |=  a/hiss  ^-  $%({$send hiss} {$show purl})
-    ?-    tok
+    |=  A/HISS  ^-  $%({$SEND HISS} {$SHOW PURL})
+    ?-    TOK
         ~
-      [%send (add-auth-header ~ (request-token request-url))]
+      [%SEND (ADD-AUTH-HEADER ~ (REQUEST-TOKEN REQUEST-URL))]
     ::
-        {$access-token ^}
-      [%send (add-auth-header [oauth-token+oauth-token.tok]~ a)]
+        {$ACCESS-TOKEN ^}
+      [%SEND (ADD-AUTH-HEADER [OAUTH-TOKEN+OAUTH-TOKEN.TOK]~ A)]
     ::
-        {$request-token ^}
-      [%show (auth-url dialog-url)]
+        {$REQUEST-TOKEN ^}
+      [%SHOW (AUTH-URL DIALOG-URL)]
     ==
   ::
-  ::  If no token is saved, the http response we just got has a request token
-  ++  res-handle-request-token
-    |=  a/httr  ^-  core-move
-    ?^  tok  [%give a]
-    ?.  =(%true (grab-quay r.a 'oauth_callback_confirmed'))
-      ~|(%callback-rejected !!)
-    =+  request-token=(grab-token-response a)
-    [[%redo ~] (save `token`[%request-token request-token])]
+  ::  IF NO TOKEN IS SAVED, THE HTTP RESPONSE WE JUST GOT HAS A REQUEST TOKEN
+  ++  RES-HANDLE-REQUEST-TOKEN
+    |=  A/HTTR  ^-  CORE-MOVE
+    ?^  TOK  [%GIVE A]
+    ?.  =(%TRUE (GRAB-QUAY R.A 'OAUTH_CALLBACK_CONFIRMED'))
+      ~|(%CALLBACK-REJECTED !!)
+    =+  REQUEST-TOKEN=(GRAB-TOKEN-RESPONSE A)
+    [[%REDO ~] (SAVE `TOKEN`[%REQUEST-TOKEN REQUEST-TOKEN])]
   ::
-  ::  Exchange oauth_token in query string for access token. expects:
-  ::    ++  bak  bak-save-token                         :: save access token
-  ++  in-exchange-token
-    |=  exchange-url/$@(@t purl)
+  ::  EXCHANGE OAUTH_TOKEN IN QUERY STRING FOR ACCESS TOKEN. EXPECTS:
+  ::    ++  BAK  BAK-SAVE-TOKEN                         :: SAVE ACCESS TOKEN
+  ++  IN-EXCHANGE-TOKEN
+    |=  EXCHANGE-URL/$@(@T PURL)
     ::
-    |=  a/quay  ^-  sec-move
-    ?>  (check-token-quay a)
-    [%send (add-auth-header a (exchange-token exchange-url))]
+    |=  A/QUAY  ^-  SEC-MOVE
+    ?>  (CHECK-TOKEN-QUAY A)
+    [%SEND (ADD-AUTH-HEADER A (EXCHANGE-TOKEN EXCHANGE-URL))]
   ::
-  ::  If a valid access token has been returned, save it
-  ++  bak-save-token
-    |=  a/httr  ^-  core-move
-    ?:  (bad-response p.a)
-      [%give a]  :: [%redo ~]  ::  handle 4xx?
-    ?.  (check-screen-name a)
-      [[%redo ~] (save `token`~)]
-    =+  access-token=(grab-token-response a)
-    [[%redo ~] (save `token`[%access-token access-token])]
+  ::  IF A VALID ACCESS TOKEN HAS BEEN RETURNED, SAVE IT
+  ++  BAK-SAVE-TOKEN
+    |=  A/HTTR  ^-  CORE-MOVE
+    ?:  (BAD-RESPONSE P.A)
+      [%GIVE A]  :: [%REDO ~]  ::  HANDLE 4XX?
+    ?.  (CHECK-SCREEN-NAME A)
+      [[%REDO ~] (SAVE `TOKEN`~)]
+    =+  ACCESS-TOKEN=(GRAB-TOKEN-RESPONSE A)
+    [[%REDO ~] (SAVE `TOKEN`[%ACCESS-TOKEN ACCESS-TOKEN])]
   --
 --
 ::
-::::  Example "standard" sec/ core:
+::::  EXAMPLE "STANDARD" SEC/ CORE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth1
+::  /+    OAUTH1
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale keys:oauth1) tok/token:oauth1}
-::  ++  aut  (~(standard oauth1 bal tok) . |=(tok/token:oauth1 +>(tok tok)))
-::  ++  out
-::    %+  out-add-header:aut
-::      request-token='https://my-api.com/request_token'
-::    oauth-dialog='https://my-api.com/authorize'
+::  |_  {BAL/(BALE KEYS:OAUTH1) TOK/TOKEN:OAUTH1}
+::  ++  AUT  (~(STANDARD OAUTH1 BAL TOK) . |=(TOK/TOKEN:OAUTH1 +>(TOK TOK)))
+::  ++  OUT
+::    %+  OUT-ADD-HEADER:AUT
+::      REQUEST-TOKEN='HTTPS://MY-API.COM/REQUEST_TOKEN'
+::    OAUTH-DIALOG='HTTPS://MY-API.COM/AUTHORIZE'
 ::  ::
-::  ++  res  res-handle-request-token:aut
-::  ++  in
-::    %-  in-exchagne-token:aut
-::    exchange-url='https://my-api.com/access_token'
+::  ++  RES  RES-HANDLE-REQUEST-TOKEN:AUT
+::  ++  IN
+::    %-  IN-EXCHAGNE-TOKEN:AUT
+::    EXCHANGE-URL='HTTPS://MY-API.COM/ACCESS_TOKEN'
 ::  ::
-::  ++  bak  bak-save-token:aut
+::  ++  BAK  BAK-SAVE-TOKEN:AUT
 ::  --
 ::
 ::
-::::  Equivalent imperative code:
+::::  EQUIVALENT IMPERATIVE CODE:
   ::
 ::
 ::  ::
-::  ::::  /hoon/my-api/com/sec
+::  ::::  /HOON/MY-API/COM/SEC
 ::    ::
-::  /+    oauth1
+::  /+    OAUTH1
 ::  ::
 ::  ::::
 ::    ::
-::  |_  {bal/(bale keys:oauth1) tok/token:oauth1}
-::  ++  aut  ~(. oauth1 bal tok)
-::  ++  out  ::  add header
-::    =+  aut
-::    |=  req/hiss  ^-  $%({$send hiss} {$show purl})
-::    ?~  tok
-::      [%send (add-auth-header ~ (request-token 'https://my-api.com/request_token'))]
-::    ?:  ?=($request-token -.tok)
-::      [%show (auth-url 'https://my-api.com/authorize')]
-::    [%send (add-auth-header [oauth-token+ouath-token.tok]~ req)]
+::  |_  {BAL/(BALE KEYS:OAUTH1) TOK/TOKEN:OAUTH1}
+::  ++  AUT  ~(. OAUTH1 BAL TOK)
+::  ++  OUT  ::  ADD HEADER
+::    =+  AUT
+::    |=  REQ/HISS  ^-  $%({$SEND HISS} {$SHOW PURL})
+::    ?~  TOK
+::      [%SEND (ADD-AUTH-HEADER ~ (REQUEST-TOKEN 'HTTPS://MY-API.COM/REQUEST_TOKEN'))]
+::    ?:  ?=($REQUEST-TOKEN -.TOK)
+::      [%SHOW (AUTH-URL 'HTTPS://MY-API.COM/AUTHORIZE')]
+::    [%SEND (ADD-AUTH-HEADER [OAUTH-TOKEN+OUATH-TOKEN.TOK]~ REQ)]
 ::  ::
-::  ++  res  :: handle request token
-::    =+  aut
-::    |=  res/httr  ^-  $%({{$redo ~} _..res} {$give httr})
-::    ?^  tok  [%give a]
-::    ?>  =(%true (grab r.res 'oauth_callback_confirmed'))
-::    =.  tok  [%request-token (grab-token-response res)]
-::    [[%redo ~] ..res]
+::  ++  RES  :: HANDLE REQUEST TOKEN
+::    =+  AUT
+::    |=  RES/HTTR  ^-  $%({{$REDO ~} _..RES} {$GIVE HTTR})
+::    ?^  TOK  [%GIVE A]
+::    ?>  =(%TRUE (GRAB R.RES 'OAUTH_CALLBACK_CONFIRMED'))
+::    =.  TOK  [%REQUEST-TOKEN (GRAB-TOKEN-RESPONSE RES)]
+::    [[%REDO ~] ..RES]
 ::  ::
-::  ++  in  ::  exchange token
-::    =+  aut
-::    |=  inp/quay  ^-  {$send hiss}
-::    ?>  (check-token-quay inp)
-::    :-  %send
-::    (add-auth-header inp (exchange-token 'https://my-api.com/access_token'))
+::  ++  IN  ::  EXCHANGE TOKEN
+::    =+  AUT
+::    |=  INP/QUAY  ^-  {$SEND HISS}
+::    ?>  (CHECK-TOKEN-QUAY INP)
+::    :-  %SEND
+::    (ADD-AUTH-HEADER INP (EXCHANGE-TOKEN 'HTTPS://MY-API.COM/ACCESS_TOKEN'))
 ::  ::
-::  ++  bak  ::  save token
-::    =+  aut
-::    |=  bak/httr  ^-  $%({{$redo ~} _..bak} {$give httr})
-::    ?:  (bad-response bak)  [%give bak]
-::    =.  tok  [%access-token (grab-token-response res)]
-::    [[%redo ~] ..bak]
+::  ++  BAK  ::  SAVE TOKEN
+::    =+  AUT
+::    |=  BAK/HTTR  ^-  $%({{$REDO ~} _..BAK} {$GIVE HTTR})
+::    ?:  (BAD-RESPONSE BAK)  [%GIVE BAK]
+::    =.  TOK  [%ACCESS-TOKEN (GRAB-TOKEN-RESPONSE RES)]
+::    [[%REDO ~] ..BAK]
 ::  --
 ::

@@ -1,11 +1,11 @@
 ::
-::::  /hoon/do-claim/womb/mar
+::::  /HOON/DO-CLAIM/WOMB/MAR
   ::
 /?    310
-|_  {path @}
+|_  {PATH @}
 ::
-++  grab                                                ::  convert from
+++  GRAB                                                ::  CONVERT FROM
   |%
-  ++  noun  {path @}                                    ::  clam from %noun
+  ++  NOUN  {PATH @}                                    ::  CLAM FROM %NOUN
   --
 --

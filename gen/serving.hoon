@@ -1,12 +1,12 @@
-::  Eyre: show web base path
+::  EYRE: SHOW WEB BASE PATH
 ::
-::::  /hoon/serving/gen
+::::  /HOON/SERVING/GEN
   ::
 /?    310
 ::
 ::::
   ::
-:-  %say
-|=  [[now=time @ our=ship ^] ~ ~]
-:-  %noun
-.^(path %e (en-beam:format [our %serv da+now] /))
+:-  %SAY
+|=  [[NOW=TIME @ OUR=SHIP ^] ~ ~]
+:-  %NOUN
+.^(PATH %E (EN-BEAM:FORMAT [OUR %SERV DA+NOW] /))

@@ -1,82 +1,82 @@
-/+  test-runner
-/=  all-tests
-  /^  (map path (list test-arm:test-runner))
-  /:  /===/tests
-  /*  /test-gen/
+/+  TEST-RUNNER
+/=  ALL-TESTS
+  /^  (MAP PATH (LIST TEST-ARM:TEST-RUNNER))
+  /:  /===/TESTS
+  /*  /TEST-GEN/
 ::
 |%
-++  main
-  |=  [defer=? tests=(list test:test-runner)]
-  ^-  tang
+++  MAIN
+  |=  [DEFER=? TESTS=(LIST TEST:TEST-RUNNER)]
+  ^-  TANG
   ::
-  %-  zing
-  %+  turn  tests
-  |=  [=path test-func=test-func:test-runner]
-  ^-  tang
+  %-  ZING
+  %+  TURN  TESTS
+  |=  [=PATH TEST-FUNC=TEST-FUNC:TEST-RUNNER]
+  ^-  TANG
   ::
-  =/  test-results=tang  (run-test path test-func)
-  ::  if :defer is set, produce errors; otherwise print them and produce ~
+  =/  TEST-RESULTS=TANG  (RUN-TEST PATH TEST-FUNC)
+  ::  IF :DEFER IS SET, PRODUCE ERRORS; OTHERWISE PRINT THEM AND PRODUCE ~
   ::
-  ?:  defer
-    test-results
-  ((slog (flop test-results)) ~)
+  ?:  DEFER
+    TEST-RESULTS
+  ((SLOG (FLOP TEST-RESULTS)) ~)
 ::
-++  run-test
-  ::  executes an individual test.
-  |=  [pax=path test=test-func:test-runner]
-  ^-  tang
-  =+  name=(spud pax)
-  =+  run=(mule test)
-  ?-  -.run
-    %|  ::  the stack is already flopped for output?
-        ;:  weld
-          p.run
-          `tang`[[%leaf (weld "CRASHED " name)] ~]
+++  RUN-TEST
+  ::  EXECUTES AN INDIVIDUAL TEST.
+  |=  [PAX=PATH TEST=TEST-FUNC:TEST-RUNNER]
+  ^-  TANG
+  =+  NAME=(SPUD PAX)
+  =+  RUN=(MULE TEST)
+  ?-  -.RUN
+    %|  ::  THE STACK IS ALREADY FLOPPED FOR OUTPUT?
+        ;:  WELD
+          P.RUN
+          `TANG`[[%LEAF (WELD "CRASHED " NAME)] ~]
         ==
-    %&  ?:  =(~ p.run)
-          [[%leaf (weld "OK      " name)] ~]
-        ::  Create a welded list of all failures indented.
-        %-  flop
-        ;:  weld
-          `tang`[[%leaf (weld "FAILED  " name)] ~]
-          ::TODO indent
-          :: %+  turn  p:run
-          ::   |=  {i/tape}
-          ::   ^-  tank
-          ::   [%leaf (weld "  " i)]
-          p.run
+    %&  ?:  =(~ P.RUN)
+          [[%LEAF (WELD "OK      " NAME)] ~]
+        ::  CREATE A WELDED LIST OF ALL FAILURES INDENTED.
+        %-  FLOP
+        ;:  WELD
+          `TANG`[[%LEAF (WELD "FAILED  " NAME)] ~]
+          ::TODO INDENT
+          :: %+  TURN  P:RUN
+          ::   |=  {I/TAPE}
+          ::   ^-  TANK
+          ::   [%LEAF (WELD "  " I)]
+          P.RUN
         ==
   ==
-::  +filter-tests-by-prefix
+::  +FILTER-TESTS-BY-PREFIX
 ::
-++  filter-tests-by-prefix
-  |=  [prefix=path tests=(list test:test-runner)]
-  ^+  tests
+++  FILTER-TESTS-BY-PREFIX
+  |=  [PREFIX=PATH TESTS=(LIST TEST:TEST-RUNNER)]
+  ^+  TESTS
   ::
-  =/  prefix-length=@ud  (lent prefix)
+  =/  PREFIX-LENGTH=@UD  (LENT PREFIX)
   ::
-  %+  skim  tests
+  %+  SKIM  TESTS
   ::
-  |=  [=path *]
-  =(prefix (scag prefix-length path))
+  |=  [=PATH *]
+  =(PREFIX (SCAG PREFIX-LENGTH PATH))
 --
 ::
-:-  %say
-|=  $:  [now=@da eny=@uvJ bec=beak]
-        [filter=$?(~ [pax=path ~])]
-        [defer=_& seed=?(~ @uvJ)]
+:-  %SAY
+|=  $:  [NOW=@DA ENY=@UVJ BEC=BEAK]
+        [FILTER=$?(~ [PAX=PATH ~])]
+        [DEFER=_& SEED=?(~ @UVJ)]
     ==
-::  start printing early if we're not deferring output
+::  START PRINTING EARLY IF WE'RE NOT DEFERRING OUTPUT
 ::
-~?  !defer  %tests-compiled
-:-  %tang
-::  use empty path prefix if unspecified
+~?  !DEFER  %TESTS-COMPILED
+:-  %TANG
+::  USE EMPTY PATH PREFIX IF UNSPECIFIED
 ::
-=/  prefix=path  ?~(filter ~ pax.filter)
+=/  PREFIX=PATH  ?~(FILTER ~ PAX.FILTER)
 ::
-=/  filtered-tests=(list test:test-runner)
-  %+  filter-tests-by-prefix
-    prefix
-  (resolve-test-paths:test-runner all-tests)
+=/  FILTERED-TESTS=(LIST TEST:TEST-RUNNER)
+  %+  FILTER-TESTS-BY-PREFIX
+    PREFIX
+  (RESOLVE-TEST-PATHS:TEST-RUNNER ALL-TESTS)
 ::
-(main defer filtered-tests)
+(MAIN DEFER FILTERED-TESTS)

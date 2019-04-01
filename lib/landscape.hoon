@@ -1,21 +1,21 @@
-|=  inner=manx
-^-  manx
-;html
+|=  INNER=MANX
+^-  MANX
+;HTML
 ::
-  ;head
-    ;title: Landscape
-    ;meta(charset "utf-8");
-    ;meta
-      =name     "viewport"
-      =content  "width=device-width, initial-scale=1, shrink-to-fit=no";
-    ;link(rel "stylesheet", href "/~~/landscape/css/index.css");
+  ;HEAD
+    ;TITLE: LANDSCAPE
+    ;META(CHARSET "UTF-8");
+    ;META
+      =NAME     "VIEWPORT"
+      =CONTENT  "WIDTH=DEVICE-WIDTH, INITIAL-SCALE=1, SHRINK-TO-FIT=NO";
+    ;LINK(REL "STYLESHEET", HREF "/~~/LANDSCAPE/CSS/INDEX.CSS");
   ==
 ::
-  ;body
-    ;div#root
-      ;+  inner
+  ;BODY
+    ;DIV#ROOT
+      ;+  INNER
     ==
-    ;script@"/~~/landscape/js/index-min.js";
+    ;SCRIPT@"/~~/LANDSCAPE/JS/INDEX-MIN.JS";
   ==
 ::
 ==

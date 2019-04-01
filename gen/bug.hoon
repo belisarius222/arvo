@@ -1,57 +1,57 @@
 !:
-:-  %say
+:-  %SAY
 |=  *
-:-  %noun
-=-  "hello, world"
+:-  %NOUN
+=-  "HELLO, WORLD"
 |%
-+$  scan  [=loop=(map =@ud =xray) =xray]
-+$  xray
-  $~  %noun
-  $@  $?  %noun
-          %void
++$  SCAN  [=LOOP=(MAP =@UD =XRAY) =XRAY]
++$  XRAY
+  $~  %NOUN
+  $@  $?  %NOUN
+          %VOID
       ==
-  $%  ::  %bark: atom selection
+  $%  ::  %BARK: ATOM SELECTION
       ::
-      [%bark =(map atom aura)]
-      ::  %bush: head-of-cell superposition
+      [%BARK =(MAP ATOM AURA)]
+      ::  %BUSH: HEAD-OF-CELL SUPERPOSITION
       ::
-      [%bush wide=xray tall=xray]
-      ::  %cell: ordered pair
+      [%BUSH WIDE=XRAY TALL=XRAY]
+      ::  %CELL: ORDERED PAIR
       ::
-      [%cell head=xray tail=xray]
-      ::  %core: functional attribute battery
+      [%CELL HEAD=XRAY TAIL=XRAY]
+      ::  %CORE: FUNCTIONAL ATTRIBUTE BATTERY
       ::
-      [%core =vair =xray =(map term (map term xray))]
-      ::  %face: namespace
+      [%CORE =VAIR =XRAY =(MAP TERM (MAP TERM XRAY))]
+      ::  %FACE: NAMESPACE
       ::
-      [%face =term =xray]
-      ::  %fork: disordered superposition
+      [%FACE =TERM =XRAY]
+      ::  %FORK: DISORDERED SUPERPOSITION
       ::
-      [%fork =(set xray)]
-      ::  %hint: context-preserving type hint
+      [%FORK =(SET XRAY)]
+      ::  %HINT: CONTEXT-PRESERVING TYPE HINT
       ::
-      [%hint [=type =note] =xray]
-      ::  %knot: recursion root
+      [%HINT [=TYPE =NOTE] =XRAY]
+      ::  %KNOT: RECURSION ROOT
       ::
-      [%knot =(set @ud) =xray]
-      ::  %loop: recursion point
+      [%KNOT =(SET @UD) =XRAY]
+      ::  %LOOP: RECURSION POINT
       ::
-      [%loop index=@ud]
-      ::  %rock: constant
+      [%LOOP INDEX=@UD]
+      ::  %ROCK: CONSTANT
       ::
-      [%rock =atom =aura]
-      ::  %root: atom/cell superposition
+      [%ROCK =ATOM =AURA]
+      ::  %ROOT: ATOM/CELL SUPERPOSITION
       ::
-      [%root flat=xray deep=xray]
-      ::  %sand: variable atom
+      [%ROOT FLAT=XRAY DEEP=XRAY]
+      ::  %SAND: VARIABLE ATOM
       ::
-      [%sand =aura]
-      ::  %wood: tagged superposition
+      [%SAND =AURA]
+      ::  %WOOD: TAGGED SUPERPOSITION
       ::
-      [%wood =(map atom (pair aura xray))]
+      [%WOOD =(MAP ATOM (PAIR AURA XRAY))]
   ==
-++  foo
-  |=  bar=xray
+++  FOO
+  |=  BAR=XRAY
   !!
 --
 

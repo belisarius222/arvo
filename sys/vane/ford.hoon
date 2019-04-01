@@ -1,6340 +1,6340 @@
-::  ford: build system vane
+::  FORD: BUILD SYSTEM VANE
 !:
-::    Ford is a functional reactive build system.
+::    FORD IS A FUNCTIONAL REACTIVE BUILD SYSTEM.
 ::
-::    A Ford build is a function of the Urbit namespace and a date that
-::    produces marked, typed data or an error.
+::    A FORD BUILD IS A FUNCTION OF THE URBIT NAMESPACE AND A DATE THAT
+::    PRODUCES MARKED, TYPED DATA OR AN ERROR.
 ::
-::    The function in the definition of a build is called a "schematic,"
-::    and it's represented by a Hoon data structure with twenty-five sub-types.
-::    A schematic is a (possibly trivial) DAG of sub-builds to be performed.
-::    The different schematic sub-types transform the results of their
-::    sub-builds in different ways.
+::    THE FUNCTION IN THE DEFINITION OF A BUILD IS CALLED A "SCHEMATIC,"
+::    AND IT'S REPRESENTED BY A HOON DATA STRUCTURE WITH TWENTY-FIVE SUB-TYPES.
+::    A SCHEMATIC IS A (POSSIBLY TRIVIAL) DAG OF SUB-BUILDS TO BE PERFORMED.
+::    THE DIFFERENT SCHEMATIC SUB-TYPES TRANSFORM THE RESULTS OF THEIR
+::    SUB-BUILDS IN DIFFERENT WAYS.
 ::
-::    We call the date in the definition of a build the "formal date" to
-::    distinguish it from the time at which the build was performed.
+::    WE CALL THE DATE IN THE DEFINITION OF A BUILD THE "FORMAL DATE" TO
+::    DISTINGUISH IT FROM THE TIME AT WHICH THE BUILD WAS PERFORMED.
 ::
-::    Each build is referentially transparent with respect to its formal date:
-::    ask to run that function on the namespace and a particular formal date,
-::    and Ford will always produce the same result.
+::    EACH BUILD IS REFERENTIALLY TRANSPARENT WITH RESPECT TO ITS FORMAL DATE:
+::    ASK TO RUN THAT FUNCTION ON THE NAMESPACE AND A PARTICULAR FORMAL DATE,
+::    AND FORD WILL ALWAYS PRODUCE THE SAME RESULT.
 ::
-::    We can now say Ford is a functional build system, since each build is a
-::    function. We have not yet explained how it's a functional reactive build
-::    system. With Ford, you can subscribe to results of a build. Ford tracks
-::    the result of a "live" build consisting of a static schematic and the
-::    ever-changing current date. Whenever this live build's result changes,
-::    Ford sends you the new result and the formal date of the build (the date
-::    which would cause the same result if you asked Ford to build that
-::    schematic again). This is a push-based FRP paradigm.
+::    WE CAN NOW SAY FORD IS A FUNCTIONAL BUILD SYSTEM, SINCE EACH BUILD IS A
+::    FUNCTION. WE HAVE NOT YET EXPLAINED HOW IT'S A FUNCTIONAL REACTIVE BUILD
+::    SYSTEM. WITH FORD, YOU CAN SUBSCRIBE TO RESULTS OF A BUILD. FORD TRACKS
+::    THE RESULT OF A "LIVE" BUILD CONSISTING OF A STATIC SCHEMATIC AND THE
+::    EVER-CHANGING CURRENT DATE. WHENEVER THIS LIVE BUILD'S RESULT CHANGES,
+::    FORD SENDS YOU THE NEW RESULT AND THE FORMAL DATE OF THE BUILD (THE DATE
+::    WHICH WOULD CAUSE THE SAME RESULT IF YOU ASKED FORD TO BUILD THAT
+::    SCHEMATIC AGAIN). THIS IS A PUSH-BASED FRP PARADIGM.
 ::
-::    The implementation is event-driven, like the rest of Urbit. While
-::    performing a build, Ford registers each namespace access as a dependency
-::    and also notes whether the dependency is "live," meaning the path within
-::    the namespace updates with time. For example a live Clay dependency would
-::    update the +case within the +beam over time.
+::    THE IMPLEMENTATION IS EVENT-DRIVEN, LIKE THE REST OF URBIT. WHILE
+::    PERFORMING A BUILD, FORD REGISTERS EACH NAMESPACE ACCESS AS A DEPENDENCY
+::    AND ALSO NOTES WHETHER THE DEPENDENCY IS "LIVE," MEANING THE PATH WITHIN
+::    THE NAMESPACE UPDATES WITH TIME. FOR EXAMPLE A LIVE CLAY DEPENDENCY WOULD
+::    UPDATE THE +CASE WITHIN THE +BEAM OVER TIME.
 ::
-::    A request to perform a build without subscribing to its future changes is
-::    called a "once build."
+::    A REQUEST TO PERFORM A BUILD WITHOUT SUBSCRIBING TO ITS FUTURE CHANGES IS
+::    CALLED A "ONCE BUILD."
 ::
-::    After finishing a build, Ford subscribes to updates on the build's
-::    dependencies. For now, this just means it subscribes to Clay for file
-::    changes. Whenever any of the files in the subscription have new contents,
-::    Clay will notify Ford, which will then rerun any live builds that depend
-::    on any of the changed files and send its subscribers the new results.
+::    AFTER FINISHING A BUILD, FORD SUBSCRIBES TO UPDATES ON THE BUILD'S
+::    DEPENDENCIES. FOR NOW, THIS JUST MEANS IT SUBSCRIBES TO CLAY FOR FILE
+::    CHANGES. WHENEVER ANY OF THE FILES IN THE SUBSCRIPTION HAVE NEW CONTENTS,
+::    CLAY WILL NOTIFY FORD, WHICH WILL THEN RERUN ANY LIVE BUILDS THAT DEPEND
+::    ON ANY OF THE CHANGED FILES AND SEND ITS SUBSCRIBERS THE NEW RESULTS.
 ::
-::    This matches the semantics of live builds defined above. If someone had
-::    asked for a build of the schematic with a formal date d2 just before the
-::    changed Clay files, Ford would respond with the result of the previous
-::    build with formal date d1, which would still be an accurate
-::    representation of the schematic's result at d2, since Ford knows none of
-::    its dependencies changed between d1 and d2.
+::    THIS MATCHES THE SEMANTICS OF LIVE BUILDS DEFINED ABOVE. IF SOMEONE HAD
+::    ASKED FOR A BUILD OF THE SCHEMATIC WITH A FORMAL DATE D2 JUST BEFORE THE
+::    CHANGED CLAY FILES, FORD WOULD RESPOND WITH THE RESULT OF THE PREVIOUS
+::    BUILD WITH FORMAL DATE D1, WHICH WOULD STILL BE AN ACCURATE
+::    REPRESENTATION OF THE SCHEMATIC'S RESULT AT D2, SINCE FORD KNOWS NONE OF
+::    ITS DEPENDENCIES CHANGED BETWEEN D1 AND D2.
 ::
-::    Note that Ford can only calculate dependencies after running a build,
-::    not before. This is because Ford can be thought of as an interpreter for
-::    schematics, rather than a compiler, in the sense that it can't have a
-::    dependency-gathering step followed by a build step. The dependencies of
-::    some schematics must be calculated based on results, e.g. the %alts
-::    schematic, which tries a sequence of sub-builds until one succeeds. If
-::    the first sub-build succeeds, the build depends only on that first
-::    sub-build, but if the first fails and the second succeeds, the build
-::    depends on both.
+::    NOTE THAT FORD CAN ONLY CALCULATE DEPENDENCIES AFTER RUNNING A BUILD,
+::    NOT BEFORE. THIS IS BECAUSE FORD CAN BE THOUGHT OF AS AN INTERPRETER FOR
+::    SCHEMATICS, RATHER THAN A COMPILER, IN THE SENSE THAT IT CAN'T HAVE A
+::    DEPENDENCY-GATHERING STEP FOLLOWED BY A BUILD STEP. THE DEPENDENCIES OF
+::    SOME SCHEMATICS MUST BE CALCULATED BASED ON RESULTS, E.G. THE %ALTS
+::    SCHEMATIC, WHICH TRIES A SEQUENCE OF SUB-BUILDS UNTIL ONE SUCCEEDS. IF
+::    THE FIRST SUB-BUILD SUCCEEDS, THE BUILD DEPENDS ONLY ON THAT FIRST
+::    SUB-BUILD, BUT IF THE FIRST FAILS AND THE SECOND SUCCEEDS, THE BUILD
+::    DEPENDS ON BOTH.
 ::
-::    This dynamicity implies we don't know what we depend on until we depend
-::    on it. Most build systems have this property, but this part of Ford's
-::    job is easier than for most Unix-based build systems: Ford draws all
-::    resources from an immutable namespace, and it can track every access of
-::    that namespace.
+::    THIS DYNAMICITY IMPLIES WE DON'T KNOW WHAT WE DEPEND ON UNTIL WE DEPEND
+::    ON IT. MOST BUILD SYSTEMS HAVE THIS PROPERTY, BUT THIS PART OF FORD'S
+::    JOB IS EASIER THAN FOR MOST UNIX-BASED BUILD SYSTEMS: FORD DRAWS ALL
+::    RESOURCES FROM AN IMMUTABLE NAMESPACE, AND IT CAN TRACK EVERY ACCESS OF
+::    THAT NAMESPACE.
 ::
-::    Ford might produce a build's result asynchronously, in a subsequent Arvo
-::    event. This happens when accessing the namespace doesn't complete
-::    synchronously, such as when grabbing a file from another ship. Ford
-::    guarantees it will respond with build results in chronological order
-::    using the formal date, not the order in which the builds completed.
+::    FORD MIGHT PRODUCE A BUILD'S RESULT ASYNCHRONOUSLY, IN A SUBSEQUENT ARVO
+::    EVENT. THIS HAPPENS WHEN ACCESSING THE NAMESPACE DOESN'T COMPLETE
+::    SYNCHRONOUSLY, SUCH AS WHEN GRABBING A FILE FROM ANOTHER SHIP. FORD
+::    GUARANTEES IT WILL RESPOND WITH BUILD RESULTS IN CHRONOLOGICAL ORDER
+::    USING THE FORMAL DATE, NOT THE ORDER IN WHICH THE BUILDS COMPLETED.
 ::
-::    Ford does not guarantee it will notify a subscriber of a changed build
-::    only once per change. In common usage it will not send duplicate
-::    notifications, but it might if its cache was recently wiped.
+::    FORD DOES NOT GUARANTEE IT WILL NOTIFY A SUBSCRIBER OF A CHANGED BUILD
+::    ONLY ONCE PER CHANGE. IN COMMON USAGE IT WILL NOT SEND DUPLICATE
+::    NOTIFICATIONS, BUT IT MIGHT IF ITS CACHE WAS RECENTLY WIPED.
 ::
-::    Ford uses dependency tracking, caching, and results of previous builds
-::    to eliminate excess work. When rerunning a live build, Ford "promotes"
-::    previous results to the new time if the build's dependencies hvaen't
-::    changed since the previous build's formal date. Ford does this check
-::    for each build in a tree of sub-builds under the "root build," which
-::    is the build that was requested directly.
+::    FORD USES DEPENDENCY TRACKING, CACHING, AND RESULTS OF PREVIOUS BUILDS
+::    TO ELIMINATE EXCESS WORK. WHEN RERUNNING A LIVE BUILD, FORD "PROMOTES"
+::    PREVIOUS RESULTS TO THE NEW TIME IF THE BUILD'S DEPENDENCIES HVAEN'T
+::    CHANGED SINCE THE PREVIOUS BUILD'S FORMAL DATE. FORD DOES THIS CHECK
+::    FOR EACH BUILD IN A TREE OF SUB-BUILDS UNDER THE "ROOT BUILD," WHICH
+::    IS THE BUILD THAT WAS REQUESTED DIRECTLY.
 ::
-::    In addition to the main %build +task sub-type, Ford also supports
-::    four other commands:
+::    IN ADDITION TO THE MAIN %BUILD +TASK SUB-TYPE, FORD ALSO SUPPORTS
+::    FOUR OTHER COMMANDS:
 ::
-::    %kill: cancel a build
+::    %KILL: CANCEL A BUILD
 ::
-::      A once build in progress will be canceled, including all of its
-::      sub-builds that aren't part of any other builds.
+::      A ONCE BUILD IN PROGRESS WILL BE CANCELED, INCLUDING ALL OF ITS
+::      SUB-BUILDS THAT AREN'T PART OF ANY OTHER BUILDS.
 ::
-::      A live build's subscriptions will be canceled, its completed results
-::      will be deleted, and its dependency tracking information will be
-::      deleted. If a rebuild is in progress, it will be canceled.
+::      A LIVE BUILD'S SUBSCRIPTIONS WILL BE CANCELED, ITS COMPLETED RESULTS
+::      WILL BE DELETED, AND ITS DEPENDENCY TRACKING INFORMATION WILL BE
+::      DELETED. IF A REBUILD IS IN PROGRESS, IT WILL BE CANCELED.
 ::
-::    %keep: resize caches
+::    %KEEP: RESIZE CACHES
 ::
-::      Ford maintains two caches: a :compiler-cache that stores
-::      content-addressed compiler operations, such as parsing, compiling,
-::      and type inference; and a :build-cache that stores previously
-::      completed build trees along with their results and dependency tracking.
+::      FORD MAINTAINS TWO CACHES: A :COMPILER-CACHE THAT STORES
+::      CONTENT-ADDRESSED COMPILER OPERATIONS, SUCH AS PARSING, COMPILING,
+::      AND TYPE INFERENCE; AND A :BUILD-CACHE THAT STORES PREVIOUSLY
+::      COMPLETED BUILD TREES ALONG WITH THEIR RESULTS AND DEPENDENCY TRACKING.
 ::
-::      The %keep command resets the maximum sizes of these caches, deleting
-::      entries if necessary.
+::      THE %KEEP COMMAND RESETS THE MAXIMUM SIZES OF THESE CACHES, DELETING
+::      ENTRIES IF NECESSARY.
 ::
-::    %wipe: decimate storage
+::    %WIPE: DECIMATE STORAGE
 ::
-::      The %wipe command removes build results from storage to free memory.
-::      It deletes the specified percentage of build results, in LRU
-::      (Least Recently Used) order. It also removes entries from the compiler
-::      cache. It does not remove dependency tracking information.
+::      THE %WIPE COMMAND REMOVES BUILD RESULTS FROM STORAGE TO FREE MEMORY.
+::      IT DELETES THE SPECIFIED PERCENTAGE OF BUILD RESULTS, IN LRU
+::      (LEAST RECENTLY USED) ORDER. IT ALSO REMOVES ENTRIES FROM THE COMPILER
+::      CACHE. IT DOES NOT REMOVE DEPENDENCY TRACKING INFORMATION.
 ::
-::    %wegh: report memory usage
+::    %WEGH: REPORT MEMORY USAGE
 ::
-::      Like all vanes, Ford can also be asked to produce a human-readable
-::      report of its memory usage. Nock cannot calculate its own memory use
-::      directly, so instead we produce the nouns themselves, which the runtime
-::      "weighs" based on its memory model.
+::      LIKE ALL VANES, FORD CAN ALSO BE ASKED TO PRODUCE A HUMAN-READABLE
+::      REPORT OF ITS MEMORY USAGE. NOCK CANNOT CALCULATE ITS OWN MEMORY USE
+::      DIRECTLY, SO INSTEAD WE PRODUCE THE NOUNS THEMSELVES, WHICH THE RUNTIME
+::      "WEIGHS" BASED ON ITS MEMORY MODEL.
 ::
-::    For details on Ford's implementation, consult Ford's vane interface core
-::    near the bottom of the file.
+::    FOR DETAILS ON FORD'S IMPLEMENTATION, CONSULT FORD'S VANE INTERFACE CORE
+::    NEAR THE BOTTOM OF THE FILE.
 ::
-::  pit: a +vase of the hoon+zuse kernel, which is a deeply nested core
+::  PIT: A +VASE OF THE HOON+ZUSE KERNEL, WHICH IS A DEEPLY NESTED CORE
 ::
-|=  pit=vase
+|=  PIT=VASE
 ::
-=,  contain
-=,  ford
-::  ford internal data structures
+=,  CONTAIN
+=,  FORD
+::  FORD INTERNAL DATA STRUCTURES
 ::
 =>  =~
 |%
-::  +move: arvo moves that ford can emit
+::  +MOVE: ARVO MOVES THAT FORD CAN EMIT
 ::
-+=  move
++=  MOVE
   ::
-  $:  ::  duct: request identifier
+  $:  ::  DUCT: REQUEST IDENTIFIER
       ::
-      =duct
-      ::  card: move contents; either a +note or a +gift:able
+      =DUCT
+      ::  CARD: MOVE CONTENTS; EITHER A +NOTE OR A +GIFT:ABLE
       ::
-      card=(wind note gift:able)
+      CARD=(WIND NOTE GIFT:ABLE)
   ==
-::  +note: private request from ford to another vane
+::  +NOTE: PRIVATE REQUEST FROM FORD TO ANOTHER VANE
 ::
-+=  note
-  $%  ::  %c: to clay
++=  NOTE
+  $%  ::  %C: TO CLAY
       ::
-      $:  %c
-          ::  %warp: internal (intra-ship) file request
+      $:  %C
+          ::  %WARP: INTERNAL (INTRA-SHIP) FILE REQUEST
           ::
-          $%  $:  %warp
-                  ::  ship: target for request
+          $%  $:  %WARP
+                  ::  SHIP: TARGET FOR REQUEST
                   ::
-                  =ship
-                  ::  riff: clay request contents
+                  =SHIP
+                  ::  RIFF: CLAY REQUEST CONTENTS
                   ::
-                  riff=riff:clay
+                  RIFF=RIFF:CLAY
   ==  ==  ==  ==
-::  +sign: private response from another vane to ford
+::  +SIGN: PRIVATE RESPONSE FROM ANOTHER VANE TO FORD
 ::
-+=  sign
-  $%  ::  %c: from clay
++=  SIGN
+  $%  ::  %C: FROM CLAY
       ::
-      $:  %c
-          ::  %writ: internal (intra-ship) file response
+      $:  %C
+          ::  %WRIT: INTERNAL (INTRA-SHIP) FILE RESPONSE
           ::
-          $%  $:  %writ
-                  ::  riot: response contents
+          $%  $:  %WRIT
+                  ::  RIOT: RESPONSE CONTENTS
                   ::
-                  riot=riot:clay
+                  RIOT=RIOT:CLAY
               ==
-              ::  %wris: response to %mult; many changed files
+              ::  %WRIS: RESPONSE TO %MULT; MANY CHANGED FILES
               ::
-              $:  %wris
-                  ::  case: case of the new files
+              $:  %WRIS
+                  ::  CASE: CASE OF THE NEW FILES
                   ::
-                  ::    %wris can only return dates to us.
+                  ::    %WRIS CAN ONLY RETURN DATES TO US.
                   ::
-                  case=[%da p=@da]
-                  ::  care-paths: the +care:clay and +path of each file
+                  CASE=[%DA P=@DA]
+                  ::  CARE-PATHS: THE +CARE:CLAY AND +PATH OF EACH FILE
                   ::
-                  care-paths=(set [care=care:clay =path])
+                  CARE-PATHS=(SET [CARE=CARE:CLAY =PATH])
   ==  ==  ==  ==
 --
 |%
-::  +axle: overall ford state
+::  +AXLE: OVERALL FORD STATE
 ::
-+=  axle
-  $:  ::  date: date at which ford's state was updated to this data structure
++=  AXLE
+  $:  ::  DATE: DATE AT WHICH FORD'S STATE WAS UPDATED TO THIS DATA STRUCTURE
       ::
-      date=%~2018.12.13
-      ::  state: all persistent state
+      DATE=%~2018.12.13
+      ::  STATE: ALL PERSISTENT STATE
       ::
-      state=ford-state
+      STATE=FORD-STATE
   ==
-::  +ford-state: all state that ford maintains
+::  +FORD-STATE: ALL STATE THAT FORD MAINTAINS
 ::
-+=  ford-state
-  $:  ::  builds: per-build state machine for all builds
++=  FORD-STATE
+  $:  ::  BUILDS: PER-BUILD STATE MACHINE FOR ALL BUILDS
       ::
-      ::    Ford holds onto all in-progress builds that were either directly
-      ::    requested by a duct (root builds) or that are dependencies
-      ::    (sub-builds) of a directly requested build.
+      ::    FORD HOLDS ONTO ALL IN-PROGRESS BUILDS THAT WERE EITHER DIRECTLY
+      ::    REQUESTED BY A DUCT (ROOT BUILDS) OR THAT ARE DEPENDENCIES
+      ::    (SUB-BUILDS) OF A DIRECTLY REQUESTED BUILD.
       ::
-      ::    It also stores the last completed version of each live build tree
-      ::    (root build and sub-builds), and any cached builds.
+      ::    IT ALSO STORES THE LAST COMPLETED VERSION OF EACH LIVE BUILD TREE
+      ::    (ROOT BUILD AND SUB-BUILDS), AND ANY CACHED BUILDS.
       ::
-      builds=(map build build-status)
-      ::  ducts: per-duct state machine for all incoming ducts (build requests)
+      BUILDS=(MAP BUILD BUILD-STATUS)
+      ::  DUCTS: PER-DUCT STATE MACHINE FOR ALL INCOMING DUCTS (BUILD REQUESTS)
       ::
-      ::    Ford tracks every duct that has requested a build until it has
-      ::    finished dealing with that request.
+      ::    FORD TRACKS EVERY DUCT THAT HAS REQUESTED A BUILD UNTIL IT HAS
+      ::    FINISHED DEALING WITH THAT REQUEST.
       ::
-      ::    For live ducts, we store the duct while we repeatedly run new
-      ::    versions of the live build it requested until it is explicitly
-      ::    canceled by the requester.
+      ::    FOR LIVE DUCTS, WE STORE THE DUCT WHILE WE REPEATEDLY RUN NEW
+      ::    VERSIONS OF THE LIVE BUILD IT REQUESTED UNTIL IT IS EXPLICITLY
+      ::    CANCELED BY THE REQUESTER.
       ::
-      ::    A once (non-live) duct, on the other hand, will be removed
-      ::    as soon as the requested build has been completed.
+      ::    A ONCE (NON-LIVE) DUCT, ON THE OTHER HAND, WILL BE REMOVED
+      ::    AS SOON AS THE REQUESTED BUILD HAS BEEN COMPLETED.
       ::
-      ducts=(map duct duct-status)
-      ::  builds-by-schematic: all attempted builds, sorted by time
+      DUCTS=(MAP DUCT DUCT-STATUS)
+      ::  BUILDS-BY-SCHEMATIC: ALL ATTEMPTED BUILDS, SORTED BY TIME
       ::
-      ::    For each schematic we've attempted to build at any time,
-      ::    list the formal dates of all build attempts, sorted newest first.
+      ::    FOR EACH SCHEMATIC WE'VE ATTEMPTED TO BUILD AT ANY TIME,
+      ::    LIST THE FORMAL DATES OF ALL BUILD ATTEMPTS, SORTED NEWEST FIRST.
       ::
-      builds-by-schematic=(map schematic (list @da))
-      ::  pending-scrys: outgoing requests for static resources
+      BUILDS-BY-SCHEMATIC=(MAP SCHEMATIC (LIST @DA))
+      ::  PENDING-SCRYS: OUTGOING REQUESTS FOR STATIC RESOURCES
       ::
-      pending-scrys=(request-tracker scry-request)
-      ::  pending-subscriptions: outgoing subscriptions on live resources
+      PENDING-SCRYS=(REQUEST-TRACKER SCRY-REQUEST)
+      ::  PENDING-SUBSCRIPTIONS: OUTGOING SUBSCRIPTIONS ON LIVE RESOURCES
       ::
-      pending-subscriptions=(request-tracker subscription)
-      ::  build-cache: fifo queue of completed root builds
+      PENDING-SUBSCRIPTIONS=(REQUEST-TRACKER SUBSCRIPTION)
+      ::  BUILD-CACHE: FIFO QUEUE OF COMPLETED ROOT BUILDS
       ::
-      $=  build-cache
-      $:  ::  next-anchor-id: incrementing identifier for cache anchors
+      $=  BUILD-CACHE
+      $:  ::  NEXT-ANCHOR-ID: INCREMENTING IDENTIFIER FOR CACHE ANCHORS
           ::
-          next-anchor-id=@ud
-          ::  queue: fifo queue of root builds identified by anchor id
+          NEXT-ANCHOR-ID=@UD
+          ::  QUEUE: FIFO QUEUE OF ROOT BUILDS IDENTIFIED BY ANCHOR ID
           ::
-          queue=(capped-queue build-cache-key)
+          QUEUE=(CAPPED-QUEUE BUILD-CACHE-KEY)
       ==
-      ::  compiler-cache: clock based cache of build results
+      ::  COMPILER-CACHE: CLOCK BASED CACHE OF BUILD RESULTS
       ::
-      compiler-cache=(clock compiler-cache-key build-result)
+      COMPILER-CACHE=(CLOCK COMPILER-CACHE-KEY BUILD-RESULT)
   ==
-::  +anchor: something which holds on to builds
+::  +ANCHOR: SOMETHING WHICH HOLDS ON TO BUILDS
 ::
-::    An anchor is a reference which keeps builds. This is either a %duct, in
-::    which case the build is live because a duct is waiting for a response, or
-::    a %cache, in which case the anchor is a cached build.
+::    AN ANCHOR IS A REFERENCE WHICH KEEPS BUILDS. THIS IS EITHER A %DUCT, IN
+::    WHICH CASE THE BUILD IS LIVE BECAUSE A DUCT IS WAITING FOR A RESPONSE, OR
+::    A %CACHE, IN WHICH CASE THE ANCHOR IS A CACHED BUILD.
 ::
-::    When a duct would be removed from a build, the %duct anchor is replaced
-::    with a %cache anchor. This %cache anchor refers to a FIFO queue of cached
-::    builds.
+::    WHEN A DUCT WOULD BE REMOVED FROM A BUILD, THE %DUCT ANCHOR IS REPLACED
+::    WITH A %CACHE ANCHOR. THIS %CACHE ANCHOR REFERS TO A FIFO QUEUE OF CACHED
+::    BUILDS.
 ::
-+=  anchor
-  $%  ::  %duct: this is anchored on a duct
++=  ANCHOR
+  $%  ::  %DUCT: THIS IS ANCHORED ON A DUCT
       ::
-      [%duct =duct]
-      ::  %cache: this is anchored to a cache entry
+      [%DUCT =DUCT]
+      ::  %CACHE: THIS IS ANCHORED TO A CACHE ENTRY
       ::
-      [%cache id=@ud]
+      [%CACHE ID=@UD]
   ==
-::  +build-status: current data for a build, including construction status
+::  +BUILD-STATUS: CURRENT DATA FOR A BUILD, INCLUDING CONSTRUCTION STATUS
 ::
-::    +build-status stores the construction status of a build as a finite state
-::    machine (:state). It stores links to dependent sub-builds in :subs, and
-::    per-duct client builds in :clients.
+::    +BUILD-STATUS STORES THE CONSTRUCTION STATUS OF A BUILD AS A FINITE STATE
+::    MACHINE (:STATE). IT STORES LINKS TO DEPENDENT SUB-BUILDS IN :SUBS, AND
+::    PER-DUCT CLIENT BUILDS IN :CLIENTS.
 ::
-+=  build-status
-  $:  ::  requesters: ducts for whom this build is the root build
++=  BUILD-STATUS
+  $:  ::  REQUESTERS: DUCTS FOR WHOM THIS BUILD IS THE ROOT BUILD
       ::
-      requesters=(set anchor)
-      ::  clients: per duct information for this build
+      REQUESTERS=(SET ANCHOR)
+      ::  CLIENTS: PER DUCT INFORMATION FOR THIS BUILD
       ::
-      clients=(jug anchor build)
-      ::  subs: sub-builds of this build, for whom this build is a client
+      CLIENTS=(JUG ANCHOR BUILD)
+      ::  SUBS: SUB-BUILDS OF THIS BUILD, FOR WHOM THIS BUILD IS A CLIENT
       ::
-      subs=(map build build-relation)
-      ::  state: a state machine for tracking the build's progress
+      SUBS=(MAP BUILD BUILD-RELATION)
+      ::  STATE: A STATE MACHINE FOR TRACKING THE BUILD'S PROGRESS
       ::
-      $=  state
-      $%  $:  ::  %untried: build has not been started yet
+      $=  STATE
+      $%  $:  ::  %UNTRIED: BUILD HAS NOT BEEN STARTED YET
               ::
-              %untried  ~
+              %UNTRIED  ~
           ==
-          $:  ::  %blocked: build blocked on either sub-builds or resource
+          $:  ::  %BLOCKED: BUILD BLOCKED ON EITHER SUB-BUILDS OR RESOURCE
               ::
-              ::    If we're in this state and there are no blocks in :subs,
-              ::    then we're blocked on a resource.
+              ::    IF WE'RE IN THIS STATE AND THERE ARE NO BLOCKS IN :SUBS,
+              ::    THEN WE'RE BLOCKED ON A RESOURCE.
               ::
-              %blocked  ~
+              %BLOCKED  ~
           ==
-          $:  ::  %unblocked: we were blocked but now we aren't
+          $:  ::  %UNBLOCKED: WE WERE BLOCKED BUT NOW WE AREN'T
               ::
-              %unblocked  ~
+              %UNBLOCKED  ~
           ==
-          $:  ::  %complete: build has finished running and has a result
+          $:  ::  %COMPLETE: BUILD HAS FINISHED RUNNING AND HAS A RESULT
               ::
-              %complete
-              ::  build-record: the product of the build, possibly tombstoned
+              %COMPLETE
+              ::  BUILD-RECORD: THE PRODUCT OF THE BUILD, POSSIBLY TOMBSTONED
               ::
-              =build-record
+              =BUILD-RECORD
   ==  ==  ==
-::  +duct-status: information relating a build to a duct
+::  +DUCT-STATUS: INFORMATION RELATING A BUILD TO A DUCT
 ::
-+=  duct-status
-  $:  ::  live: whether this duct is being run live
++=  DUCT-STATUS
+  $:  ::  LIVE: WHETHER THIS DUCT IS BEING RUN LIVE
       ::
-      $=  live
-      $%  [%once in-progress=@da]
-          $:  %live
+      $=  LIVE
+      $%  [%ONCE IN-PROGRESS=@DA]
+          $:  %LIVE
               ::
               ::
-              in-progress=(unit @da)
-              ::  the last subscription we made
+              IN-PROGRESS=(UNIT @DA)
+              ::  THE LAST SUBSCRIPTION WE MADE
               ::
-              ::    This can possibly have an empty set of resources, in which
-              ::    we never sent a move.
+              ::    THIS CAN POSSIBLY HAVE AN EMPTY SET OF RESOURCES, IN WHICH
+              ::    WE NEVER SENT A MOVE.
               ::
-              ::    NOTE: This implies that a single live build can only depend
-              ::    on live resources from a single disc. We don't have a
-              ::    working plan for fixing this and will need to think very
-              ::    hard about the future.
+              ::    NOTE: THIS IMPLIES THAT A SINGLE LIVE BUILD CAN ONLY DEPEND
+              ::    ON LIVE RESOURCES FROM A SINGLE DISC. WE DON'T HAVE A
+              ::    WORKING PLAN FOR FIXING THIS AND WILL NEED TO THINK VERY
+              ::    HARD ABOUT THE FUTURE.
               ::
-              last-sent=(unit [date=@da subscription=(unit subscription)])
+              LAST-SENT=(UNIT [DATE=@DA SUBSCRIPTION=(UNIT SUBSCRIPTION)])
       ==  ==
-      ::  root-schematic: the requested build for this duct
+      ::  ROOT-SCHEMATIC: THE REQUESTED BUILD FOR THIS DUCT
       ::
-      root-schematic=schematic
+      ROOT-SCHEMATIC=SCHEMATIC
   ==
-::  +build-relation: how do two builds relate to each other?
+::  +BUILD-RELATION: HOW DO TWO BUILDS RELATE TO EACH OTHER?
 ::
-::    A +build-relation can be either :verified or not, and :blocked or not.
-::    It is a symmetric relation between two builds, in the sense that both
-::    the client and the sub will store the same relation, just pointing to
-::    the other build.
+::    A +BUILD-RELATION CAN BE EITHER :VERIFIED OR NOT, AND :BLOCKED OR NOT.
+::    IT IS A SYMMETRIC RELATION BETWEEN TWO BUILDS, IN THE SENSE THAT BOTH
+::    THE CLIENT AND THE SUB WILL STORE THE SAME RELATION, JUST POINTING TO
+::    THE OTHER BUILD.
 ::
-::    If it's not :verified, then the relation is a guess based on previous
-::    builds. These guesses are used to ensure that we hold onto builds we
-::    expect to be used in future builds. Each time we run +make on a build,
-::    it might produce new :verified sub-builds, which may have been unverified
-::    until then. Once a build completes, any unverified sub-builds must be
-::    cleaned up, since it turned out they weren't used by the build after all.
+::    IF IT'S NOT :VERIFIED, THEN THE RELATION IS A GUESS BASED ON PREVIOUS
+::    BUILDS. THESE GUESSES ARE USED TO ENSURE THAT WE HOLD ONTO BUILDS WE
+::    EXPECT TO BE USED IN FUTURE BUILDS. EACH TIME WE RUN +MAKE ON A BUILD,
+::    IT MIGHT PRODUCE NEW :VERIFIED SUB-BUILDS, WHICH MAY HAVE BEEN UNVERIFIED
+::    UNTIL THEN. ONCE A BUILD COMPLETES, ANY UNVERIFIED SUB-BUILDS MUST BE
+::    CLEANED UP, SINCE IT TURNED OUT THEY WEREN'T USED BY THE BUILD AFTER ALL.
 ::
-::    :blocked is used to note that a build can't be completed until that
-::    sub-build has been completed. A relation can be :blocked but not :verified
-::    if we're trying to promote a build, but we haven't run all its sub-builds
-::    yet. In that case, we'll try to promote or run the sub-build in order to
-::    determine whether we can promote the client. Until the sub-build has been
-::    completed, the client is provisionally blocked on the sub-build.
+::    :BLOCKED IS USED TO NOTE THAT A BUILD CAN'T BE COMPLETED UNTIL THAT
+::    SUB-BUILD HAS BEEN COMPLETED. A RELATION CAN BE :BLOCKED BUT NOT :VERIFIED
+::    IF WE'RE TRYING TO PROMOTE A BUILD, BUT WE HAVEN'T RUN ALL ITS SUB-BUILDS
+::    YET. IN THAT CASE, WE'LL TRY TO PROMOTE OR RUN THE SUB-BUILD IN ORDER TO
+::    DETERMINE WHETHER WE CAN PROMOTE THE CLIENT. UNTIL THE SUB-BUILD HAS BEEN
+::    COMPLETED, THE CLIENT IS PROVISIONALLY BLOCKED ON THE SUB-BUILD.
 ::
-+=  build-relation
-  $:  ::  verified: do we know this relation is real, or is it only a guess?
++=  BUILD-RELATION
+  $:  ::  VERIFIED: DO WE KNOW THIS RELATION IS REAL, OR IS IT ONLY A GUESS?
       ::
-      verified=?
-      ::  is this build blocked on this other build?
+      VERIFIED=?
+      ::  IS THIS BUILD BLOCKED ON THIS OTHER BUILD?
       ::
-      blocked=?
+      BLOCKED=?
   ==
-::  +build-record: information associated with the result of a completed +build
+::  +BUILD-RECORD: INFORMATION ASSOCIATED WITH THE RESULT OF A COMPLETED +BUILD
 ::
-+=  build-record
-  $%  $:  ::  %tombstone: the build's result has been wiped
++=  BUILD-RECORD
+  $%  $:  ::  %TOMBSTONE: THE BUILD'S RESULT HAS BEEN WIPED
           ::
-          %tombstone  ~
+          %TOMBSTONE  ~
       ==
-      $:  ::  %value: we have the +build-result
+      $:  ::  %VALUE: WE HAVE THE +BUILD-RESULT
           ::
-          %value
-          ::  last-accessed: last time we looked at the result
+          %VALUE
+          ::  LAST-ACCESSED: LAST TIME WE LOOKED AT THE RESULT
           ::
-          ::    This is used for LRU cache reclamation.
+          ::    THIS IS USED FOR LRU CACHE RECLAMATION.
           ::
-          last-accessed=@da
-          ::  build-result: the stored value of the build's product
+          LAST-ACCESSED=@DA
+          ::  BUILD-RESULT: THE STORED VALUE OF THE BUILD'S PRODUCT
           ::
-          =build-result
+          =BUILD-RESULT
   ==  ==
-::  +build: a referentially transparent request for a build
+::  +BUILD: A REFERENTIALLY TRANSPARENT REQUEST FOR A BUILD
 ::
-::    Each unique +build will always produce the same +build-result
-::    when run (if it completes). A live build consists of a sequence of
-::    instances of +build with the same :schematic and increasing :date.
+::    EACH UNIQUE +BUILD WILL ALWAYS PRODUCE THE SAME +BUILD-RESULT
+::    WHEN RUN (IF IT COMPLETES). A LIVE BUILD CONSISTS OF A SEQUENCE OF
+::    INSTANCES OF +BUILD WITH THE SAME :SCHEMATIC AND INCREASING :DATE.
 ::
-+=  build
-  $:  ::  date: the formal date of this build; unrelated to time of execution
++=  BUILD
+  $:  ::  DATE: THE FORMAL DATE OF THIS BUILD; UNRELATED TO TIME OF EXECUTION
       ::
-      date=@da
-      ::  schematic: the schematic that determines how to run this build
+      DATE=@DA
+      ::  SCHEMATIC: THE SCHEMATIC THAT DETERMINES HOW TO RUN THIS BUILD
       ::
-      =schematic
+      =SCHEMATIC
   ==
-::  +request-tracker: generic tracker and multiplexer for pending requests
+::  +REQUEST-TRACKER: GENERIC TRACKER AND MULTIPLEXER FOR PENDING REQUESTS
 ::
-++  request-tracker
-  |*  request-type=mold
-  %+  map  request-type
-  $:  ::  waiting: ducts blocked on this request
+++  REQUEST-TRACKER
+  |*  REQUEST-TYPE=MOLD
+  %+  MAP  REQUEST-TYPE
+  $:  ::  WAITING: DUCTS BLOCKED ON THIS REQUEST
       ::
-      waiting=(set duct)
-      ::  originator: the duct that kicked off the request
+      WAITING=(SET DUCT)
+      ::  ORIGINATOR: THE DUCT THAT KICKED OFF THE REQUEST
       ::
-      originator=duct
+      ORIGINATOR=DUCT
   ==
-::  +subscription: a single subscription to changes on a set of resources
+::  +SUBSCRIPTION: A SINGLE SUBSCRIPTION TO CHANGES ON A SET OF RESOURCES
 ::
-+=  subscription
-  $:  ::  date: date this was made
++=  SUBSCRIPTION
+  $:  ::  DATE: DATE THIS WAS MADE
       ::
-      date=@da
-      ::  disc: ship and desk for all :resources
+      DATE=@DA
+      ::  DISC: SHIP AND DESK FOR ALL :RESOURCES
       ::
-      =disc
-      ::  resources: we will be notified if any of these resources change
+      =DISC
+      ::  RESOURCES: WE WILL BE NOTIFIED IF ANY OF THESE RESOURCES CHANGE
       ::
-      resources=(set resource)
+      RESOURCES=(SET RESOURCE)
   ==
-::  +scry-request: parsed arguments to a scry operation
+::  +SCRY-REQUEST: PARSED ARGUMENTS TO A SCRY OPERATION
 ::
-+=  scry-request
-  $:  ::  vane: the vane from which to make the request
++=  SCRY-REQUEST
+  $:  ::  VANE: THE VANE FROM WHICH TO MAKE THE REQUEST
       ::
-      ::    If we add other vanes in the future, this will become a fork type.
-      ::    For now, though, Ford only knows how to make asynchronous scry
-      ::    requests to Clay.
+      ::    IF WE ADD OTHER VANES IN THE FUTURE, THIS WILL BECOME A FORK TYPE.
+      ::    FOR NOW, THOUGH, FORD ONLY KNOWS HOW TO MAKE ASYNCHRONOUS SCRY
+      ::    REQUESTS TO CLAY.
       ::
-      vane=%c
-      ::  care: type of request
+      VANE=%C
+      ::  CARE: TYPE OF REQUEST
       ::
-      care=care:clay
-      ::  beam: request path
+      CARE=CARE:CLAY
+      ::  BEAM: REQUEST PATH
       ::
-      =beam
+      =BEAM
   ==
-::  +compiler-cache-key: content addressable build definitions
+::  +COMPILER-CACHE-KEY: CONTENT ADDRESSABLE BUILD DEFINITIONS
 ::
-+=  compiler-cache-key
-  $%  [%call gate=vase sample=vase]
-      [%hood =beam txt=@t]
-      [%ride formula=hoon subject=vase]
-      [%slim subject-type=type formula=hoon]
-      [%slit gate=type sample=type]
++=  COMPILER-CACHE-KEY
+  $%  [%CALL GATE=VASE SAMPLE=VASE]
+      [%HOOD =BEAM TXT=@T]
+      [%RIDE FORMULA=HOON SUBJECT=VASE]
+      [%SLIM SUBJECT-TYPE=TYPE FORMULA=HOON]
+      [%SLIT GATE=TYPE SAMPLE=TYPE]
   ==
-::  +build-cache-key: key for the fifo cache of completed build trees
+::  +BUILD-CACHE-KEY: KEY FOR THE FIFO CACHE OF COMPLETED BUILD TREES
 ::
-+=  build-cache-key
-  $:  ::  id: incrementing identifier for an +anchor
++=  BUILD-CACHE-KEY
+  $:  ::  ID: INCREMENTING IDENTIFIER FOR AN +ANCHOR
       ::
-      id=@ud
-      ::  root-build: the root build associated with this anchor
+      ID=@UD
+      ::  ROOT-BUILD: THE ROOT BUILD ASSOCIATED WITH THIS ANCHOR
       ::
-      root-build=build
+      ROOT-BUILD=BUILD
   ==
-::  +build-receipt: result of running +make
+::  +BUILD-RECEIPT: RESULT OF RUNNING +MAKE
 ::
-::    A +build-receipt contains all information necessary to perform the
-::    effects and state mutations indicated by a call to +make. If :build
-::    succeeded, :result will be %build-result; otherwise, it will be %blocks.
+::    A +BUILD-RECEIPT CONTAINS ALL INFORMATION NECESSARY TO PERFORM THE
+::    EFFECTS AND STATE MUTATIONS INDICATED BY A CALL TO +MAKE. IF :BUILD
+::    SUCCEEDED, :RESULT WILL BE %BUILD-RESULT; OTHERWISE, IT WILL BE %BLOCKS.
 ::
-::    After +make runs on a batch of builds, the resulting +build-receipt's are
-::    applied one at a time.
+::    AFTER +MAKE RUNS ON A BATCH OF BUILDS, THE RESULTING +BUILD-RECEIPT'S ARE
+::    APPLIED ONE AT A TIME.
 ::
-+=  build-receipt
-  $:  ::  build: the build we worked on
++=  BUILD-RECEIPT
+  $:  ::  BUILD: THE BUILD WE WORKED ON
       ::
-      =build
-      ::  result: the outcome of this build
+      =BUILD
+      ::  RESULT: THE OUTCOME OF THIS BUILD
       ::
-      $=  result
-      $%  ::  %build-result: the build produced a result
+      $=  RESULT
+      $%  ::  %BUILD-RESULT: THE BUILD PRODUCED A RESULT
           ::
-          $:  %build-result
-              =build-result
+          $:  %BUILD-RESULT
+              =BUILD-RESULT
           ==
-          ::  %blocks: the build blocked on the following builds or resource
+          ::  %BLOCKS: THE BUILD BLOCKED ON THE FOLLOWING BUILDS OR RESOURCE
           ::
-          $:  %blocks
-              ::  builds: builds that :build blocked on
+          $:  %BLOCKS
+              ::  BUILDS: BUILDS THAT :BUILD BLOCKED ON
               ::
-              builds=(list build)
+              BUILDS=(LIST BUILD)
           ==
       ==
-      ::  sub-builds: subbuilds of :build
+      ::  SUB-BUILDS: SUBBUILDS OF :BUILD
       ::
-      ::    While running +make on :build, we need to keep track of any
-      ::    sub-builds that we try to access so we can keep track of
-      ::    component linkages and cache access times.
+      ::    WHILE RUNNING +MAKE ON :BUILD, WE NEED TO KEEP TRACK OF ANY
+      ::    SUB-BUILDS THAT WE TRY TO ACCESS SO WE CAN KEEP TRACK OF
+      ::    COMPONENT LINKAGES AND CACHE ACCESS TIMES.
       ::
-      sub-builds=(list build)
-      ::  cache-access: if not ~, cache this result as :compiler-cache-key.
+      SUB-BUILDS=(LIST BUILD)
+      ::  CACHE-ACCESS: IF NOT ~, CACHE THIS RESULT AS :COMPILER-CACHE-KEY.
       ::
-      cache-access=(unit [=compiler-cache-key new=?])
+      CACHE-ACCESS=(UNIT [=COMPILER-CACHE-KEY NEW=?])
   ==
 --
-=,  format
+=,  FORMAT
 |%
-::  +tear: split a +term into segments delimited by `-`
+::  +TEAR: SPLIT A +TERM INTO SEGMENTS DELIMITED BY `-`
 ::
-::  Example:
+::  EXAMPLE:
 ::  ```
-::  dojo> (tear 'foo-bar-baz')
-::  ['foo' 'bar' 'baz']
+::  DOJO> (TEAR 'FOO-BAR-BAZ')
+::  ['FOO' 'BAR' 'BAZ']
 ::  ```
 ::
-++  tear
-  |=  a=term
-  ^-  (list term)
-  ::  sym-no-heps: a parser for terms with no heps and a leading letter
+++  TEAR
+  |=  A=TERM
+  ^-  (LIST TERM)
+  ::  SYM-NO-HEPS: A PARSER FOR TERMS WITH NO HEPS AND A LEADING LETTER
   ::
-  =/  sym-no-heps  (cook crip ;~(plug low (star ;~(pose low nud))))
+  =/  SYM-NO-HEPS  (COOK CRIP ;~(PLUG LOW (STAR ;~(POSE LOW NUD))))
   ::
-  (fall (rush a (most hep sym-no-heps)) /[a])
-::  +segments: compute all paths from :path-part, replacing some `/`s with `-`s
+  (FALL (RUSH A (MOST HEP SYM-NO-HEPS)) /[A])
+::  +SEGMENTS: COMPUTE ALL PATHS FROM :PATH-PART, REPLACING SOME `/`S WITH `-`S
 ::
-::    For example, when passed a :path-part of 'foo-bar-baz',
-::    the product will contain:
+::    FOR EXAMPLE, WHEN PASSED A :PATH-PART OF 'FOO-BAR-BAZ',
+::    THE PRODUCT WILL CONTAIN:
 ::    ```
-::    dojo> (segments 'foo-bar-baz')
-::    [/foo/bar/baz /foo/bar-baz /foo-bar/baz /foo-bar-baz]
+::    DOJO> (SEGMENTS 'FOO-BAR-BAZ')
+::    [/FOO/BAR/BAZ /FOO/BAR-BAZ /FOO-BAR/BAZ /FOO-BAR-BAZ]
 ::    ```
 ::
-++  segments
-  |=  path-part=@tas
-  ^-  (list path)
+++  SEGMENTS
+  |=  PATH-PART=@TAS
+  ^-  (LIST PATH)
   ::
-  =/  join  |=([a=@tas b=@tas] (crip "{(trip a)}-{(trip b)}"))
+  =/  JOIN  |=([A=@TAS B=@TAS] (CRIP "{(TRIP A)}-{(TRIP B)}"))
   ::
-  =/  torn=(list @tas)  (tear path-part)
+  =/  TORN=(LIST @TAS)  (TEAR PATH-PART)
   ::
-  |-  ^-  (list (list @tas))
+  |-  ^-  (LIST (LIST @TAS))
   ::
-  ?<  ?=(~ torn)
+  ?<  ?=(~ TORN)
   ::
-  ?:  ?=([@ ~] torn)
-    ~[torn]
+  ?:  ?=([@ ~] TORN)
+    ~[TORN]
   ::
-  %-  zing
-  %+  turn  $(torn t.torn)
-  |=  s=(list @tas)
-  ^-  (list (list @tas))
+  %-  ZING
+  %+  TURN  $(TORN T.TORN)
+  |=  S=(LIST @TAS)
+  ^-  (LIST (LIST @TAS))
   ::
-  ?>  ?=(^ s)
-  ~[[i.torn s] [(join i.torn i.s) t.s]]
-::  +build-to-tape: convert :build to a printable format
+  ?>  ?=(^ S)
+  ~[[I.TORN S] [(JOIN I.TORN I.S) T.S]]
+::  +BUILD-TO-TAPE: CONVERT :BUILD TO A PRINTABLE FORMAT
 ::
-::    Builds often contain the standard library and large types, so
-::    this function should always be called when trying to print a +build.
+::    BUILDS OFTEN CONTAIN THE STANDARD LIBRARY AND LARGE TYPES, SO
+::    THIS FUNCTION SHOULD ALWAYS BE CALLED WHEN TRYING TO PRINT A +BUILD.
 ::
-++  build-to-tape
-  |=  =build
-  ^-  tape
+++  BUILD-TO-TAPE
+  |=  =BUILD
+  ^-  TAPE
   ~+
   ::
-  =/  enclose  |=(tape "[{+<}]")
-  =/  date=@da  date.build
-  =/  =schematic  schematic.build
+  =/  ENCLOSE  |=(TAPE "[{+<}]")
+  =/  DATE=@DA  DATE.BUILD
+  =/  =SCHEMATIC  SCHEMATIC.BUILD
   ::
-  %-  enclose
-  %+  welp  (trip (scot %da date))
-  %+  welp  " "
+  %-  ENCLOSE
+  %+  WELP  (TRIP (SCOT %DA DATE))
+  %+  WELP  " "
   ::
-  ?+      -.schematic
-        :(welp "[" (trip -.schematic) " {<`@uvI`(mug schematic)>}]")
+  ?+      -.SCHEMATIC
+        :(WELP "[" (TRIP -.SCHEMATIC) " {<`@UVI`(MUG SCHEMATIC)>}]")
       ::
       %$
-    "literal"
+    "LITERAL"
   ::
       ^
-    %-  enclose
-    ;:(welp $(build [date head.schematic]) " " $(build [date tail.schematic]))
+    %-  ENCLOSE
+    ;:(WELP $(BUILD [DATE HEAD.SCHEMATIC]) " " $(BUILD [DATE TAIL.SCHEMATIC]))
   ::
-      %alts
-    ;:  welp
-      %+  roll  choices.schematic
-      |=  [choice=^schematic txt=_"[alts"]
-      :(welp txt " " ^$(schematic.build choice))
+      %ALTS
+    ;:  WELP
+      %+  ROLL  CHOICES.SCHEMATIC
+      |=  [CHOICE=^SCHEMATIC TXT=_"[ALTS"]
+      :(WELP TXT " " ^$(SCHEMATIC.BUILD CHOICE))
     ::
       "]"
     ==
   ::
-      %core
-    :(welp "[core " (spud (en-beam (rail-to-beam source-path.schematic))) "]")
+      %CORE
+    :(WELP "[CORE " (SPUD (EN-BEAM (RAIL-TO-BEAM SOURCE-PATH.SCHEMATIC))) "]")
   ::
-      %hood
-    :(welp "[hood " (spud (en-beam (rail-to-beam source-path.schematic))) "]")
+      %HOOD
+    :(WELP "[HOOD " (SPUD (EN-BEAM (RAIL-TO-BEAM SOURCE-PATH.SCHEMATIC))) "]")
   ::
-      %plan
-    ;:  welp
-      "[plan "
-      (spud (en-beam (rail-to-beam path-to-render.schematic)))
+      %PLAN
+    ;:  WELP
+      "[PLAN "
+      (SPUD (EN-BEAM (RAIL-TO-BEAM PATH-TO-RENDER.SCHEMATIC)))
       "]"
     ==
   ::
-      %scry
-    (spud (en-beam (extract-beam resource.schematic ~)))
+      %SCRY
+    (SPUD (EN-BEAM (EXTRACT-BEAM RESOURCE.SCHEMATIC ~)))
   ::
-    ::    %slim
-    ::  "slim {<subject-type.schematic>} {<formula.schematic>}"
+    ::    %SLIM
+    ::  "SLIM {<SUBJECT-TYPE.SCHEMATIC>} {<FORMULA.SCHEMATIC>}"
   ::
-      %vale
-    ;:  welp
-      "[vale ["
-      (trip (scot %p ship.disc.schematic))
+      %VALE
+    ;:  WELP
+      "[VALE ["
+      (TRIP (SCOT %P SHIP.DISC.SCHEMATIC))
       " "
-      (trip desk.disc.schematic)
+      (TRIP DESK.DISC.SCHEMATIC)
       "] "
-      (trip mark.schematic)
+      (TRIP MARK.SCHEMATIC)
       "]"
     ==
   ==
-::  +rail-to-beam: convert :rail to a +beam, filling in the case with `[%ud 0]`
+::  +RAIL-TO-BEAM: CONVERT :RAIL TO A +BEAM, FILLING IN THE CASE WITH `[%UD 0]`
 ::
-++  rail-to-beam
-  |=  =rail
-  ^-  beam
-  [[ship.disc.rail desk.disc.rail [%ud 0]] spur.rail]
-::  +rail-to-path: pretty-printable rail
+++  RAIL-TO-BEAM
+  |=  =RAIL
+  ^-  BEAM
+  [[SHIP.DISC.RAIL DESK.DISC.RAIL [%UD 0]] SPUR.RAIL]
+::  +RAIL-TO-PATH: PRETTY-PRINTABLE RAIL
 ::
-++  rail-to-path
-  |=  =rail
-  ^-  path
-  (en-beam (rail-to-beam rail))
-::  +unify-jugs: make a new jug, unifying sets for all keys
+++  RAIL-TO-PATH
+  |=  =RAIL
+  ^-  PATH
+  (EN-BEAM (RAIL-TO-BEAM RAIL))
+::  +UNIFY-JUGS: MAKE A NEW JUG, UNIFYING SETS FOR ALL KEYS
 ::
-::    Example:
+::    EXAMPLE:
 ::    ```
-::    dojo> %+  unify-jugs
-::            (~(gas by *(jug @tas @ud)) ~[[%a (sy 1 2 ~)] [%b (sy 4 5 ~)]])
-::          (~(gas by *(jug @tas @ud)) ~[[%b (sy 5 6 ~)] [%c (sy 7 8 ~)]])
+::    DOJO> %+  UNIFY-JUGS
+::            (~(GAS BY *(JUG @TAS @UD)) ~[[%A (SY 1 2 ~)] [%B (SY 4 5 ~)]])
+::          (~(GAS BY *(JUG @TAS @UD)) ~[[%B (SY 5 6 ~)] [%C (SY 7 8 ~)]])
 ::
-::    {[p=%a q={1 2 3}] [p=%b q={4 5 6}] [p=%c q={7 8}]}
+::    {[P=%A Q={1 2 3}] [P=%B Q={4 5 6}] [P=%C Q={7 8}]}
 ::    ```
 ::
-++  unify-jugs
-  |*  [a=(jug) b=(jug)]
-  ^+  a
+++  UNIFY-JUGS
+  |*  [A=(JUG) B=(JUG)]
+  ^+  A
   ::
-  =/  tapped  ~(tap by b)
+  =/  TAPPED  ~(TAP BY B)
   ::
-  |-  ^+  a
-  ?~  tapped  a
+  |-  ^+  A
+  ?~  TAPPED  A
   ::
-  =/  key  p.i.tapped
-  =/  vals  ~(tap in q.i.tapped)
+  =/  KEY  P.I.TAPPED
+  =/  VALS  ~(TAP IN Q.I.TAPPED)
   ::
-  =.  a
-    |-  ^+  a
-    ?~  vals  a
+  =.  A
+    |-  ^+  A
+    ?~  VALS  A
     ::
-    $(vals t.vals, a (~(put ju a) key i.vals))
+    $(VALS T.VALS, A (~(PUT JU A) KEY I.VALS))
   ::
-  $(tapped t.tapped)
-::  +path-to-resource: decode a +resource from a +wire
+  $(TAPPED T.TAPPED)
+::  +PATH-TO-RESOURCE: DECODE A +RESOURCE FROM A +WIRE
 ::
-++  path-to-resource
-  |=  =path
-  ^-  (unit resource)
+++  PATH-TO-RESOURCE
+  |=  =PATH
+  ^-  (UNIT RESOURCE)
   ::
-  =/  scry-request=(unit scry-request)  (path-to-scry-request path)
-  ?~  scry-request
+  =/  SCRY-REQUEST=(UNIT SCRY-REQUEST)  (PATH-TO-SCRY-REQUEST PATH)
+  ?~  SCRY-REQUEST
     ~
-  =+  [vane care bem]=u.scry-request
-  =/  =beam  bem
-  =/  =rail  [disc=[p.beam q.beam] spur=s.beam]
-  `[vane care rail]
-::  +scry-request-to-path: encode a +scry-request in a +wire
+  =+  [VANE CARE BEM]=U.SCRY-REQUEST
+  =/  =BEAM  BEM
+  =/  =RAIL  [DISC=[P.BEAM Q.BEAM] SPUR=S.BEAM]
+  `[VANE CARE RAIL]
+::  +SCRY-REQUEST-TO-PATH: ENCODE A +SCRY-REQUEST IN A +WIRE
 ::
-::    Example:
+::    EXAMPLE:
 ::    ```
-::    dojo> %-  scry-request-to-path
-::          [%c %x [[~zod %home [%da ~2018.1.1]] /hoon/bar]])
+::    DOJO> %-  SCRY-REQUEST-TO-PATH
+::          [%C %X [[~ZOD %HOME [%DA ~2018.1.1]] /HOON/BAR]])
 ::
-::    /cx/~zod/home/~2018.1.1/bar/hoon
+::    /CX/~ZOD/HOME/~2018.1.1/BAR/HOON
 ::    ```
 ::
-++  scry-request-to-path
-  |=  =scry-request
-  ^-  path
-  =/  =term  (cat 3 [vane care]:scry-request)
-  [term (en-beam beam.scry-request)]
-::  +path-to-scry-request: parse :path's components into :vane, :care, and :rail
+++  SCRY-REQUEST-TO-PATH
+  |=  =SCRY-REQUEST
+  ^-  PATH
+  =/  =TERM  (CAT 3 [VANE CARE]:SCRY-REQUEST)
+  [TERM (EN-BEAM BEAM.SCRY-REQUEST)]
+::  +PATH-TO-SCRY-REQUEST: PARSE :PATH'S COMPONENTS INTO :VANE, :CARE, AND :RAIL
 ::
-++  path-to-scry-request
-  |=  =path
-  ^-  (unit scry-request)
+++  PATH-TO-SCRY-REQUEST
+  |=  =PATH
+  ^-  (UNIT SCRY-REQUEST)
   ::
-  ?~  path
+  ?~  PATH
     ~
-  ?~  vane=((soft ,%c) (end 3 1 i.path))
+  ?~  VANE=((SOFT ,%C) (END 3 1 I.PATH))
     ~
-  ?~  care=((soft care:clay) (rsh 3 1 i.path))
+  ?~  CARE=((SOFT CARE:CLAY) (RSH 3 1 I.PATH))
     ~
-  ?~  beam=(de-beam t.path)
+  ?~  BEAM=(DE-BEAM T.PATH)
     ~
-  ?.  ?=(%da -.r.u.beam)
+  ?.  ?=(%DA -.R.U.BEAM)
     ~
-  `[u.vane u.care u.beam]
-::  +scry-request-to-build: convert a +scry-request to a %scry build
+  `[U.VANE U.CARE U.BEAM]
+::  +SCRY-REQUEST-TO-BUILD: CONVERT A +SCRY-REQUEST TO A %SCRY BUILD
 ::
-++  scry-request-to-build
-  |=  =scry-request
-  ^-  build
-  ::  we only operate on dates, not other kinds of +case:clay
+++  SCRY-REQUEST-TO-BUILD
+  |=  =SCRY-REQUEST
+  ^-  BUILD
+  ::  WE ONLY OPERATE ON DATES, NOT OTHER KINDS OF +CASE:CLAY
   ::
-  ?>  ?=(%da -.r.beam.scry-request)
+  ?>  ?=(%DA -.R.BEAM.SCRY-REQUEST)
   ::
-  =,  scry-request
-  [p.r.beam [%scry [vane care `rail`[[p q] s]:beam]]]
-::  +extract-beam: obtain a +beam from a +resource
+  =,  SCRY-REQUEST
+  [P.R.BEAM [%SCRY [VANE CARE `RAIL`[[P Q] S]:BEAM]]]
+::  +EXTRACT-BEAM: OBTAIN A +BEAM FROM A +RESOURCE
 ::
-::    Fills case with [%ud 0] for live resources if :date is `~`.
-::    For once resources, ignore :date.
+::    FILLS CASE WITH [%UD 0] FOR LIVE RESOURCES IF :DATE IS `~`.
+::    FOR ONCE RESOURCES, IGNORE :DATE.
 ::
-++  extract-beam
-  |=  [=resource date=(unit @da)]  ^-  beam
+++  EXTRACT-BEAM
+  |=  [=RESOURCE DATE=(UNIT @DA)]  ^-  BEAM
   ::
-  =/  =case  ?~(date [%ud 0] [%da u.date])
+  =/  =CASE  ?~(DATE [%UD 0] [%DA U.DATE])
   ::
-  =,  rail.resource
-  [[ship.disc desk.disc case] spur]
-::  +extract-disc: obtain a +disc from a +resource
+  =,  RAIL.RESOURCE
+  [[SHIP.DISC DESK.DISC CASE] SPUR]
+::  +EXTRACT-DISC: OBTAIN A +DISC FROM A +RESOURCE
 ::
-++  extract-disc
-  |=  =resource  ^-  disc
-  disc.rail.resource
-::  +get-sub-schematics: find any schematics contained within :schematic
+++  EXTRACT-DISC
+  |=  =RESOURCE  ^-  DISC
+  DISC.RAIL.RESOURCE
+::  +GET-SUB-SCHEMATICS: FIND ANY SCHEMATICS CONTAINED WITHIN :SCHEMATIC
 ::
-++  get-sub-schematics
-  |=  =schematic
-  ^-  (list ^schematic)
-  ?-    -.schematic
-      ^      ~[head.schematic tail.schematic]
+++  GET-SUB-SCHEMATICS
+  |=  =SCHEMATIC
+  ^-  (LIST ^SCHEMATIC)
+  ?-    -.SCHEMATIC
+      ^      ~[HEAD.SCHEMATIC TAIL.SCHEMATIC]
       %$     ~
-      %pin   ~[schematic.schematic]
-      %alts  choices.schematic
-      %bake  ~
-      %bunt  ~
-      %call  ~[gate.schematic sample.schematic]
-      %cast  ~[input.schematic]
-      %core  ~
-      %diff  ~[start.schematic end.schematic]
-      %dude  ~[attempt.schematic]
-      %hood  ~
-      %join  ~[first.schematic second.schematic]
-      %list  schematics.schematic
-      %mash  ~[schematic.first.schematic schematic.second.schematic]
-      %mute  [subject.schematic (turn mutations.schematic tail)]
-      %pact  ~[start.schematic diff.schematic]
-      %path  ~
-      %plan  ~
-      %reef  ~
-      %ride  ~[subject.schematic]
-      %same  ~[schematic.schematic]
-      %scry  ~
-      %slim  ~
-      %slit  ~
-      %vale  ~
-      %volt  ~
-      %walk  ~
+      %PIN   ~[SCHEMATIC.SCHEMATIC]
+      %ALTS  CHOICES.SCHEMATIC
+      %BAKE  ~
+      %BUNT  ~
+      %CALL  ~[GATE.SCHEMATIC SAMPLE.SCHEMATIC]
+      %CAST  ~[INPUT.SCHEMATIC]
+      %CORE  ~
+      %DIFF  ~[START.SCHEMATIC END.SCHEMATIC]
+      %DUDE  ~[ATTEMPT.SCHEMATIC]
+      %HOOD  ~
+      %JOIN  ~[FIRST.SCHEMATIC SECOND.SCHEMATIC]
+      %LIST  SCHEMATICS.SCHEMATIC
+      %MASH  ~[SCHEMATIC.FIRST.SCHEMATIC SCHEMATIC.SECOND.SCHEMATIC]
+      %MUTE  [SUBJECT.SCHEMATIC (TURN MUTATIONS.SCHEMATIC TAIL)]
+      %PACT  ~[START.SCHEMATIC DIFF.SCHEMATIC]
+      %PATH  ~
+      %PLAN  ~
+      %REEF  ~
+      %RIDE  ~[SUBJECT.SCHEMATIC]
+      %SAME  ~[SCHEMATIC.SCHEMATIC]
+      %SCRY  ~
+      %SLIM  ~
+      %SLIT  ~
+      %VALE  ~
+      %VOLT  ~
+      %WALK  ~
   ==
-::  +by-schematic: door for manipulating :by-schematic.builds.ford-state
+::  +BY-SCHEMATIC: DOOR FOR MANIPULATING :BY-SCHEMATIC.BUILDS.FORD-STATE
 ::
-::    The :dates list for each key in :builds is sorted in reverse
-::    chronological order. These operations access and mutate keys and values
-::    of :builds and maintain that sort order.
+::    THE :DATES LIST FOR EACH KEY IN :BUILDS IS SORTED IN REVERSE
+::    CHRONOLOGICAL ORDER. THESE OPERATIONS ACCESS AND MUTATE KEYS AND VALUES
+::    OF :BUILDS AND MAINTAIN THAT SORT ORDER.
 ::
-++  by-schematic
-  |_  builds=(map schematic (list @da))
-  ::  +put: add a +build to :builds
+++  BY-SCHEMATIC
+  |_  BUILDS=(MAP SCHEMATIC (LIST @DA))
+  ::  +PUT: ADD A +BUILD TO :BUILDS
   ::
-  ::    If :build already exists in :builds, this is a no-op.
-  ::    Otherwise, replace the value at the key :schematic.build
-  ::    with a new :dates list that contains :date.build.
+  ::    IF :BUILD ALREADY EXISTS IN :BUILDS, THIS IS A NO-OP.
+  ::    OTHERWISE, REPLACE THE VALUE AT THE KEY :SCHEMATIC.BUILD
+  ::    WITH A NEW :DATES LIST THAT CONTAINS :DATE.BUILD.
   ::
-  ++  put
-    |=  =build
-    ^+  builds
-    %+  ~(put by builds)  schematic.build
+  ++  PUT
+    |=  =BUILD
+    ^+  BUILDS
+    %+  ~(PUT BY BUILDS)  SCHEMATIC.BUILD
     ::
-    =/  dates  (fall (~(get by builds) schematic.build) ~)
+    =/  DATES  (FALL (~(GET BY BUILDS) SCHEMATIC.BUILD) ~)
     |-
-    ^+  dates
-    ?~  dates
-      [date.build ~]
-    ?:  =(i.dates date.build)
-      dates
-    ?:  (gth date.build i.dates)
-      [date.build dates]
-    [i.dates $(dates t.dates)]
-  ::  +del: remove a +build from :builds
+    ^+  DATES
+    ?~  DATES
+      [DATE.BUILD ~]
+    ?:  =(I.DATES DATE.BUILD)
+      DATES
+    ?:  (GTH DATE.BUILD I.DATES)
+      [DATE.BUILD DATES]
+    [I.DATES $(DATES T.DATES)]
+  ::  +DEL: REMOVE A +BUILD FROM :BUILDS
   ::
-  ::    Removes :build from :builds by replacing the value at
-  ::    the key :schematic.build with a new :dates list with
-  ::    :date.build omitted. If the resulting :dates list is
-  ::    empty, then remove the key-value pair from :builds.
+  ::    REMOVES :BUILD FROM :BUILDS BY REPLACING THE VALUE AT
+  ::    THE KEY :SCHEMATIC.BUILD WITH A NEW :DATES LIST WITH
+  ::    :DATE.BUILD OMITTED. IF THE RESULTING :DATES LIST IS
+  ::    EMPTY, THEN REMOVE THE KEY-VALUE PAIR FROM :BUILDS.
   ::
-  ++  del
-    |=  =build
-    ^+  builds
-    =.  builds
-      %+  ~(jab by builds)  schematic.build
-      |=  dates=(list @da)
-      ~|  build+build
-      =/  date-index  (need (find [date.build]~ dates))
-      (oust [date-index 1] dates)
-    ::  if :builds has an empty entry for :build, delete it
+  ++  DEL
+    |=  =BUILD
+    ^+  BUILDS
+    =.  BUILDS
+      %+  ~(JAB BY BUILDS)  SCHEMATIC.BUILD
+      |=  DATES=(LIST @DA)
+      ~|  BUILD+BUILD
+      =/  DATE-INDEX  (NEED (FIND [DATE.BUILD]~ DATES))
+      (OUST [DATE-INDEX 1] DATES)
+    ::  IF :BUILDS HAS AN EMPTY ENTRY FOR :BUILD, DELETE IT
     ::
-    =?    builds
-        =(~ (~(got by builds) schematic.build))
-      (~(del by builds) schematic.build)
+    =?    BUILDS
+        =(~ (~(GOT BY BUILDS) SCHEMATIC.BUILD))
+      (~(DEL BY BUILDS) SCHEMATIC.BUILD)
     ::
-    builds
-  ::  +find-previous: find the most recent older build with :schematic.build
+    BUILDS
+  ::  +FIND-PREVIOUS: FIND THE MOST RECENT OLDER BUILD WITH :SCHEMATIC.BUILD
   ::
-  ++  find-previous
-    |=  =build
-    ^-  (unit ^build)
+  ++  FIND-PREVIOUS
+    |=  =BUILD
+    ^-  (UNIT ^BUILD)
     ::
-    =/  dates=(list @da)  (fall (~(get by builds) schematic.build) ~)
+    =/  DATES=(LIST @DA)  (FALL (~(GET BY BUILDS) SCHEMATIC.BUILD) ~)
     ::
-    |-  ^-  (unit ^build)
-    ?~  dates  ~
+    |-  ^-  (UNIT ^BUILD)
+    ?~  DATES  ~
     ::
-    ?:  (lth i.dates date.build)
-      `[i.dates schematic.build]
-    $(dates t.dates)
-  ::  +find-next: find the earliest build of :schematic.build later than :build
+    ?:  (LTH I.DATES DATE.BUILD)
+      `[I.DATES SCHEMATIC.BUILD]
+    $(DATES T.DATES)
+  ::  +FIND-NEXT: FIND THE EARLIEST BUILD OF :SCHEMATIC.BUILD LATER THAN :BUILD
   ::
-  ++  find-next
-    |=  =build
-    ^-  (unit ^build)
+  ++  FIND-NEXT
+    |=  =BUILD
+    ^-  (UNIT ^BUILD)
     ::
-    =/  dates=(list @da)  (flop (fall (~(get by builds) schematic.build) ~))
+    =/  DATES=(LIST @DA)  (FLOP (FALL (~(GET BY BUILDS) SCHEMATIC.BUILD) ~))
     ::
-    |-  ^-  (unit ^build)
-    ?~  dates  ~
+    |-  ^-  (UNIT ^BUILD)
+    ?~  DATES  ~
     ::
-    ?:  (gth i.dates date.build)
-      `[i.dates schematic.build]
-    $(dates t.dates)
+    ?:  (GTH I.DATES DATE.BUILD)
+      `[I.DATES SCHEMATIC.BUILD]
+    $(DATES T.DATES)
   --
-::  +get-request-ducts: all ducts waiting on this request
+::  +GET-REQUEST-DUCTS: ALL DUCTS WAITING ON THIS REQUEST
 ::
-++  get-request-ducts
-  |*  [tracker=(request-tracker) request=*]
-  ^-  (list duct)
+++  GET-REQUEST-DUCTS
+  |*  [TRACKER=(REQUEST-TRACKER) REQUEST=*]
+  ^-  (LIST DUCT)
   ::
-  ~(tap in waiting:(~(got by tracker) request))
-::  +put-request: associates a +duct with a request
+  ~(TAP IN WAITING:(~(GOT BY TRACKER) REQUEST))
+::  +PUT-REQUEST: ASSOCIATES A +DUCT WITH A REQUEST
 ::
-++  put-request
-  |*  [tracker=(request-tracker) request=* =duct]
+++  PUT-REQUEST
+  |*  [TRACKER=(REQUEST-TRACKER) REQUEST=* =DUCT]
   ::
-  %+  ~(put by tracker)  request
-  ?~  existing=(~(get by tracker) request)
-    [(sy duct ~) duct]
-  u.existing(waiting (~(put in waiting.u.existing) duct))
-::  +del-request: remove a duct and produce the originating duct if empty
+  %+  ~(PUT BY TRACKER)  REQUEST
+  ?~  EXISTING=(~(GET BY TRACKER) REQUEST)
+    [(SY DUCT ~) DUCT]
+  U.EXISTING(WAITING (~(PUT IN WAITING.U.EXISTING) DUCT))
+::  +DEL-REQUEST: REMOVE A DUCT AND PRODUCE THE ORIGINATING DUCT IF EMPTY
 ::
-++  del-request
-  |*  [tracker=(request-tracker) request=* =duct]
-  ^-  [(unit ^duct) _tracker]
-  ::  remove :duct from the existing :record of this :request
+++  DEL-REQUEST
+  |*  [TRACKER=(REQUEST-TRACKER) REQUEST=* =DUCT]
+  ^-  [(UNIT ^DUCT) _TRACKER]
+  ::  REMOVE :DUCT FROM THE EXISTING :RECORD OF THIS :REQUEST
   ::
-  =/  record  (~(got by tracker) request)
-  =.  waiting.record  (~(del in waiting.record) duct)
-  ::  if no more ducts wait on :request, delete it
+  =/  RECORD  (~(GOT BY TRACKER) REQUEST)
+  =.  WAITING.RECORD  (~(DEL IN WAITING.RECORD) DUCT)
+  ::  IF NO MORE DUCTS WAIT ON :REQUEST, DELETE IT
   ::
-  ?^  waiting.record
-    [~ (~(put by tracker) request record)]
-  [`originator.record (~(del by tracker) request)]
-::  +parse-scaffold: produces a parser for a hoon file with +crane instances
+  ?^  WAITING.RECORD
+    [~ (~(PUT BY TRACKER) REQUEST RECORD)]
+  [`ORIGINATOR.RECORD (~(DEL BY TRACKER) REQUEST)]
+::  +PARSE-SCAFFOLD: PRODUCES A PARSER FOR A HOON FILE WITH +CRANE INSTANCES
 ::
-::    Ford parses a superset of hoon which contains additional runes to
-::    represent +crane s. This parses to a +scaffold.
+::    FORD PARSES A SUPERSET OF HOON WHICH CONTAINS ADDITIONAL RUNES TO
+::    REPRESENT +CRANE S. THIS PARSES TO A +SCAFFOLD.
 ::
-::    src-beam: +beam of the source file we're parsing
+::    SRC-BEAM: +BEAM OF THE SOURCE FILE WE'RE PARSING
 ::
-++  parse-scaffold
-  |=  src-beam=beam
+++  PARSE-SCAFFOLD
+  |=  SRC-BEAM=BEAM
   ::
-  =/  hoon-parser  (vang & (en-beam src-beam))
+  =/  HOON-PARSER  (VANG & (EN-BEAM SRC-BEAM))
   |^  ::
-      %+  cook
-        |=  a=[@ud (list ^cable) (list ^cable) (list ^crane) (list hoon)]
-        ^-  scaffold
-        [[[p q] s]:src-beam a]
+      %+  COOK
+        |=  A=[@UD (LIST ^CABLE) (LIST ^CABLE) (LIST ^CRANE) (LIST HOON)]
+        ^-  SCAFFOLD
+        [[[P Q] S]:SRC-BEAM A]
       ::
-      %+  ifix  [gay gay]
-      ;~  plug
-      ::  parses the zuse version, eg "/?  309"
+      %+  IFIX  [GAY GAY]
+      ;~  PLUG
+      ::  PARSES THE ZUSE VERSION, EG "/?  309"
       ::
-        ;~  pose
-          (ifix [;~(plug net wut gap) gap] dem)
-          (easy zuse)
+        ;~  POSE
+          (IFIX [;~(PLUG NET WUT GAP) GAP] DEM)
+          (EASY ZUSE)
         ==
-      ::  pareses the structures, eg "/-  types"
+      ::  PARESES THE STRUCTURES, EG "/-  TYPES"
       ::
-        ;~  pose
-          (ifix [;~(plug net hep gap) gap] (most ;~(plug com gaw) cable))
-          (easy ~)
+        ;~  POSE
+          (IFIX [;~(PLUG NET HEP GAP) GAP] (MOST ;~(PLUG COM GAW) CABLE))
+          (EASY ~)
         ==
-      ::  parses the libraries, eg "/+  lib1, lib2"
+      ::  PARSES THE LIBRARIES, EG "/+  LIB1, LIB2"
       ::
-        ;~  pose
-          (ifix [;~(plug net lus gap) gap] (most ;~(plug com gaw) cable))
-          (easy ~)
+        ;~  POSE
+          (IFIX [;~(PLUG NET LUS GAP) GAP] (MOST ;~(PLUG COM GAW) CABLE))
+          (EASY ~)
         ==
       ::
-        (star ;~(sfix crane gap))
+        (STAR ;~(SFIX CRANE GAP))
       ::
-        (most gap tall:hoon-parser)
+        (MOST GAP TALL:HOON-PARSER)
       ==
-  ::  +beam: parses a hood path and converts it to a beam
+  ::  +BEAM: PARSES A HOOD PATH AND CONVERTS IT TO A BEAM
   ::
-  ++  beam
-    %+  sear  de-beam
-    ;~  pfix
-      net
-      (sear plex (stag %clsg poor)):hoon-parser
+  ++  BEAM
+    %+  SEAR  DE-BEAM
+    ;~  PFIX
+      NET
+      (SEAR PLEX (STAG %CLSG POOR)):HOON-PARSER
     ==
-  ::  +cable: parses a +^cable, a reference to something on the filesystem
+  ::  +CABLE: PARSES A +^CABLE, A REFERENCE TO SOMETHING ON THE FILESYSTEM
   ::
-  ::    This parses:
+  ::    THIS PARSES:
   ::
-  ::      `library`       ->  wraps `library` around the library `library`
-  ::      `face=library`  ->  wraps `face` around the library `library`
-  ::      `*library`      ->  exposes `library` directly to the subject
+  ::      `LIBRARY`       ->  WRAPS `LIBRARY` AROUND THE LIBRARY `LIBRARY`
+  ::      `FACE=LIBRARY`  ->  WRAPS `FACE` AROUND THE LIBRARY `LIBRARY`
+  ::      `*LIBRARY`      ->  EXPOSES `LIBRARY` DIRECTLY TO THE SUBJECT
   ::
-  ++  cable
-    %+  cook  |=(a=^cable a)
-    ;~  pose
-      (stag ~ ;~(pfix tar sym))
-      (cook |=([face=term tis=@ file=term] [`face file]) ;~(plug sym tis sym))
-      (cook |=(a=term [`a a]) sym)
+  ++  CABLE
+    %+  COOK  |=(A=^CABLE A)
+    ;~  POSE
+      (STAG ~ ;~(PFIX TAR SYM))
+      (COOK |=([FACE=TERM TIS=@ FILE=TERM] [`FACE FILE]) ;~(PLUG SYM TIS SYM))
+      (COOK |=(A=TERM [`A A]) SYM)
     ==
-  ::  +crane: all runes that start with / which aren't /?, /-, /+ or //.
+  ::  +CRANE: ALL RUNES THAT START WITH / WHICH AREN'T /?, /-, /+ OR //.
   ::
-  ++  crane
-    =<  apex
-    ::  whether we allow tall form
-    =|  allow-tall-form=?
+  ++  CRANE
+    =<  APEX
+    ::  WHETHER WE ALLOW TALL FORM
+    =|  ALLOW-TALL-FORM=?
     ::
     |%
-    ++  apex
-      %+  knee  *^crane  |.  ~+
-      ;~  pfix  net
-        ;~  pose
-          ::  `/~`  hoon literal
+    ++  APEX
+      %+  KNEE  *^CRANE  |.  ~+
+      ;~  PFIX  NET
+        ;~  POSE
+          ::  `/~`  HOON LITERAL
           ::
-          (stag %fssg ;~(pfix sig hoon))
-          ::  `/$`  process query string
+          (STAG %FSSG ;~(PFIX SIG HOON))
+          ::  `/$`  PROCESS QUERY STRING
           ::
-          (stag %fsbc ;~(pfix bus hoon))
-          ::  `/|`  first of many options that succeeds
+          (STAG %FSBC ;~(PFIX BUS HOON))
+          ::  `/|`  FIRST OF MANY OPTIONS THAT SUCCEEDS
           ::
-          (stag %fsbr ;~(pfix bar parse-alts))
-          ::  `/=`  wrap a face around a crane
+          (STAG %FSBR ;~(PFIX BAR PARSE-ALTS))
+          ::  `/=`  WRAP A FACE AROUND A CRANE
           ::
-          (stag %fsts ;~(pfix tis parse-face))
-          ::  `/.`  null terminated list
+          (STAG %FSTS ;~(PFIX TIS PARSE-FACE))
+          ::  `/.`  NULL TERMINATED LIST
           ::
-          (stag %fsdt ;~(pfix dot parse-list))
-          ::  `/,`  switch by path
+          (STAG %FSDT ;~(PFIX DOT PARSE-LIST))
+          ::  `/,`  SWITCH BY PATH
           ::
-          (stag %fscm ;~(pfix com parse-switch))
-          ::  `/&`  pass through a series of mark
+          (STAG %FSCM ;~(PFIX COM PARSE-SWITCH))
+          ::  `/&`  PASS THROUGH A SERIES OF MARK
           ::
-          (stag %fspm ;~(pfix pad parse-pipe))
-          ::  `/_`  run a crane on each file in the current directory
+          (STAG %FSPM ;~(PFIX PAD PARSE-PIPE))
+          ::  `/_`  RUN A CRANE ON EACH FILE IN THE CURRENT DIRECTORY
           ::
-          (stag %fscb ;~(pfix cab subcrane))
-          ::  `/;`  passes date through a gate
+          (STAG %FSCB ;~(PFIX CAB SUBCRANE))
+          ::  `/;`  PASSES DATE THROUGH A GATE
           ::
-          (stag %fssm ;~(pfix mic parse-gate))
-          ::  `/:`  evaluate at path
+          (STAG %FSSM ;~(PFIX MIC PARSE-GATE))
+          ::  `/:`  EVALUATE AT PATH
           ::
-          (stag %fscl ;~(pfix col parse-at-path))
-          ::  `/^`  cast
+          (STAG %FSCL ;~(PFIX COL PARSE-AT-PATH))
+          ::  `/^`  CAST
           ::
-          (stag %fskt ;~(pfix ket parse-cast))
-          ::  `/*`  run a crane on each file with current path as prefix
+          (STAG %FSKT ;~(PFIX KET PARSE-CAST))
+          ::  `/*`  RUN A CRANE ON EACH FILE WITH CURRENT PATH AS PREFIX
           ::
-          (stag %fstr ;~(pfix tar subcrane))
-          ::  `/!mark/ evaluate as hoon, then pass through mark
+          (STAG %FSTR ;~(PFIX TAR SUBCRANE))
+          ::  `/!MARK/ EVALUATE AS HOON, THEN PASS THROUGH MARK
           ::
-          (stag %fszp ;~(pfix zap ;~(sfix sym net)))
-          ::  `/mark/` passes current path through :mark
+          (STAG %FSZP ;~(PFIX ZAP ;~(SFIX SYM NET)))
+          ::  `/MARK/` PASSES CURRENT PATH THROUGH :MARK
           ::
-          (stag %fszy ;~(sfix sym net))
+          (STAG %FSZY ;~(SFIX SYM NET))
         ==
       ==
-    ::  +parse-alts: parse a set of alternatives
+    ::  +PARSE-ALTS: PARSE A SET OF ALTERNATIVES
     ::
-    ++  parse-alts
-      %+  wide-or-tall
-        (ifix [lit rit] (most ace subcrane))
-      ;~(sfix (star subcrane) gap duz)
-    ::  +parse-face: parse a face around a subcrane
+    ++  PARSE-ALTS
+      %+  WIDE-OR-TALL
+        (IFIX [LIT RIT] (MOST ACE SUBCRANE))
+      ;~(SFIX (STAR SUBCRANE) GAP DUZ)
+    ::  +PARSE-FACE: PARSE A FACE AROUND A SUBCRANE
     ::
-    ++  parse-face
-      %+  wide-or-tall
-        ;~(plug sym ;~(pfix tis subcrane))
-      ;~(pfix gap ;~(plug sym subcrane))
-    ::  +parse-list: parse a null terminated list of cranes
+    ++  PARSE-FACE
+      %+  WIDE-OR-TALL
+        ;~(PLUG SYM ;~(PFIX TIS SUBCRANE))
+      ;~(PFIX GAP ;~(PLUG SYM SUBCRANE))
+    ::  +PARSE-LIST: PARSE A NULL TERMINATED LIST OF CRANES
     ::
-    ++  parse-list
-      %+  wide-or-tall
-        fail
-      ;~(sfix (star subcrane) gap duz)
-    ::  +parse-switch: parses a list of [path crane]
+    ++  PARSE-LIST
+      %+  WIDE-OR-TALL
+        FAIL
+      ;~(SFIX (STAR SUBCRANE) GAP DUZ)
+    ::  +PARSE-SWITCH: PARSES A LIST OF [PATH CRANE]
     ::
-    ++  parse-switch
-      %+  wide-or-tall
-        fail
-      =-  ;~(sfix (star -) gap duz)
-      ;~(pfix gap net ;~(plug static-path subcrane))
-    ::  +parse-pipe: parses a pipe of mark conversions
+    ++  PARSE-SWITCH
+      %+  WIDE-OR-TALL
+        FAIL
+      =-  ;~(SFIX (STAR -) GAP DUZ)
+      ;~(PFIX GAP NET ;~(PLUG STATIC-PATH SUBCRANE))
+    ::  +PARSE-PIPE: PARSES A PIPE OF MARK CONVERSIONS
     ::
-    ++  parse-pipe
-      %+  wide-or-tall
-        ;~(plug (plus ;~(sfix sym pad)) subcrane)
-      =+  (cook |=(a=term [a ~]) sym)
-      ;~(pfix gap ;~(plug - subcrane))
-    ::  +parse-gate: parses a gate applied to a crane
+    ++  PARSE-PIPE
+      %+  WIDE-OR-TALL
+        ;~(PLUG (PLUS ;~(SFIX SYM PAD)) SUBCRANE)
+      =+  (COOK |=(A=TERM [A ~]) SYM)
+      ;~(PFIX GAP ;~(PLUG - SUBCRANE))
+    ::  +PARSE-GATE: PARSES A GATE APPLIED TO A CRANE
     ::
-    ++  parse-gate
-      %+  wide-or-tall
-        ;~(plug ;~(sfix wide:hoon-parser mic) subcrane)
-      ;~(pfix gap ;~(plug tall:hoon-parser subcrane))
-    ::  +parse-at-path: parses a late bound bath
+    ++  PARSE-GATE
+      %+  WIDE-OR-TALL
+        ;~(PLUG ;~(SFIX WIDE:HOON-PARSER MIC) SUBCRANE)
+      ;~(PFIX GAP ;~(PLUG TALL:HOON-PARSER SUBCRANE))
+    ::  +PARSE-AT-PATH: PARSES A LATE BOUND BATH
     ::
-    ++  parse-at-path
-      %+  wide-or-tall
-        ;~(plug ;~(sfix late-bound-path col) subcrane)
-      ;~(pfix gap ;~(plug late-bound-path subcrane))
-    ::  +parse-cast: parses a mold and then the subcrane to apply that mold to
+    ++  PARSE-AT-PATH
+      %+  WIDE-OR-TALL
+        ;~(PLUG ;~(SFIX LATE-BOUND-PATH COL) SUBCRANE)
+      ;~(PFIX GAP ;~(PLUG LATE-BOUND-PATH SUBCRANE))
+    ::  +PARSE-CAST: PARSES A MOLD AND THEN THE SUBCRANE TO APPLY THAT MOLD TO
     ::
-    ++  parse-cast
-      %+  wide-or-tall
-        ;~(plug ;~(sfix wyde:hoon-parser ket) subcrane)
-      ;~(pfix gap ;~(plug till:hoon-parser subcrane))
-    ::  +subcrane: parses a subcrane
+    ++  PARSE-CAST
+      %+  WIDE-OR-TALL
+        ;~(PLUG ;~(SFIX WYDE:HOON-PARSER KET) SUBCRANE)
+      ;~(PFIX GAP ;~(PLUG TILL:HOON-PARSER SUBCRANE))
+    ::  +SUBCRANE: PARSES A SUBCRANE
     ::
-    ++  subcrane
-      %+  wide-or-tall
-        apex(allow-tall-form |)
-      ;~(pfix gap apex)
-    ::  +wide-or-tall: parses tall form hoon if :allow-tall-form is %.y
+    ++  SUBCRANE
+      %+  WIDE-OR-TALL
+        APEX(ALLOW-TALL-FORM |)
+      ;~(PFIX GAP APEX)
+    ::  +WIDE-OR-TALL: PARSES TALL FORM HOON IF :ALLOW-TALL-FORM IS %.Y
     ::
-    ++  wide-or-tall
-      |*  [wide=rule tall=rule]
-      ?.  allow-tall-form  wide
-      ;~(pose wide tall)
-    ::  +hoon: parses hoon as an argument to a crane
+    ++  WIDE-OR-TALL
+      |*  [WIDE=RULE TALL=RULE]
+      ?.  ALLOW-TALL-FORM  WIDE
+      ;~(POSE WIDE TALL)
+    ::  +HOON: PARSES HOON AS AN ARGUMENT TO A CRANE
     ::
-    ++  hoon
-      %+  wide-or-tall
-        (ifix [lac rac] (stag %cltr (most ace wide:hoon-parser)))
-      ;~(pfix gap tall:hoon-parser)
+    ++  HOON
+      %+  WIDE-OR-TALL
+        (IFIX [LAC RAC] (STAG %CLTR (MOST ACE WIDE:HOON-PARSER)))
+      ;~(PFIX GAP TALL:HOON-PARSER)
     --
-  ::  +static-path: parses a path
+  ::  +STATIC-PATH: PARSES A PATH
   ::
-  ++  static-path
-    (sear plex (stag %clsg (more net hasp))):hoon-parser
-  ::  +late-bound-path: a path whose time varies
+  ++  STATIC-PATH
+    (SEAR PLEX (STAG %CLSG (MORE NET HASP))):HOON-PARSER
+  ::  +LATE-BOUND-PATH: A PATH WHOSE TIME VARIES
   ::
-  ++  late-bound-path
-    ;~  pfix  net
-      %+  cook  |=(a=truss a)
-      =>  hoon-parser
-      ;~  plug
-        (stag ~ gash)
-        ;~(pose (stag ~ ;~(pfix cen porc)) (easy ~))
+  ++  LATE-BOUND-PATH
+    ;~  PFIX  NET
+      %+  COOK  |=(A=TRUSS A)
+      =>  HOON-PARSER
+      ;~  PLUG
+        (STAG ~ GASH)
+        ;~(POSE (STAG ~ ;~(PFIX CEN PORC)) (EASY ~))
       ==
     ==
   --
-::  +per-event: per-event core; main build engine
+::  +PER-EVENT: PER-EVENT CORE; MAIN BUILD ENGINE
 ::
-::    This arm produces a gate that when called with state and event
-::    information produces the core of Ford's main build engine.
+::    THIS ARM PRODUCES A GATE THAT WHEN CALLED WITH STATE AND EVENT
+::    INFORMATION PRODUCES THE CORE OF FORD'S MAIN BUILD ENGINE.
 ::
-::    The main build engine core has the following entry points:
+::    THE MAIN BUILD ENGINE CORE HAS THE FOLLOWING ENTRY POINTS:
 ::
-::      +start-build  start performing a build
-::      +rebuild      rerun a live build at a new date
-::      +unblock      continue a build that was waiting on a resource
-::      +cancel       stop trying to run a build and delete its tracking info
-::      +wipe         wipe the build storage to free memory
-::      +keep         resize caches, deleting entries if necessary
+::      +START-BUILD  START PERFORMING A BUILD
+::      +REBUILD      RERUN A LIVE BUILD AT A NEW DATE
+::      +UNBLOCK      CONTINUE A BUILD THAT WAS WAITING ON A RESOURCE
+::      +CANCEL       STOP TRYING TO RUN A BUILD AND DELETE ITS TRACKING INFO
+::      +WIPE         WIPE THE BUILD STORAGE TO FREE MEMORY
+::      +KEEP         RESIZE CACHES, DELETING ENTRIES IF NECESSARY
 ::
-::    The main internal arm is +execute-loop, which is called from +start-build,
-::    +rebuild, and +unblock. +execute defines Ford's build loop.
+::    THE MAIN INTERNAL ARM IS +EXECUTE-LOOP, WHICH IS CALLED FROM +START-BUILD,
+::    +REBUILD, AND +UNBLOCK. +EXECUTE DEFINES FORD'S BUILD LOOP.
 ::
-++  per-event
-  ::  moves: the moves to be sent out at the end of this event, reversed
+++  PER-EVENT
+  ::  MOVES: THE MOVES TO BE SENT OUT AT THE END OF THIS EVENT, REVERSED
   ::
-  =|  moves=(list move)
-  ::  scry-results: responses to scry's to handle in this event
+  =|  MOVES=(LIST MOVE)
+  ::  SCRY-RESULTS: RESPONSES TO SCRY'S TO HANDLE IN THIS EVENT
   ::
-  ::    If a value is `~`, the requested resource is not available.
-  ::    Otherwise, the value will contain a +cage.
+  ::    IF A VALUE IS `~`, THE REQUESTED RESOURCE IS NOT AVAILABLE.
+  ::    OTHERWISE, THE VALUE WILL CONTAIN A +CAGE.
   ::
-  =|  scry-results=(map scry-request (unit cage))
-  ::  next-builds: builds to perform in the next iteration
+  =|  SCRY-RESULTS=(MAP SCRY-REQUEST (UNIT CAGE))
+  ::  NEXT-BUILDS: BUILDS TO PERFORM IN THE NEXT ITERATION
   ::
-  =|  next-builds=(set build)
-  ::  candidate-builds: builds which might go into next-builds
+  =|  NEXT-BUILDS=(SET BUILD)
+  ::  CANDIDATE-BUILDS: BUILDS WHICH MIGHT GO INTO NEXT-BUILDS
   ::
-  =|  candidate-builds=(set build)
-  ::  gate that produces the +per-event core from event information
+  =|  CANDIDATE-BUILDS=(SET BUILD)
+  ::  GATE THAT PRODUCES THE +PER-EVENT CORE FROM EVENT INFORMATION
   ::
-  ::    Produces a core containing Ford's main build engine.
+  ::    PRODUCES A CORE CONTAINING FORD'S MAIN BUILD ENGINE.
   ::
-  ~%  %f  ..is  ~
-  |=  [[our=@p =duct now=@da scry=sley] state=ford-state]
+  ~%  %F  ..IS  ~
+  |=  [[OUR=@P =DUCT NOW=@DA SCRY=SLEY] STATE=FORD-STATE]
   ::
-  ~%  %per-event  +  ~
+  ~%  %PER-EVENT  +  ~
   |%
-  ::  +finalize: extract moves and state from the +per-event core
+  ::  +FINALIZE: EXTRACT MOVES AND STATE FROM THE +PER-EVENT CORE
   ::
-  ::    Run once at the end of processing an event.
+  ::    RUN ONCE AT THE END OF PROCESSING AN EVENT.
   ::
-  ++  finalize
-    ^-  [(list move) ford-state]
-    [(flop moves) state]
-  ::  |entry-points: externally fired arms
+  ++  FINALIZE
+    ^-  [(LIST MOVE) FORD-STATE]
+    [(FLOP MOVES) STATE]
+  ::  |ENTRY-POINTS: EXTERNALLY FIRED ARMS
   ::
-  ::+|  entry-points
+  ::+|  ENTRY-POINTS
   ::
-  ::  +start-build: perform a fresh +build, either live or once
+  ::  +START-BUILD: PERFORM A FRESH +BUILD, EITHER LIVE OR ONCE
   ::
-  ::    This might complete the build, or the build might block on one or more
-  ::    requests for resources. Calls +execute-loop.
+  ::    THIS MIGHT COMPLETE THE BUILD, OR THE BUILD MIGHT BLOCK ON ONE OR MORE
+  ::    REQUESTS FOR RESOURCES. CALLS +EXECUTE-LOOP.
   ::
-  ++  start-build
-    ~/  %start-build
-    |=  [=build live=?]
-    ^-  [(list move) ford-state]
+  ++  START-BUILD
+    ~/  %START-BUILD
+    |=  [=BUILD LIVE=?]
+    ^-  [(LIST MOVE) FORD-STATE]
     ::
-    =<  finalize
-    ::  associate :duct with :build in :ducts.state
+    =<  FINALIZE
+    ::  ASSOCIATE :DUCT WITH :BUILD IN :DUCTS.STATE
     ::
-    =.  ducts.state
-      %+  ~(put by ducts.state)  duct
-      :_  schematic.build
-      ?:  live
-        [%live in-progress=`date.build last-sent=~]
-      [%once in-progress=date.build]
-    ::  register a state machine for :build in :builds.state
+    =.  DUCTS.STATE
+      %+  ~(PUT BY DUCTS.STATE)  DUCT
+      :_  SCHEMATIC.BUILD
+      ?:  LIVE
+        [%LIVE IN-PROGRESS=`DATE.BUILD LAST-SENT=~]
+      [%ONCE IN-PROGRESS=DATE.BUILD]
+    ::  REGISTER A STATE MACHINE FOR :BUILD IN :BUILDS.STATE
     ::
-    =.  state  (add-build build)
-    ::  :anchor: the reason we hold onto the root of this build tree
+    =.  STATE  (ADD-BUILD BUILD)
+    ::  :ANCHOR: THE REASON WE HOLD ONTO THE ROOT OF THIS BUILD TREE
     ::
-    =/  =anchor  [%duct duct]
-    ::  register :duct as an anchor in :requesters.build-status
+    =/  =ANCHOR  [%DUCT DUCT]
+    ::  REGISTER :DUCT AS AN ANCHOR IN :REQUESTERS.BUILD-STATUS
     ::
-    ::    This establishes :build as the root build for :duct.
+    ::    THIS ESTABLISHES :BUILD AS THE ROOT BUILD FOR :DUCT.
     ::
-    =.  builds.state
-      %+  ~(jab by builds.state)  build
-      |=  =build-status
-      build-status(requesters (~(put in requesters.build-status) anchor))
-    ::  copy :anchor into any preexisting descendants
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  BUILD
+      |=  =BUILD-STATUS
+      BUILD-STATUS(REQUESTERS (~(PUT IN REQUESTERS.BUILD-STATUS) ANCHOR))
+    ::  COPY :ANCHOR INTO ANY PREEXISTING DESCENDANTS
     ::
-    ::    Sub-builds will reference :build in their :clients.build-status,
-    ::    using `[%duct duct]` as the key. Some sub-builds might already
-    ::    exist if we've already started running :build, so make sure they
-    ::    know who their daddy is.
+    ::    SUB-BUILDS WILL REFERENCE :BUILD IN THEIR :CLIENTS.BUILD-STATUS,
+    ::    USING `[%DUCT DUCT]` AS THE KEY. SOME SUB-BUILDS MIGHT ALREADY
+    ::    EXIST IF WE'VE ALREADY STARTED RUNNING :BUILD, SO MAKE SURE THEY
+    ::    KNOW WHO THEIR DADDY IS.
     ::
-    =.  builds.state  (add-anchor-to-subs anchor build)
-    ::  run +execute on :build in a loop until it completes or blocks
+    =.  BUILDS.STATE  (ADD-ANCHOR-TO-SUBS ANCHOR BUILD)
+    ::  RUN +EXECUTE ON :BUILD IN A LOOP UNTIL IT COMPLETES OR BLOCKS
     ::
-    (execute-loop (sy [build ~]))
-  ::  +rebuild: rebuild a live build based on +resource updates
+    (EXECUTE-LOOP (SY [BUILD ~]))
+  ::  +REBUILD: REBUILD A LIVE BUILD BASED ON +RESOURCE UPDATES
   ::
-  ::    For every changed resource, run the %scry build for that
-  ::    for that resource. Then rebuild upward using the main +execute-loop
-  ::    until all relevant builds either complete or block on external
-  ::    resources. Use dependency tracking information from the previous
-  ::    run of this live build to inform the dependency tracking for this
-  ::    new rebuild.
+  ::    FOR EVERY CHANGED RESOURCE, RUN THE %SCRY BUILD FOR THAT
+  ::    FOR THAT RESOURCE. THEN REBUILD UPWARD USING THE MAIN +EXECUTE-LOOP
+  ::    UNTIL ALL RELEVANT BUILDS EITHER COMPLETE OR BLOCK ON EXTERNAL
+  ::    RESOURCES. USE DEPENDENCY TRACKING INFORMATION FROM THE PREVIOUS
+  ::    RUN OF THIS LIVE BUILD TO INFORM THE DEPENDENCY TRACKING FOR THIS
+  ::    NEW REBUILD.
   ::
-  ++  rebuild
-    ~/  %rebuild
-    |=  $:  =subscription
-            new-date=@da
-            =disc
-            care-paths=(set [care=care:clay =path])
+  ++  REBUILD
+    ~/  %REBUILD
+    |=  $:  =SUBSCRIPTION
+            NEW-DATE=@DA
+            =DISC
+            CARE-PATHS=(SET [CARE=CARE:CLAY =PATH])
         ==
-    ^-  [(list move) ford-state]
+    ^-  [(LIST MOVE) FORD-STATE]
     ::
-    ~|  [%rebuilding new-date disc]
+    ~|  [%REBUILDING NEW-DATE DISC]
     ::
-    =<  finalize
-    ::  mark this subscription as complete now that we've heard a response
+    =<  FINALIZE
+    ::  MARK THIS SUBSCRIPTION AS COMPLETE NOW THAT WE'VE HEARD A RESPONSE
     ::
-    =.  pending-subscriptions.state
-      +:(del-request pending-subscriptions.state subscription duct)
-    ::  for every changed resource, create a %scry build
+    =.  PENDING-SUBSCRIPTIONS.STATE
+      +:(DEL-REQUEST PENDING-SUBSCRIPTIONS.STATE SUBSCRIPTION DUCT)
+    ::  FOR EVERY CHANGED RESOURCE, CREATE A %SCRY BUILD
     ::
-    =/  builds=(list build)
-      %+  turn  ~(tap in care-paths)
-      |=  [care=care:clay =path]
-      ^-  build
+    =/  BUILDS=(LIST BUILD)
+      %+  TURN  ~(TAP IN CARE-PATHS)
+      |=  [CARE=CARE:CLAY =PATH]
+      ^-  BUILD
       ::
-      [new-date [%scry [%c care rail=[disc spur=(flop path)]]]]
-    ::  sanity check; only rebuild live builds, not once builds
+      [NEW-DATE [%SCRY [%C CARE RAIL=[DISC SPUR=(FLOP PATH)]]]]
+    ::  SANITY CHECK; ONLY REBUILD LIVE BUILDS, NOT ONCE BUILDS
     ::
-    =/  duct-status  (~(got by ducts.state) duct)
-    ?>  ?=(%live -.live.duct-status)
-    ::  sanity check; only rebuild once we've completed the previous one
+    =/  DUCT-STATUS  (~(GOT BY DUCTS.STATE) DUCT)
+    ?>  ?=(%LIVE -.LIVE.DUCT-STATUS)
+    ::  SANITY CHECK; ONLY REBUILD ONCE WE'VE COMPLETED THE PREVIOUS ONE
     ::
-    ?>  ?=(~ in-progress.live.duct-status)
-    ?>  ?=(^ last-sent.live.duct-status)
-    ::  set the in-progress date for this new build
+    ?>  ?=(~ IN-PROGRESS.LIVE.DUCT-STATUS)
+    ?>  ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
+    ::  SET THE IN-PROGRESS DATE FOR THIS NEW BUILD
     ::
-    =.  ducts.state
-      %+  ~(put by ducts.state)  duct
-      duct-status(in-progress.live `new-date)
-    ::  copy the previous build's tree as provisional sub-builds
+    =.  DUCTS.STATE
+      %+  ~(PUT BY DUCTS.STATE)  DUCT
+      DUCT-STATUS(IN-PROGRESS.LIVE `NEW-DATE)
+    ::  COPY THE PREVIOUS BUILD'S TREE AS PROVISIONAL SUB-BUILDS
     ::
-    ::    This provides an upward rebuild path from leaves to root,
-    ::    so that once the %scry builds complete, we'll know to rebuild
-    ::    their clients. This process will continue up through rebuilding
-    ::    the root build.
+    ::    THIS PROVIDES AN UPWARD REBUILD PATH FROM LEAVES TO ROOT,
+    ::    SO THAT ONCE THE %SCRY BUILDS COMPLETE, WE'LL KNOW TO REBUILD
+    ::    THEIR CLIENTS. THIS PROCESS WILL CONTINUE UP THROUGH REBUILDING
+    ::    THE ROOT BUILD.
     ::
-    ::    If the build at this new date ends up with a different set of
-    ::    dependencies from its previous incarnation, provisional sub-builds
-    ::    that weren't actually used will be removed in
-    ::    +cleanup-orphaned-provisional-builds.
+    ::    IF THE BUILD AT THIS NEW DATE ENDS UP WITH A DIFFERENT SET OF
+    ::    DEPENDENCIES FROM ITS PREVIOUS INCARNATION, PROVISIONAL SUB-BUILDS
+    ::    THAT WEREN'T ACTUALLY USED WILL BE REMOVED IN
+    ::    +CLEANUP-ORPHANED-PROVISIONAL-BUILDS.
     ::
-    =/  old-root=build
-      [date.u.last-sent.live.duct-status root-schematic.duct-status]
+    =/  OLD-ROOT=BUILD
+      [DATE.U.LAST-SENT.LIVE.DUCT-STATUS ROOT-SCHEMATIC.DUCT-STATUS]
     ::
-    =.  state
+    =.  STATE
       ::
-      ~|  [%duct-doesnt-refer-to-real-build live.duct-status]
-      ~|  [%missing-build (build-to-tape old-root)]
-      ~|  [%dates (~(get by builds-by-schematic.state) root-schematic.duct-status)]
-      ?>  (~(has by builds.state) old-root)
+      ~|  [%DUCT-DOESNT-REFER-TO-REAL-BUILD LIVE.DUCT-STATUS]
+      ~|  [%MISSING-BUILD (BUILD-TO-TAPE OLD-ROOT)]
+      ~|  [%DATES (~(GET BY BUILDS-BY-SCHEMATIC.STATE) ROOT-SCHEMATIC.DUCT-STATUS)]
+      ?>  (~(HAS BY BUILDS.STATE) OLD-ROOT)
       ::
-      (copy-build-tree-as-provisional old-root new-date=new-date)
-    ::  gather all the :builds, forcing reruns
+      (COPY-BUILD-TREE-AS-PROVISIONAL OLD-ROOT NEW-DATE=NEW-DATE)
+    ::  GATHER ALL THE :BUILDS, FORCING RERUNS
     ::
-    ::    The normal +gather logic would promote the previous results
-    ::    for these %scry builds, since we have subscriptions on them.
-    ::    We pass `force=%.y` to ensure the builds get enqueued instead
-    ::    of promoted.
+    ::    THE NORMAL +GATHER LOGIC WOULD PROMOTE THE PREVIOUS RESULTS
+    ::    FOR THESE %SCRY BUILDS, SINCE WE HAVE SUBSCRIPTIONS ON THEM.
+    ::    WE PASS `FORCE=%.Y` TO ENSURE THE BUILDS GET ENQUEUED INSTEAD
+    ::    OF PROMOTED.
     ::
-    =.  ..execute  (gather (sy builds) force=%.y)
-    ::  rebuild resource builds at the new date
+    =.  ..EXECUTE  (GATHER (SY BUILDS) FORCE=%.Y)
+    ::  REBUILD RESOURCE BUILDS AT THE NEW DATE
     ::
-    ::    This kicks off the main build loop, which will first build
-    ::    :builds, then rebuild upward toward the root. If the whole
-    ::    build tree completes synchronously, then this will produce
-    ::    %made moves at the end of this event. Otherwise, it will
-    ::    block on resources and complete during a later event.
+    ::    THIS KICKS OFF THE MAIN BUILD LOOP, WHICH WILL FIRST BUILD
+    ::    :BUILDS, THEN REBUILD UPWARD TOWARD THE ROOT. IF THE WHOLE
+    ::    BUILD TREE COMPLETES SYNCHRONOUSLY, THEN THIS WILL PRODUCE
+    ::    %MADE MOVES AT THE END OF THIS EVENT. OTHERWISE, IT WILL
+    ::    BLOCK ON RESOURCES AND COMPLETE DURING A LATER EVENT.
     ::
-    (execute-loop ~)
-  ::  +unblock: continue builds that had blocked on :resource
+    (EXECUTE-LOOP ~)
+  ::  +UNBLOCK: CONTINUE BUILDS THAT HAD BLOCKED ON :RESOURCE
   ::
-  ::    A build can be stymied temporarily if it depends on a resource
-  ::    that must be fetched asynchronously. +unblock is called when
-  ::    we receive a response to a resource request that blocked a build.
+  ::    A BUILD CAN BE STYMIED TEMPORARILY IF IT DEPENDS ON A RESOURCE
+  ::    THAT MUST BE FETCHED ASYNCHRONOUSLY. +UNBLOCK IS CALLED WHEN
+  ::    WE RECEIVE A RESPONSE TO A RESOURCE REQUEST THAT BLOCKED A BUILD.
   ::
-  ::    We pick up the build from where we left off, starting with the
-  ::    %scry build that blocked on this resource last time we tried it.
+  ::    WE PICK UP THE BUILD FROM WHERE WE LEFT OFF, STARTING WITH THE
+  ::    %SCRY BUILD THAT BLOCKED ON THIS RESOURCE LAST TIME WE TRIED IT.
   ::
-  ++  unblock
-    ~/  %unblock
-    |=  [=scry-request scry-result=(unit cage)]
-    ^-  [(list move) ford-state]
+  ++  UNBLOCK
+    ~/  %UNBLOCK
+    |=  [=SCRY-REQUEST SCRY-RESULT=(UNIT CAGE)]
+    ^-  [(LIST MOVE) FORD-STATE]
     ::
-    =<  finalize
-    ::  place :scry-result in :scry-results.per-event
+    =<  FINALIZE
+    ::  PLACE :SCRY-RESULT IN :SCRY-RESULTS.PER-EVENT
     ::
-    ::    We don't want to call the actual +scry function again,
-    ::    because we already tried that in a previous event and it
-    ::    had no synchronous answer. This +unblock call is a result
-    ::    of the response to the asynchronous request we made to
-    ::    retrieve that resource from another vane.
+    ::    WE DON'T WANT TO CALL THE ACTUAL +SCRY FUNCTION AGAIN,
+    ::    BECAUSE WE ALREADY TRIED THAT IN A PREVIOUS EVENT AND IT
+    ::    HAD NO SYNCHRONOUS ANSWER. THIS +UNBLOCK CALL IS A RESULT
+    ::    OF THE RESPONSE TO THE ASYNCHRONOUS REQUEST WE MADE TO
+    ::    RETRIEVE THAT RESOURCE FROM ANOTHER VANE.
     ::
-    ::    Instead, we'll intercept any calls to +scry by looking up
-    ::    the arguments in :scry-results.per-event. This is ok because
-    ::    in this function we attempt to run every +build that had
-    ::    blocked on the resource, so the information is guaranteed
-    ::    to be used during this event before it goes out of scope.
+    ::    INSTEAD, WE'LL INTERCEPT ANY CALLS TO +SCRY BY LOOKING UP
+    ::    THE ARGUMENTS IN :SCRY-RESULTS.PER-EVENT. THIS IS OK BECAUSE
+    ::    IN THIS FUNCTION WE ATTEMPT TO RUN EVERY +BUILD THAT HAD
+    ::    BLOCKED ON THE RESOURCE, SO THE INFORMATION IS GUARANTEED
+    ::    TO BE USED DURING THIS EVENT BEFORE IT GOES OUT OF SCOPE.
     ::
-    =.  scry-results  (~(put by scry-results) scry-request scry-result)
-    ::  mark this +scry-request as complete now that we have a response
+    =.  SCRY-RESULTS  (~(PUT BY SCRY-RESULTS) SCRY-REQUEST SCRY-RESULT)
+    ::  MARK THIS +SCRY-REQUEST AS COMPLETE NOW THAT WE HAVE A RESPONSE
     ::
-    =.  pending-scrys.state
-      +:(del-request pending-scrys.state scry-request duct)
-    ::  update :unblocked-build's state machine to reflect its new status
+    =.  PENDING-SCRYS.STATE
+      +:(DEL-REQUEST PENDING-SCRYS.STATE SCRY-REQUEST DUCT)
+    ::  UPDATE :UNBLOCKED-BUILD'S STATE MACHINE TO REFLECT ITS NEW STATUS
     ::
-    =/  unblocked-build=build  (scry-request-to-build scry-request)
-    =.  builds.state
-      %+  ~(jab by builds.state)  unblocked-build
-      |=  =build-status
-      build-status(state [%unblocked ~])
-    ::  jump into the main build loop, starting with :unblocked-build
+    =/  UNBLOCKED-BUILD=BUILD  (SCRY-REQUEST-TO-BUILD SCRY-REQUEST)
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  UNBLOCKED-BUILD
+      |=  =BUILD-STATUS
+      BUILD-STATUS(STATE [%UNBLOCKED ~])
+    ::  JUMP INTO THE MAIN BUILD LOOP, STARTING WITH :UNBLOCKED-BUILD
     ::
-    (execute-loop (sy unblocked-build ~))
-  ::  +wipe: forcibly decimate build results from the state
+    (EXECUTE-LOOP (SY UNBLOCKED-BUILD ~))
+  ::  +WIPE: FORCIBLY DECIMATE BUILD RESULTS FROM THE STATE
   ::
-  ::    +wipe decimates both the :compiler-cache and the results in
-  ::    :builds.state. It removes the specified percentage of build results
-  ::    from the state. For simplicity, it considers the weight of each
-  ::    compiler cache line to be equal to the weight of a build result.
+  ::    +WIPE DECIMATES BOTH THE :COMPILER-CACHE AND THE RESULTS IN
+  ::    :BUILDS.STATE. IT REMOVES THE SPECIFIED PERCENTAGE OF BUILD RESULTS
+  ::    FROM THE STATE. FOR SIMPLICITY, IT CONSIDERS THE WEIGHT OF EACH
+  ::    COMPILER CACHE LINE TO BE EQUAL TO THE WEIGHT OF A BUILD RESULT.
   ::
-  ::    It deletes cache entries before dipping into :builds.state; it only
-  ::    converts entries in :builds.state to %tombstone's if there aren't
-  ::    enough entries in the compiler cache to sate the request's bloodlust.
+  ::    IT DELETES CACHE ENTRIES BEFORE DIPPING INTO :BUILDS.STATE; IT ONLY
+  ::    CONVERTS ENTRIES IN :BUILDS.STATE TO %TOMBSTONE'S IF THERE AREN'T
+  ::    ENOUGH ENTRIES IN THE COMPILER CACHE TO SATE THE REQUEST'S BLOODLUST.
   ::
-  ::    When deleting results from :builds.state, it first sorts them by
-  ::    their :last-accessed date so that the stalest builds are deleted first.
-  ::    We do not touch the :build-cache directly, but because the results
-  ::    of the builds in :build-cache live in :builds.state, the results of
-  ::    both FIFO-cached builds and active builds are all sorted and trimmed.
+  ::    WHEN DELETING RESULTS FROM :BUILDS.STATE, IT FIRST SORTS THEM BY
+  ::    THEIR :LAST-ACCESSED DATE SO THAT THE STALEST BUILDS ARE DELETED FIRST.
+  ::    WE DO NOT TOUCH THE :BUILD-CACHE DIRECTLY, BUT BECAUSE THE RESULTS
+  ::    OF THE BUILDS IN :BUILD-CACHE LIVE IN :BUILDS.STATE, THE RESULTS OF
+  ::    BOTH FIFO-CACHED BUILDS AND ACTIVE BUILDS ARE ALL SORTED AND TRIMMED.
   ::
-  ++  wipe
-    ~/  %wipe
-    |=  percent-to-remove=@ud
-    ^+  state
-    ::  removing 0% is the same as doing nothing, so do nothing
+  ++  WIPE
+    ~/  %WIPE
+    |=  PERCENT-TO-REMOVE=@UD
+    ^+  STATE
+    ::  REMOVING 0% IS THE SAME AS DOING NOTHING, SO DO NOTHING
     ::
-    ?:  =(0 percent-to-remove)
-      ~&  %wipe-no-op
-      state
+    ?:  =(0 PERCENT-TO-REMOVE)
+      ~&  %WIPE-NO-OP
+      STATE
     ::
-    ~|  [%wipe percent-to-remove=percent-to-remove]
-    ?>  (lte percent-to-remove 100)
-    ::  find all completed builds, sorted by :last-accessed date
+    ~|  [%WIPE PERCENT-TO-REMOVE=PERCENT-TO-REMOVE]
+    ?>  (LTE PERCENT-TO-REMOVE 100)
+    ::  FIND ALL COMPLETED BUILDS, SORTED BY :LAST-ACCESSED DATE
     ::
-    =/  completed-builds=(list build)
-      =-  (turn - head)
-      %+  sort
-        ::  filter for builds with a stored +build-result
+    =/  COMPLETED-BUILDS=(LIST BUILD)
+      =-  (TURN - HEAD)
+      %+  SORT
+        ::  FILTER FOR BUILDS WITH A STORED +BUILD-RESULT
         ::
-        %+  skim  ~(tap by builds.state)
-        |=  [=build =build-status]
+        %+  SKIM  ~(TAP BY BUILDS.STATE)
+        |=  [=BUILD =BUILD-STATUS]
         ^-  ?
         ::
-        ?=([%complete %value *] state.build-status)
-      ::  sort by :last-accessed date
+        ?=([%COMPLETE %VALUE *] STATE.BUILD-STATUS)
+      ::  SORT BY :LAST-ACCESSED DATE
       ::
-      |=  [[* a=build-status] [* b=build-status]]
+      |=  [[* A=BUILD-STATUS] [* B=BUILD-STATUS]]
       ^-  ?
       ::
-      ?>  ?=([%complete %value *] state.a)
-      ?>  ?=([%complete %value *] state.b)
+      ?>  ?=([%COMPLETE %VALUE *] STATE.A)
+      ?>  ?=([%COMPLETE %VALUE *] STATE.B)
       ::
-      %+  lte
-        last-accessed.build-record.state.a
-      last-accessed.build-record.state.b
-    ::  determine how many builds should remain after decimation
+      %+  LTE
+        LAST-ACCESSED.BUILD-RECORD.STATE.A
+      LAST-ACCESSED.BUILD-RECORD.STATE.B
+    ::  DETERMINE HOW MANY BUILDS SHOULD REMAIN AFTER DECIMATION
     ::
-    ::    This formula has the property that repeated applications
-    ::    of +wipe with anything other than 100% retention rate will
-    ::    always eventually remove every build.
+    ::    THIS FORMULA HAS THE PROPERTY THAT REPEATED APPLICATIONS
+    ::    OF +WIPE WITH ANYTHING OTHER THAN 100% RETENTION RATE WILL
+    ::    ALWAYS EVENTUALLY REMOVE EVERY BUILD.
     ::
-    =/  num-completed-builds=@ud
-      (add (lent completed-builds) size.compiler-cache.state)
-    =/  percent-to-keep=@ud  (sub 100 percent-to-remove)
-    =/  num-to-keep=@ud  (div (mul percent-to-keep num-completed-builds) 100)
-    =/  num-to-remove=@ud  (sub num-completed-builds num-to-keep)
+    =/  NUM-COMPLETED-BUILDS=@UD
+      (ADD (LENT COMPLETED-BUILDS) SIZE.COMPILER-CACHE.STATE)
+    =/  PERCENT-TO-KEEP=@UD  (SUB 100 PERCENT-TO-REMOVE)
+    =/  NUM-TO-KEEP=@UD  (DIV (MUL PERCENT-TO-KEEP NUM-COMPLETED-BUILDS) 100)
+    =/  NUM-TO-REMOVE=@UD  (SUB NUM-COMPLETED-BUILDS NUM-TO-KEEP)
     ::
-    |^  ^+  state
+    |^  ^+  STATE
         ::
-        =+  cache-size=size.compiler-cache.state
-        ?:  (lte num-to-remove cache-size)
-          (remove-from-cache num-to-remove)
-        =.  compiler-cache.state
-          %~  purge
-            (by-clock compiler-cache-key build-result)
-          compiler-cache.state
-        (tombstone-builds (sub num-to-remove cache-size))
+        =+  CACHE-SIZE=SIZE.COMPILER-CACHE.STATE
+        ?:  (LTE NUM-TO-REMOVE CACHE-SIZE)
+          (REMOVE-FROM-CACHE NUM-TO-REMOVE)
+        =.  COMPILER-CACHE.STATE
+          %~  PURGE
+            (BY-CLOCK COMPILER-CACHE-KEY BUILD-RESULT)
+          COMPILER-CACHE.STATE
+        (TOMBSTONE-BUILDS (SUB NUM-TO-REMOVE CACHE-SIZE))
     ::
-    ++  remove-from-cache
-      |=  count=@ud
-      %_    state
-          compiler-cache
-        %-  %~  trim
-                (by-clock compiler-cache-key build-result)
-                compiler-cache.state
-        count
+    ++  REMOVE-FROM-CACHE
+      |=  COUNT=@UD
+      %_    STATE
+          COMPILER-CACHE
+        %-  %~  TRIM
+                (BY-CLOCK COMPILER-CACHE-KEY BUILD-RESULT)
+                COMPILER-CACHE.STATE
+        COUNT
       ==
     ::
-    ++  tombstone-builds
-      |=  num-to-remove=@ud
+    ++  TOMBSTONE-BUILDS
+      |=  NUM-TO-REMOVE=@UD
       ::
-      ~|  [%wipe num-to-remove=num-to-remove]
-      ::  the oldest :num-to-remove builds are considered stale
+      ~|  [%WIPE NUM-TO-REMOVE=NUM-TO-REMOVE]
+      ::  THE OLDEST :NUM-TO-REMOVE BUILDS ARE CONSIDERED STALE
       ::
-      =/  stale-builds  (scag num-to-remove completed-builds)
-      ::  iterate over :stale-builds, replacing with %tombstone's
+      =/  STALE-BUILDS  (SCAG NUM-TO-REMOVE COMPLETED-BUILDS)
+      ::  ITERATE OVER :STALE-BUILDS, REPLACING WITH %TOMBSTONE'S
       ::
-      |-  ^+  state
-      ?~  stale-builds  state
-      ::  replace the build's entry in :builds.state with a %tombstone
+      |-  ^+  STATE
+      ?~  STALE-BUILDS  STATE
+      ::  REPLACE THE BUILD'S ENTRY IN :BUILDS.STATE WITH A %TOMBSTONE
       ::
-      =.  builds.state
-        =<  builds
-        %+  update-build-status  i.stale-builds
-        |=  =build-status
-        build-status(state [%complete %tombstone ~])
+      =.  BUILDS.STATE
+        =<  BUILDS
+        %+  UPDATE-BUILD-STATUS  I.STALE-BUILDS
+        |=  =BUILD-STATUS
+        BUILD-STATUS(STATE [%COMPLETE %TOMBSTONE ~])
       ::
-      $(stale-builds t.stale-builds)
+      $(STALE-BUILDS T.STALE-BUILDS)
     --
-  ::  +keep: resize caches
+  ::  +KEEP: RESIZE CACHES
   ::
-  ::    Ford maintains two caches: a :build-cache for caching previously
-  ::    completed build trees, and a :compiler-cache for caching various
-  ::    compiler operations that tend to be shared among multiple builds.
+  ::    FORD MAINTAINS TWO CACHES: A :BUILD-CACHE FOR CACHING PREVIOUSLY
+  ::    COMPLETED BUILD TREES, AND A :COMPILER-CACHE FOR CACHING VARIOUS
+  ::    COMPILER OPERATIONS THAT TEND TO BE SHARED AMONG MULTIPLE BUILDS.
   ::
-  ::    To handle this command, we reset the maximum sizes of both of
-  ::    these caches, removing entries from the caches if necessary.
+  ::    TO HANDLE THIS COMMAND, WE RESET THE MAXIMUM SIZES OF BOTH OF
+  ::    THESE CACHES, REMOVING ENTRIES FROM THE CACHES IF NECESSARY.
   ::
-  ++  keep
-    ~/  %keep
-    |=  [compiler-cache-size=@ud build-cache-size=@ud]
-    ^+  state
-    ::  pop old builds out of :build-cache and remove their cache anchors
+  ++  KEEP
+    ~/  %KEEP
+    |=  [COMPILER-CACHE-SIZE=@UD BUILD-CACHE-SIZE=@UD]
+    ^+  STATE
+    ::  POP OLD BUILDS OUT OF :BUILD-CACHE AND REMOVE THEIR CACHE ANCHORS
     ::
-    =^  pops  queue.build-cache.state
-      %.  build-cache-size
-      ~(resize (to-capped-queue build-cache-key) queue.build-cache.state)
+    =^  POPS  QUEUE.BUILD-CACHE.STATE
+      %.  BUILD-CACHE-SIZE
+      ~(RESIZE (TO-CAPPED-QUEUE BUILD-CACHE-KEY) QUEUE.BUILD-CACHE.STATE)
     ::
-    =.  state
-      |-  ^+  state
-      ?~  pops  state
+    =.  STATE
+      |-  ^+  STATE
+      ?~  POPS  STATE
       ::
-      =.  state  (remove-anchor-from-root root-build.i.pops [%cache id.i.pops])
+      =.  STATE  (REMOVE-ANCHOR-FROM-ROOT ROOT-BUILD.I.POPS [%CACHE ID.I.POPS])
       ::
-      $(pops t.pops)
-    ::  resize the :compiler-cache
+      $(POPS T.POPS)
+    ::  RESIZE THE :COMPILER-CACHE
     ::
-    %_    state
-        compiler-cache
-      %-  %~  resize
-              (by-clock compiler-cache-key build-result)
-              compiler-cache.state
-      compiler-cache-size
+    %_    STATE
+        COMPILER-CACHE
+      %-  %~  RESIZE
+              (BY-CLOCK COMPILER-CACHE-KEY BUILD-RESULT)
+              COMPILER-CACHE.STATE
+      COMPILER-CACHE-SIZE
     ==
-  ::  +cancel: cancel a build
+  ::  +CANCEL: CANCEL A BUILD
   ::
-  ::    When called on a live build, removes all tracking related to the live
-  ::    build, and no more %made moves will be sent for that build.
+  ::    WHEN CALLED ON A LIVE BUILD, REMOVES ALL TRACKING RELATED TO THE LIVE
+  ::    BUILD, AND NO MORE %MADE MOVES WILL BE SENT FOR THAT BUILD.
   ::
-  ::    When called on a once build, removes all tracking related to the once
-  ::    build, and that build will never be completed or have a %made sent.
+  ::    WHEN CALLED ON A ONCE BUILD, REMOVES ALL TRACKING RELATED TO THE ONCE
+  ::    BUILD, AND THAT BUILD WILL NEVER BE COMPLETED OR HAVE A %MADE SENT.
   ::
-  ::    When called on a build that isn't registered in :state, such as a
-  ::    completed once build, or a build that has already been canceled,
-  ::    prints and no-ops.
+  ::    WHEN CALLED ON A BUILD THAT ISN'T REGISTERED IN :STATE, SUCH AS A
+  ::    COMPLETED ONCE BUILD, OR A BUILD THAT HAS ALREADY BEEN CANCELED,
+  ::    PRINTS AND NO-OPS.
   ::
-  ++  cancel  ^+  [moves state]
+  ++  CANCEL  ^+  [MOVES STATE]
     ::
-    =<  finalize
+    =<  FINALIZE
     ::
-    ?~  duct-status=(~(get by ducts.state) duct)
-      ~&  [%no-build-for-duct duct]
-      ..execute
-    ::  :duct is being canceled, so remove it unconditionally
+    ?~  DUCT-STATUS=(~(GET BY DUCTS.STATE) DUCT)
+      ~&  [%NO-BUILD-FOR-DUCT DUCT]
+      ..EXECUTE
+    ::  :DUCT IS BEING CANCELED, SO REMOVE IT UNCONDITIONALLY
     ::
-    =.  ducts.state  (~(del by ducts.state) duct)
-    ::  if the duct was not live, cancel any in-progress builds
+    =.  DUCTS.STATE  (~(DEL BY DUCTS.STATE) DUCT)
+    ::  IF THE DUCT WAS NOT LIVE, CANCEL ANY IN-PROGRESS BUILDS
     ::
-    ?:  ?=(%once -.live.u.duct-status)
+    ?:  ?=(%ONCE -.LIVE.U.DUCT-STATUS)
       ::
-      =/  root-build=build  [in-progress.live root-schematic]:u.duct-status
+      =/  ROOT-BUILD=BUILD  [IN-PROGRESS.LIVE ROOT-SCHEMATIC]:U.DUCT-STATUS
       ::
-      =.  ..execute  (cancel-scrys root-build)
-      =.  state  (remove-anchor-from-root root-build [%duct duct])
-      ..execute
-    ::  if the duct was live and has an unfinished build, cancel it
+      =.  ..EXECUTE  (CANCEL-SCRYS ROOT-BUILD)
+      =.  STATE  (REMOVE-ANCHOR-FROM-ROOT ROOT-BUILD [%DUCT DUCT])
+      ..EXECUTE
+    ::  IF THE DUCT WAS LIVE AND HAS AN UNFINISHED BUILD, CANCEL IT
     ::
-    =?  ..execute  ?=(^ in-progress.live.u.duct-status)
+    =?  ..EXECUTE  ?=(^ IN-PROGRESS.LIVE.U.DUCT-STATUS)
       ::
-      =/  root-build=build  [u.in-progress.live root-schematic]:u.duct-status
+      =/  ROOT-BUILD=BUILD  [U.IN-PROGRESS.LIVE ROOT-SCHEMATIC]:U.DUCT-STATUS
       ::
-      =.  ..execute  (cancel-scrys root-build)
-      =.  state  (remove-anchor-from-root root-build [%duct duct])
-      ..execute
-    ::  if there is no completed build for the live duct, we're done
+      =.  ..EXECUTE  (CANCEL-SCRYS ROOT-BUILD)
+      =.  STATE  (REMOVE-ANCHOR-FROM-ROOT ROOT-BUILD [%DUCT DUCT])
+      ..EXECUTE
+    ::  IF THERE IS NO COMPLETED BUILD FOR THE LIVE DUCT, WE'RE DONE
     ::
-    ?~  last-sent=last-sent.live.u.duct-status
-      ..execute
-    ::  there is a completed build for the live duct, so delete it
+    ?~  LAST-SENT=LAST-SENT.LIVE.U.DUCT-STATUS
+      ..EXECUTE
+    ::  THERE IS A COMPLETED BUILD FOR THE LIVE DUCT, SO DELETE IT
     ::
-    =/  root-build=build  [date.u.last-sent root-schematic.u.duct-status]
+    =/  ROOT-BUILD=BUILD  [DATE.U.LAST-SENT ROOT-SCHEMATIC.U.DUCT-STATUS]
     ::
-    =.  state  (remove-anchor-from-root root-build [%duct duct])
+    =.  STATE  (REMOVE-ANCHOR-FROM-ROOT ROOT-BUILD [%DUCT DUCT])
     ::
-    ?~  subscription.u.last-sent
-      ..execute
-    (cancel-clay-subscription u.subscription.u.last-sent)
-  ::  +cancel-scrys: cancel all blocked %scry sub-builds of :root-builds
+    ?~  SUBSCRIPTION.U.LAST-SENT
+      ..EXECUTE
+    (CANCEL-CLAY-SUBSCRIPTION U.SUBSCRIPTION.U.LAST-SENT)
+  ::  +CANCEL-SCRYS: CANCEL ALL BLOCKED %SCRY SUB-BUILDS OF :ROOT-BUILDS
   ::
-  ++  cancel-scrys
-    |=  root-build=build
-    ^+  ..execute
+  ++  CANCEL-SCRYS
+    |=  ROOT-BUILD=BUILD
+    ^+  ..EXECUTE
     ::
-    =/  blocked-sub-scrys  ~(tap in (collect-blocked-sub-scrys root-build))
+    =/  BLOCKED-SUB-SCRYS  ~(TAP IN (COLLECT-BLOCKED-SUB-SCRYS ROOT-BUILD))
     ::
-    |-  ^+  ..execute
-    ?~  blocked-sub-scrys  ..execute
+    |-  ^+  ..EXECUTE
+    ?~  BLOCKED-SUB-SCRYS  ..EXECUTE
     ::
-    =.  ..execute  (cancel-scry-request i.blocked-sub-scrys)
+    =.  ..EXECUTE  (CANCEL-SCRY-REQUEST I.BLOCKED-SUB-SCRYS)
     ::
-    $(blocked-sub-scrys t.blocked-sub-scrys)
-  ::  +move-root-to-cache: replace :duct with a %cache anchor in :build's tree
+    $(BLOCKED-SUB-SCRYS T.BLOCKED-SUB-SCRYS)
+  ::  +MOVE-ROOT-TO-CACHE: REPLACE :DUCT WITH A %CACHE ANCHOR IN :BUILD'S TREE
   ::
-  ++  move-root-to-cache
-    ~/  %move-root-to-cache
-    |=  =build
-    ^+  state
-    ::  obtain the new cache id and increment the :next-anchor-id in the state
+  ++  MOVE-ROOT-TO-CACHE
+    ~/  %MOVE-ROOT-TO-CACHE
+    |=  =BUILD
+    ^+  STATE
+    ::  OBTAIN THE NEW CACHE ID AND INCREMENT THE :NEXT-ANCHOR-ID IN THE STATE
     ::
-    =^  new-id  next-anchor-id.build-cache.state
-      =/  id=@ud  next-anchor-id.build-cache.state
-      [id +(id)]
-    ::  replace the requester in the root build
+    =^  NEW-ID  NEXT-ANCHOR-ID.BUILD-CACHE.STATE
+      =/  ID=@UD  NEXT-ANCHOR-ID.BUILD-CACHE.STATE
+      [ID +(ID)]
+    ::  REPLACE THE REQUESTER IN THE ROOT BUILD
     ::
-    =.  builds.state
-      %+  ~(jab by builds.state)  build
-      |=  =build-status
-      %_    build-status
-          requesters
-        =-  (~(del in -) [%duct duct])
-        =-  (~(put in -) [%cache new-id])
-        requesters.build-status
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  BUILD
+      |=  =BUILD-STATUS
+      %_    BUILD-STATUS
+          REQUESTERS
+        =-  (~(DEL IN -) [%DUCT DUCT])
+        =-  (~(PUT IN -) [%CACHE NEW-ID])
+        REQUESTERS.BUILD-STATUS
       ==
-    ::  enqueue :build into cache, possibly popping and deleting a stale build
+    ::  ENQUEUE :BUILD INTO CACHE, POSSIBLY POPPING AND DELETING A STALE BUILD
     ::
-    =^  oldest  queue.build-cache.state
-      %.  [new-id build]
-      ~(put (to-capped-queue build-cache-key) queue.build-cache.state)
+    =^  OLDEST  QUEUE.BUILD-CACHE.STATE
+      %.  [NEW-ID BUILD]
+      ~(PUT (TO-CAPPED-QUEUE BUILD-CACHE-KEY) QUEUE.BUILD-CACHE.STATE)
     ::
-    =?    state
-        ?=(^ oldest)
-      (remove-anchor-from-root root-build.u.oldest [%cache id.u.oldest])
-    ::  recursively replace :clients in :build and descendants
+    =?    STATE
+        ?=(^ OLDEST)
+      (REMOVE-ANCHOR-FROM-ROOT ROOT-BUILD.U.OLDEST [%CACHE ID.U.OLDEST])
+    ::  RECURSIVELY REPLACE :CLIENTS IN :BUILD AND DESCENDANTS
     ::
-    |-  ^+  state
+    |-  ^+  STATE
     ::
-    =/  client-status=build-status  (~(got by builds.state) build)
-    =/  subs=(list ^build)  ~(tap in ~(key by subs.client-status))
+    =/  CLIENT-STATUS=BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    =/  SUBS=(LIST ^BUILD)  ~(TAP IN ~(KEY BY SUBS.CLIENT-STATUS))
     ::
-    |-  ^+  state
-    ?~  subs  state
+    |-  ^+  STATE
+    ?~  SUBS  STATE
     ::
-    =.  builds.state
-      %+  ~(jab by builds.state)  i.subs
-      |=  =build-status
-      %_    build-status
-          clients
-        ::  if we've already encountered :i.subs, don't overwrite
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  I.SUBS
+      |=  =BUILD-STATUS
+      %_    BUILD-STATUS
+          CLIENTS
+        ::  IF WE'VE ALREADY ENCOUNTERED :I.SUBS, DON'T OVERWRITE
         ::
-        ?:  (~(has by clients.build-status) [%cache new-id])
-          clients.build-status
+        ?:  (~(HAS BY CLIENTS.BUILD-STATUS) [%CACHE NEW-ID])
+          CLIENTS.BUILD-STATUS
         ::
-        =/  old-clients-on-duct  (~(get ju clients.build-status) [%duct duct])
+        =/  OLD-CLIENTS-ON-DUCT  (~(GET JU CLIENTS.BUILD-STATUS) [%DUCT DUCT])
         ::
-        =-  (~(del by -) [%duct duct])
-        =-  (~(put by -) [%cache new-id] old-clients-on-duct)
-        clients.build-status
+        =-  (~(DEL BY -) [%DUCT DUCT])
+        =-  (~(PUT BY -) [%CACHE NEW-ID] OLD-CLIENTS-ON-DUCT)
+        CLIENTS.BUILD-STATUS
       ==
     ::
-    =.  state  ^$(build i.subs)
+    =.  STATE  ^$(BUILD I.SUBS)
     ::
-    $(subs t.subs)
-  ::  +remove-anchor-from-root: remove :anchor from :build's tree
+    $(SUBS T.SUBS)
+  ::  +REMOVE-ANCHOR-FROM-ROOT: REMOVE :ANCHOR FROM :BUILD'S TREE
   ::
-  ++  remove-anchor-from-root
-    ~/  %remove-anchor-from-root
-    |=  [=build =anchor]
-    ^+  state
+  ++  REMOVE-ANCHOR-FROM-ROOT
+    ~/  %REMOVE-ANCHOR-FROM-ROOT
+    |=  [=BUILD =ANCHOR]
+    ^+  STATE
     ::
-    =.  builds.state
-      %+  ~(jab by builds.state)  build
-      |=  =build-status
-      build-status(requesters (~(del in requesters.build-status) anchor))
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  BUILD
+      |=  =BUILD-STATUS
+      BUILD-STATUS(REQUESTERS (~(DEL IN REQUESTERS.BUILD-STATUS) ANCHOR))
     ::
-    =.  builds.state  (remove-anchor-from-subs build anchor)
+    =.  BUILDS.STATE  (REMOVE-ANCHOR-FROM-SUBS BUILD ANCHOR)
     ::
-    (cleanup build)
-  ::  +remove-anchor-from-subs: recursively remove :anchor from sub-builds
+    (CLEANUP BUILD)
+  ::  +REMOVE-ANCHOR-FROM-SUBS: RECURSIVELY REMOVE :ANCHOR FROM SUB-BUILDS
   ::
-  ++  remove-anchor-from-subs
-    ~/  %remove-anchor-from-subs
-    |=  [=build =anchor]
-    ^+  builds.state
+  ++  REMOVE-ANCHOR-FROM-SUBS
+    ~/  %REMOVE-ANCHOR-FROM-SUBS
+    |=  [=BUILD =ANCHOR]
+    ^+  BUILDS.STATE
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
-    =/  client=^build  build
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    =/  SUBS=(LIST ^BUILD)  ~(TAP IN ~(KEY BY SUBS.BUILD-STATUS))
+    =/  CLIENT=^BUILD  BUILD
     ::
-    |-  ^+  builds.state
-    ?~  subs  builds.state
+    |-  ^+  BUILDS.STATE
+    ?~  SUBS  BUILDS.STATE
     ::
-    =/  sub-status=^build-status  (~(got by builds.state) i.subs)
+    =/  SUB-STATUS=^BUILD-STATUS  (~(GOT BY BUILDS.STATE) I.SUBS)
     ::
-    =.  clients.sub-status
-      (~(del ju clients.sub-status) anchor client)
+    =.  CLIENTS.SUB-STATUS
+      (~(DEL JU CLIENTS.SUB-STATUS) ANCHOR CLIENT)
     ::
-    =.  builds.state  (~(put by builds.state) i.subs sub-status)
+    =.  BUILDS.STATE  (~(PUT BY BUILDS.STATE) I.SUBS SUB-STATUS)
     ::
-    =?  builds.state  !(~(has by clients.sub-status) anchor)
+    =?  BUILDS.STATE  !(~(HAS BY CLIENTS.SUB-STATUS) ANCHOR)
       ::
-      ^$(build i.subs)
+      ^$(BUILD I.SUBS)
     ::
-    $(subs t.subs)
-  ::  +add-anchors-to-build-subs: for each sub, add all of :build's anchors
+    $(SUBS T.SUBS)
+  ::  +ADD-ANCHORS-TO-BUILD-SUBS: FOR EACH SUB, ADD ALL OF :BUILD'S ANCHORS
   ::
-  ++  add-anchors-to-build-subs
-    ~/  %add-anchors-to-build-subs
-    |=  =build
-    ^+  state
+  ++  ADD-ANCHORS-TO-BUILD-SUBS
+    ~/  %ADD-ANCHORS-TO-BUILD-SUBS
+    |=  =BUILD
+    ^+  STATE
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    =/  new-anchors
-      ~(tap in (~(put in ~(key by clients.build-status)) [%duct duct]))
-    =/  subs  ~(tap in ~(key by subs.build-status))
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    =/  NEW-ANCHORS
+      ~(TAP IN (~(PUT IN ~(KEY BY CLIENTS.BUILD-STATUS)) [%DUCT DUCT]))
+    =/  SUBS  ~(TAP IN ~(KEY BY SUBS.BUILD-STATUS))
     ::
-    =.  state
+    =.  STATE
       |-
-      ^+  state
-      ?~  subs  state
+      ^+  STATE
+      ?~  SUBS  STATE
       ::
-      =.  state  (add-build i.subs)
+      =.  STATE  (ADD-BUILD I.SUBS)
       ::
-      $(subs t.subs)
+      $(SUBS T.SUBS)
     ::
-    =.  builds.state
-      |-  ^+  builds.state
-      ?~  new-anchors  builds.state
+    =.  BUILDS.STATE
+      |-  ^+  BUILDS.STATE
+      ?~  NEW-ANCHORS  BUILDS.STATE
       ::
-      =.  builds.state  (add-anchor-to-subs i.new-anchors build)
+      =.  BUILDS.STATE  (ADD-ANCHOR-TO-SUBS I.NEW-ANCHORS BUILD)
       ::
-      $(new-anchors t.new-anchors)
+      $(NEW-ANCHORS T.NEW-ANCHORS)
     ::
-    state
-  ::  +add-anchor-to-subs: attach :duct to :build's descendants
+    STATE
+  ::  +ADD-ANCHOR-TO-SUBS: ATTACH :DUCT TO :BUILD'S DESCENDANTS
   ::
-  ++  add-anchor-to-subs
-    ~/  %add-anchor-to-subs
-    |=  [=anchor =build]
-    ^+  builds.state
+  ++  ADD-ANCHOR-TO-SUBS
+    ~/  %ADD-ANCHOR-TO-SUBS
+    |=  [=ANCHOR =BUILD]
+    ^+  BUILDS.STATE
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    =/  subs=(list ^build)  ~(tap in ~(key by subs.build-status))
-    =/  client=^build  build
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    =/  SUBS=(LIST ^BUILD)  ~(TAP IN ~(KEY BY SUBS.BUILD-STATUS))
+    =/  CLIENT=^BUILD  BUILD
     ::
-    |-  ^+  builds.state
-    ?~  subs  builds.state
+    |-  ^+  BUILDS.STATE
+    ?~  SUBS  BUILDS.STATE
     ::
-    =/  sub-status=^build-status  (~(got by builds.state) i.subs)
+    =/  SUB-STATUS=^BUILD-STATUS  (~(GOT BY BUILDS.STATE) I.SUBS)
     ::
-    =/  already-had-anchor=?  (~(has by clients.sub-status) anchor)
+    =/  ALREADY-HAD-ANCHOR=?  (~(HAS BY CLIENTS.SUB-STATUS) ANCHOR)
     ::
-    =.  clients.sub-status
-      (~(put ju clients.sub-status) anchor client)
+    =.  CLIENTS.SUB-STATUS
+      (~(PUT JU CLIENTS.SUB-STATUS) ANCHOR CLIENT)
     ::
-    =.  builds.state  (~(put by builds.state) i.subs sub-status)
+    =.  BUILDS.STATE  (~(PUT BY BUILDS.STATE) I.SUBS SUB-STATUS)
     ::
-    =?  builds.state  !already-had-anchor  ^$(build i.subs)
+    =?  BUILDS.STATE  !ALREADY-HAD-ANCHOR  ^$(BUILD I.SUBS)
     ::
-    $(subs t.subs)
-  ::  +copy-build-tree-as-provisional: prepopulate new live build
+    $(SUBS T.SUBS)
+  ::  +COPY-BUILD-TREE-AS-PROVISIONAL: PREPOPULATE NEW LIVE BUILD
   ::
-  ::    Make a provisional copy of the completed old root build tree at the
-  ::    :new time.
+  ::    MAKE A PROVISIONAL COPY OF THE COMPLETED OLD ROOT BUILD TREE AT THE
+  ::    :NEW TIME.
   ::
-  ++  copy-build-tree-as-provisional
-    ~/  %copy-build-tree-as-provisional
-    |=  [old-root=build new-date=@da]
-    ^+  state
-    ~|  [old-root=(build-to-tape old-root) new-date=new-date]
+  ++  COPY-BUILD-TREE-AS-PROVISIONAL
+    ~/  %COPY-BUILD-TREE-AS-PROVISIONAL
+    |=  [OLD-ROOT=BUILD NEW-DATE=@DA]
+    ^+  STATE
+    ~|  [OLD-ROOT=(BUILD-TO-TAPE OLD-ROOT) NEW-DATE=NEW-DATE]
     ::
-    =/  old-client=build  old-root
-    =/  new-client=build  old-client(date new-date)
-    =.  state  (add-build new-client)
+    =/  OLD-CLIENT=BUILD  OLD-ROOT
+    =/  NEW-CLIENT=BUILD  OLD-CLIENT(DATE NEW-DATE)
+    =.  STATE  (ADD-BUILD NEW-CLIENT)
     ::
-    =.  builds.state
-      %+  ~(jab by builds.state)  new-client
-      |=  =build-status
-      build-status(requesters (~(put in requesters.build-status) [%duct duct]))
+    =.  BUILDS.STATE
+      %+  ~(JAB BY BUILDS.STATE)  NEW-CLIENT
+      |=  =BUILD-STATUS
+      BUILD-STATUS(REQUESTERS (~(PUT IN REQUESTERS.BUILD-STATUS) [%DUCT DUCT]))
     ::
-    =<  copy-node
+    =<  COPY-NODE
     ::
     |%
-    ++  copy-node
-      ^+  state
+    ++  COPY-NODE
+      ^+  STATE
       ::
-      =/  old-build-status=build-status
-        ~|  old-client=(build-to-tape old-client)
-        (~(got by builds.state) old-client)
+      =/  OLD-BUILD-STATUS=BUILD-STATUS
+        ~|  OLD-CLIENT=(BUILD-TO-TAPE OLD-CLIENT)
+        (~(GOT BY BUILDS.STATE) OLD-CLIENT)
       ::
-      =/  old-subs=(list build)  ~(tap in ~(key by subs.old-build-status))
-      =/  new-subs=(list build)  (turn old-subs |=(a=build a(date new-date)))
+      =/  OLD-SUBS=(LIST BUILD)  ~(TAP IN ~(KEY BY SUBS.OLD-BUILD-STATUS))
+      =/  NEW-SUBS=(LIST BUILD)  (TURN OLD-SUBS |=(A=BUILD A(DATE NEW-DATE)))
       ::
-      =.  builds.state
-        (add-subs-to-client new-client new-subs [verified=%.n blocked=%.y])
+      =.  BUILDS.STATE
+        (ADD-SUBS-TO-CLIENT NEW-CLIENT NEW-SUBS [VERIFIED=%.N BLOCKED=%.Y])
       ::
       |-
-      ^+  state
-      ?~  old-subs
-        state
+      ^+  STATE
+      ?~  OLD-SUBS
+        STATE
       ::
-      =.  state  (add-client-to-sub i.old-subs)
-      =.  state
-        copy-node(old-client i.old-subs, new-client i.old-subs(date new-date))
+      =.  STATE  (ADD-CLIENT-TO-SUB I.OLD-SUBS)
+      =.  STATE
+        COPY-NODE(OLD-CLIENT I.OLD-SUBS, NEW-CLIENT I.OLD-SUBS(DATE NEW-DATE))
       ::
-      $(old-subs t.old-subs)
+      $(OLD-SUBS T.OLD-SUBS)
     ::
-    ++  add-client-to-sub
-      |=  old-sub=build
-      ^+  state
+    ++  ADD-CLIENT-TO-SUB
+      |=  OLD-SUB=BUILD
+      ^+  STATE
       ::
-      =/  new-sub  old-sub(date new-date)
-      =.  state  (add-build new-sub)
+      =/  NEW-SUB  OLD-SUB(DATE NEW-DATE)
+      =.  STATE  (ADD-BUILD NEW-SUB)
       ::
-      =.  builds.state
-        %+  ~(jab by builds.state)  new-sub
-        |=  =build-status
-        %_  build-status
-          clients  (~(put ju clients.build-status) [%duct duct] new-client)
+      =.  BUILDS.STATE
+        %+  ~(JAB BY BUILDS.STATE)  NEW-SUB
+        |=  =BUILD-STATUS
+        %_  BUILD-STATUS
+          CLIENTS  (~(PUT JU CLIENTS.BUILD-STATUS) [%DUCT DUCT] NEW-CLIENT)
         ==
       ::
-      state
+      STATE
     --
-  ::  +add-subs-to-client: register :new-subs as subs of :new-client
+  ::  +ADD-SUBS-TO-CLIENT: REGISTER :NEW-SUBS AS SUBS OF :NEW-CLIENT
   ::
-  ++  add-subs-to-client
-    ~/  %add-subs-to-client
-    |=  [new-client=build new-subs=(list build) =build-relation]
-    ^+  builds.state
+  ++  ADD-SUBS-TO-CLIENT
+    ~/  %ADD-SUBS-TO-CLIENT
+    |=  [NEW-CLIENT=BUILD NEW-SUBS=(LIST BUILD) =BUILD-RELATION]
+    ^+  BUILDS.STATE
     ::
-    %+  ~(jab by builds.state)  new-client
-    |=  =build-status
-    %_    build-status
-        subs
-      %-  ~(gas by subs.build-status)
-      %+  murn  new-subs
-      |=  sub=build
-      ^-  (unit (pair build ^build-relation))
+    %+  ~(JAB BY BUILDS.STATE)  NEW-CLIENT
+    |=  =BUILD-STATUS
+    %_    BUILD-STATUS
+        SUBS
+      %-  ~(GAS BY SUBS.BUILD-STATUS)
+      %+  MURN  NEW-SUBS
+      |=  SUB=BUILD
+      ^-  (UNIT (PAIR BUILD ^BUILD-RELATION))
       ::
-      ?^  (~(get by subs.build-status) sub)
+      ?^  (~(GET BY SUBS.BUILD-STATUS) SUB)
         ~
-      `[sub build-relation]
+      `[SUB BUILD-RELATION]
     ==
-  ::  |construction: arms for performing builds
+  ::  |CONSTRUCTION: ARMS FOR PERFORMING BUILDS
   ::
-  ::+|  construction
+  ::+|  CONSTRUCTION
   ::
-  ::  +execute-loop: +execute repeatedly until there's no more work to do
+  ::  +EXECUTE-LOOP: +EXECUTE REPEATEDLY UNTIL THERE'S NO MORE WORK TO DO
   ::
-  ::    Keep running +execute until all relevant builds either complete or
-  ::    block on external resource requests. See +execute for details of each
-  ::    loop execution.
+  ::    KEEP RUNNING +EXECUTE UNTIL ALL RELEVANT BUILDS EITHER COMPLETE OR
+  ::    BLOCK ON EXTERNAL RESOURCE REQUESTS. SEE +EXECUTE FOR DETAILS OF EACH
+  ::    LOOP EXECUTION.
   ::
-  ::    This implementation is for simplicity. In the longer term, we'd
-  ::    like to just perform a single run through +execute and set a Behn timer
-  ::    to wake us up immediately. This has the advantage that Ford stops hard
-  ::    blocking the main Urbit event loop, letting other work be done.
+  ::    THIS IMPLEMENTATION IS FOR SIMPLICITY. IN THE LONGER TERM, WE'D
+  ::    LIKE TO JUST PERFORM A SINGLE RUN THROUGH +EXECUTE AND SET A BEHN TIMER
+  ::    TO WAKE US UP IMMEDIATELY. THIS HAS THE ADVANTAGE THAT FORD STOPS HARD
+  ::    BLOCKING THE MAIN URBIT EVENT LOOP, LETTING OTHER WORK BE DONE.
   ::
-  ++  execute-loop  !.
-    ~/  %execute-loop
-    |=  builds=(set build)
-    ^+  ..execute
+  ++  EXECUTE-LOOP  !.
+    ~/  %EXECUTE-LOOP
+    |=  BUILDS=(SET BUILD)
+    ^+  ..EXECUTE
     ::
-    =.  ..execute  (execute builds)
+    =.  ..EXECUTE  (EXECUTE BUILDS)
     ::
-    ?:  ?&  ?=(~ next-builds)
-            ?=(~ candidate-builds)
+    ?:  ?&  ?=(~ NEXT-BUILDS)
+            ?=(~ CANDIDATE-BUILDS)
         ==
-      ..execute
+      ..EXECUTE
     ::
-    $(builds ~)
-  ::  +execute: main recursive construction algorithm
+    $(BUILDS ~)
+  ::  +EXECUTE: MAIN RECURSIVE CONSTRUCTION ALGORITHM
   ::
-  ::    Performs the three step build process: First, figure out which builds
-  ::    we're going to run this loop through the ford algorithm. Second, run
-  ::    the gathered builds, possibly in parallel. Third, apply the
-  ::    +build-receipt algorithms to the ford state.
+  ::    PERFORMS THE THREE STEP BUILD PROCESS: FIRST, FIGURE OUT WHICH BUILDS
+  ::    WE'RE GOING TO RUN THIS LOOP THROUGH THE FORD ALGORITHM. SECOND, RUN
+  ::    THE GATHERED BUILDS, POSSIBLY IN PARALLEL. THIRD, APPLY THE
+  ::    +BUILD-RECEIPT ALGORITHMS TO THE FORD STATE.
   ::
-  ++  execute
-    ~/  %execute
-    |=  builds=(set build)
-    ^+  ..execute
+  ++  EXECUTE
+    ~/  %EXECUTE
+    |=  BUILDS=(SET BUILD)
+    ^+  ..EXECUTE
     ::
-    =.  ..execute  (gather builds force=%.n)
+    =.  ..EXECUTE  (GATHER BUILDS FORCE=%.N)
     ::
-    =^  build-receipts  ..execute  run-builds
+    =^  BUILD-RECEIPTS  ..EXECUTE  RUN-BUILDS
     ::
-    (reduce build-receipts)
-  ::  +gather: collect builds to be run in a batch
+    (REDUCE BUILD-RECEIPTS)
+  ::  +GATHER: COLLECT BUILDS TO BE RUN IN A BATCH
   ::
-  ::    The +gather phase is the first of the three parts of +execute. In
-  ::    +gather, we look through each item in :candidate-builds.  If we
-  ::    should run the candidate build this cycle through the +execute loop, we
-  ::    place it in :next-builds. +gather runs until it has no more candidates.
+  ::    THE +GATHER PHASE IS THE FIRST OF THE THREE PARTS OF +EXECUTE. IN
+  ::    +GATHER, WE LOOK THROUGH EACH ITEM IN :CANDIDATE-BUILDS.  IF WE
+  ::    SHOULD RUN THE CANDIDATE BUILD THIS CYCLE THROUGH THE +EXECUTE LOOP, WE
+  ::    PLACE IT IN :NEXT-BUILDS. +GATHER RUNS UNTIL IT HAS NO MORE CANDIDATES.
   ::
-  ++  gather  !.
-    ~/  %gather
-    |=  [builds=(set build) force=?]
-    ^+  ..execute
-    ::  add builds that were triggered by incoming event to the candidate list
+  ++  GATHER  !.
+    ~/  %GATHER
+    |=  [BUILDS=(SET BUILD) FORCE=?]
+    ^+  ..EXECUTE
+    ::  ADD BUILDS THAT WERE TRIGGERED BY INCOMING EVENT TO THE CANDIDATE LIST
     ::
-    =.  candidate-builds  (~(uni in candidate-builds) builds)
+    =.  CANDIDATE-BUILDS  (~(UNI IN CANDIDATE-BUILDS) BUILDS)
     ::
-    |^  ^+  ..execute
+    |^  ^+  ..EXECUTE
         ::
-        ?:  =(~ candidate-builds)
-          ..execute
+        ?:  =(~ CANDIDATE-BUILDS)
+          ..EXECUTE
         ::
-        =/  next=build
-          ?<  ?=(~ candidate-builds)
-          n.candidate-builds
-        =.  candidate-builds  (~(del in candidate-builds) next)
+        =/  NEXT=BUILD
+          ?<  ?=(~ CANDIDATE-BUILDS)
+          N.CANDIDATE-BUILDS
+        =.  CANDIDATE-BUILDS  (~(DEL IN CANDIDATE-BUILDS) NEXT)
         ::
-        $(..execute (gather-build next))
-    ::  +gather-build: looks at a single candidate build
+        $(..EXECUTE (GATHER-BUILD NEXT))
+    ::  +GATHER-BUILD: LOOKS AT A SINGLE CANDIDATE BUILD
     ::
-    ::    This gate inspects a single build. It might move it to :next-builds,
-    ::    or promote it using an old build. It also might add this build's
-    ::    sub-builds to :candidate-builds.
+    ::    THIS GATE INSPECTS A SINGLE BUILD. IT MIGHT MOVE IT TO :NEXT-BUILDS,
+    ::    OR PROMOTE IT USING AN OLD BUILD. IT ALSO MIGHT ADD THIS BUILD'S
+    ::    SUB-BUILDS TO :CANDIDATE-BUILDS.
     ::
-    ++  gather-build
-      |=  =build
-      ^+  ..execute
-      ~|  [%duct duct]
-      =/  duct-status  (~(got by ducts.state) duct)
-      ::  if we already have a result for this build, don't rerun the build
+    ++  GATHER-BUILD
+      |=  =BUILD
+      ^+  ..EXECUTE
+      ~|  [%DUCT DUCT]
+      =/  DUCT-STATUS  (~(GOT BY DUCTS.STATE) DUCT)
+      ::  IF WE ALREADY HAVE A RESULT FOR THIS BUILD, DON'T RERUN THE BUILD
       ::
-      =^  current-result  builds.state  (access-build-record build)
+      =^  CURRENT-RESULT  BUILDS.STATE  (ACCESS-BUILD-RECORD BUILD)
       ::
-      ?:  ?=([~ %value *] current-result)
-        (on-build-complete build)
-      ::  place :build in :builds.state if it isn't already there
+      ?:  ?=([~ %VALUE *] CURRENT-RESULT)
+        (ON-BUILD-COMPLETE BUILD)
+      ::  PLACE :BUILD IN :BUILDS.STATE IF IT ISN'T ALREADY THERE
       ::
-      =.  state  (add-build build)
-      ::  ignore blocked builds
+      =.  STATE  (ADD-BUILD BUILD)
+      ::  IGNORE BLOCKED BUILDS
       ::
-      =/  =build-status  (~(got by builds.state) build)
-      ?:  ?=(%blocked -.state.build-status)
-        =.  state  (add-anchors-to-build-subs build)
+      =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+      ?:  ?=(%BLOCKED -.STATE.BUILD-STATUS)
+        =.  STATE  (ADD-ANCHORS-TO-BUILD-SUBS BUILD)
         ::
-        =/  sub-scrys=(list scry-request)
-          ~(tap in (collect-blocked-sub-scrys build))
+        =/  SUB-SCRYS=(LIST SCRY-REQUEST)
+          ~(TAP IN (COLLECT-BLOCKED-SUB-SCRYS BUILD))
         ::
-        =.  pending-scrys.state
-          |-  ^+  pending-scrys.state
-          ?~  sub-scrys  pending-scrys.state
+        =.  PENDING-SCRYS.STATE
+          |-  ^+  PENDING-SCRYS.STATE
+          ?~  SUB-SCRYS  PENDING-SCRYS.STATE
           ::
-          =.  pending-scrys.state
-            (put-request pending-scrys.state i.sub-scrys duct)
+          =.  PENDING-SCRYS.STATE
+            (PUT-REQUEST PENDING-SCRYS.STATE I.SUB-SCRYS DUCT)
           ::
-          $(sub-scrys t.sub-scrys)
+          $(SUB-SCRYS T.SUB-SCRYS)
         ::
-        ..execute
-      ::  old-build: most recent previous build with :schematic.build
+        ..EXECUTE
+      ::  OLD-BUILD: MOST RECENT PREVIOUS BUILD WITH :SCHEMATIC.BUILD
       ::
-      =/  old-build=(unit ^build)
-        ?:  ?&  ?=(%live -.live.duct-status)
-                ?=(^ last-sent.live.duct-status)
+      =/  OLD-BUILD=(UNIT ^BUILD)
+        ?:  ?&  ?=(%LIVE -.LIVE.DUCT-STATUS)
+                ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
             ==
-          ::  check whether :build was run as part of the last live build tree
+          ::  CHECK WHETHER :BUILD WAS RUN AS PART OF THE LAST LIVE BUILD TREE
           ::
-          ::    If we had build this schematic as part of the build tree
-          ::    during the last run of this live build, then we can compare
-          ::    our result to that build. It might not be the most recent,
-          ::    but if our sub-builds have the same results as they did then,
-          ::    we can promote them. This is especially helpful for a %scry
-          ::    build, because we don't have to make a new request for the
-          ::    resource if the last live build subscribed to it.
+          ::    IF WE HAD BUILD THIS SCHEMATIC AS PART OF THE BUILD TREE
+          ::    DURING THE LAST RUN OF THIS LIVE BUILD, THEN WE CAN COMPARE
+          ::    OUR RESULT TO THAT BUILD. IT MIGHT NOT BE THE MOST RECENT,
+          ::    BUT IF OUR SUB-BUILDS HAVE THE SAME RESULTS AS THEY DID THEN,
+          ::    WE CAN PROMOTE THEM. THIS IS ESPECIALLY HELPFUL FOR A %SCRY
+          ::    BUILD, BECAUSE WE DON'T HAVE TO MAKE A NEW REQUEST FOR THE
+          ::    RESOURCE IF THE LAST LIVE BUILD SUBSCRIBED TO IT.
           ::
-          ::    Otherwise, default to looking up the most recent build of this
-          ::    schematic in :builds-by-schematic.state. We'll have to rerun
-          ::    any %scry sub-builds, but other than that, we should still be
-          ::    able to promote its result if its sub-builds have the same
-          ::    results as ours.
+          ::    OTHERWISE, DEFAULT TO LOOKING UP THE MOST RECENT BUILD OF THIS
+          ::    SCHEMATIC IN :BUILDS-BY-SCHEMATIC.STATE. WE'LL HAVE TO RERUN
+          ::    ANY %SCRY SUB-BUILDS, BUT OTHER THAN THAT, WE SHOULD STILL BE
+          ::    ABLE TO PROMOTE ITS RESULT IF ITS SUB-BUILDS HAVE THE SAME
+          ::    RESULTS AS OURS.
           ::
-          =/  possible-build=^build
-            [date.u.last-sent.live.duct-status schematic.build]
-          ?:  (~(has by builds.state) possible-build)
-            `possible-build
-          (~(find-previous by-schematic builds-by-schematic.state) build)
-        (~(find-previous by-schematic builds-by-schematic.state) build)
-      ::  if no previous builds exist, we need to run :build
+          =/  POSSIBLE-BUILD=^BUILD
+            [DATE.U.LAST-SENT.LIVE.DUCT-STATUS SCHEMATIC.BUILD]
+          ?:  (~(HAS BY BUILDS.STATE) POSSIBLE-BUILD)
+            `POSSIBLE-BUILD
+          (~(FIND-PREVIOUS BY-SCHEMATIC BUILDS-BY-SCHEMATIC.STATE) BUILD)
+        (~(FIND-PREVIOUS BY-SCHEMATIC BUILDS-BY-SCHEMATIC.STATE) BUILD)
+      ::  IF NO PREVIOUS BUILDS EXIST, WE NEED TO RUN :BUILD
       ::
-      ?~  old-build
-        (add-build-to-next build)
+      ?~  OLD-BUILD
+        (ADD-BUILD-TO-NEXT BUILD)
       ::
-      =/  old-build-status=^build-status
-        ~|  [%missing-old-build (build-to-tape u.old-build)]
-        ~|  [%build-state (turn ~(tap in ~(key by builds.state)) build-to-tape)]
-        (~(got by builds.state) u.old-build)
-      ::  selectively promote scry builds
+      =/  OLD-BUILD-STATUS=^BUILD-STATUS
+        ~|  [%MISSING-OLD-BUILD (BUILD-TO-TAPE U.OLD-BUILD)]
+        ~|  [%BUILD-STATE (TURN ~(TAP IN ~(KEY BY BUILDS.STATE)) BUILD-TO-TAPE)]
+        (~(GOT BY BUILDS.STATE) U.OLD-BUILD)
+      ::  SELECTIVELY PROMOTE SCRY BUILDS
       ::
-      ::    We can only promote a scry if it's not forced and we ran the same
-      ::    scry schematic as a descendant of the root build schematic at the
-      ::    last sent time for this duct.
+      ::    WE CAN ONLY PROMOTE A SCRY IF IT'S NOT FORCED AND WE RAN THE SAME
+      ::    SCRY SCHEMATIC AS A DESCENDANT OF THE ROOT BUILD SCHEMATIC AT THE
+      ::    LAST SENT TIME FOR THIS DUCT.
       ::
-      ?:  ?&  ?=(%scry -.schematic.build)
-              ?|  force
+      ?:  ?&  ?=(%SCRY -.SCHEMATIC.BUILD)
+              ?|  FORCE
                   ?!
-                  ?&  ?=(%live -.live.duct-status)
-                      ?=(^ last-sent.live.duct-status)
+                  ?&  ?=(%LIVE -.LIVE.DUCT-STATUS)
+                      ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
                   ::
-                      =/  subscription=(unit subscription)
-                        subscription.u.last-sent.live.duct-status
+                      =/  SUBSCRIPTION=(UNIT SUBSCRIPTION)
+                        SUBSCRIPTION.U.LAST-SENT.LIVE.DUCT-STATUS
                       ::
-                      ?~  subscription
-                        %.n
-                      %-  ~(has in resources.u.subscription)
-                      resource.schematic.build
+                      ?~  SUBSCRIPTION
+                        %.N
+                      %-  ~(HAS IN RESOURCES.U.SUBSCRIPTION)
+                      RESOURCE.SCHEMATIC.BUILD
           ==  ==  ==
-        (add-build-to-next build)
-      ::  if we don't have :u.old-build's result cached, we need to run :build
+        (ADD-BUILD-TO-NEXT BUILD)
+      ::  IF WE DON'T HAVE :U.OLD-BUILD'S RESULT CACHED, WE NEED TO RUN :BUILD
       ::
-      =^  old-build-record  builds.state  (access-build-record u.old-build)
-      ?.  ?=([~ %value *] old-build-record)
-        (add-build-to-next build)
+      =^  OLD-BUILD-RECORD  BUILDS.STATE  (ACCESS-BUILD-RECORD U.OLD-BUILD)
+      ?.  ?=([~ %VALUE *] OLD-BUILD-RECORD)
+        (ADD-BUILD-TO-NEXT BUILD)
       ::
-      =.  old-build-status  (~(got by builds.state) u.old-build)
+      =.  OLD-BUILD-STATUS  (~(GOT BY BUILDS.STATE) U.OLD-BUILD)
       ::
-      =/  old-subs=(list ^build)  ~(tap in ~(key by subs.old-build-status))
-      =/  new-subs=(list ^build)
-        (turn old-subs |=(^build +<(date date.build)))
-      ::  link sub-builds provisionally, blocking on incomplete
+      =/  OLD-SUBS=(LIST ^BUILD)  ~(TAP IN ~(KEY BY SUBS.OLD-BUILD-STATUS))
+      =/  NEW-SUBS=(LIST ^BUILD)
+        (TURN OLD-SUBS |=(^BUILD +<(DATE DATE.BUILD)))
+      ::  LINK SUB-BUILDS PROVISIONALLY, BLOCKING ON INCOMPLETE
       ::
-      ::    We don't know that :build will end up depending on :new-subs,
-      ::    so they're not :verified.
+      ::    WE DON'T KNOW THAT :BUILD WILL END UP DEPENDING ON :NEW-SUBS,
+      ::    SO THEY'RE NOT :VERIFIED.
       ::
-      =/  split-new-subs
-        %+  skid  new-subs
-        |=  sub=^build
+      =/  SPLIT-NEW-SUBS
+        %+  SKID  NEW-SUBS
+        |=  SUB=^BUILD
         ^-  ?
         ::
-        ?~  maybe-build-status=(~(get by builds.state) sub)
-          %.n
+        ?~  MAYBE-BUILD-STATUS=(~(GET BY BUILDS.STATE) SUB)
+          %.N
         ::
-        ?&  ?=(%complete -.state.u.maybe-build-status)
-            ?=(%value -.build-record.state.u.maybe-build-status)
+        ?&  ?=(%COMPLETE -.STATE.U.MAYBE-BUILD-STATUS)
+            ?=(%VALUE -.BUILD-RECORD.STATE.U.MAYBE-BUILD-STATUS)
         ==
       ::
-      =/  stored-new-subs=(list ^build)     -.split-new-subs
-      =/  un-stored-new-subs=(list ^build)  +.split-new-subs
+      =/  STORED-NEW-SUBS=(LIST ^BUILD)     -.SPLIT-NEW-SUBS
+      =/  UN-STORED-NEW-SUBS=(LIST ^BUILD)  +.SPLIT-NEW-SUBS
       ::
-      =.  builds.state
-        (add-subs-to-client build stored-new-subs [verified=%.n blocked=%.n])
-      =.  builds.state
-        (add-subs-to-client build un-stored-new-subs [verified=%.n blocked=%.y])
+      =.  BUILDS.STATE
+        (ADD-SUBS-TO-CLIENT BUILD STORED-NEW-SUBS [VERIFIED=%.N BLOCKED=%.N])
+      =.  BUILDS.STATE
+        (ADD-SUBS-TO-CLIENT BUILD UN-STORED-NEW-SUBS [VERIFIED=%.N BLOCKED=%.Y])
       ::
-      =.  state  (add-anchors-to-build-subs build)
+      =.  STATE  (ADD-ANCHORS-TO-BUILD-SUBS BUILD)
       ::
-      ?^  un-stored-new-subs
-        ::  enqueue incomplete sub-builds to be promoted or run
+      ?^  UN-STORED-NEW-SUBS
+        ::  ENQUEUE INCOMPLETE SUB-BUILDS TO BE PROMOTED OR RUN
         ::
-        ::    When not all our sub builds have results, we can't add :build to
-        ::    :next-builds.state. Instead, put all the remaining uncached new
-        ::    subs into :candidate-builds.
+        ::    WHEN NOT ALL OUR SUB BUILDS HAVE RESULTS, WE CAN'T ADD :BUILD TO
+        ::    :NEXT-BUILDS.STATE. INSTEAD, PUT ALL THE REMAINING UNCACHED NEW
+        ::    SUBS INTO :CANDIDATE-BUILDS.
         ::
-        ::    If all of our sub-builds finish immediately (i.e. promoted) when
-        ::    they pass through +gather-internal, they will add :build back to
-        ::    :candidate-builds and we will run again before +execute runs
-        ::    +make.
+        ::    IF ALL OF OUR SUB-BUILDS FINISH IMMEDIATELY (I.E. PROMOTED) WHEN
+        ::    THEY PASS THROUGH +GATHER-INTERNAL, THEY WILL ADD :BUILD BACK TO
+        ::    :CANDIDATE-BUILDS AND WE WILL RUN AGAIN BEFORE +EXECUTE RUNS
+        ::    +MAKE.
         ::
-        %_    ..execute
-            candidate-builds
-          (~(gas in candidate-builds) un-stored-new-subs)
+        %_    ..EXECUTE
+            CANDIDATE-BUILDS
+          (~(GAS IN CANDIDATE-BUILDS) UN-STORED-NEW-SUBS)
         ==
       ::
-      =^  promotable  builds.state  (are-subs-unchanged old-subs new-subs)
-      ?.  promotable
-        (add-build-to-next build)
+      =^  PROMOTABLE  BUILDS.STATE  (ARE-SUBS-UNCHANGED OLD-SUBS NEW-SUBS)
+      ?.  PROMOTABLE
+        (ADD-BUILD-TO-NEXT BUILD)
       ::
-      ?>  =(schematic.build schematic.u.old-build)
-      ?>  (~(has by builds.state) build)
-      (promote-build u.old-build date.build new-subs)
-    ::  +are-subs-unchanged: checks sub-build equivalence, updating access time
+      ?>  =(SCHEMATIC.BUILD SCHEMATIC.U.OLD-BUILD)
+      ?>  (~(HAS BY BUILDS.STATE) BUILD)
+      (PROMOTE-BUILD U.OLD-BUILD DATE.BUILD NEW-SUBS)
+    ::  +ARE-SUBS-UNCHANGED: CHECKS SUB-BUILD EQUIVALENCE, UPDATING ACCESS TIME
     ::
-    ++  are-subs-unchanged
-      |=  [old-subs=(list build) new-subs=(list build)]
-      ^-  [? _builds.state]
+    ++  ARE-SUBS-UNCHANGED
+      |=  [OLD-SUBS=(LIST BUILD) NEW-SUBS=(LIST BUILD)]
+      ^-  [? _BUILDS.STATE]
       ::
-      ?~  old-subs
-        [%.y builds.state]
-      ?>  ?=(^ new-subs)
+      ?~  OLD-SUBS
+        [%.Y BUILDS.STATE]
+      ?>  ?=(^ NEW-SUBS)
       ::
-      =^  old-build-record  builds.state  (access-build-record i.old-subs)
-      ?.  ?=([~ %value *] old-build-record)
-        [%.n builds.state]
+      =^  OLD-BUILD-RECORD  BUILDS.STATE  (ACCESS-BUILD-RECORD I.OLD-SUBS)
+      ?.  ?=([~ %VALUE *] OLD-BUILD-RECORD)
+        [%.N BUILDS.STATE]
       ::
-      =^  new-build-record  builds.state  (access-build-record i.new-subs)
-      ?.  ?=([~ %value *] new-build-record)
-        [%.n builds.state]
+      =^  NEW-BUILD-RECORD  BUILDS.STATE  (ACCESS-BUILD-RECORD I.NEW-SUBS)
+      ?.  ?=([~ %VALUE *] NEW-BUILD-RECORD)
+        [%.N BUILDS.STATE]
       ::
-      ?.  =(build-result.u.old-build-record build-result.u.new-build-record)
-        [%.n builds.state]
-      $(new-subs t.new-subs, old-subs t.old-subs)
-    ::  +add-build-to-next: run this build during the +make phase
+      ?.  =(BUILD-RESULT.U.OLD-BUILD-RECORD BUILD-RESULT.U.NEW-BUILD-RECORD)
+        [%.N BUILDS.STATE]
+      $(NEW-SUBS T.NEW-SUBS, OLD-SUBS T.OLD-SUBS)
+    ::  +ADD-BUILD-TO-NEXT: RUN THIS BUILD DURING THE +MAKE PHASE
     ::
-    ++  add-build-to-next
-      |=  =build
-      ..execute(next-builds (~(put in next-builds) build))
-    ::  +promote-build: promote result of :build to newer :date
+    ++  ADD-BUILD-TO-NEXT
+      |=  =BUILD
+      ..EXECUTE(NEXT-BUILDS (~(PUT IN NEXT-BUILDS) BUILD))
+    ::  +PROMOTE-BUILD: PROMOTE RESULT OF :BUILD TO NEWER :DATE
     ::
-    ::    Also performs relevant accounting, and possibly sends %made moves.
+    ::    ALSO PERFORMS RELEVANT ACCOUNTING, AND POSSIBLY SENDS %MADE MOVES.
     ::
-    ++  promote-build
-      |=  [old-build=build new-date=@da new-subs=(list build)]
-      ^+  ..execute
-      ::  grab the previous result, freshening the cache
+    ++  PROMOTE-BUILD
+      |=  [OLD-BUILD=BUILD NEW-DATE=@DA NEW-SUBS=(LIST BUILD)]
+      ^+  ..EXECUTE
+      ::  GRAB THE PREVIOUS RESULT, FRESHENING THE CACHE
       ::
-      =^  old-build-record  builds.state  (access-build-record old-build)
-      ::  we can only promote a cached result, not missing or a %tombstone
+      =^  OLD-BUILD-RECORD  BUILDS.STATE  (ACCESS-BUILD-RECORD OLD-BUILD)
+      ::  WE CAN ONLY PROMOTE A CACHED RESULT, NOT MISSING OR A %TOMBSTONE
       ::
-      ?>  ?=([~ %value *] old-build-record)
-      =/  =build-result  build-result.u.old-build-record
-      ::  :new-build is :old-build at :date; promotion destination
+      ?>  ?=([~ %VALUE *] OLD-BUILD-RECORD)
+      =/  =BUILD-RESULT  BUILD-RESULT.U.OLD-BUILD-RECORD
+      ::  :NEW-BUILD IS :OLD-BUILD AT :DATE; PROMOTION DESTINATION
       ::
-      =/  new-build=build  old-build(date new-date)
+      =/  NEW-BUILD=BUILD  OLD-BUILD(DATE NEW-DATE)
       ::
-      =.  builds.state
-        %+  ~(jab by builds.state)  new-build
-        |=  =build-status
-        ^+  build-status
+      =.  BUILDS.STATE
+        %+  ~(JAB BY BUILDS.STATE)  NEW-BUILD
+        |=  =BUILD-STATUS
+        ^+  BUILD-STATUS
         ::
-        %_    build-status
-        ::  verify linkages between :new-build and subs
+        %_    BUILD-STATUS
+        ::  VERIFY LINKAGES BETWEEN :NEW-BUILD AND SUBS
         ::
-            subs
+            SUBS
           ::
-          ^-  (map build build-relation)
-          %-  my
-          ^-  (list (pair build build-relation))
-          %+  turn  new-subs
-          |=  sub=build
+          ^-  (MAP BUILD BUILD-RELATION)
+          %-  MY
+          ^-  (LIST (PAIR BUILD BUILD-RELATION))
+          %+  TURN  NEW-SUBS
+          |=  SUB=BUILD
           ::
-          [sub [verified=& blocked=|]]
-        ::  copy the old result to :new-build
+          [SUB [VERIFIED=& BLOCKED=|]]
+        ::  COPY THE OLD RESULT TO :NEW-BUILD
         ::
-            state
-          [%complete [%value last-accessed=now build-result=build-result]]
+            STATE
+          [%COMPLETE [%VALUE LAST-ACCESSED=NOW BUILD-RESULT=BUILD-RESULT]]
         ==
       ::
-      (on-build-complete new-build)
+      (ON-BUILD-COMPLETE NEW-BUILD)
     --
-  ::  +run-builds: run the builds and produce +build-receipts
+  ::  +RUN-BUILDS: RUN THE BUILDS AND PRODUCE +BUILD-RECEIPTS
   ::
-  ::    Runs the builds and cleans up the build lists afterwards.
+  ::    RUNS THE BUILDS AND CLEANS UP THE BUILD LISTS AFTERWARDS.
   ::
-  ::    When the vere interpreter has a parallel variant of +turn, use
-  ::    that as each build might take a while and there are no data
-  ::    dependencies between builds here. For now, though, run them serially.
+  ::    WHEN THE VERE INTERPRETER HAS A PARALLEL VARIANT OF +TURN, USE
+  ::    THAT AS EACH BUILD MIGHT TAKE A WHILE AND THERE ARE NO DATA
+  ::    DEPENDENCIES BETWEEN BUILDS HERE. FOR NOW, THOUGH, RUN THEM SERIALLY.
   ::
-  ++  run-builds
+  ++  RUN-BUILDS
     =<  $
-    ~%  %run-builds  +  ~
+    ~%  %RUN-BUILDS  +  ~
     |.
-    ^-  [(list build-receipt) _..execute]
+    ^-  [(LIST BUILD-RECEIPT) _..EXECUTE]
     ::
-    =/  build-receipts=(list build-receipt)
-      (turn ~(tap in next-builds) make)
+    =/  BUILD-RECEIPTS=(LIST BUILD-RECEIPT)
+      (TURN ~(TAP IN NEXT-BUILDS) MAKE)
     ::
-    =.  next-builds  ~
-    [build-receipts ..execute]
-  ::  reduce: apply +build-receipts produce from the +make phase.
+    =.  NEXT-BUILDS  ~
+    [BUILD-RECEIPTS ..EXECUTE]
+  ::  REDUCE: APPLY +BUILD-RECEIPTS PRODUCE FROM THE +MAKE PHASE.
   ::
-  ::    +gather produces builds to run make on. +make produces
-  ::    +build-receipts. It is in +reduce where we take these +build-receipts
-  ::    and apply them to ..execute.
+  ::    +GATHER PRODUCES BUILDS TO RUN MAKE ON. +MAKE PRODUCES
+  ::    +BUILD-RECEIPTS. IT IS IN +REDUCE WHERE WE TAKE THESE +BUILD-RECEIPTS
+  ::    AND APPLY THEM TO ..EXECUTE.
   ::
-  ++  reduce  !.
-    ~/  %reduce
-    |=  build-receipts=(list build-receipt)
-    ^+  ..execute
-    ::  sort :build-receipts so blocks are processed before completions
+  ++  REDUCE  !.
+    ~/  %REDUCE
+    |=  BUILD-RECEIPTS=(LIST BUILD-RECEIPT)
+    ^+  ..EXECUTE
+    ::  SORT :BUILD-RECEIPTS SO BLOCKS ARE PROCESSED BEFORE COMPLETIONS
     ::
-    ::    It's possible for a build to block on a sub-build that was run
-    ::    in the same batch. If that's the case, make sure we register
-    ::    that the build blocked on the sub-build before registering the
-    ::    completion of the sub-build. This way, when we do register the
-    ::    completion of the sub-build, we will know which builds are blocked
-    ::    on the sub-build, so we can enqueue those blocked clients to be
-    ::    rerun.
+    ::    IT'S POSSIBLE FOR A BUILD TO BLOCK ON A SUB-BUILD THAT WAS RUN
+    ::    IN THE SAME BATCH. IF THAT'S THE CASE, MAKE SURE WE REGISTER
+    ::    THAT THE BUILD BLOCKED ON THE SUB-BUILD BEFORE REGISTERING THE
+    ::    COMPLETION OF THE SUB-BUILD. THIS WAY, WHEN WE DO REGISTER THE
+    ::    COMPLETION OF THE SUB-BUILD, WE WILL KNOW WHICH BUILDS ARE BLOCKED
+    ::    ON THE SUB-BUILD, SO WE CAN ENQUEUE THOSE BLOCKED CLIENTS TO BE
+    ::    RERUN.
     ::
-    =.  build-receipts
-      %+  sort  build-receipts
-      |=  [a=build-receipt b=build-receipt]
+    =.  BUILD-RECEIPTS
+      %+  SORT  BUILD-RECEIPTS
+      |=  [A=BUILD-RECEIPT B=BUILD-RECEIPT]
       ^-  ?
-      ?=(%blocks -.result.a)
+      ?=(%BLOCKS -.RESULT.A)
     ::
-    |^  ^+  ..execute
-        ?~  build-receipts  ..execute
+    |^  ^+  ..EXECUTE
+        ?~  BUILD-RECEIPTS  ..EXECUTE
         ::
-        =.  ..execute  (apply-build-receipt i.build-receipts)
-        $(build-receipts t.build-receipts)
-    ::  +apply-build-receipt: applies a single state diff to ..execute
+        =.  ..EXECUTE  (APPLY-BUILD-RECEIPT I.BUILD-RECEIPTS)
+        $(BUILD-RECEIPTS T.BUILD-RECEIPTS)
+    ::  +APPLY-BUILD-RECEIPT: APPLIES A SINGLE STATE DIFF TO ..EXECUTE
     ::
-    ++  apply-build-receipt
-      |=  made=build-receipt
-      ^+  ..execute
-      ::  process :sub-builds.made
+    ++  APPLY-BUILD-RECEIPT
+      |=  MADE=BUILD-RECEIPT
+      ^+  ..EXECUTE
+      ::  PROCESS :SUB-BUILDS.MADE
       ::
-      =.  state  (track-sub-builds build.made sub-builds.made)
+      =.  STATE  (TRACK-SUB-BUILDS BUILD.MADE SUB-BUILDS.MADE)
       ::
-      ?-    -.result.made
-          %build-result
-        (apply-build-result [build build-result.result cache-access]:made)
+      ?-    -.RESULT.MADE
+          %BUILD-RESULT
+        (APPLY-BUILD-RESULT [BUILD BUILD-RESULT.RESULT CACHE-ACCESS]:MADE)
       ::
-          %blocks
-        (apply-blocks [build builds.result]:made)
+          %BLOCKS
+        (APPLY-BLOCKS [BUILD BUILDS.RESULT]:MADE)
       ==
-    ::  +track-sub-builds:
+    ::  +TRACK-SUB-BUILDS:
     ::
-    ::    For every sub-build discovered while running :build, we have to make
-    ::    sure that we track that sub-build and that it is associated with the
-    ::    right ducts.
+    ::    FOR EVERY SUB-BUILD DISCOVERED WHILE RUNNING :BUILD, WE HAVE TO MAKE
+    ::    SURE THAT WE TRACK THAT SUB-BUILD AND THAT IT IS ASSOCIATED WITH THE
+    ::    RIGHT DUCTS.
     ::
-    ++  track-sub-builds
-      |=  [client=build sub-builds=(list build)]
-      ^+  state
-      ::  mark :sub-builds as :subs in :build's +build-status
+    ++  TRACK-SUB-BUILDS
+      |=  [CLIENT=BUILD SUB-BUILDS=(LIST BUILD)]
+      ^+  STATE
+      ::  MARK :SUB-BUILDS AS :SUBS IN :BUILD'S +BUILD-STATUS
       ::
-      =^  build-status  builds.state
-        %+  update-build-status  client
-        |=  =build-status
-        %_    build-status
-            subs
-          %-  ~(gas by subs.build-status)
-          %+  turn  sub-builds
-          |=  sub=build
+      =^  BUILD-STATUS  BUILDS.STATE
+        %+  UPDATE-BUILD-STATUS  CLIENT
+        |=  =BUILD-STATUS
+        %_    BUILD-STATUS
+            SUBS
+          %-  ~(GAS BY SUBS.BUILD-STATUS)
+          %+  TURN  SUB-BUILDS
+          |=  SUB=BUILD
           ::
-          =/  blocked=?
-            ?~  sub-status=(~(get by builds.state) sub)
-              %.y
-            !?=([%complete %value *] state.u.sub-status)
+          =/  BLOCKED=?
+            ?~  SUB-STATUS=(~(GET BY BUILDS.STATE) SUB)
+              %.Y
+            !?=([%COMPLETE %VALUE *] STATE.U.SUB-STATUS)
           ::
-          [sub [verified=& blocked]]
+          [SUB [VERIFIED=& BLOCKED]]
         ==
       ::
-      =.  state  (add-anchors-to-build-subs client)
+      =.  STATE  (ADD-ANCHORS-TO-BUILD-SUBS CLIENT)
       ::
-      |-  ^+  state
-      ?~  sub-builds  state
+      |-  ^+  STATE
+      ?~  SUB-BUILDS  STATE
       ::
-      =.  builds.state
-        %+  ~(jab by builds.state)  i.sub-builds
-        |=  build-status=^build-status
-        %_    build-status
-        ::  freshen :last-accessed date
+      =.  BUILDS.STATE
+        %+  ~(JAB BY BUILDS.STATE)  I.SUB-BUILDS
+        |=  BUILD-STATUS=^BUILD-STATUS
+        %_    BUILD-STATUS
+        ::  FRESHEN :LAST-ACCESSED DATE
         ::
-            state
+            STATE
           ::
-          ?.  ?=([%complete %value *] state.build-status)
-            state.build-status
-          state.build-status(last-accessed.build-record now)
+          ?.  ?=([%COMPLETE %VALUE *] STATE.BUILD-STATUS)
+            STATE.BUILD-STATUS
+          STATE.BUILD-STATUS(LAST-ACCESSED.BUILD-RECORD NOW)
         ==
       ::
-      $(sub-builds t.sub-builds)
-    ::  +apply-build-result: apply a %build-result +build-receipt to ..execute
+      $(SUB-BUILDS T.SUB-BUILDS)
+    ::  +APPLY-BUILD-RESULT: APPLY A %BUILD-RESULT +BUILD-RECEIPT TO ..EXECUTE
     ::
-    ::    Our build produced an actual result.
+    ::    OUR BUILD PRODUCED AN ACTUAL RESULT.
     ::
-    ++  apply-build-result
-      |=  [=build =build-result cache-access=(unit [=compiler-cache-key new=?])]
-      ^+  ..execute
+    ++  APPLY-BUILD-RESULT
+      |=  [=BUILD =BUILD-RESULT CACHE-ACCESS=(UNIT [=COMPILER-CACHE-KEY NEW=?])]
+      ^+  ..EXECUTE
       ::
-      =?  compiler-cache.state  ?=(^ cache-access)
-        =+  by-clock=(by-clock compiler-cache-key ^build-result)
-        ?.  new.u.cache-access
-          =^  ignored  compiler-cache.state
-            (~(get by-clock compiler-cache.state) compiler-cache-key.u.cache-access)
-          compiler-cache.state
+      =?  COMPILER-CACHE.STATE  ?=(^ CACHE-ACCESS)
+        =+  BY-CLOCK=(BY-CLOCK COMPILER-CACHE-KEY ^BUILD-RESULT)
+        ?.  NEW.U.CACHE-ACCESS
+          =^  IGNORED  COMPILER-CACHE.STATE
+            (~(GET BY-CLOCK COMPILER-CACHE.STATE) COMPILER-CACHE-KEY.U.CACHE-ACCESS)
+          COMPILER-CACHE.STATE
         ::
-        %+  ~(put by-clock compiler-cache.state)
-          compiler-cache-key.u.cache-access
-        build-result
+        %+  ~(PUT BY-CLOCK COMPILER-CACHE.STATE)
+          COMPILER-CACHE-KEY.U.CACHE-ACCESS
+        BUILD-RESULT
       ::
-      =.  builds.state
-        %+  ~(jab by builds.state)  build
-        |=  =build-status
-        build-status(state [%complete [%value last-accessed=now build-result]])
+      =.  BUILDS.STATE
+        %+  ~(JAB BY BUILDS.STATE)  BUILD
+        |=  =BUILD-STATUS
+        BUILD-STATUS(STATE [%COMPLETE [%VALUE LAST-ACCESSED=NOW BUILD-RESULT]])
       ::
-      (on-build-complete build)
-    ::  +apply-blocks: apply a %blocks +build-receipt to ..execute
+      (ON-BUILD-COMPLETE BUILD)
+    ::  +APPLY-BLOCKS: APPLY A %BLOCKS +BUILD-RECEIPT TO ..EXECUTE
     ::
-    ::    :build blocked. Record information about what builds it blocked on
-    ::    and try those blocked builds as candidates in the next pass.
+    ::    :BUILD BLOCKED. RECORD INFORMATION ABOUT WHAT BUILDS IT BLOCKED ON
+    ::    AND TRY THOSE BLOCKED BUILDS AS CANDIDATES IN THE NEXT PASS.
     ::
-    ++  apply-blocks
-      |=  [=build blocks=(list build)]
-      ^+  ..execute
-      ::  if a %scry blocked, register it and maybe send an async request
+    ++  APPLY-BLOCKS
+      |=  [=BUILD BLOCKS=(LIST BUILD)]
+      ^+  ..EXECUTE
+      ::  IF A %SCRY BLOCKED, REGISTER IT AND MAYBE SEND AN ASYNC REQUEST
       ::
-      =?    ..execute
-          ?=(~ blocks)
-        ?>  ?=(%scry -.schematic.build)
-        =,  resource.schematic.build
-        %-  start-scry-request
-        [vane care [[ship.disc.rail desk.disc.rail [%da date.build]] spur.rail]]
-      ::  we must run +apply-build-receipt on :build.made before :block
+      =?    ..EXECUTE
+          ?=(~ BLOCKS)
+        ?>  ?=(%SCRY -.SCHEMATIC.BUILD)
+        =,  RESOURCE.SCHEMATIC.BUILD
+        %-  START-SCRY-REQUEST
+        [VANE CARE [[SHIP.DISC.RAIL DESK.DISC.RAIL [%DA DATE.BUILD]] SPUR.RAIL]]
+      ::  WE MUST RUN +APPLY-BUILD-RECEIPT ON :BUILD.MADE BEFORE :BLOCK
       ::
-      ?<  %+  lien  blocks
-          |=  block=^build
-          ?~  maybe-build-status=(~(get by builds.state) block)
-            %.n
-          ?=(%complete -.state.u.maybe-build-status)
-      ::  transition :build's state machine to the %blocked state
+      ?<  %+  LIEN  BLOCKS
+          |=  BLOCK=^BUILD
+          ?~  MAYBE-BUILD-STATUS=(~(GET BY BUILDS.STATE) BLOCK)
+            %.N
+          ?=(%COMPLETE -.STATE.U.MAYBE-BUILD-STATUS)
+      ::  TRANSITION :BUILD'S STATE MACHINE TO THE %BLOCKED STATE
       ::
-      =.  builds.state
-        %+  ~(jab by builds.state)  build
-        |=  =build-status
-        build-status(state [%blocked ~])
-      ::  enqueue :blocks to be run next
+      =.  BUILDS.STATE
+        %+  ~(JAB BY BUILDS.STATE)  BUILD
+        |=  =BUILD-STATUS
+        BUILD-STATUS(STATE [%BLOCKED ~])
+      ::  ENQUEUE :BLOCKS TO BE RUN NEXT
       ::
-      =.  candidate-builds  (~(gas in candidate-builds) blocks)
+      =.  CANDIDATE-BUILDS  (~(GAS IN CANDIDATE-BUILDS) BLOCKS)
       ::
-      ..execute
+      ..EXECUTE
     --
-  ::  +make: attempt to perform :build, non-recursively
+  ::  +MAKE: ATTEMPT TO PERFORM :BUILD, NON-RECURSIVELY
   ::
-  ::    Registers component linkages between :build and its sub-builds.
-  ::    Attempts to perform +scry if necessary. Does not directly enqueue
-  ::    any moves.
+  ::    REGISTERS COMPONENT LINKAGES BETWEEN :BUILD AND ITS SUB-BUILDS.
+  ::    ATTEMPTS TO PERFORM +SCRY IF NECESSARY. DOES NOT DIRECTLY ENQUEUE
+  ::    ANY MOVES.
   ::
-  ++  make
-    ~/  %make
-    |=  =build
-    ^-  build-receipt
-    ::  out: receipt to return to caller
+  ++  MAKE
+    ~/  %MAKE
+    |=  =BUILD
+    ^-  BUILD-RECEIPT
+    ::  OUT: RECEIPT TO RETURN TO CALLER
     ::
-    =|  out=build-receipt
-    ::  ~&  [%turbo-make (build-to-tape build)]
-    ::  dispatch based on the kind of +schematic in :build
+    =|  OUT=BUILD-RECEIPT
+    ::  ~&  [%TURBO-MAKE (BUILD-TO-TAPE BUILD)]
+    ::  DISPATCH BASED ON THE KIND OF +SCHEMATIC IN :BUILD
     ::
-    |^  =,  schematic.build
+    |^  =,  SCHEMATIC.BUILD
         ::
-        =.  build.out  build
+        =.  BUILD.OUT  BUILD
         ::
-        ?-    -.schematic.build
+        ?-    -.SCHEMATIC.BUILD
         ::
-            ^  (make-autocons [head tail])
+            ^  (MAKE-AUTOCONS [HEAD TAIL])
         ::
-            %$  (make-literal literal)
+            %$  (MAKE-LITERAL LITERAL)
         ::
-            %pin   (make-pin date schematic)
-            %alts  (make-alts choices ~)
-            %bake  (make-bake renderer query-string path-to-render)
-            %bunt  (make-bunt disc mark)
-            %call  (make-call gate sample)
-            %cast  (make-cast disc mark input)
-            %core  (make-core source-path)
-            %diff  (make-diff disc start end)
-            %dude  (make-dude error attempt)
-            %hood  (make-hood source-path)
-            %join  (make-join disc mark first second)
-            %list  (make-list schematics)
-            %mash  (make-mash disc mark first second)
-            %mute  (make-mute subject mutations)
-            %pact  (make-pact disc start diff)
-            %path  (make-path disc prefix raw-path)
-            %plan  (make-plan path-to-render query-string scaffold)
-            %reef  (make-reef disc)
-            %ride  (make-ride formula subject)
-            %same  (make-same schematic)
-            %scry  (make-scry resource)
-            %slim  (make-slim subject-type formula)
-            %slit  (make-slit gate sample)
-            %vale  (make-vale disc mark input)
-            %volt  (make-volt disc mark input)
-            %walk  (make-walk disc source target)
+            %PIN   (MAKE-PIN DATE SCHEMATIC)
+            %ALTS  (MAKE-ALTS CHOICES ~)
+            %BAKE  (MAKE-BAKE RENDERER QUERY-STRING PATH-TO-RENDER)
+            %BUNT  (MAKE-BUNT DISC MARK)
+            %CALL  (MAKE-CALL GATE SAMPLE)
+            %CAST  (MAKE-CAST DISC MARK INPUT)
+            %CORE  (MAKE-CORE SOURCE-PATH)
+            %DIFF  (MAKE-DIFF DISC START END)
+            %DUDE  (MAKE-DUDE ERROR ATTEMPT)
+            %HOOD  (MAKE-HOOD SOURCE-PATH)
+            %JOIN  (MAKE-JOIN DISC MARK FIRST SECOND)
+            %LIST  (MAKE-LIST SCHEMATICS)
+            %MASH  (MAKE-MASH DISC MARK FIRST SECOND)
+            %MUTE  (MAKE-MUTE SUBJECT MUTATIONS)
+            %PACT  (MAKE-PACT DISC START DIFF)
+            %PATH  (MAKE-PATH DISC PREFIX RAW-PATH)
+            %PLAN  (MAKE-PLAN PATH-TO-RENDER QUERY-STRING SCAFFOLD)
+            %REEF  (MAKE-REEF DISC)
+            %RIDE  (MAKE-RIDE FORMULA SUBJECT)
+            %SAME  (MAKE-SAME SCHEMATIC)
+            %SCRY  (MAKE-SCRY RESOURCE)
+            %SLIM  (MAKE-SLIM SUBJECT-TYPE FORMULA)
+            %SLIT  (MAKE-SLIT GATE SAMPLE)
+            %VALE  (MAKE-VALE DISC MARK INPUT)
+            %VOLT  (MAKE-VOLT DISC MARK INPUT)
+            %WALK  (MAKE-WALK DISC SOURCE TARGET)
         ==
-    ::  |schematic-handlers:make: implementation of the schematics
+    ::  |SCHEMATIC-HANDLERS:MAKE: IMPLEMENTATION OF THE SCHEMATICS
     ::
-    ::    All of these produce a value of the same type as +make itself.
+    ::    ALL OF THESE PRODUCE A VALUE OF THE SAME TYPE AS +MAKE ITSELF.
     ::
-    ::  +|  schematic-handlers
+    ::  +|  SCHEMATIC-HANDLERS
     ::
-    ++  make-autocons
-      ~%  %make-autocons  ..^^$  ~
-      |=  [head=schematic tail=schematic]
-      ^-  build-receipt
+    ++  MAKE-AUTOCONS
+      ~%  %MAKE-AUTOCONS  ..^^$  ~
+      |=  [HEAD=SCHEMATIC TAIL=SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =/  head-build=^build  [date.build head]
-      =/  tail-build=^build  [date.build tail]
-      =^  head-result  out  (depend-on head-build)
-      =^  tail-result  out  (depend-on tail-build)
+      =/  HEAD-BUILD=^BUILD  [DATE.BUILD HEAD]
+      =/  TAIL-BUILD=^BUILD  [DATE.BUILD TAIL]
+      =^  HEAD-RESULT  OUT  (DEPEND-ON HEAD-BUILD)
+      =^  TAIL-RESULT  OUT  (DEPEND-ON TAIL-BUILD)
       ::
-      =|  blocks=(list ^build)
-      =?  blocks  ?=(~ head-result)  [head-build blocks]
-      =?  blocks  ?=(~ tail-result)  [tail-build blocks]
-      ::  if either build blocked, we're not done
+      =|  BLOCKS=(LIST ^BUILD)
+      =?  BLOCKS  ?=(~ HEAD-RESULT)  [HEAD-BUILD BLOCKS]
+      =?  BLOCKS  ?=(~ TAIL-RESULT)  [TAIL-BUILD BLOCKS]
+      ::  IF EITHER BUILD BLOCKED, WE'RE NOT DONE
       ::
-      ?^  blocks
+      ?^  BLOCKS
         ::
-        (return-blocks blocks)
+        (RETURN-BLOCKS BLOCKS)
       ::
-      ?<  ?=(~ head-result)
-      ?<  ?=(~ tail-result)
+      ?<  ?=(~ HEAD-RESULT)
+      ?<  ?=(~ TAIL-RESULT)
       ::
-      (return-result %success u.head-result u.tail-result)
+      (RETURN-RESULT %SUCCESS U.HEAD-RESULT U.TAIL-RESULT)
     ::
-    ++  make-literal
-      ~%  %make-literal  ..^^$  ~
-      |=  =cage
-      ^-  build-receipt
-      (return-result %success %$ cage)
+    ++  MAKE-LITERAL
+      ~%  %MAKE-LITERAL  ..^^$  ~
+      |=  =CAGE
+      ^-  BUILD-RECEIPT
+      (RETURN-RESULT %SUCCESS %$ CAGE)
     ::
-    ++  make-pin
-      ~%  %make-pin  ..^^$  ~
-      |=  [date=@da =schematic]
-      ^-  build-receipt
-      ::  pinned-sub: sub-build with the %pin date as formal date
+    ++  MAKE-PIN
+      ~%  %MAKE-PIN  ..^^$  ~
+      |=  [DATE=@DA =SCHEMATIC]
+      ^-  BUILD-RECEIPT
+      ::  PINNED-SUB: SUB-BUILD WITH THE %PIN DATE AS FORMAL DATE
       ::
-      =/  pinned-sub=^build  [date schematic]
+      =/  PINNED-SUB=^BUILD  [DATE SCHEMATIC]
       ::
-      =^  result  out  (depend-on pinned-sub)
+      =^  RESULT  OUT  (DEPEND-ON PINNED-SUB)
       ::
-      ?~  result
-        (return-blocks ~[pinned-sub])
+      ?~  RESULT
+        (RETURN-BLOCKS ~[PINNED-SUB])
       ::
-      (return-result u.result)
+      (RETURN-RESULT U.RESULT)
     ::
-    ++  make-alts
-      ~%  %make-alts  ..^^$  ~
-      |=  [choices=(list schematic) errors=(list tank)]
-      ^-  build-receipt
+    ++  MAKE-ALTS
+      ~%  %MAKE-ALTS  ..^^$  ~
+      |=  [CHOICES=(LIST SCHEMATIC) ERRORS=(LIST TANK)]
+      ^-  BUILD-RECEIPT
       ::
-      ?~  choices
-        (return-error [[%leaf "%alts: all options failed"] errors])
+      ?~  CHOICES
+        (RETURN-ERROR [[%LEAF "%ALTS: ALL OPTIONS FAILED"] ERRORS])
       ::
-      =/  choice=^build  [date.build i.choices]
+      =/  CHOICE=^BUILD  [DATE.BUILD I.CHOICES]
       ::
-      =^  result  out  (depend-on choice)
-      ?~  result
-        (return-blocks ~[choice])
+      =^  RESULT  OUT  (DEPEND-ON CHOICE)
+      ?~  RESULT
+        (RETURN-BLOCKS ~[CHOICE])
       ::
-      ?:  ?=([%error *] u.result)
+      ?:  ?=([%ERROR *] U.RESULT)
         ::
-        =/  braces  [[' ' ' ' ~] ['{' ~] ['}' ~]]
-        =/  wrapped-error=tank
-          [%rose braces `(list tank)`message.u.result]
-        =.  errors
-          (weld errors `(list tank)`[[%leaf "option"] wrapped-error ~])
-        $(choices t.choices)
+        =/  BRACES  [[' ' ' ' ~] ['{' ~] ['}' ~]]
+        =/  WRAPPED-ERROR=TANK
+          [%ROSE BRACES `(LIST TANK)`MESSAGE.U.RESULT]
+        =.  ERRORS
+          (WELD ERRORS `(LIST TANK)`[[%LEAF "OPTION"] WRAPPED-ERROR ~])
+        $(CHOICES T.CHOICES)
       ::
-      (return-result %success %alts u.result)
+      (RETURN-RESULT %SUCCESS %ALTS U.RESULT)
     ::
-    ++  make-bake
-      ~%  %make-bake  ..^^$  ~
-      |=  [renderer=term query-string=coin path-to-render=rail]
-      ^-  build-receipt
-      ::  path-build: find the file path for the renderer source
+    ++  MAKE-BAKE
+      ~%  %MAKE-BAKE  ..^^$  ~
+      |=  [RENDERER=TERM QUERY-STRING=COIN PATH-TO-RENDER=RAIL]
+      ^-  BUILD-RECEIPT
+      ::  PATH-BUILD: FIND THE FILE PATH FOR THE RENDERER SOURCE
       ::
-      =/  path-build=^build
-        [date.build [%path disc.path-to-render %ren renderer]]
+      =/  PATH-BUILD=^BUILD
+        [DATE.BUILD [%PATH DISC.PATH-TO-RENDER %REN RENDERER]]
       ::
-      =^  path-result  out  (depend-on path-build)
-      ?~  path-result
-        (return-blocks [path-build]~)
+      =^  PATH-RESULT  OUT  (DEPEND-ON PATH-BUILD)
+      ?~  PATH-RESULT
+        (RETURN-BLOCKS [PATH-BUILD]~)
       ::
-      |^  ^-  build-receipt
-          ::  if there's a renderer called :renderer, use it on :path-to-render
+      |^  ^-  BUILD-RECEIPT
+          ::  IF THERE'S A RENDERER CALLED :RENDERER, USE IT ON :PATH-TO-RENDER
           ::
-          ::    Otherwise, fall back to running the contents of :path-to-render
-          ::    through a mark that has the same name as :renderer.
+          ::    OTHERWISE, FALL BACK TO RUNNING THE CONTENTS OF :PATH-TO-RENDER
+          ::    THROUGH A MARK THAT HAS THE SAME NAME AS :RENDERER.
           ::
-          ?:  ?=([~ %success %path *] path-result)
-            (try-renderer-then-mark rail.u.path-result)
-          (try-mark ~)
-      ::  +try-renderer-then-mark: try to render a path, then fall back to mark
+          ?:  ?=([~ %SUCCESS %PATH *] PATH-RESULT)
+            (TRY-RENDERER-THEN-MARK RAIL.U.PATH-RESULT)
+          (TRY-MARK ~)
+      ::  +TRY-RENDERER-THEN-MARK: TRY TO RENDER A PATH, THEN FALL BACK TO MARK
       ::
-      ++  try-renderer-then-mark
-        |=  =rail
-        ^-  build-receipt
-        ::  build a +scaffold from the renderer source
+      ++  TRY-RENDERER-THEN-MARK
+        |=  =RAIL
+        ^-  BUILD-RECEIPT
+        ::  BUILD A +SCAFFOLD FROM THE RENDERER SOURCE
         ::
-        =/  hood-build=^build  [date.build [%hood rail]]
+        =/  HOOD-BUILD=^BUILD  [DATE.BUILD [%HOOD RAIL]]
         ::
-        =^  hood-result  out  (depend-on hood-build)
-        ?~  hood-result
-          (return-blocks [hood-build]~)
-        ::  if we can't find and parse the renderer, try the mark instead
+        =^  HOOD-RESULT  OUT  (DEPEND-ON HOOD-BUILD)
+        ?~  HOOD-RESULT
+          (RETURN-BLOCKS [HOOD-BUILD]~)
+        ::  IF WE CAN'T FIND AND PARSE THE RENDERER, TRY THE MARK INSTEAD
         ::
-        ?:  ?=([~ %error *] hood-result)
-          (try-mark message.u.hood-result)
-        ?>  ?=([~ %success %hood *] hood-result)
-        ::  link the renderer, passing through :path-to-render and :query-string
+        ?:  ?=([~ %ERROR *] HOOD-RESULT)
+          (TRY-MARK MESSAGE.U.HOOD-RESULT)
+        ?>  ?=([~ %SUCCESS %HOOD *] HOOD-RESULT)
+        ::  LINK THE RENDERER, PASSING THROUGH :PATH-TO-RENDER AND :QUERY-STRING
         ::
-        =/  plan-build=^build
-          :-  date.build
-          [%plan path-to-render query-string scaffold.u.hood-result]
+        =/  PLAN-BUILD=^BUILD
+          :-  DATE.BUILD
+          [%PLAN PATH-TO-RENDER QUERY-STRING SCAFFOLD.U.HOOD-RESULT]
         ::
-        =^  plan-result  out  (depend-on plan-build)
-        ?~  plan-result
-          (return-blocks [plan-build]~)
-        ::  if compiling the renderer errors out, try the mark instead
+        =^  PLAN-RESULT  OUT  (DEPEND-ON PLAN-BUILD)
+        ?~  PLAN-RESULT
+          (RETURN-BLOCKS [PLAN-BUILD]~)
+        ::  IF COMPILING THE RENDERER ERRORS OUT, TRY THE MARK INSTEAD
         ::
-        ?:  ?=([~ %error *] plan-result)
-          (try-mark message.u.plan-result)
-        ?>  ?=([~ %success %plan *] plan-result)
-        ::  renderers return their name as the mark
+        ?:  ?=([~ %ERROR *] PLAN-RESULT)
+          (TRY-MARK MESSAGE.U.PLAN-RESULT)
+        ?>  ?=([~ %SUCCESS %PLAN *] PLAN-RESULT)
+        ::  RENDERERS RETURN THEIR NAME AS THE MARK
         ::
-        ::    We should rethink whether we want this to be the case going
-        ::    forward, but for now, Eyre depends on this detail to work.
+        ::    WE SHOULD RETHINK WHETHER WE WANT THIS TO BE THE CASE GOING
+        ::    FORWARD, BUT FOR NOW, EYRE DEPENDS ON THIS DETAIL TO WORK.
         ::
-        (return-result [%success %bake renderer vase.u.plan-result])
-      ::   +try-mark: try to cast a file's contents through a mark
+        (RETURN-RESULT [%SUCCESS %BAKE RENDERER VASE.U.PLAN-RESULT])
+      ::   +TRY-MARK: TRY TO CAST A FILE'S CONTENTS THROUGH A MARK
       ::
-      ::     :errors contains any error messages from our previous attempt to
-      ::     run a renderer, if we made one. This way if both the renderer and
-      ::     mark fail, the requester will see the errors of both attempts.
+      ::     :ERRORS CONTAINS ANY ERROR MESSAGES FROM OUR PREVIOUS ATTEMPT TO
+      ::     RUN A RENDERER, IF WE MADE ONE. THIS WAY IF BOTH THE RENDERER AND
+      ::     MARK FAIL, THE REQUESTER WILL SEE THE ERRORS OF BOTH ATTEMPTS.
       ::
-      ++  try-mark
-        |=  errors=(list tank)
-        ^-  build-receipt
-        ::  no renderer, try mark; retrieve directory listing of :path-to-render
+      ++  TRY-MARK
+        |=  ERRORS=(LIST TANK)
+        ^-  BUILD-RECEIPT
+        ::  NO RENDERER, TRY MARK; RETRIEVE DIRECTORY LISTING OF :PATH-TO-RENDER
         ::
-        ::    There might be multiple files of different marks stored at
-        ::    :path-to-render. Retrieve the directory listing for
-        ::    :path-to-render, then check which of the path segments in
-        ::    that directory are files (not just folders), then for each
-        ::    file try to %cast its mark to the desired mark (:renderer).
+        ::    THERE MIGHT BE MULTIPLE FILES OF DIFFERENT MARKS STORED AT
+        ::    :PATH-TO-RENDER. RETRIEVE THE DIRECTORY LISTING FOR
+        ::    :PATH-TO-RENDER, THEN CHECK WHICH OF THE PATH SEGMENTS IN
+        ::    THAT DIRECTORY ARE FILES (NOT JUST FOLDERS), THEN FOR EACH
+        ::    FILE TRY TO %CAST ITS MARK TO THE DESIRED MARK (:RENDERER).
         ::
-        ::    Start by retrieving the directory listing, using :toplevel-build.
+        ::    START BY RETRIEVING THE DIRECTORY LISTING, USING :TOPLEVEL-BUILD.
         ::
-        =/  toplevel-build=^build
-          [date.build [%scry %c %y path-to-render]]
+        =/  TOPLEVEL-BUILD=^BUILD
+          [DATE.BUILD [%SCRY %C %Y PATH-TO-RENDER]]
         ::
-        =^  toplevel-result  out  (depend-on toplevel-build)
-        ?~  toplevel-result
-          (return-blocks [toplevel-build]~)
+        =^  TOPLEVEL-RESULT  OUT  (DEPEND-ON TOPLEVEL-BUILD)
+        ?~  TOPLEVEL-RESULT
+          (RETURN-BLOCKS [TOPLEVEL-BUILD]~)
         ::
-        ?:  ?=([~ %error *] toplevel-result)
+        ?:  ?=([~ %ERROR *] TOPLEVEL-RESULT)
           ::
-          =/  =path  (rail-to-path path-to-render)
-          ?~  errors
-            %-  return-error
-            :-  [%leaf "ford: %bake {<renderer>} on {<path>} failed:"]
-            message.u.toplevel-result
+          =/  =PATH  (RAIL-TO-PATH PATH-TO-RENDER)
+          ?~  ERRORS
+            %-  RETURN-ERROR
+            :-  [%LEAF "FORD: %BAKE {<RENDERER>} ON {<PATH>} FAILED:"]
+            MESSAGE.U.TOPLEVEL-RESULT
           ::
-          =/  braces  [[' ' ' ' ~] ['{' ~] ['}' ~]]
-          %-  return-error  :~
-            [%leaf "ford: %bake {<renderer>} on {<path>} failed:"]
-            [%leaf "as-renderer"]
-            [%rose braces errors]
-            [%leaf "as-mark"]
-            [%rose braces message.u.toplevel-result]
+          =/  BRACES  [[' ' ' ' ~] ['{' ~] ['}' ~]]
+          %-  RETURN-ERROR  :~
+            [%LEAF "FORD: %BAKE {<RENDERER>} ON {<PATH>} FAILED:"]
+            [%LEAF "AS-RENDERER"]
+            [%ROSE BRACES ERRORS]
+            [%LEAF "AS-MARK"]
+            [%ROSE BRACES MESSAGE.U.TOPLEVEL-RESULT]
           ==
-        ?>  ?=([~ %success %scry *] toplevel-result)
+        ?>  ?=([~ %SUCCESS %SCRY *] TOPLEVEL-RESULT)
         ::
-        =/  toplevel-arch=arch  ;;(arch q.q.cage.u.toplevel-result)
-        ::  find the :sub-path-segments that could be files
+        =/  TOPLEVEL-ARCH=ARCH  ;;(ARCH Q.Q.CAGE.U.TOPLEVEL-RESULT)
+        ::  FIND THE :SUB-PATH-SEGMENTS THAT COULD BE FILES
         ::
-        ::    Filter out path segments that aren't a +term,
-        ::    since those aren't valid marks and therefore can't
-        ::    be the last segment of a filepath in Clay.
+        ::    FILTER OUT PATH SEGMENTS THAT AREN'T A +TERM,
+        ::    SINCE THOSE AREN'T VALID MARKS AND THEREFORE CAN'T
+        ::    BE THE LAST SEGMENT OF A FILEPATH IN CLAY.
         ::
-        =/  sub-path-segments=(list @ta)
-          (skim (turn ~(tap by dir.toplevel-arch) head) (sane %tas))
+        =/  SUB-PATH-SEGMENTS=(LIST @TA)
+          (SKIM (TURN ~(TAP BY DIR.TOPLEVEL-ARCH) HEAD) (SANE %TAS))
         ::
-        =/  sub-schematics=(list [sub-path=@ta =schematic])
-          %+  turn  sub-path-segments
-          |=  sub=@ta
-          :-  sub
-          [%scry %c %y path-to-render(spur [sub spur.path-to-render])]
+        =/  SUB-SCHEMATICS=(LIST [SUB-PATH=@TA =SCHEMATIC])
+          %+  TURN  SUB-PATH-SEGMENTS
+          |=  SUB=@TA
+          :-  SUB
+          [%SCRY %C %Y PATH-TO-RENDER(SPUR [SUB SPUR.PATH-TO-RENDER])]
         ::
-        =^  maybe-schematic-results  out
-          %-  perform-schematics  :*
-            ;:  weld
-              "ford: %bake "  (trip renderer)  " on "
-              (spud (rail-to-path path-to-render))  " contained failures:"
+        =^  MAYBE-SCHEMATIC-RESULTS  OUT
+          %-  PERFORM-SCHEMATICS  :*
+            ;:  WELD
+              "FORD: %BAKE "  (TRIP RENDERER)  " ON "
+              (SPUD (RAIL-TO-PATH PATH-TO-RENDER))  " CONTAINED FAILURES:"
             ==
-            sub-schematics
-            %fail-on-errors
-            *@ta
+            SUB-SCHEMATICS
+            %FAIL-ON-ERRORS
+            *@TA
           ==
-        ?~  maybe-schematic-results
-          out
-        ::  marks: list of the marks of the files at :path-to-render
+        ?~  MAYBE-SCHEMATIC-RESULTS
+          OUT
+        ::  MARKS: LIST OF THE MARKS OF THE FILES AT :PATH-TO-RENDER
         ::
-        =/  marks=(list @tas)
-          %+  murn  u.maybe-schematic-results
-          |=  [sub-path=@ta result=build-result]
-          ^-  (unit @tas)
+        =/  MARKS=(LIST @TAS)
+          %+  MURN  U.MAYBE-SCHEMATIC-RESULTS
+          |=  [SUB-PATH=@TA RESULT=BUILD-RESULT]
+          ^-  (UNIT @TAS)
           ::
-          ?>  ?=([%success %scry *] result)
+          ?>  ?=([%SUCCESS %SCRY *] RESULT)
           ::
-          =/  =arch  ;;(arch q.q.cage.result)
-          ::  if it's a directory, not a file, we can't load it
+          =/  =ARCH  ;;(ARCH Q.Q.CAGE.RESULT)
+          ::  IF IT'S A DIRECTORY, NOT A FILE, WE CAN'T LOAD IT
           ::
-          ?~  fil.arch
+          ?~  FIL.ARCH
             ~
-          [~ `@tas`sub-path]
-        ::  sort marks in alphabetical order
+          [~ `@TAS`SUB-PATH]
+        ::  SORT MARKS IN ALPHABETICAL ORDER
         ::
-        =.  marks  (sort marks lte)
-        ::  try to convert files to the destination mark, in order
+        =.  MARKS  (SORT MARKS LTE)
+        ::  TRY TO CONVERT FILES TO THE DESTINATION MARK, IN ORDER
         ::
-        =/  alts-build=^build
+        =/  ALTS-BUILD=^BUILD
           ::
-          :+  date.build  %alts
-          ^=  choices  ^-  (list schematic)
+          :+  DATE.BUILD  %ALTS
+          ^=  CHOICES  ^-  (LIST SCHEMATIC)
           ::
-          %+  turn  marks
-          |=  mark=term
-          ^-  schematic
+          %+  TURN  MARKS
+          |=  MARK=TERM
+          ^-  SCHEMATIC
           ::
-          =/  file=rail  path-to-render(spur [mark spur.path-to-render])
+          =/  FILE=RAIL  PATH-TO-RENDER(SPUR [MARK SPUR.PATH-TO-RENDER])
           ::
-          [%cast disc.file renderer [%scry %c %x file]]
+          [%CAST DISC.FILE RENDERER [%SCRY %C %X FILE]]
         ::
-        =^  alts-result  out  (depend-on alts-build)
-        ?~  alts-result
-          (return-blocks [alts-build]~)
+        =^  ALTS-RESULT  OUT  (DEPEND-ON ALTS-BUILD)
+        ?~  ALTS-RESULT
+          (RETURN-BLOCKS [ALTS-BUILD]~)
         ::
-        ?:  ?=([~ %error *] alts-result)
-          =/  =path  (rail-to-path path-to-render)
-          ?~  errors
-            %-  return-error
-            :-  [%leaf "ford: %bake {<renderer>} on {<path>} failed:"]
-            message.u.alts-result
+        ?:  ?=([~ %ERROR *] ALTS-RESULT)
+          =/  =PATH  (RAIL-TO-PATH PATH-TO-RENDER)
+          ?~  ERRORS
+            %-  RETURN-ERROR
+            :-  [%LEAF "FORD: %BAKE {<RENDERER>} ON {<PATH>} FAILED:"]
+            MESSAGE.U.ALTS-RESULT
           ::
-          =/  braces  [[' ' ' ' ~] ['{' ~] ['}' ~]]
-          %-  return-error  :~
-            [%leaf "ford: %bake {<renderer>} on {<path>} failed:"]
-            [%leaf "as-renderer"]
-            [%rose braces errors]
-            [%leaf "as-mark"]
-            [%rose braces message.u.alts-result]
+          =/  BRACES  [[' ' ' ' ~] ['{' ~] ['}' ~]]
+          %-  RETURN-ERROR  :~
+            [%LEAF "FORD: %BAKE {<RENDERER>} ON {<PATH>} FAILED:"]
+            [%LEAF "AS-RENDERER"]
+            [%ROSE BRACES ERRORS]
+            [%LEAF "AS-MARK"]
+            [%ROSE BRACES MESSAGE.U.ALTS-RESULT]
           ==
         ::
-        ?>  ?=([~ %success %alts *] alts-result)
+        ?>  ?=([~ %SUCCESS %ALTS *] ALTS-RESULT)
         ::
-        =/  =build-result
-          [%success %bake (result-to-cage u.alts-result)]
+        =/  =BUILD-RESULT
+          [%SUCCESS %BAKE (RESULT-TO-CAGE U.ALTS-RESULT)]
         ::
-        (return-result build-result)
+        (RETURN-RESULT BUILD-RESULT)
       --
     ::
-    ++  make-bunt
-      ~%  %make-bunt  ..^^$  ~
-      |=  [=disc mark=term]
-      ^-  build-receipt
-      ::  resolve path of the mark definition file
+    ++  MAKE-BUNT
+      ~%  %MAKE-BUNT  ..^^$  ~
+      |=  [=DISC MARK=TERM]
+      ^-  BUILD-RECEIPT
+      ::  RESOLVE PATH OF THE MARK DEFINITION FILE
       ::
-      =/  path-build=^build  [date.build [%path disc %mar mark]]
+      =/  PATH-BUILD=^BUILD  [DATE.BUILD [%PATH DISC %MAR MARK]]
       ::
-      =^  path-result  out  (depend-on path-build)
-      ?~  path-result
-        (return-blocks [path-build]~)
+      =^  PATH-RESULT  OUT  (DEPEND-ON PATH-BUILD)
+      ?~  PATH-RESULT
+        (RETURN-BLOCKS [PATH-BUILD]~)
       ::
-      ?:  ?=([~ %error *] path-result)
-        %-  return-error
-        :_  message.u.path-result
-        :-  %leaf
-        "ford: %bunt resolving path for {<mark>} on {<disc>} failed:"
+      ?:  ?=([~ %ERROR *] PATH-RESULT)
+        %-  RETURN-ERROR
+        :_  MESSAGE.U.PATH-RESULT
+        :-  %LEAF
+        "FORD: %BUNT RESOLVING PATH FOR {<MARK>} ON {<DISC>} FAILED:"
       ::
-      ?>  ?=([~ %success %path *] path-result)
-      ::  build the mark core from source
+      ?>  ?=([~ %SUCCESS %PATH *] PATH-RESULT)
+      ::  BUILD THE MARK CORE FROM SOURCE
       ::
-      =/  core-build=^build  [date.build [%core rail.u.path-result]]
+      =/  CORE-BUILD=^BUILD  [DATE.BUILD [%CORE RAIL.U.PATH-RESULT]]
       ::
-      =^  core-result  out  (depend-on core-build)
-      ?~  core-result
-        (return-blocks [core-build]~)
+      =^  CORE-RESULT  OUT  (DEPEND-ON CORE-BUILD)
+      ?~  CORE-RESULT
+        (RETURN-BLOCKS [CORE-BUILD]~)
       ::
-      ?:  ?=([~ %error *] core-result)
-        %-  return-error
-        :_  message.u.core-result
-        :-  %leaf
-        "ford: %bunt compiling mark {<mark>} on {<disc>} failed:"
+      ?:  ?=([~ %ERROR *] CORE-RESULT)
+        %-  RETURN-ERROR
+        :_  MESSAGE.U.CORE-RESULT
+        :-  %LEAF
+        "FORD: %BUNT COMPILING MARK {<MARK>} ON {<DISC>} FAILED:"
       ::
-      ?>  ?=([~ %success %core *] core-result)
-      ::  extract the sample from the mark core
+      ?>  ?=([~ %SUCCESS %CORE *] CORE-RESULT)
+      ::  EXTRACT THE SAMPLE FROM THE MARK CORE
       ::
-      =/  mark-vase=vase    vase.u.core-result
-      ~|  %mark-vase
-      =+  [sample-type=p sample-value=q]:(slot 6 mark-vase)
-      ::  if sample is wrapped in a face, unwrap it
+      =/  MARK-VASE=VASE    VASE.U.CORE-RESULT
+      ~|  %MARK-VASE
+      =+  [SAMPLE-TYPE=P SAMPLE-VALUE=Q]:(SLOT 6 MARK-VASE)
+      ::  IF SAMPLE IS WRAPPED IN A FACE, UNWRAP IT
       ::
-      =?  sample-type  ?=(%face -.sample-type)  q.sample-type
+      =?  SAMPLE-TYPE  ?=(%FACE -.SAMPLE-TYPE)  Q.SAMPLE-TYPE
       ::
-      =/  =cage  [mark sample-type sample-value]
-      (return-result %success %bunt cage)
+      =/  =CAGE  [MARK SAMPLE-TYPE SAMPLE-VALUE]
+      (RETURN-RESULT %SUCCESS %BUNT CAGE)
     ::
-    ++  make-call
-      ~%  %make-call  ..^^$  ~
-      |=  [gate=schematic sample=schematic]
-      ^-  build-receipt
+    ++  MAKE-CALL
+      ~%  %MAKE-CALL  ..^^$  ~
+      |=  [GATE=SCHEMATIC SAMPLE=SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =/  gate-build=^build  [date.build gate]
-      =^  gate-result    out  (depend-on gate-build)
+      =/  GATE-BUILD=^BUILD  [DATE.BUILD GATE]
+      =^  GATE-RESULT    OUT  (DEPEND-ON GATE-BUILD)
       ::
-      =/  sample-build=^build  [date.build sample]
-      =^  sample-result  out  (depend-on sample-build)
+      =/  SAMPLE-BUILD=^BUILD  [DATE.BUILD SAMPLE]
+      =^  SAMPLE-RESULT  OUT  (DEPEND-ON SAMPLE-BUILD)
       ::
-      =|  blocks=(list ^build)
-      =?  blocks  ?=(~ gate-result)    [[date.build gate] blocks]
-      =?  blocks  ?=(~ sample-result)  [[date.build sample] blocks]
-      ?^  blocks
-        (return-blocks blocks)
+      =|  BLOCKS=(LIST ^BUILD)
+      =?  BLOCKS  ?=(~ GATE-RESULT)    [[DATE.BUILD GATE] BLOCKS]
+      =?  BLOCKS  ?=(~ SAMPLE-RESULT)  [[DATE.BUILD SAMPLE] BLOCKS]
+      ?^  BLOCKS
+        (RETURN-BLOCKS BLOCKS)
       ::
-      ?<  ?=(~ gate-result)
-      ?:  ?=([~ %error *] gate-result)
-        %-  return-error
-        :-  [%leaf "ford: %call failed to build gate:"]
-        message.u.gate-result
+      ?<  ?=(~ GATE-RESULT)
+      ?:  ?=([~ %ERROR *] GATE-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %CALL FAILED TO BUILD GATE:"]
+        MESSAGE.U.GATE-RESULT
       ::
-      ?<  ?=(~ sample-result)
-      ?:  ?=([~ %error *] sample-result)
-        %-  return-error
-        :-  [%leaf "ford: %call failed to build sample:"]
-        message.u.sample-result
+      ?<  ?=(~ SAMPLE-RESULT)
+      ?:  ?=([~ %ERROR *] SAMPLE-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %CALL FAILED TO BUILD SAMPLE:"]
+        MESSAGE.U.SAMPLE-RESULT
       ::
-      =/  gate-vase=vase    q:(result-to-cage u.gate-result)
-      =/  sample-vase=vase  q:(result-to-cage u.sample-result)
-      ::  run %slit to get the resulting type of calculating the gate
+      =/  GATE-VASE=VASE    Q:(RESULT-TO-CAGE U.GATE-RESULT)
+      =/  SAMPLE-VASE=VASE  Q:(RESULT-TO-CAGE U.SAMPLE-RESULT)
+      ::  RUN %SLIT TO GET THE RESULTING TYPE OF CALCULATING THE GATE
       ::
-      =/  slit-schematic=schematic  [%slit gate-vase sample-vase]
-      =/  slit-build=^build  [date.build slit-schematic]
-      =^  slit-result  out  (depend-on slit-build)
-      ?~  slit-result
-        (return-blocks [date.build slit-schematic]~)
+      =/  SLIT-SCHEMATIC=SCHEMATIC  [%SLIT GATE-VASE SAMPLE-VASE]
+      =/  SLIT-BUILD=^BUILD  [DATE.BUILD SLIT-SCHEMATIC]
+      =^  SLIT-RESULT  OUT  (DEPEND-ON SLIT-BUILD)
+      ?~  SLIT-RESULT
+        (RETURN-BLOCKS [DATE.BUILD SLIT-SCHEMATIC]~)
       ::
-      ?:  ?=([~ %error *] slit-result)
-        %-  return-error
-        :-  [%leaf "ford: %call failed type calculation"]
-        message.u.slit-result
+      ?:  ?=([~ %ERROR *] SLIT-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %CALL FAILED TYPE CALCULATION"]
+        MESSAGE.U.SLIT-RESULT
       ::
-      ?>  ?=([~ %success %slit *] slit-result)
+      ?>  ?=([~ %SUCCESS %SLIT *] SLIT-RESULT)
       ::
-      =/  =compiler-cache-key  [%call gate-vase sample-vase]
-      =^  cached-result  out  (access-cache compiler-cache-key)
-      ?^  cached-result
-        (return-result u.cached-result)
+      =/  =COMPILER-CACHE-KEY  [%CALL GATE-VASE SAMPLE-VASE]
+      =^  CACHED-RESULT  OUT  (ACCESS-CACHE COMPILER-CACHE-KEY)
+      ?^  CACHED-RESULT
+        (RETURN-RESULT U.CACHED-RESULT)
       ::
-      ?>  &(?=(^ q.gate-vase) ?=(^ +.q.gate-vase))
-      =/  val
-        (mong [q.gate-vase q.sample-vase] intercepted-scry)
+      ?>  &(?=(^ Q.GATE-VASE) ?=(^ +.Q.GATE-VASE))
+      =/  VAL
+        (MONG [Q.GATE-VASE Q.SAMPLE-VASE] INTERCEPTED-SCRY)
       ::
-      ?-    -.val
+      ?-    -.VAL
           %0
-        (return-result %success %call [type.u.slit-result p.val])
+        (RETURN-RESULT %SUCCESS %CALL [TYPE.U.SLIT-RESULT P.VAL])
       ::
           %1
-        =/  blocked-paths=(list path)  ((hard (list path)) p.val)
-        (blocked-paths-to-receipt %call blocked-paths)
+        =/  BLOCKED-PATHS=(LIST PATH)  ((HARD (LIST PATH)) P.VAL)
+        (BLOCKED-PATHS-TO-RECEIPT %CALL BLOCKED-PATHS)
       ::
           %2
-        (return-error [[%leaf "ford: %call execution failed:"] p.val])
+        (RETURN-ERROR [[%LEAF "FORD: %CALL EXECUTION FAILED:"] P.VAL])
       ==
     ::
-    ++  make-cast
-      ~%  %make-cast  ..^^$  ~
-      |=  [=disc mark=term input=schematic]
-      ^-  build-receipt
+    ++  MAKE-CAST
+      ~%  %MAKE-CAST  ..^^$  ~
+      |=  [=DISC MARK=TERM INPUT=SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =/  input-build=^build  [date.build input]
+      =/  INPUT-BUILD=^BUILD  [DATE.BUILD INPUT]
       ::
-      =^  input-result  out  (depend-on input-build)
-      ?~  input-result
-        (return-blocks [input-build]~)
+      =^  INPUT-RESULT  OUT  (DEPEND-ON INPUT-BUILD)
+      ?~  INPUT-RESULT
+        (RETURN-BLOCKS [INPUT-BUILD]~)
       ::
-      ?:  ?=([~ %error *] input-result)
-        %-  return-error
-        :_  message.u.input-result
-        :-  %leaf
-        ;:  weld
-          "ford: %cast "  (trip mark)  "on ["  (trip (scot %p ship.disc))
-          " "  (trip desk.disc)  "] failed on input:"
+      ?:  ?=([~ %ERROR *] INPUT-RESULT)
+        %-  RETURN-ERROR
+        :_  MESSAGE.U.INPUT-RESULT
+        :-  %LEAF
+        ;:  WELD
+          "FORD: %CAST "  (TRIP MARK)  "ON ["  (TRIP (SCOT %P SHIP.DISC))
+          " "  (TRIP DESK.DISC)  "] FAILED ON INPUT:"
         ==
       ::
-      ?>  ?=([~ %success *] input-result)
+      ?>  ?=([~ %SUCCESS *] INPUT-RESULT)
       ::
-      =/  result-cage=cage  (result-to-cage u.input-result)
+      =/  RESULT-CAGE=CAGE  (RESULT-TO-CAGE U.INPUT-RESULT)
       ::
-      =/  translation-path-build=^build
-        [date.build [%walk disc p.result-cage mark]]
-      =^  translation-path-result  out
-        (depend-on translation-path-build)
+      =/  TRANSLATION-PATH-BUILD=^BUILD
+        [DATE.BUILD [%WALK DISC P.RESULT-CAGE MARK]]
+      =^  TRANSLATION-PATH-RESULT  OUT
+        (DEPEND-ON TRANSLATION-PATH-BUILD)
       ::
-      ?~  translation-path-result
-        (return-blocks [translation-path-build]~)
+      ?~  TRANSLATION-PATH-RESULT
+        (RETURN-BLOCKS [TRANSLATION-PATH-BUILD]~)
       ::
-      ?:  ?=([~ %error *] translation-path-result)
-        %-  return-error
-        :_  message.u.translation-path-result
-        :-  %leaf
-        ;:  weld
-          "ford: %cast "  (trip mark)  "on ["  (trip (scot %p ship.disc))
-          " "  (trip desk.disc)  "] failed:"
+      ?:  ?=([~ %ERROR *] TRANSLATION-PATH-RESULT)
+        %-  RETURN-ERROR
+        :_  MESSAGE.U.TRANSLATION-PATH-RESULT
+        :-  %LEAF
+        ;:  WELD
+          "FORD: %CAST "  (TRIP MARK)  "ON ["  (TRIP (SCOT %P SHIP.DISC))
+          " "  (TRIP DESK.DISC)  "] FAILED:"
         ==
       ::
-      ?>  ?=([~ %success %walk *] translation-path-result)
+      ?>  ?=([~ %SUCCESS %WALK *] TRANSLATION-PATH-RESULT)
       ::
-      =/  translation-path=(list mark-action)
-        results.u.translation-path-result
+      =/  TRANSLATION-PATH=(LIST MARK-ACTION)
+        RESULTS.U.TRANSLATION-PATH-RESULT
       ::
-      |^  ^-  build-receipt
-          ?~  translation-path
-            (return-result %success %cast result-cage)
+      |^  ^-  BUILD-RECEIPT
+          ?~  TRANSLATION-PATH
+            (RETURN-RESULT %SUCCESS %CAST RESULT-CAGE)
           ::
-          =^  action-result  out
-            =,  i.translation-path
-            ?-  -.i.translation-path
-              %grow  (run-grow source target result-cage)
-              %grab  (run-grab source target result-cage)
+          =^  ACTION-RESULT  OUT
+            =,  I.TRANSLATION-PATH
+            ?-  -.I.TRANSLATION-PATH
+              %GROW  (RUN-GROW SOURCE TARGET RESULT-CAGE)
+              %GRAB  (RUN-GRAB SOURCE TARGET RESULT-CAGE)
             ==
           ::
-          ?-    -.action-result
-              %success
+          ?-    -.ACTION-RESULT
+              %SUCCESS
             %_  $
-              translation-path  t.translation-path
-              result-cage  cage.action-result
+              TRANSLATION-PATH  T.TRANSLATION-PATH
+              RESULT-CAGE  CAGE.ACTION-RESULT
             ==
           ::
-              %blocks
-            (return-blocks blocks.action-result)
+              %BLOCKS
+            (RETURN-BLOCKS BLOCKS.ACTION-RESULT)
           ::
-              %error
-            (return-error [leaf+"ford: failed to %cast" tang.action-result])
+              %ERROR
+            (RETURN-ERROR [LEAF+"FORD: FAILED TO %CAST" TANG.ACTION-RESULT])
         ==
       ::
-      +=  action-result
-        $%  ::  translation was successful and here's a cage for you
-            [%success =cage]
-            ::  it was an error. sorry.
-            [%error =tang]
-            ::  we block on a build
-            [%blocks blocks=(list ^build)]
+      +=  ACTION-RESULT
+        $%  ::  TRANSLATION WAS SUCCESSFUL AND HERE'S A CAGE FOR YOU
+            [%SUCCESS =CAGE]
+            ::  IT WAS AN ERROR. SORRY.
+            [%ERROR =TANG]
+            ::  WE BLOCK ON A BUILD
+            [%BLOCKS BLOCKS=(LIST ^BUILD)]
         ==
       ::
-      ++  run-grab
-        |=  [source-mark=term target-mark=term input-cage=cage]
-        ^-  [action-result _out]
+      ++  RUN-GRAB
+        |=  [SOURCE-MARK=TERM TARGET-MARK=TERM INPUT-CAGE=CAGE]
+        ^-  [ACTION-RESULT _OUT]
         ::
-        =/  mark-path-build=^build
-          [date.build [%path disc %mar target-mark]]
+        =/  MARK-PATH-BUILD=^BUILD
+          [DATE.BUILD [%PATH DISC %MAR TARGET-MARK]]
         ::
-        =^  mark-path-result  out
-          (depend-on mark-path-build)
-        ?~  mark-path-result
-          [[%blocks [mark-path-build]~] out]
+        =^  MARK-PATH-RESULT  OUT
+          (DEPEND-ON MARK-PATH-BUILD)
+        ?~  MARK-PATH-RESULT
+          [[%BLOCKS [MARK-PATH-BUILD]~] OUT]
         ::
-        ?.  ?=([~ %success %path *] mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            ;:  weld
-              "ford: %cast failed to find path for mark "  (trip source-mark)
-              " during +grab:"
+        ?.  ?=([~ %SUCCESS %PATH *] MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            ;:  WELD
+              "FORD: %CAST FAILED TO FIND PATH FOR MARK "  (TRIP SOURCE-MARK)
+              " DURING +GRAB:"
             ==
-            mark-path-result
+            MARK-PATH-RESULT
           ==
         ::
-        =/  mark-core-build=^build  [date.build [%core rail.u.mark-path-result]]
+        =/  MARK-CORE-BUILD=^BUILD  [DATE.BUILD [%CORE RAIL.U.MARK-PATH-RESULT]]
         ::
-        =^  mark-core-result  out  (depend-on mark-core-build)
-        ?~  mark-core-result
-          [[%blocks ~[mark-core-build]] out]
-        ::  find +grab within the destination mark core
+        =^  MARK-CORE-RESULT  OUT  (DEPEND-ON MARK-CORE-BUILD)
+        ?~  MARK-CORE-RESULT
+          [[%BLOCKS ~[MARK-CORE-BUILD]] OUT]
+        ::  FIND +GRAB WITHIN THE DESTINATION MARK CORE
         ::
-        =/  grab-build=^build
-          :-  date.build
-          [%ride [%limb %grab] [%$ (result-to-cage u.mark-core-result)]]
+        =/  GRAB-BUILD=^BUILD
+          :-  DATE.BUILD
+          [%RIDE [%LIMB %GRAB] [%$ (RESULT-TO-CAGE U.MARK-CORE-RESULT)]]
         ::
-        =^  grab-result  out  (depend-on grab-build)
-        ?~  grab-result
-          [[%blocks [grab-build]~] out]
+        =^  GRAB-RESULT  OUT  (DEPEND-ON GRAB-BUILD)
+        ?~  GRAB-RESULT
+          [[%BLOCKS [GRAB-BUILD]~] OUT]
         ::
-        ?.  ?=([~ %success %ride *] grab-result)
-          =/  =path  (rail-to-path rail.u.mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            :(weld "ford: %cast failed to ride " (spud path) " during +grab:")
-            grab-result
+        ?.  ?=([~ %SUCCESS %RIDE *] GRAB-RESULT)
+          =/  =PATH  (RAIL-TO-PATH RAIL.U.MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            :(WELD "FORD: %CAST FAILED TO RIDE " (SPUD PATH) " DURING +GRAB:")
+            GRAB-RESULT
           ==
-        ::  find an arm for the input's mark within the +grab core
+        ::  FIND AN ARM FOR THE INPUT'S MARK WITHIN THE +GRAB CORE
         ::
-        =/  grab-mark-build=^build
-          :-  date.build
-          [%ride [%limb source-mark] [%$ %noun vase.u.grab-result]]
+        =/  GRAB-MARK-BUILD=^BUILD
+          :-  DATE.BUILD
+          [%RIDE [%LIMB SOURCE-MARK] [%$ %NOUN VASE.U.GRAB-RESULT]]
         ::
-        =^  grab-mark-result  out  (depend-on grab-mark-build)
-        ?~  grab-mark-result
-          [[%blocks [grab-mark-build]~] out]
+        =^  GRAB-MARK-RESULT  OUT  (DEPEND-ON GRAB-MARK-BUILD)
+        ?~  GRAB-MARK-RESULT
+          [[%BLOCKS [GRAB-MARK-BUILD]~] OUT]
         ::
-        ?.  ?=([~ %success %ride *] grab-mark-result)
-          =/  =path  (rail-to-path rail.u.mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            :(weld "ford: %cast failed to ride " (spud path) " during +grab:")
-            grab-mark-result
+        ?.  ?=([~ %SUCCESS %RIDE *] GRAB-MARK-RESULT)
+          =/  =PATH  (RAIL-TO-PATH RAIL.U.MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            :(WELD "FORD: %CAST FAILED TO RIDE " (SPUD PATH) " DURING +GRAB:")
+            GRAB-MARK-RESULT
           ==
-        ::  slam the +mark-name:grab gate on the result of running :input
+        ::  SLAM THE +MARK-NAME:GRAB GATE ON THE RESULT OF RUNNING :INPUT
         ::
-        =/  call-build=^build
-          :-  date.build
-          [%call gate=[%$ %noun vase.u.grab-mark-result] sample=[%$ input-cage]]
+        =/  CALL-BUILD=^BUILD
+          :-  DATE.BUILD
+          [%CALL GATE=[%$ %NOUN VASE.U.GRAB-MARK-RESULT] SAMPLE=[%$ INPUT-CAGE]]
         ::
-        =^  call-result  out  (depend-on call-build)
-        ?~  call-result
-          [[%blocks [call-build]~] out]
+        =^  CALL-RESULT  OUT  (DEPEND-ON CALL-BUILD)
+        ?~  CALL-RESULT
+          [[%BLOCKS [CALL-BUILD]~] OUT]
         ::
-        ?.  ?=([~ %success %call *] call-result)
-          =/  =path  (rail-to-path rail.u.mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            :(weld "ford: %cast failed to call +grab arm in " (spud path) ":")
-            call-result
+        ?.  ?=([~ %SUCCESS %CALL *] CALL-RESULT)
+          =/  =PATH  (RAIL-TO-PATH RAIL.U.MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            :(WELD "FORD: %CAST FAILED TO CALL +GRAB ARM IN " (SPUD PATH) ":")
+            CALL-RESULT
           ==
         ::
-        [[%success [mark vase.u.call-result]] out]
-      ::  +grow: grow from the input mark to the destination mark
+        [[%SUCCESS [MARK VASE.U.CALL-RESULT]] OUT]
+      ::  +GROW: GROW FROM THE INPUT MARK TO THE DESTINATION MARK
       ::
-      ++  run-grow
-        |=  [source-mark=term target-mark=term input-cage=cage]
-        ^-  [action-result _out]
+      ++  RUN-GROW
+        |=  [SOURCE-MARK=TERM TARGET-MARK=TERM INPUT-CAGE=CAGE]
+        ^-  [ACTION-RESULT _OUT]
         ::
-        =/  starting-mark-path-build=^build
-          [date.build [%path disc %mar source-mark]]
+        =/  STARTING-MARK-PATH-BUILD=^BUILD
+          [DATE.BUILD [%PATH DISC %MAR SOURCE-MARK]]
         ::
-        =^  starting-mark-path-result  out
-          (depend-on starting-mark-path-build)
-        ?~  starting-mark-path-result
-          [[%blocks [starting-mark-path-build]~] out]
+        =^  STARTING-MARK-PATH-RESULT  OUT
+          (DEPEND-ON STARTING-MARK-PATH-BUILD)
+        ?~  STARTING-MARK-PATH-RESULT
+          [[%BLOCKS [STARTING-MARK-PATH-BUILD]~] OUT]
         ::
-        ?.  ?=([~ %success %path *] starting-mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            ;:  weld
-              "ford: %cast failed to find path for mark "  (trip source-mark)
-              " during +grow:"
+        ?.  ?=([~ %SUCCESS %PATH *] STARTING-MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            ;:  WELD
+              "FORD: %CAST FAILED TO FIND PATH FOR MARK "  (TRIP SOURCE-MARK)
+              " DURING +GROW:"
             ==
-            starting-mark-path-result
+            STARTING-MARK-PATH-RESULT
           ==
-        ::  grow the value from the initial mark to the final mark
+        ::  GROW THE VALUE FROM THE INITIAL MARK TO THE FINAL MARK
         ::
-        ::  Replace the input mark's sample with the input's result,
-        ::  then fire the mark-name:grow arm to produce a result.
+        ::  REPLACE THE INPUT MARK'S SAMPLE WITH THE INPUT'S RESULT,
+        ::  THEN FIRE THE MARK-NAME:GROW ARM TO PRODUCE A RESULT.
         ::
-        =/  grow-build=^build
-          :-  date.build
-          :+  %ride
-            formula=`hoon`[%tsld [%wing ~[target-mark]] [%wing ~[%grow]]]
-          ^=  subject
-          ^-  schematic
-          :*  %mute
-              ^-  schematic
-              [%core rail.u.starting-mark-path-result]
-              ^=  mutations
-              ^-  (list [wing schematic])
-              [[%& 6]~ [%$ input-cage]]~
-          ==
-        ::
-        =^  grow-result  out  (depend-on grow-build)
-        ?~  grow-result
-          [[%blocks [grow-build]~] out]
-        ::
-        ?.  ?=([~ %success %ride *] grow-result)
-          =/  =path  (rail-to-path rail.u.starting-mark-path-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            :(weld "ford: %cast failed to ride " (spud path) " during +grow:")
-            grow-result
-          ==
-        ::  make sure the product nests in the sample of the destination mark
-        ::
-        =/  bunt-build=^build  [date.build [%bunt disc target-mark]]
-        ::
-        =^  bunt-result  out  (depend-on bunt-build)
-        ?~  bunt-result
-          [[%blocks [bunt-build]~] out]
-        ::
-        ?.  ?=([~ %success %bunt *] bunt-result)
-          %-  cast-wrap-error  :*
-            source-mark
-            target-mark
-            :(weld "ford: %cast failed to bunt " (trip target-mark) ":")
-            bunt-result
+        =/  GROW-BUILD=^BUILD
+          :-  DATE.BUILD
+          :+  %RIDE
+            FORMULA=`HOON`[%TSLD [%WING ~[TARGET-MARK]] [%WING ~[%GROW]]]
+          ^=  SUBJECT
+          ^-  SCHEMATIC
+          :*  %MUTE
+              ^-  SCHEMATIC
+              [%CORE RAIL.U.STARTING-MARK-PATH-RESULT]
+              ^=  MUTATIONS
+              ^-  (LIST [WING SCHEMATIC])
+              [[%& 6]~ [%$ INPUT-CAGE]]~
           ==
         ::
-        ?.  (~(nest ut p.q.cage.u.bunt-result) | p.vase.u.grow-result)
-          =*  src  source-mark
-          =*  dst  target-mark
-          :_  out
-          :-  %error
+        =^  GROW-RESULT  OUT  (DEPEND-ON GROW-BUILD)
+        ?~  GROW-RESULT
+          [[%BLOCKS [GROW-BUILD]~] OUT]
+        ::
+        ?.  ?=([~ %SUCCESS %RIDE *] GROW-RESULT)
+          =/  =PATH  (RAIL-TO-PATH RAIL.U.STARTING-MARK-PATH-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            :(WELD "FORD: %CAST FAILED TO RIDE " (SPUD PATH) " DURING +GROW:")
+            GROW-RESULT
+          ==
+        ::  MAKE SURE THE PRODUCT NESTS IN THE SAMPLE OF THE DESTINATION MARK
+        ::
+        =/  BUNT-BUILD=^BUILD  [DATE.BUILD [%BUNT DISC TARGET-MARK]]
+        ::
+        =^  BUNT-RESULT  OUT  (DEPEND-ON BUNT-BUILD)
+        ?~  BUNT-RESULT
+          [[%BLOCKS [BUNT-BUILD]~] OUT]
+        ::
+        ?.  ?=([~ %SUCCESS %BUNT *] BUNT-RESULT)
+          %-  CAST-WRAP-ERROR  :*
+            SOURCE-MARK
+            TARGET-MARK
+            :(WELD "FORD: %CAST FAILED TO BUNT " (TRIP TARGET-MARK) ":")
+            BUNT-RESULT
+          ==
+        ::
+        ?.  (~(NEST UT P.Q.CAGE.U.BUNT-RESULT) | P.VASE.U.GROW-RESULT)
+          =*  SRC  SOURCE-MARK
+          =*  DST  TARGET-MARK
+          :_  OUT
+          :-  %ERROR
           :_  ~
-          :-  %leaf
-          ;:  weld
-            "ford: %cast from "  (trip src)  " to "  (trip dst)
-            " failed: nest fail"
+          :-  %LEAF
+          ;:  WELD
+            "FORD: %CAST FROM "  (TRIP SRC)  " TO "  (TRIP DST)
+            " FAILED: NEST FAIL"
           ==
         ::
-        [[%success mark vase.u.grow-result] out]
+        [[%SUCCESS MARK VASE.U.GROW-RESULT] OUT]
       ::
-      ++  cast-wrap-error
-        |=  $:  source-mark=term
-                target-mark=term
-                description=tape
-                result=(unit build-result)
+      ++  CAST-WRAP-ERROR
+        |=  $:  SOURCE-MARK=TERM
+                TARGET-MARK=TERM
+                DESCRIPTION=TAPE
+                RESULT=(UNIT BUILD-RESULT)
             ==
-        ^-  [action-result _out]
+        ^-  [ACTION-RESULT _OUT]
         ::
-        ?>  ?=([~ %error *] result)
+        ?>  ?=([~ %ERROR *] RESULT)
         ::
-        :_  out
-        :-  %error
-        :*  :-  %leaf
-            ;:  weld
-              "ford: %cast failed while trying to cast from "
-              (trip source-mark)  " to "  (trip target-mark)  ":"
+        :_  OUT
+        :-  %ERROR
+        :*  :-  %LEAF
+            ;:  WELD
+              "FORD: %CAST FAILED WHILE TRYING TO CAST FROM "
+              (TRIP SOURCE-MARK)  " TO "  (TRIP TARGET-MARK)  ":"
             ==
-            [%leaf description]
-            message.u.result
+            [%LEAF DESCRIPTION]
+            MESSAGE.U.RESULT
         ==
       --
     ::
-    ++  make-core
-      ~%  %make-core  ..^^$  ~
-      |=  source-path=rail
-      ^-  build-receipt
-      ::  convert file at :source-path to a +scaffold
+    ++  MAKE-CORE
+      ~%  %MAKE-CORE  ..^^$  ~
+      |=  SOURCE-PATH=RAIL
+      ^-  BUILD-RECEIPT
+      ::  CONVERT FILE AT :SOURCE-PATH TO A +SCAFFOLD
       ::
-      =/  hood-build=^build  [date.build [%hood source-path]]
+      =/  HOOD-BUILD=^BUILD  [DATE.BUILD [%HOOD SOURCE-PATH]]
       ::
-      =^  hood-result  out  (depend-on hood-build)
-      ?~  hood-result
-        (return-blocks [hood-build]~)
+      =^  HOOD-RESULT  OUT  (DEPEND-ON HOOD-BUILD)
+      ?~  HOOD-RESULT
+        (RETURN-BLOCKS [HOOD-BUILD]~)
       ::
-      ?:  ?=(%error -.u.hood-result)
-        %-  return-error
-        :-  [%leaf "ford: %core on {<(rail-to-path source-path)>} failed:"]
-        message.u.hood-result
-      ::  build the +scaffold into a program
+      ?:  ?=(%ERROR -.U.HOOD-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %CORE ON {<(RAIL-TO-PATH SOURCE-PATH)>} FAILED:"]
+        MESSAGE.U.HOOD-RESULT
+      ::  BUILD THE +SCAFFOLD INTO A PROGRAM
       ::
-      ?>  ?=([%success %hood *] u.hood-result)
+      ?>  ?=([%SUCCESS %HOOD *] U.HOOD-RESULT)
       ::
-      =/  plan-build=^build
-        [date.build [%plan source-path `coin`[%many ~] scaffold.u.hood-result]]
+      =/  PLAN-BUILD=^BUILD
+        [DATE.BUILD [%PLAN SOURCE-PATH `COIN`[%MANY ~] SCAFFOLD.U.HOOD-RESULT]]
       ::
-      =^  plan-result  out  (depend-on plan-build)
-      ?~  plan-result
-        (return-blocks [plan-build]~)
+      =^  PLAN-RESULT  OUT  (DEPEND-ON PLAN-BUILD)
+      ?~  PLAN-RESULT
+        (RETURN-BLOCKS [PLAN-BUILD]~)
       ::
-      ?:  ?=(%error -.u.plan-result)
-        %-  return-error
-        :-  [%leaf "ford: %core on {<(rail-to-path source-path)>} failed:"]
-        message.u.plan-result
+      ?:  ?=(%ERROR -.U.PLAN-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %CORE ON {<(RAIL-TO-PATH SOURCE-PATH)>} FAILED:"]
+        MESSAGE.U.PLAN-RESULT
       ::
-      ?>  ?=([%success %plan *] u.plan-result)
-      (return-result %success %core vase.u.plan-result)
+      ?>  ?=([%SUCCESS %PLAN *] U.PLAN-RESULT)
+      (RETURN-RESULT %SUCCESS %CORE VASE.U.PLAN-RESULT)
     ::
-    ++  make-diff
-      ~%  %make-diff  ..^^$  ~
-      |=  [=disc start=schematic end=schematic]
-      ^-  build-receipt
-      ::  run both input schematics as an autocons build
+    ++  MAKE-DIFF
+      ~%  %MAKE-DIFF  ..^^$  ~
+      |=  [=DISC START=SCHEMATIC END=SCHEMATIC]
+      ^-  BUILD-RECEIPT
+      ::  RUN BOTH INPUT SCHEMATICS AS AN AUTOCONS BUILD
       ::
-      =/  sub-build=^build  [date.build [start end]]
+      =/  SUB-BUILD=^BUILD  [DATE.BUILD [START END]]
       ::
-      =^  sub-result  out  (depend-on sub-build)
-      ?~  sub-result
-        (return-blocks [sub-build]~)
+      =^  SUB-RESULT  OUT  (DEPEND-ON SUB-BUILD)
+      ?~  SUB-RESULT
+        (RETURN-BLOCKS [SUB-BUILD]~)
       ::
-      ?.  ?=([~ %success ^ ^] sub-result)
-        (wrap-error sub-result)
-      ?.  ?=([%success *] head.u.sub-result)
-        (wrap-error `head.u.sub-result)
-      ?.  ?=([%success *] tail.u.sub-result)
-        (wrap-error `tail.u.sub-result)
+      ?.  ?=([~ %SUCCESS ^ ^] SUB-RESULT)
+        (WRAP-ERROR SUB-RESULT)
+      ?.  ?=([%SUCCESS *] HEAD.U.SUB-RESULT)
+        (WRAP-ERROR `HEAD.U.SUB-RESULT)
+      ?.  ?=([%SUCCESS *] TAIL.U.SUB-RESULT)
+        (WRAP-ERROR `TAIL.U.SUB-RESULT)
       ::
-      =/  start-cage=cage  (result-to-cage head.u.sub-result)
-      =/  end-cage=cage    (result-to-cage tail.u.sub-result)
-      ::  if the marks aren't the same, we can't diff them
+      =/  START-CAGE=CAGE  (RESULT-TO-CAGE HEAD.U.SUB-RESULT)
+      =/  END-CAGE=CAGE    (RESULT-TO-CAGE TAIL.U.SUB-RESULT)
+      ::  IF THE MARKS AREN'T THE SAME, WE CAN'T DIFF THEM
       ::
-      ?.  =(p.start-cage p.end-cage)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %diff failed: mark mismatch: %{<p.start-cage>} / %{<p.end-cage>}"
-      ::  if the values are the same, the diff is null
+      ?.  =(P.START-CAGE P.END-CAGE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %DIFF FAILED: MARK MISMATCH: %{<P.START-CAGE>} / %{<P.END-CAGE>}"
+      ::  IF THE VALUES ARE THE SAME, THE DIFF IS NULL
       ::
-      ?:  =(q.q.start-cage q.q.end-cage)
-        =/  =build-result
-          [%success %diff [%null [%atom %n ~] ~]]
+      ?:  =(Q.Q.START-CAGE Q.Q.END-CAGE)
+        =/  =BUILD-RESULT
+          [%SUCCESS %DIFF [%NULL [%ATOM %N ~] ~]]
         ::
-        (return-result build-result)
+        (RETURN-RESULT BUILD-RESULT)
       ::
-      =/  mark-path-build=^build  [date.build [%path disc %mar p.start-cage]]
+      =/  MARK-PATH-BUILD=^BUILD  [DATE.BUILD [%PATH DISC %MAR P.START-CAGE]]
       ::
-      =^  mark-path-result  out  (depend-on mark-path-build)
-      ?~  mark-path-result
-        (return-blocks [mark-path-build]~)
+      =^  MARK-PATH-RESULT  OUT  (DEPEND-ON MARK-PATH-BUILD)
+      ?~  MARK-PATH-RESULT
+        (RETURN-BLOCKS [MARK-PATH-BUILD]~)
       ::
-      ?:  ?=([~ %error *] mark-path-result)
-        %-  return-error
-        :-  [%leaf "ford: %diff failed on {<disc>}:"]
-        message.u.mark-path-result
+      ?:  ?=([~ %ERROR *] MARK-PATH-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %DIFF FAILED ON {<DISC>}:"]
+        MESSAGE.U.MARK-PATH-RESULT
       ::
-      ?>  ?=([~ %success %path *] mark-path-result)
+      ?>  ?=([~ %SUCCESS %PATH *] MARK-PATH-RESULT)
       ::
-      =/  mark-build=^build  [date.build [%core rail.u.mark-path-result]]
+      =/  MARK-BUILD=^BUILD  [DATE.BUILD [%CORE RAIL.U.MARK-PATH-RESULT]]
       ::
-      =^  mark-result  out  (depend-on mark-build)
-      ?~  mark-result
-        (return-blocks [mark-build]~)
+      =^  MARK-RESULT  OUT  (DEPEND-ON MARK-BUILD)
+      ?~  MARK-RESULT
+        (RETURN-BLOCKS [MARK-BUILD]~)
       ::
-      ?:  ?=([~ %error *] mark-result)
-        %-  return-error
-        :-  [%leaf "ford: %diff failed on {<disc>}:"]
-        message.u.mark-result
+      ?:  ?=([~ %ERROR *] MARK-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %DIFF FAILED ON {<DISC>}:"]
+        MESSAGE.U.MARK-RESULT
       ::
-      ?>  ?=([~ %success %core *] mark-result)
+      ?>  ?=([~ %SUCCESS %CORE *] MARK-RESULT)
       ::
-      ?.  (slab %grad p.vase.u.mark-result)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %diff failed: %{<p.start-cage>} mark has no +grad arm"
+      ?.  (SLAB %GRAD P.VASE.U.MARK-RESULT)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %DIFF FAILED: %{<P.START-CAGE>} MARK HAS NO +GRAD ARM"
       ::
-      =/  grad-build=^build
-        [date.build [%ride [%limb %grad] [%$ %noun vase.u.mark-result]]]
+      =/  GRAD-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %GRAD] [%$ %NOUN VASE.U.MARK-RESULT]]]
       ::
-      =^  grad-result  out  (depend-on grad-build)
-      ?~  grad-result
-        (return-blocks [grad-build]~)
+      =^  GRAD-RESULT  OUT  (DEPEND-ON GRAD-BUILD)
+      ?~  GRAD-RESULT
+        (RETURN-BLOCKS [GRAD-BUILD]~)
       ::
-      ?:  ?=([~ %error *] grad-result)
-        %-  return-error
-        :-  [%leaf "ford: %diff failed on {<disc>}:"]
-        message.u.grad-result
+      ?:  ?=([~ %ERROR *] GRAD-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %DIFF FAILED ON {<DISC>}:"]
+        MESSAGE.U.GRAD-RESULT
       ::
-      ?>  ?=([~ %success %ride *] grad-result)
-      ::  if +grad produced a @tas, convert to that mark and diff those
+      ?>  ?=([~ %SUCCESS %RIDE *] GRAD-RESULT)
+      ::  IF +GRAD PRODUCED A @TAS, CONVERT TO THAT MARK AND DIFF THOSE
       ::
-      ?@  q.vase.u.grad-result
-        =/  mark=(unit @tas)  ((sand %tas) q.vase.u.grad-result)
-        ?~  mark
-          %-  return-error  :_  ~  :-  %leaf
-          "ford: %diff failed: %{<p.start-cage>} mark has invalid +grad arm"
+      ?@  Q.VASE.U.GRAD-RESULT
+        =/  MARK=(UNIT @TAS)  ((SAND %TAS) Q.VASE.U.GRAD-RESULT)
+        ?~  MARK
+          %-  RETURN-ERROR  :_  ~  :-  %LEAF
+          "FORD: %DIFF FAILED: %{<P.START-CAGE>} MARK HAS INVALID +GRAD ARM"
         ::
-        =/  diff-build=^build
-          :-  date.build
-          :^    %diff
-              disc
-            [%cast disc u.mark [%$ start-cage]]
-          [%cast disc u.mark [%$ end-cage]]
+        =/  DIFF-BUILD=^BUILD
+          :-  DATE.BUILD
+          :^    %DIFF
+              DISC
+            [%CAST DISC U.MARK [%$ START-CAGE]]
+          [%CAST DISC U.MARK [%$ END-CAGE]]
         ::
-        =^  diff-result  out  (depend-on diff-build)
-        ?~  diff-result
-          (return-blocks [diff-build]~)
+        =^  DIFF-RESULT  OUT  (DEPEND-ON DIFF-BUILD)
+        ?~  DIFF-RESULT
+          (RETURN-BLOCKS [DIFF-BUILD]~)
         ::
-        ?.  ?=([~ %success %diff *] diff-result)
-          (wrap-error diff-result)
+        ?.  ?=([~ %SUCCESS %DIFF *] DIFF-RESULT)
+          (WRAP-ERROR DIFF-RESULT)
         ::
-        =/  =build-result
-          [%success %diff cage.u.diff-result]
+        =/  =BUILD-RESULT
+          [%SUCCESS %DIFF CAGE.U.DIFF-RESULT]
         ::
-        (return-result build-result)
-      ::  +grad produced a cell, which should be a core with a +form arm
+        (RETURN-RESULT BUILD-RESULT)
+      ::  +GRAD PRODUCED A CELL, WHICH SHOULD BE A CORE WITH A +FORM ARM
       ::
-      ?.  (slab %form p.vase.u.grad-result)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %diff failed: %{<p.start-cage>} mark has no +form:grab arm"
-      ::  the +grab core should also contain a +diff arm
+      ?.  (SLAB %FORM P.VASE.U.GRAD-RESULT)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %DIFF FAILED: %{<P.START-CAGE>} MARK HAS NO +FORM:GRAB ARM"
+      ::  THE +GRAB CORE SHOULD ALSO CONTAIN A +DIFF ARM
       ::
-      ?.  (slab %diff p.vase.u.grad-result)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %diff failed: %{<p.start-cage>} mark has no +diff:grab arm"
+      ?.  (SLAB %DIFF P.VASE.U.GRAD-RESULT)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %DIFF FAILED: %{<P.START-CAGE>} MARK HAS NO +DIFF:GRAB ARM"
       ::
-      =/  diff-build=^build
-        :-  date.build
-        :+  %call
+      =/  DIFF-BUILD=^BUILD
+        :-  DATE.BUILD
+        :+  %CALL
           ::
-          ^=  gate
-          :+  %ride
+          ^=  GATE
+          :+  %RIDE
             ::
-            formula=`hoon`[%tsld [%wing ~[%diff]] [%wing ~[%grad]]]
+            FORMULA=`HOON`[%TSLD [%WING ~[%DIFF]] [%WING ~[%GRAD]]]
           ::
-          ^=  subject
-          :+  %mute
+          ^=  SUBJECT
+          :+  %MUTE
             ::
-            subject=`schematic`[%$ %noun vase.u.mark-result]
+            SUBJECT=`SCHEMATIC`[%$ %NOUN VASE.U.MARK-RESULT]
           ::
-          ^=  mutations
-          ^-  (list [wing schematic])
-          [[%& 6]~ [%$ start-cage]]~
+          ^=  MUTATIONS
+          ^-  (LIST [WING SCHEMATIC])
+          [[%& 6]~ [%$ START-CAGE]]~
         ::
-        sample=`schematic`[%$ end-cage]
+        SAMPLE=`SCHEMATIC`[%$ END-CAGE]
       ::
-      =^  diff-result  out  (depend-on diff-build)
-      ?~  diff-result
-        (return-blocks [diff-build]~)
+      =^  DIFF-RESULT  OUT  (DEPEND-ON DIFF-BUILD)
+      ?~  DIFF-RESULT
+        (RETURN-BLOCKS [DIFF-BUILD]~)
       ::
-      ?.  ?=([~ %success %call *] diff-result)
-        (wrap-error diff-result)
+      ?.  ?=([~ %SUCCESS %CALL *] DIFF-RESULT)
+        (WRAP-ERROR DIFF-RESULT)
       ::
-      =/  form-build=^build
-        [date.build [%ride [%limb %form] [%$ %noun vase.u.grad-result]]]
+      =/  FORM-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %FORM] [%$ %NOUN VASE.U.GRAD-RESULT]]]
       ::
-      =^  form-result  out  (depend-on form-build)
-      ?~  form-result
-        (return-blocks [form-build]~)
+      =^  FORM-RESULT  OUT  (DEPEND-ON FORM-BUILD)
+      ?~  FORM-RESULT
+        (RETURN-BLOCKS [FORM-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] form-result)
-        (wrap-error form-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] FORM-RESULT)
+        (WRAP-ERROR FORM-RESULT)
       ::
-      =/  mark=(unit @tas)  ((soft @tas) q.vase.u.form-result)
-      ?~  mark
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %diff failed: invalid +form result: {(text vase.u.form-result)}"
+      =/  MARK=(UNIT @TAS)  ((SOFT @TAS) Q.VASE.U.FORM-RESULT)
+      ?~  MARK
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %DIFF FAILED: INVALID +FORM RESULT: {(TEXT VASE.U.FORM-RESULT)}"
       ::
-      =/  =build-result
-        [%success %diff [u.mark vase.u.diff-result]]
+      =/  =BUILD-RESULT
+        [%SUCCESS %DIFF [U.MARK VASE.U.DIFF-RESULT]]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-dude
-      ~%  %make-dude  ..^^$  ~
-      |=  [error=tank attempt=schematic]
-      ^-  build-receipt
+    ++  MAKE-DUDE
+      ~%  %MAKE-DUDE  ..^^$  ~
+      |=  [ERROR=TANK ATTEMPT=SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =/  attempt-build=^build  [date.build attempt]
-      =^  attempt-result  out  (depend-on attempt-build)
-      ?~  attempt-result
+      =/  ATTEMPT-BUILD=^BUILD  [DATE.BUILD ATTEMPT]
+      =^  ATTEMPT-RESULT  OUT  (DEPEND-ON ATTEMPT-BUILD)
+      ?~  ATTEMPT-RESULT
         ::
-        (return-blocks ~[[date.build attempt]])
+        (RETURN-BLOCKS ~[[DATE.BUILD ATTEMPT]])
       ::
-      ?.  ?=([%error *] u.attempt-result)
-        (return-result u.attempt-result)
+      ?.  ?=([%ERROR *] U.ATTEMPT-RESULT)
+        (RETURN-RESULT U.ATTEMPT-RESULT)
       ::
-      (return-error [error message.u.attempt-result])
+      (RETURN-ERROR [ERROR MESSAGE.U.ATTEMPT-RESULT])
     ::
-    ++  make-hood
-      ~%  %make-hood  ..^^$  ~
-      |=  source-rail=rail
-      ^-  build-receipt
+    ++  MAKE-HOOD
+      ~%  %MAKE-HOOD  ..^^$  ~
+      |=  SOURCE-RAIL=RAIL
+      ^-  BUILD-RECEIPT
       ::
-      =/  scry-build=^build  [date.build [%scry [%c %x source-rail]]]
-      =^  scry-result  out  (depend-on scry-build)
-      ?~  scry-result
+      =/  SCRY-BUILD=^BUILD  [DATE.BUILD [%SCRY [%C %X SOURCE-RAIL]]]
+      =^  SCRY-RESULT  OUT  (DEPEND-ON SCRY-BUILD)
+      ?~  SCRY-RESULT
         ::
-        (return-blocks ~[scry-build])
+        (RETURN-BLOCKS ~[SCRY-BUILD])
       ::
-      ?:  ?=([~ %error *] scry-result)
-        =/  =path  (rail-to-path source-rail)
-        %-  return-error
-        :-  [%leaf "ford: %hood failed for {<path>}:"]
-        message.u.scry-result
-      =+  as-cage=(result-to-cage u.scry-result)
-      ::  hoon files must be atoms to parse
+      ?:  ?=([~ %ERROR *] SCRY-RESULT)
+        =/  =PATH  (RAIL-TO-PATH SOURCE-RAIL)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %HOOD FAILED FOR {<PATH>}:"]
+        MESSAGE.U.SCRY-RESULT
+      =+  AS-CAGE=(RESULT-TO-CAGE U.SCRY-RESULT)
+      ::  HOON FILES MUST BE ATOMS TO PARSE
       ::
-      ?.  ?=(@ q.q.as-cage)
-        =/  =path  (rail-to-path source-rail)
-        %-  return-error
+      ?.  ?=(@ Q.Q.AS-CAGE)
+        =/  =PATH  (RAIL-TO-PATH SOURCE-RAIL)
+        %-  RETURN-ERROR
         :_  ~
-        :-  %leaf
-        "ford: %hood: path {<path>} not an atom"
+        :-  %LEAF
+        "FORD: %HOOD: PATH {<PATH>} NOT AN ATOM"
       ::
-      =/  src-beam=beam  [[ship.disc desk.disc [%ud 0]] spur]:source-rail
+      =/  SRC-BEAM=BEAM  [[SHIP.DISC DESK.DISC [%UD 0]] SPUR]:SOURCE-RAIL
       ::
-      =/  =compiler-cache-key  [%hood src-beam q.q.as-cage]
-      =^  cached-result  out  (access-cache compiler-cache-key)
-      ?^  cached-result
-        (return-result u.cached-result)
+      =/  =COMPILER-CACHE-KEY  [%HOOD SRC-BEAM Q.Q.AS-CAGE]
+      =^  CACHED-RESULT  OUT  (ACCESS-CACHE COMPILER-CACHE-KEY)
+      ?^  CACHED-RESULT
+        (RETURN-RESULT U.CACHED-RESULT)
       ::
-      =/  parsed
-        ((full (parse-scaffold src-beam)) [1 1] (trip q.q.as-cage))
+      =/  PARSED
+        ((FULL (PARSE-SCAFFOLD SRC-BEAM)) [1 1] (TRIP Q.Q.AS-CAGE))
       ::
-      ?~  q.parsed
-        =/  =path  (rail-to-path source-rail)
-        %-  return-error
-        :-  :-  %leaf
-            %+  weld  "ford: %hood: syntax error at "
-            "[{<p.p.parsed>} {<q.p.parsed>}] in {<path>}"
+      ?~  Q.PARSED
+        =/  =PATH  (RAIL-TO-PATH SOURCE-RAIL)
+        %-  RETURN-ERROR
+        :-  :-  %LEAF
+            %+  WELD  "FORD: %HOOD: SYNTAX ERROR AT "
+            "[{<P.P.PARSED>} {<Q.P.PARSED>}] IN {<PATH>}"
         ~
       ::
-      (return-result %success %hood p.u.q.parsed)
+      (RETURN-RESULT %SUCCESS %HOOD P.U.Q.PARSED)
     ::
-    ++  make-join
-      ~%  %make-join  ..^^$  ~
-      |=  [disc=disc mark=term first=schematic second=schematic]
-      ^-  build-receipt
+    ++  MAKE-JOIN
+      ~%  %MAKE-JOIN  ..^^$  ~
+      |=  [DISC=DISC MARK=TERM FIRST=SCHEMATIC SECOND=SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =/  initial-build=^build
-        [date.build [first second] [%path disc %mar mark]]
+      =/  INITIAL-BUILD=^BUILD
+        [DATE.BUILD [FIRST SECOND] [%PATH DISC %MAR MARK]]
       ::
-      =^  initial-result  out  (depend-on initial-build)
-      ?~  initial-result
-        (return-blocks [initial-build]~)
+      =^  INITIAL-RESULT  OUT  (DEPEND-ON INITIAL-BUILD)
+      ?~  INITIAL-RESULT
+        (RETURN-BLOCKS [INITIAL-BUILD]~)
       ::
-      ?.  ?=([~ %success [%success ^ ^] %success %path *] initial-result)
-        (wrap-error initial-result)
-      ?.  ?=([%success *] head.head.u.initial-result)
-        (wrap-error `head.head.u.initial-result)
-      ?.  ?=([%success *] tail.head.u.initial-result)
-        (wrap-error `tail.head.u.initial-result)
+      ?.  ?=([~ %SUCCESS [%SUCCESS ^ ^] %SUCCESS %PATH *] INITIAL-RESULT)
+        (WRAP-ERROR INITIAL-RESULT)
+      ?.  ?=([%SUCCESS *] HEAD.HEAD.U.INITIAL-RESULT)
+        (WRAP-ERROR `HEAD.HEAD.U.INITIAL-RESULT)
+      ?.  ?=([%SUCCESS *] TAIL.HEAD.U.INITIAL-RESULT)
+        (WRAP-ERROR `TAIL.HEAD.U.INITIAL-RESULT)
       ::
-      =/  first-cage=cage   (result-to-cage head.head.u.initial-result)
-      =/  second-cage=cage  (result-to-cage tail.head.u.initial-result)
-      =/  mark-path=rail    rail.tail.u.initial-result
-      ::  TODO: duplicate logic with +make-pact and others
+      =/  FIRST-CAGE=CAGE   (RESULT-TO-CAGE HEAD.HEAD.U.INITIAL-RESULT)
+      =/  SECOND-CAGE=CAGE  (RESULT-TO-CAGE TAIL.HEAD.U.INITIAL-RESULT)
+      =/  MARK-PATH=RAIL    RAIL.TAIL.U.INITIAL-RESULT
+      ::  TODO: DUPLICATE LOGIC WITH +MAKE-PACT AND OTHERS
       ::
-      =/  mark-build=^build  [date.build [%core mark-path]]
+      =/  MARK-BUILD=^BUILD  [DATE.BUILD [%CORE MARK-PATH]]
       ::
-      =^  mark-result  out  (depend-on mark-build)
-      ?~  mark-result
-        (return-blocks [mark-build]~)
+      =^  MARK-RESULT  OUT  (DEPEND-ON MARK-BUILD)
+      ?~  MARK-RESULT
+        (RETURN-BLOCKS [MARK-BUILD]~)
       ::
-      ?:  ?=([~ %error *] mark-result)
-        %-  return-error
-        :-  [%leaf "ford: %join to {<mark>} on {<disc>} failed:"]
-        message.u.mark-result
+      ?:  ?=([~ %ERROR *] MARK-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %JOIN TO {<MARK>} ON {<DISC>} FAILED:"]
+        MESSAGE.U.MARK-RESULT
       ::
-      ?>  ?=([~ %success %core *] mark-result)
+      ?>  ?=([~ %SUCCESS %CORE *] MARK-RESULT)
       ::
-      =/  mark-vase=vase  vase.u.mark-result
+      =/  MARK-VASE=VASE  VASE.U.MARK-RESULT
       ::
-      ?.  (slab %grad p.mark-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %join failed: %{<mark>} mark has no +grad arm"
+      ?.  (SLAB %GRAD P.MARK-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %JOIN FAILED: %{<MARK>} MARK HAS NO +GRAD ARM"
       ::
-      =/  grad-build=^build
-        [date.build [%ride [%limb %grad] [%$ %noun mark-vase]]]
+      =/  GRAD-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %GRAD] [%$ %NOUN MARK-VASE]]]
       ::
-      =^  grad-result  out  (depend-on grad-build)
-      ?~  grad-result
-        (return-blocks [grad-build]~)
+      =^  GRAD-RESULT  OUT  (DEPEND-ON GRAD-BUILD)
+      ?~  GRAD-RESULT
+        (RETURN-BLOCKS [GRAD-BUILD]~)
       ::
-      ?:  ?=([~ %error *] grad-result)
-        %-  return-error
-        :-  [%leaf "ford: %join to {<mark>} on {<disc>} failed:"]
-        message.u.grad-result
+      ?:  ?=([~ %ERROR *] GRAD-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %JOIN TO {<MARK>} ON {<DISC>} FAILED:"]
+        MESSAGE.U.GRAD-RESULT
       ::
-      ?>  ?=([~ %success %ride *] grad-result)
+      ?>  ?=([~ %SUCCESS %RIDE *] GRAD-RESULT)
       ::
-      =/  grad-vase=vase  vase.u.grad-result
-      ::  if +grad produced a mark, delegate %join behavior to that mark
+      =/  GRAD-VASE=VASE  VASE.U.GRAD-RESULT
+      ::  IF +GRAD PRODUCED A MARK, DELEGATE %JOIN BEHAVIOR TO THAT MARK
       ::
-      ?@  q.grad-vase
-        ::  if +grad produced a term, make sure it's a valid mark
+      ?@  Q.GRAD-VASE
+        ::  IF +GRAD PRODUCED A TERM, MAKE SURE IT'S A VALID MARK
         ::
-        =/  grad-mark=(unit term)  ((sand %tas) q.grad-vase)
-        ?~  grad-mark
-          %-  return-error  :_  ~  :-  %leaf
-          "ford: %join failed: %{<mark>} mark invalid +grad"
-        ::  todo: doesn't catch full cycles of +grad arms, only simple cases
+        =/  GRAD-MARK=(UNIT TERM)  ((SAND %TAS) Q.GRAD-VASE)
+        ?~  GRAD-MARK
+          %-  RETURN-ERROR  :_  ~  :-  %LEAF
+          "FORD: %JOIN FAILED: %{<MARK>} MARK INVALID +GRAD"
+        ::  TODO: DOESN'T CATCH FULL CYCLES OF +GRAD ARMS, ONLY SIMPLE CASES
         ::
-        ?:  =(u.grad-mark mark)
-          %-  return-error  :_  ~  :-  %leaf
-          "ford: %join failed: %{<mark>} mark +grad arm refers to self"
+        ?:  =(U.GRAD-MARK MARK)
+          %-  RETURN-ERROR  :_  ~  :-  %LEAF
+          "FORD: %JOIN FAILED: %{<MARK>} MARK +GRAD ARM REFERS TO SELF"
         ::
-        =/  join-build=^build
-          [date.build [%join disc u.grad-mark [%$ first-cage] [%$ second-cage]]]
+        =/  JOIN-BUILD=^BUILD
+          [DATE.BUILD [%JOIN DISC U.GRAD-MARK [%$ FIRST-CAGE] [%$ SECOND-CAGE]]]
         ::
-        =^  join-result  out  (depend-on join-build)
-        ?~  join-result
-          (return-blocks [join-build]~)
+        =^  JOIN-RESULT  OUT  (DEPEND-ON JOIN-BUILD)
+        ?~  JOIN-RESULT
+          (RETURN-BLOCKS [JOIN-BUILD]~)
         ::
-        ?:  ?=([~ %error *] join-result)
-          %-  return-error
-          :-  [%leaf "ford: %join to {<mark>} on {<disc>} failed:"]
-          message.u.join-result
+        ?:  ?=([~ %ERROR *] JOIN-RESULT)
+          %-  RETURN-ERROR
+          :-  [%LEAF "FORD: %JOIN TO {<MARK>} ON {<DISC>} FAILED:"]
+          MESSAGE.U.JOIN-RESULT
         ::
-        ?>  ?=([~ %success %join *] join-result)
+        ?>  ?=([~ %SUCCESS %JOIN *] JOIN-RESULT)
         ::
-        (return-result u.join-result)
-      ::  make sure the +grad core has a +form arm
+        (RETURN-RESULT U.JOIN-RESULT)
+      ::  MAKE SURE THE +GRAD CORE HAS A +FORM ARM
       ::
-      ?.  (slab %form p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %join failed: no +form:grad in %{<mark>} mark"
-      ::  make sure the +grad core has a +join arm
+      ?.  (SLAB %FORM P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %JOIN FAILED: NO +FORM:GRAD IN %{<MARK>} MARK"
+      ::  MAKE SURE THE +GRAD CORE HAS A +JOIN ARM
       ::
-      ?.  (slab %join p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %join failed: no +join:grad in %{<mark>} mark"
-      ::  fire the +form:grad arm, which should produce a mark
+      ?.  (SLAB %JOIN P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %JOIN FAILED: NO +JOIN:GRAD IN %{<MARK>} MARK"
+      ::  FIRE THE +FORM:GRAD ARM, WHICH SHOULD PRODUCE A MARK
       ::
-      =/  form-build=^build
-        [date.build [%ride [%limb %form] [%$ %noun grad-vase]]]
+      =/  FORM-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %FORM] [%$ %NOUN GRAD-VASE]]]
       ::
-      =^  form-result  out  (depend-on form-build)
-      ?~  form-result
-        (return-blocks [form-build]~)
+      =^  FORM-RESULT  OUT  (DEPEND-ON FORM-BUILD)
+      ?~  FORM-RESULT
+        (RETURN-BLOCKS [FORM-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] form-result)
-        (wrap-error form-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] FORM-RESULT)
+        (WRAP-ERROR FORM-RESULT)
       ::
-      =/  form-mark=(unit term)  ((soft @tas) q.vase.u.form-result)
-      ?~  form-mark
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %join failed: %{<mark>} mark invalid +form:grad"
-      ::  the mark produced by +form:grad should match both diffs
+      =/  FORM-MARK=(UNIT TERM)  ((SOFT @TAS) Q.VASE.U.FORM-RESULT)
+      ?~  FORM-MARK
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %JOIN FAILED: %{<MARK>} MARK INVALID +FORM:GRAD"
+      ::  THE MARK PRODUCED BY +FORM:GRAD SHOULD MATCH BOTH DIFFS
       ::
-      ?.  &(=(u.form-mark p.first-cage) =(u.form-mark p.second-cage))
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %join failed: mark mismatch"
-      ::  if the diffs are identical, just produce the first
+      ?.  &(=(U.FORM-MARK P.FIRST-CAGE) =(U.FORM-MARK P.SECOND-CAGE))
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %JOIN FAILED: MARK MISMATCH"
+      ::  IF THE DIFFS ARE IDENTICAL, JUST PRODUCE THE FIRST
       ::
-      ?:  =(q.q.first-cage q.q.second-cage)
-        (return-result %success %join first-cage)
-      ::  call the +join:grad gate on the two diffs
+      ?:  =(Q.Q.FIRST-CAGE Q.Q.SECOND-CAGE)
+        (RETURN-RESULT %SUCCESS %JOIN FIRST-CAGE)
+      ::  CALL THE +JOIN:GRAD GATE ON THE TWO DIFFS
       ::
-      =/  diff-build=^build
-        :-  date.build
-        :+  %call
-          :+  %ride
-            [%limb %join]
-          [%$ %noun grad-vase]
-        [%$ %noun (slop q.first-cage q.second-cage)]
+      =/  DIFF-BUILD=^BUILD
+        :-  DATE.BUILD
+        :+  %CALL
+          :+  %RIDE
+            [%LIMB %JOIN]
+          [%$ %NOUN GRAD-VASE]
+        [%$ %NOUN (SLOP Q.FIRST-CAGE Q.SECOND-CAGE)]
       ::
-      =^  diff-result  out  (depend-on diff-build)
-      ?~  diff-result
-        (return-blocks [diff-build]~)
+      =^  DIFF-RESULT  OUT  (DEPEND-ON DIFF-BUILD)
+      ?~  DIFF-RESULT
+        (RETURN-BLOCKS [DIFF-BUILD]~)
       ::
-      ?:  ?=([~ %error *] diff-result)
-        %-  return-error
-        :-  [%leaf "ford: %join to {<mark>} on {<disc>} failed:"]
-        message.u.diff-result
+      ?:  ?=([~ %ERROR *] DIFF-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %JOIN TO {<MARK>} ON {<DISC>} FAILED:"]
+        MESSAGE.U.DIFF-RESULT
       ::
-      ?>  ?=([~ %success %call *] diff-result)
-      ::  the result was a unit; if `~`, use %null mark; otherwise grab tail
+      ?>  ?=([~ %SUCCESS %CALL *] DIFF-RESULT)
+      ::  THE RESULT WAS A UNIT; IF `~`, USE %NULL MARK; OTHERWISE GRAB TAIL
       ::
-      =/  =build-result
-        :+  %success  %join
-        ?@  q.vase.u.diff-result
-          [%null vase.u.diff-result]
-        [u.form-mark (slot 3 vase.u.diff-result)]
+      =/  =BUILD-RESULT
+        :+  %SUCCESS  %JOIN
+        ?@  Q.VASE.U.DIFF-RESULT
+          [%NULL VASE.U.DIFF-RESULT]
+        [U.FORM-MARK (SLOT 3 VASE.U.DIFF-RESULT)]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-list
-      ~%  %make-list  ..^^$  ~
-      |=  schematics=(list schematic)
-      ^-  build-receipt
+    ++  MAKE-LIST
+      ~%  %MAKE-LIST  ..^^$  ~
+      |=  SCHEMATICS=(LIST SCHEMATIC)
+      ^-  BUILD-RECEIPT
       ::
-      =/  key-and-schematics
-        (turn schematics |=(=schematic [~ schematic]))
-      ::  depend on builds of each schematic
+      =/  KEY-AND-SCHEMATICS
+        (TURN SCHEMATICS |=(=SCHEMATIC [~ SCHEMATIC]))
+      ::  DEPEND ON BUILDS OF EACH SCHEMATIC
       ::
-      =^  maybe-schematic-results  out
-        (perform-schematics "" key-and-schematics %ignore-errors *~)
-      ?~  maybe-schematic-results
-        out
-      ::  return all builds
+      =^  MAYBE-SCHEMATIC-RESULTS  OUT
+        (PERFORM-SCHEMATICS "" KEY-AND-SCHEMATICS %IGNORE-ERRORS *~)
+      ?~  MAYBE-SCHEMATIC-RESULTS
+        OUT
+      ::  RETURN ALL BUILDS
       ::
-      =/  =build-result
-        :+  %success  %list
-        ::  the roll above implicitly flopped the results
+      =/  =BUILD-RESULT
+        :+  %SUCCESS  %LIST
+        ::  THE ROLL ABOVE IMPLICITLY FLOPPED THE RESULTS
         ::
-        (flop (turn u.maybe-schematic-results tail))
-      (return-result build-result)
+        (FLOP (TURN U.MAYBE-SCHEMATIC-RESULTS TAIL))
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-mash
-      ~%  %make-mash  ..^^$  ~
-      |=  $:  disc=disc
-              mark=term
-              first=[disc=disc mark=term =schematic]
-              second=[disc=disc mark=term =schematic]
+    ++  MAKE-MASH
+      ~%  %MAKE-MASH  ..^^$  ~
+      |=  $:  DISC=DISC
+              MARK=TERM
+              FIRST=[DISC=DISC MARK=TERM =SCHEMATIC]
+              SECOND=[DISC=DISC MARK=TERM =SCHEMATIC]
           ==
-      ^-  build-receipt
+      ^-  BUILD-RECEIPT
       ::
-      =/  initial-build=^build
-        [date.build [schematic.first schematic.second] [%path disc %mar mark]]
+      =/  INITIAL-BUILD=^BUILD
+        [DATE.BUILD [SCHEMATIC.FIRST SCHEMATIC.SECOND] [%PATH DISC %MAR MARK]]
       ::
-      =^  initial-result  out  (depend-on initial-build)
-      ?~  initial-result
-        (return-blocks [initial-build]~)
-      ::  TODO: duplicate logic with +make-join
+      =^  INITIAL-RESULT  OUT  (DEPEND-ON INITIAL-BUILD)
+      ?~  INITIAL-RESULT
+        (RETURN-BLOCKS [INITIAL-BUILD]~)
+      ::  TODO: DUPLICATE LOGIC WITH +MAKE-JOIN
       ::
-      ?.  ?=([~ %success [%success ^ ^] %success %path *] initial-result)
-        (wrap-error initial-result)
-      ?.  ?=([%success *] head.head.u.initial-result)
-        (wrap-error `head.head.u.initial-result)
-      ?.  ?=([%success *] tail.head.u.initial-result)
-        (wrap-error `tail.head.u.initial-result)
+      ?.  ?=([~ %SUCCESS [%SUCCESS ^ ^] %SUCCESS %PATH *] INITIAL-RESULT)
+        (WRAP-ERROR INITIAL-RESULT)
+      ?.  ?=([%SUCCESS *] HEAD.HEAD.U.INITIAL-RESULT)
+        (WRAP-ERROR `HEAD.HEAD.U.INITIAL-RESULT)
+      ?.  ?=([%SUCCESS *] TAIL.HEAD.U.INITIAL-RESULT)
+        (WRAP-ERROR `TAIL.HEAD.U.INITIAL-RESULT)
       ::
-      =/  first-cage=cage   (result-to-cage head.head.u.initial-result)
-      =/  second-cage=cage  (result-to-cage tail.head.u.initial-result)
-      =/  mark-path=rail    rail.tail.u.initial-result
-      ::  TODO: duplicate logic with +make-pact and others
+      =/  FIRST-CAGE=CAGE   (RESULT-TO-CAGE HEAD.HEAD.U.INITIAL-RESULT)
+      =/  SECOND-CAGE=CAGE  (RESULT-TO-CAGE TAIL.HEAD.U.INITIAL-RESULT)
+      =/  MARK-PATH=RAIL    RAIL.TAIL.U.INITIAL-RESULT
+      ::  TODO: DUPLICATE LOGIC WITH +MAKE-PACT AND OTHERS
       ::
-      =/  mark-build=^build  [date.build [%core mark-path]]
+      =/  MARK-BUILD=^BUILD  [DATE.BUILD [%CORE MARK-PATH]]
       ::
-      =^  mark-result  out  (depend-on mark-build)
-      ?~  mark-result
-        (return-blocks [mark-build]~)
+      =^  MARK-RESULT  OUT  (DEPEND-ON MARK-BUILD)
+      ?~  MARK-RESULT
+        (RETURN-BLOCKS [MARK-BUILD]~)
       ::
-      ?.  ?=([~ %success %core *] mark-result)
-        (wrap-error mark-result)
+      ?.  ?=([~ %SUCCESS %CORE *] MARK-RESULT)
+        (WRAP-ERROR MARK-RESULT)
       ::
-      =/  mark-vase=vase  vase.u.mark-result
+      =/  MARK-VASE=VASE  VASE.U.MARK-RESULT
       ::
-      ?.  (slab %grad p.mark-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %mash failed: %{<mark>} mark has no +grad arm"
+      ?.  (SLAB %GRAD P.MARK-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %MASH FAILED: %{<MARK>} MARK HAS NO +GRAD ARM"
       ::
-      =/  grad-build=^build
-        [date.build [%ride [%limb %grad] [%$ %noun mark-vase]]]
+      =/  GRAD-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %GRAD] [%$ %NOUN MARK-VASE]]]
       ::
-      =^  grad-result  out  (depend-on grad-build)
-      ?~  grad-result
-        (return-blocks [grad-build]~)
+      =^  GRAD-RESULT  OUT  (DEPEND-ON GRAD-BUILD)
+      ?~  GRAD-RESULT
+        (RETURN-BLOCKS [GRAD-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] grad-result)
-        (wrap-error grad-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] GRAD-RESULT)
+        (WRAP-ERROR GRAD-RESULT)
       ::
-      =/  grad-vase=vase  vase.u.grad-result
-      ::  if +grad produced a mark, delegate %mash behavior to that mark
+      =/  GRAD-VASE=VASE  VASE.U.GRAD-RESULT
+      ::  IF +GRAD PRODUCED A MARK, DELEGATE %MASH BEHAVIOR TO THAT MARK
       ::
-      ?@  q.grad-vase
-        ::  if +grad produced a term, make sure it's a valid mark
+      ?@  Q.GRAD-VASE
+        ::  IF +GRAD PRODUCED A TERM, MAKE SURE IT'S A VALID MARK
         ::
-        =/  grad-mark=(unit term)  ((sand %tas) q.grad-vase)
-        ?~  grad-mark
-          %-  return-error  :_  ~  :-  %leaf
-          "ford: %mash failed: %{<mark>} mark invalid +grad"
+        =/  GRAD-MARK=(UNIT TERM)  ((SAND %TAS) Q.GRAD-VASE)
+        ?~  GRAD-MARK
+          %-  RETURN-ERROR  :_  ~  :-  %LEAF
+          "FORD: %MASH FAILED: %{<MARK>} MARK INVALID +GRAD"
         ::
-        =/  mash-build=^build
-          :-  date.build
-          :-  %mash
-          :^  disc  u.grad-mark
-            [disc.first mark.first [%$ first-cage]]
-          [disc.second mark.second [%$ second-cage]]
+        =/  MASH-BUILD=^BUILD
+          :-  DATE.BUILD
+          :-  %MASH
+          :^  DISC  U.GRAD-MARK
+            [DISC.FIRST MARK.FIRST [%$ FIRST-CAGE]]
+          [DISC.SECOND MARK.SECOND [%$ SECOND-CAGE]]
         ::
-        =^  mash-result  out  (depend-on mash-build)
-        ?~  mash-result
-          (return-blocks [mash-build]~)
+        =^  MASH-RESULT  OUT  (DEPEND-ON MASH-BUILD)
+        ?~  MASH-RESULT
+          (RETURN-BLOCKS [MASH-BUILD]~)
         ::
-        ?.  ?=([~ %success %mash *] mash-result)
-          (wrap-error mash-result)
+        ?.  ?=([~ %SUCCESS %MASH *] MASH-RESULT)
+          (WRAP-ERROR MASH-RESULT)
         ::
-        =/  =build-result
-          [%success %mash cage.u.mash-result]
+        =/  =BUILD-RESULT
+          [%SUCCESS %MASH CAGE.U.MASH-RESULT]
         ::
-        (return-result build-result)
+        (RETURN-RESULT BUILD-RESULT)
       ::
-      ?.  (slab %form p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %mash failed: %{<mark>} mark has no +form:grad"
+      ?.  (SLAB %FORM P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %MASH FAILED: %{<MARK>} MARK HAS NO +FORM:GRAD"
       ::
-      ?.  (slab %mash p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %mash failed: %{<mark>} mark has no +mash:grad"
+      ?.  (SLAB %MASH P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %MASH FAILED: %{<MARK>} MARK HAS NO +MASH:GRAD"
       ::
-      =/  form-build=^build
-        [date.build [%ride [%limb %form] [%$ %noun grad-vase]]]
+      =/  FORM-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %FORM] [%$ %NOUN GRAD-VASE]]]
       ::
-      =^  form-result  out  (depend-on form-build)
-      ?~  form-result
-        (return-blocks [form-build]~)
+      =^  FORM-RESULT  OUT  (DEPEND-ON FORM-BUILD)
+      ?~  FORM-RESULT
+        (RETURN-BLOCKS [FORM-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] form-result)
-        (wrap-error form-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] FORM-RESULT)
+        (WRAP-ERROR FORM-RESULT)
       ::
-      =/  form-mark=(unit term)  ((soft @tas) q.vase.u.form-result)
-      ?~  form-mark
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %mash failed: %{<mark>} mark invalid +form:grad"
+      =/  FORM-MARK=(UNIT TERM)  ((SOFT @TAS) Q.VASE.U.FORM-RESULT)
+      ?~  FORM-MARK
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %MASH FAILED: %{<MARK>} MARK INVALID +FORM:GRAD"
       ::
-      ?.  &(=(u.form-mark p.first-cage) =(u.form-mark p.second-cage))
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %mash failed: mark mismatch"
+      ?.  &(=(U.FORM-MARK P.FIRST-CAGE) =(U.FORM-MARK P.SECOND-CAGE))
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %MASH FAILED: MARK MISMATCH"
       ::
-      ?:  =(q.q.first-cage q.q.second-cage)
-        =/  =build-result
-          [%success %mash [%null [%atom %n ~] ~]]
+      ?:  =(Q.Q.FIRST-CAGE Q.Q.SECOND-CAGE)
+        =/  =BUILD-RESULT
+          [%SUCCESS %MASH [%NULL [%ATOM %N ~] ~]]
         ::
-        (return-result build-result)
-      ::  call the +mash:grad gate on two [ship desk diff] triples
+        (RETURN-RESULT BUILD-RESULT)
+      ::  CALL THE +MASH:GRAD GATE ON TWO [SHIP DESK DIFF] TRIPLES
       ::
-      =/  mash-build=^build
-        :-  date.build
-        :+  %call
-          :+  %ride
-            [%limb %mash]
-          [%$ %noun grad-vase]
-        :+  %$  %noun
-        %+  slop
-          ;:  slop
-            [[%atom %p ~] ship.disc.first]
-            [[%atom %tas ~] desk.disc.first]
-            q.first-cage
+      =/  MASH-BUILD=^BUILD
+        :-  DATE.BUILD
+        :+  %CALL
+          :+  %RIDE
+            [%LIMB %MASH]
+          [%$ %NOUN GRAD-VASE]
+        :+  %$  %NOUN
+        %+  SLOP
+          ;:  SLOP
+            [[%ATOM %P ~] SHIP.DISC.FIRST]
+            [[%ATOM %TAS ~] DESK.DISC.FIRST]
+            Q.FIRST-CAGE
           ==
-        ;:  slop
-          [[%atom %p ~] ship.disc.second]
-          [[%atom %tas ~] desk.disc.second]
-          q.second-cage
+        ;:  SLOP
+          [[%ATOM %P ~] SHIP.DISC.SECOND]
+          [[%ATOM %TAS ~] DESK.DISC.SECOND]
+          Q.SECOND-CAGE
         ==
       ::
-      =^  mash-result  out  (depend-on mash-build)
-      ?~  mash-result
-        (return-blocks [mash-build]~)
+      =^  MASH-RESULT  OUT  (DEPEND-ON MASH-BUILD)
+      ?~  MASH-RESULT
+        (RETURN-BLOCKS [MASH-BUILD]~)
       ::
-      ?.  ?=([~ %success %call *] mash-result)
-        (wrap-error mash-result)
+      ?.  ?=([~ %SUCCESS %CALL *] MASH-RESULT)
+        (WRAP-ERROR MASH-RESULT)
       ::
-      =/  =build-result
-        [%success %mash [u.form-mark vase.u.mash-result]]
+      =/  =BUILD-RESULT
+        [%SUCCESS %MASH [U.FORM-MARK VASE.U.MASH-RESULT]]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-mute
-      ~%  %make-mute  ..^^$  ~
-      |=  [subject=schematic mutations=(list [=wing =schematic])]
-      ^-  build-receipt
-      ::  run the subject build to produce the noun to be mutated
+    ++  MAKE-MUTE
+      ~%  %MAKE-MUTE  ..^^$  ~
+      |=  [SUBJECT=SCHEMATIC MUTATIONS=(LIST [=WING =SCHEMATIC])]
+      ^-  BUILD-RECEIPT
+      ::  RUN THE SUBJECT BUILD TO PRODUCE THE NOUN TO BE MUTATED
       ::
-      =/  subject-build=^build  [date.build subject]
-      =^  subject-result  out  (depend-on subject-build)
-      ?~  subject-result
-        (return-blocks [subject-build]~)
+      =/  SUBJECT-BUILD=^BUILD  [DATE.BUILD SUBJECT]
+      =^  SUBJECT-RESULT  OUT  (DEPEND-ON SUBJECT-BUILD)
+      ?~  SUBJECT-RESULT
+        (RETURN-BLOCKS [SUBJECT-BUILD]~)
       ::
-      ?.  ?=([~ %success *] subject-result)
-        (wrap-error subject-result)
+      ?.  ?=([~ %SUCCESS *] SUBJECT-RESULT)
+        (WRAP-ERROR SUBJECT-RESULT)
       ::
-      =/  subject-cage=cage  (result-to-cage u.subject-result)
+      =/  SUBJECT-CAGE=CAGE  (RESULT-TO-CAGE U.SUBJECT-RESULT)
       ::
-      =/  subject-vase=vase  q.subject-cage
+      =/  SUBJECT-VASE=VASE  Q.SUBJECT-CAGE
       ::
-      =^  maybe-schematic-results  out
-        %-  perform-schematics  :*
-          "ford: %mute contained failures:"
-          mutations
-          %fail-on-errors
-          *wing
+      =^  MAYBE-SCHEMATIC-RESULTS  OUT
+        %-  PERFORM-SCHEMATICS  :*
+          "FORD: %MUTE CONTAINED FAILURES:"
+          MUTATIONS
+          %FAIL-ON-ERRORS
+          *WING
         ==
-      ?~  maybe-schematic-results
-        out
-      ::  all builds succeeded; retrieve vases from results
+      ?~  MAYBE-SCHEMATIC-RESULTS
+        OUT
+      ::  ALL BUILDS SUCCEEDED; RETRIEVE VASES FROM RESULTS
       ::
-      =/  successes=(list [=wing =vase])
-        %+  turn  u.maybe-schematic-results
-        |=  [=wing result=build-result]
-        ^-  [^wing vase]
+      =/  SUCCESSES=(LIST [=WING =VASE])
+        %+  TURN  U.MAYBE-SCHEMATIC-RESULTS
+        |=  [=WING RESULT=BUILD-RESULT]
+        ^-  [^WING VASE]
         ::
-        ?>  ?=([%success *] result)
+        ?>  ?=([%SUCCESS *] RESULT)
         ::
-        [wing q:(result-to-cage result)]
-      ::  create and run a +build to apply all mutations in order
+        [WING Q:(RESULT-TO-CAGE RESULT)]
+      ::  CREATE AND RUN A +BUILD TO APPLY ALL MUTATIONS IN ORDER
       ::
-      =/  ride-build=^build
-        :-  date.build
-        :+  %ride
-          ::  formula: a `%_` +hoon that applies a list of mutations
+      =/  RIDE-BUILD=^BUILD
+        :-  DATE.BUILD
+        :+  %RIDE
+          ::  FORMULA: A `%_` +HOON THAT APPLIES A LIST OF MUTATIONS
           ::
-          ::    The hoon ends up looking like:
+          ::    THE HOON ENDS UP LOOKING LIKE:
           ::    ```
           ::    %_  +2
-          ::      wing-1  +6
-          ::      wing-2  +14
+          ::      WING-1  +6
+          ::      WING-2  +14
           ::      ...
           ::    ==
           ::    ```
           ::
-          ^=  formula
-          ^-  hoon
-          :+  %cncb  [%& 2]~
-          =/  axis  3
+          ^=  FORMULA
+          ^-  HOON
+          :+  %CNCB  [%& 2]~
+          =/  AXIS  3
           ::
-          |-  ^-  (list [wing hoon])
-          ?~  successes  ~
+          |-  ^-  (LIST [WING HOON])
+          ?~  SUCCESSES  ~
           ::
-          :-  [wing.i.successes [%$ (peg axis 2)]]
-          $(successes t.successes, axis (peg axis 3))
-        ::  subject: list of :subject-vase and mutations, as literal schematic
+          :-  [WING.I.SUCCESSES [%$ (PEG AXIS 2)]]
+          $(SUCCESSES T.SUCCESSES, AXIS (PEG AXIS 3))
+        ::  SUBJECT: LIST OF :SUBJECT-VASE AND MUTATIONS, AS LITERAL SCHEMATIC
         ::
-        ::    The subject ends up as a vase of something like this:
+        ::    THE SUBJECT ENDS UP AS A VASE OF SOMETHING LIKE THIS:
         ::    ```
-        ::    :~  original-subject
-        ::        mutant-1
-        ::        mutant-2
+        ::    :~  ORIGINAL-SUBJECT
+        ::        MUTANT-1
+        ::        MUTANT-2
         ::        ...
         ::    ==
         ::    ```
         ::
-        ^=  subject  ^-  schematic
-        :+  %$  %noun
-        ^-  vase
-        %+  slop  subject-vase
-        |-  ^-  vase
-        ?~  successes  [[%atom %n ~] ~]
+        ^=  SUBJECT  ^-  SCHEMATIC
+        :+  %$  %NOUN
+        ^-  VASE
+        %+  SLOP  SUBJECT-VASE
+        |-  ^-  VASE
+        ?~  SUCCESSES  [[%ATOM %N ~] ~]
         ::
-        (slop vase.i.successes $(successes t.successes))
+        (SLOP VASE.I.SUCCESSES $(SUCCESSES T.SUCCESSES))
       ::
-      =^  ride-result  out  (depend-on ride-build)
-      ?~  ride-result
-        (return-blocks [ride-build]~)
+      =^  RIDE-RESULT  OUT  (DEPEND-ON RIDE-BUILD)
+      ?~  RIDE-RESULT
+        (RETURN-BLOCKS [RIDE-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] ride-result)
-        (wrap-error ride-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] RIDE-RESULT)
+        (WRAP-ERROR RIDE-RESULT)
       ::
-      =/  =build-result
-        [%success %mute p.subject-cage vase.u.ride-result]
+      =/  =BUILD-RESULT
+        [%SUCCESS %MUTE P.SUBJECT-CAGE VASE.U.RIDE-RESULT]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-pact
-      ~%  %make-pact  ..^^$  ~
-      |=  [disc=disc start=schematic diff=schematic]
-      ^-  build-receipt
-      ::  first, build the inputs
+    ++  MAKE-PACT
+      ~%  %MAKE-PACT  ..^^$  ~
+      |=  [DISC=DISC START=SCHEMATIC DIFF=SCHEMATIC]
+      ^-  BUILD-RECEIPT
+      ::  FIRST, BUILD THE INPUTS
       ::
-      =/  initial-build=^build  [date.build start diff]
+      =/  INITIAL-BUILD=^BUILD  [DATE.BUILD START DIFF]
       ::
-      =^  initial-result  out  (depend-on initial-build)
-      ?~  initial-result
-        (return-blocks [initial-build]~)
+      =^  INITIAL-RESULT  OUT  (DEPEND-ON INITIAL-BUILD)
+      ?~  INITIAL-RESULT
+        (RETURN-BLOCKS [INITIAL-BUILD]~)
       ::
-      ?>  ?=([~ %success ^ ^] initial-result)
-      =/  start-result=build-result  head.u.initial-result
-      =/  diff-result=build-result    tail.u.initial-result
+      ?>  ?=([~ %SUCCESS ^ ^] INITIAL-RESULT)
+      =/  START-RESULT=BUILD-RESULT  HEAD.U.INITIAL-RESULT
+      =/  DIFF-RESULT=BUILD-RESULT    TAIL.U.INITIAL-RESULT
       ::
-      ?.  ?=(%success -.start-result)
-        (wrap-error `start-result)
-      ?.  ?=(%success -.diff-result)
-        (wrap-error `diff-result)
+      ?.  ?=(%SUCCESS -.START-RESULT)
+        (WRAP-ERROR `START-RESULT)
+      ?.  ?=(%SUCCESS -.DIFF-RESULT)
+        (WRAP-ERROR `DIFF-RESULT)
       ::
-      =/  start-cage=cage  (result-to-cage start-result)
-      =/  diff-cage=cage    (result-to-cage diff-result)
+      =/  START-CAGE=CAGE  (RESULT-TO-CAGE START-RESULT)
+      =/  DIFF-CAGE=CAGE    (RESULT-TO-CAGE DIFF-RESULT)
       ::
-      =/  start-mark=term  p.start-cage
-      =/  diff-mark=term    p.diff-cage
-      ::  load the starting mark from the filesystem
+      =/  START-MARK=TERM  P.START-CAGE
+      =/  DIFF-MARK=TERM    P.DIFF-CAGE
+      ::  LOAD THE STARTING MARK FROM THE FILESYSTEM
       ::
-      =/  mark-path-build=^build  [date.build [%path disc %mar start-mark]]
+      =/  MARK-PATH-BUILD=^BUILD  [DATE.BUILD [%PATH DISC %MAR START-MARK]]
       ::
-      =^  mark-path-result  out
-        (depend-on mark-path-build)
+      =^  MARK-PATH-RESULT  OUT
+        (DEPEND-ON MARK-PATH-BUILD)
       ::
-      ?~  mark-path-result
-        (return-blocks [mark-path-build]~)
+      ?~  MARK-PATH-RESULT
+        (RETURN-BLOCKS [MARK-PATH-BUILD]~)
       ::
-      ?.  ?=([~ %success %path *] mark-path-result)
-        (wrap-error mark-path-result)
+      ?.  ?=([~ %SUCCESS %PATH *] MARK-PATH-RESULT)
+        (WRAP-ERROR MARK-PATH-RESULT)
       ::
-      =/  mark-build=^build  [date.build [%core rail.u.mark-path-result]]
+      =/  MARK-BUILD=^BUILD  [DATE.BUILD [%CORE RAIL.U.MARK-PATH-RESULT]]
       ::
-      =^  mark-result  out  (depend-on mark-build)
-      ?~  mark-result
-        (return-blocks [mark-build]~)
+      =^  MARK-RESULT  OUT  (DEPEND-ON MARK-BUILD)
+      ?~  MARK-RESULT
+        (RETURN-BLOCKS [MARK-BUILD]~)
       ::
-      ?.  ?=([~ %success %core *] mark-result)
-        (wrap-error mark-result)
+      ?.  ?=([~ %SUCCESS %CORE *] MARK-RESULT)
+        (WRAP-ERROR MARK-RESULT)
       ::
-      =/  mark-vase=vase  vase.u.mark-result
-      ::  fire the +grad arm of the mark core
+      =/  MARK-VASE=VASE  VASE.U.MARK-RESULT
+      ::  FIRE THE +GRAD ARM OF THE MARK CORE
       ::
-      ?.  (slab %grad p.mark-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %pact failed: %{<start-mark>} mark has no +grad arm"
+      ?.  (SLAB %GRAD P.MARK-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %PACT FAILED: %{<START-MARK>} MARK HAS NO +GRAD ARM"
       ::
-      =/  grad-build=^build
-        [date.build [%ride [%limb %grad] [%$ %noun mark-vase]]]
+      =/  GRAD-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %GRAD] [%$ %NOUN MARK-VASE]]]
       ::
-      =^  grad-result  out  (depend-on grad-build)
-      ?~  grad-result
-        (return-blocks [grad-build]~)
+      =^  GRAD-RESULT  OUT  (DEPEND-ON GRAD-BUILD)
+      ?~  GRAD-RESULT
+        (RETURN-BLOCKS [GRAD-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] grad-result)
-        (wrap-error grad-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] GRAD-RESULT)
+        (WRAP-ERROR GRAD-RESULT)
       ::
-      =/  grad-vase=vase  vase.u.grad-result
-      ::  +grad can produce a term or a core
+      =/  GRAD-VASE=VASE  VASE.U.GRAD-RESULT
+      ::  +GRAD CAN PRODUCE A TERM OR A CORE
       ::
-      ::    If a mark's +grad arm produces a mark (as a +term),
-      ::    it means we should use that mark's machinery to run %pact.
-      ::    In this way, a mark can delegate its patching machinery to
-      ::    another mark.
+      ::    IF A MARK'S +GRAD ARM PRODUCES A MARK (AS A +TERM),
+      ::    IT MEANS WE SHOULD USE THAT MARK'S MACHINERY TO RUN %PACT.
+      ::    IN THIS WAY, A MARK CAN DELEGATE ITS PATCHING MACHINERY TO
+      ::    ANOTHER MARK.
       ::
-      ::    First we cast :start-cage to the +grad mark, then we run
-      ::    a new %pact build on the result of that, which will use the
-      ::    +grad mark's +grad arm. Finally we cast the %pact result back to
-      ::    :start-mark, since we're trying to produce a patched version of
-      ::    the initial marked value (:start-cage).
+      ::    FIRST WE CAST :START-CAGE TO THE +GRAD MARK, THEN WE RUN
+      ::    A NEW %PACT BUILD ON THE RESULT OF THAT, WHICH WILL USE THE
+      ::    +GRAD MARK'S +GRAD ARM. FINALLY WE CAST THE %PACT RESULT BACK TO
+      ::    :START-MARK, SINCE WE'RE TRYING TO PRODUCE A PATCHED VERSION OF
+      ::    THE INITIAL MARKED VALUE (:START-CAGE).
       ::
-      ?@  q.grad-vase
-        ::  if +grad produced a term, make sure it's a valid mark
+      ?@  Q.GRAD-VASE
+        ::  IF +GRAD PRODUCED A TERM, MAKE SURE IT'S A VALID MARK
         ::
-        =/  grad-mark=(unit term)  ((sand %tas) q.grad-vase)
-        ?~  grad-mark
-          %-  return-error  :_  ~  :-  %leaf
-          "ford: %pact failed: %{<start-mark>} mark invalid +grad"
-        ::  cast :start-cage to :grad-mark, %pact that, then cast back to start
+        =/  GRAD-MARK=(UNIT TERM)  ((SAND %TAS) Q.GRAD-VASE)
+        ?~  GRAD-MARK
+          %-  RETURN-ERROR  :_  ~  :-  %LEAF
+          "FORD: %PACT FAILED: %{<START-MARK>} MARK INVALID +GRAD"
+        ::  CAST :START-CAGE TO :GRAD-MARK, %PACT THAT, THEN CAST BACK TO START
         ::
-        =/  cast-build=^build
-          :-  date.build
-          :^  %cast  disc  start-mark
-          :^  %pact  disc
-            :^  %cast  disc  u.grad-mark
-            [%$ start-cage]
-          [%$ diff-cage]
+        =/  CAST-BUILD=^BUILD
+          :-  DATE.BUILD
+          :^  %CAST  DISC  START-MARK
+          :^  %PACT  DISC
+            :^  %CAST  DISC  U.GRAD-MARK
+            [%$ START-CAGE]
+          [%$ DIFF-CAGE]
         ::
-        =^  cast-result  out  (depend-on cast-build)
-        ?~  cast-result
-          (return-blocks [cast-build]~)
+        =^  CAST-RESULT  OUT  (DEPEND-ON CAST-BUILD)
+        ?~  CAST-RESULT
+          (RETURN-BLOCKS [CAST-BUILD]~)
         ::
-        ?.  ?=([~ %success %cast *] cast-result)
-          (wrap-error cast-result)
+        ?.  ?=([~ %SUCCESS %CAST *] CAST-RESULT)
+          (WRAP-ERROR CAST-RESULT)
         ::
-        =/  =build-result
-          [%success %pact cage.u.cast-result]
+        =/  =BUILD-RESULT
+          [%SUCCESS %PACT CAGE.U.CAST-RESULT]
         ::
-        (return-result build-result)
-      ::  +grad produced a core; make sure it has a +form arm
+        (RETURN-RESULT BUILD-RESULT)
+      ::  +GRAD PRODUCED A CORE; MAKE SURE IT HAS A +FORM ARM
       ::
-      ::    +grad can produce a core containing +pact and +form
-      ::    arms. +form:grad, which produces a mark (as a term), is used
-      ::    to verify that the diff is of the correct mark.
+      ::    +GRAD CAN PRODUCE A CORE CONTAINING +PACT AND +FORM
+      ::    ARMS. +FORM:GRAD, WHICH PRODUCES A MARK (AS A TERM), IS USED
+      ::    TO VERIFY THAT THE DIFF IS OF THE CORRECT MARK.
       ::
-      ::    +pact:grad produces a gate that gets slammed with the diff
-      ::    as its sample and produces a mutant version of :start-cage
-      ::    by applying the diff.
+      ::    +PACT:GRAD PRODUCES A GATE THAT GETS SLAMMED WITH THE DIFF
+      ::    AS ITS SAMPLE AND PRODUCES A MUTANT VERSION OF :START-CAGE
+      ::    BY APPLYING THE DIFF.
       ::
-      ?.  (slab %form p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %pact failed: no +form:grad in %{<start-mark>} mark"
-      ::  we also need a +pact arm in the +grad core
+      ?.  (SLAB %FORM P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %PACT FAILED: NO +FORM:GRAD IN %{<START-MARK>} MARK"
+      ::  WE ALSO NEED A +PACT ARM IN THE +GRAD CORE
       ::
-      ?.  (slab %pact p.grad-vase)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %pact failed: no +pact:grad in %{<start-mark>} mark"
-      ::  fire the +form arm in the core produced by +grad
+      ?.  (SLAB %PACT P.GRAD-VASE)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %PACT FAILED: NO +PACT:GRAD IN %{<START-MARK>} MARK"
+      ::  FIRE THE +FORM ARM IN THE CORE PRODUCED BY +GRAD
       ::
-      =/  form-build=^build
-        [date.build [%ride [%limb %form] [%$ %noun grad-vase]]]
+      =/  FORM-BUILD=^BUILD
+        [DATE.BUILD [%RIDE [%LIMB %FORM] [%$ %NOUN GRAD-VASE]]]
       ::
-      =^  form-result  out  (depend-on form-build)
-      ?~  form-result
-        (return-blocks [form-build]~)
+      =^  FORM-RESULT  OUT  (DEPEND-ON FORM-BUILD)
+      ?~  FORM-RESULT
+        (RETURN-BLOCKS [FORM-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] form-result)
-        (wrap-error form-result)
-      ::  +form:grad should produce a mark
+      ?.  ?=([~ %SUCCESS %RIDE *] FORM-RESULT)
+        (WRAP-ERROR FORM-RESULT)
+      ::  +FORM:GRAD SHOULD PRODUCE A MARK
       ::
-      =/  form-mark=(unit @tas)  ((soft @tas) q.vase.u.form-result)
-      ?~  form-mark
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %pact failed: %{<start-mark>} mark invalid +form:grad"
-      ::  mark produced by +form:grad needs to match the mark of the diff
+      =/  FORM-MARK=(UNIT @TAS)  ((SOFT @TAS) Q.VASE.U.FORM-RESULT)
+      ?~  FORM-MARK
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %PACT FAILED: %{<START-MARK>} MARK INVALID +FORM:GRAD"
+      ::  MARK PRODUCED BY +FORM:GRAD NEEDS TO MATCH THE MARK OF THE DIFF
       ::
-      ?.  =(u.form-mark diff-mark)
-        %-  return-error  :_  ~  :-  %leaf
-        "ford: %pact failed: %{<start-mark>} mark invalid +form:grad"
-      ::  call +pact:grad on the diff
+      ?.  =(U.FORM-MARK DIFF-MARK)
+        %-  RETURN-ERROR  :_  ~  :-  %LEAF
+        "FORD: %PACT FAILED: %{<START-MARK>} MARK INVALID +FORM:GRAD"
+      ::  CALL +PACT:GRAD ON THE DIFF
       ::
-      =/  pact-build=^build
-        :-  date.build
-        :+  %call
-          ^-  schematic
-          :+  %ride
-            [%tsld [%limb %pact] [%limb %grad]]
-          ^-  schematic
-          :+  %mute
-            ^-  schematic
-            [%$ %noun mark-vase]
-          ^-  (list [wing schematic])
-          [[%& 6]~ [%$ start-cage]]~
-        ^-  schematic
-        [%$ diff-cage]
+      =/  PACT-BUILD=^BUILD
+        :-  DATE.BUILD
+        :+  %CALL
+          ^-  SCHEMATIC
+          :+  %RIDE
+            [%TSLD [%LIMB %PACT] [%LIMB %GRAD]]
+          ^-  SCHEMATIC
+          :+  %MUTE
+            ^-  SCHEMATIC
+            [%$ %NOUN MARK-VASE]
+          ^-  (LIST [WING SCHEMATIC])
+          [[%& 6]~ [%$ START-CAGE]]~
+        ^-  SCHEMATIC
+        [%$ DIFF-CAGE]
       ::
-      =^  pact-result  out  (depend-on pact-build)
-      ?~  pact-result
-        (return-blocks [pact-build]~)
+      =^  PACT-RESULT  OUT  (DEPEND-ON PACT-BUILD)
+      ?~  PACT-RESULT
+        (RETURN-BLOCKS [PACT-BUILD]~)
       ::
-      ?.  ?=([~ %success %call *] pact-result)
-        (wrap-error pact-result)
+      ?.  ?=([~ %SUCCESS %CALL *] PACT-RESULT)
+        (WRAP-ERROR PACT-RESULT)
       ::
-      =/  =build-result
-        [%success %pact start-mark vase.u.pact-result]
+      =/  =BUILD-RESULT
+        [%SUCCESS %PACT START-MARK VASE.U.PACT-RESULT]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-path
-      ~%  %make-path  ..^^$  ~
-      |=  [disc=disc prefix=@tas raw-path=@tas]
-      ^-  build-receipt
-      ::  possible-spurs: flopped paths to which :raw-path could resolve
+    ++  MAKE-PATH
+      ~%  %MAKE-PATH  ..^^$  ~
+      |=  [DISC=DISC PREFIX=@TAS RAW-PATH=@TAS]
+      ^-  BUILD-RECEIPT
+      ::  POSSIBLE-SPURS: FLOPPED PATHS TO WHICH :RAW-PATH COULD RESOLVE
       ::
-      =/  possible-spurs=(list spur)  (turn (segments raw-path) flop)
-      ::  rails-and-schematics: scrys to check each path in :possible-paths
+      =/  POSSIBLE-SPURS=(LIST SPUR)  (TURN (SEGMENTS RAW-PATH) FLOP)
+      ::  RAILS-AND-SCHEMATICS: SCRYS TO CHECK EACH PATH IN :POSSIBLE-PATHS
       ::
-      =/  rails-and-schematics=(list [=rail =schematic])
-        %+  turn  possible-spurs
-        |=  possible-spur=spur
-        ^-  [rail schematic]
-        ::  full-spur: wrap :possible-spur with :prefix and /hoon suffix
+      =/  RAILS-AND-SCHEMATICS=(LIST [=RAIL =SCHEMATIC])
+        %+  TURN  POSSIBLE-SPURS
+        |=  POSSIBLE-SPUR=SPUR
+        ^-  [RAIL SCHEMATIC]
+        ::  FULL-SPUR: WRAP :POSSIBLE-SPUR WITH :PREFIX AND /HOON SUFFIX
         ::
-        =/  full-spur=spur  :(welp /hoon possible-spur /[prefix])
+        =/  FULL-SPUR=SPUR  :(WELP /HOON POSSIBLE-SPUR /[PREFIX])
         ::
-        :-  [disc full-spur]
-        [%scry %c %x `rail`[disc full-spur]]
-      ::  depend on builds of each schematic
+        :-  [DISC FULL-SPUR]
+        [%SCRY %C %X `RAIL`[DISC FULL-SPUR]]
+      ::  DEPEND ON BUILDS OF EACH SCHEMATIC
       ::
-      =^  maybe-schematic-results  out
-        %-  perform-schematics  :*
-          ;:  weld
-            "ford: %path resolution of "  (trip raw-path)  "at prefix "
-            (trip prefix)  " contained failures:"
+      =^  MAYBE-SCHEMATIC-RESULTS  OUT
+        %-  PERFORM-SCHEMATICS  :*
+          ;:  WELD
+            "FORD: %PATH RESOLUTION OF "  (TRIP RAW-PATH)  "AT PREFIX "
+            (TRIP PREFIX)  " CONTAINED FAILURES:"
           ==
-          rails-and-schematics
-          %filter-errors
-          *rail
+          RAILS-AND-SCHEMATICS
+          %FILTER-ERRORS
+          *RAIL
         ==
-      ?~  maybe-schematic-results
-        out
-      ::  matches: builds that completed with a successful result
+      ?~  MAYBE-SCHEMATIC-RESULTS
+        OUT
+      ::  MATCHES: BUILDS THAT COMPLETED WITH A SUCCESSFUL RESULT
       ::
-      =/  matches  u.maybe-schematic-results
-      ::  if no matches, error out
+      =/  MATCHES  U.MAYBE-SCHEMATIC-RESULTS
+      ::  IF NO MATCHES, ERROR OUT
       ::
-      ?~  matches
-        =/  =beam
-          [[ship.disc desk.disc [%da date.build]] /hoon/[raw-path]/[prefix]]
+      ?~  MATCHES
+        =/  =BEAM
+          [[SHIP.DISC DESK.DISC [%DA DATE.BUILD]] /HOON/[RAW-PATH]/[PREFIX]]
         ::
-        %-  return-error
+        %-  RETURN-ERROR
         :_  ~
-        :-  %leaf
-        (weld "%path: no matches for " (spud (en-beam beam)))
-      ::  if exactly one path matches, succeed with the matching path
+        :-  %LEAF
+        (WELD "%PATH: NO MATCHES FOR " (SPUD (EN-BEAM BEAM)))
+      ::  IF EXACTLY ONE PATH MATCHES, SUCCEED WITH THE MATCHING PATH
       ::
-      ?:  ?=([* ~] matches)
-        (return-result %success %path key.i.matches)
-      ::  multiple paths matched; error out
+      ?:  ?=([* ~] MATCHES)
+        (RETURN-RESULT %SUCCESS %PATH KEY.I.MATCHES)
+      ::  MULTIPLE PATHS MATCHED; ERROR OUT
       ::
-      %-  return-error
+      %-  RETURN-ERROR
       ::
-      :-  [%leaf "multiple matches for %path: "]
-      ::  tmi; cast :matches back to +list
+      :-  [%LEAF "MULTIPLE MATCHES FOR %PATH: "]
+      ::  TMI; CAST :MATCHES BACK TO +LIST
       ::
-      %+  roll  `_u.maybe-schematic-results`matches
-      |=  [[key=rail result=build-result] message=tang]
-      ^-  tang
-      ::  beam: reconstruct request from :kid's schematic and date
+      %+  ROLL  `_U.MAYBE-SCHEMATIC-RESULTS`MATCHES
+      |=  [[KEY=RAIL RESULT=BUILD-RESULT] MESSAGE=TANG]
+      ^-  TANG
+      ::  BEAM: RECONSTRUCT REQUEST FROM :KID'S SCHEMATIC AND DATE
       ::
-      =/  =beam  [[ship.disc desk.disc [%da date.build]] spur.key]
+      =/  =BEAM  [[SHIP.DISC DESK.DISC [%DA DATE.BUILD]] SPUR.KEY]
       ::
-      [[%leaf (spud (en-beam beam))] message]
+      [[%LEAF (SPUD (EN-BEAM BEAM))] MESSAGE]
     ::
-    ++  make-plan
-      ~%  %make-plan  ..^^$  ~
-      |=  [path-to-render=rail query-string=coin =scaffold]
-      ^-  build-receipt
-      ::  blocks: accumulator for blocked sub-builds
+    ++  MAKE-PLAN
+      ~%  %MAKE-PLAN  ..^^$  ~
+      |=  [PATH-TO-RENDER=RAIL QUERY-STRING=COIN =SCAFFOLD]
+      ^-  BUILD-RECEIPT
+      ::  BLOCKS: ACCUMULATOR FOR BLOCKED SUB-BUILDS
       ::
-      =|  blocks=(list ^build)
-      ::  error-message: accumulator for failed sub-builds
+      =|  BLOCKS=(LIST ^BUILD)
+      ::  ERROR-MESSAGE: ACCUMULATOR FOR FAILED SUB-BUILDS
       ::
-      =|  error-message=tang
+      =|  ERROR-MESSAGE=TANG
       ::
-      |^  ::  imports: structure and library +cables, with %sur/%lib prefixes
+      |^  ::  IMPORTS: STRUCTURE AND LIBRARY +CABLES, WITH %SUR/%LIB PREFIXES
           ::
-          =/  imports=(list [prefix=?(%sur %lib) =cable])
-            %+  welp
-              (turn structures.scaffold |=(cable [%sur +<]))
-            (turn libraries.scaffold |=(cable [%lib +<]))
-          ::  path-builds: %path sub-builds to resolve import paths
+          =/  IMPORTS=(LIST [PREFIX=?(%SUR %LIB) =CABLE])
+            %+  WELP
+              (TURN STRUCTURES.SCAFFOLD |=(CABLE [%SUR +<]))
+            (TURN LIBRARIES.SCAFFOLD |=(CABLE [%LIB +<]))
+          ::  PATH-BUILDS: %PATH SUB-BUILDS TO RESOLVE IMPORT PATHS
           ::
-          =/  path-builds  (gather-path-builds imports)
+          =/  PATH-BUILDS  (GATHER-PATH-BUILDS IMPORTS)
           ::
-          =^  path-results  ..$  (resolve-builds path-builds)
-          ?^  blocks
-            (return-blocks blocks)
+          =^  PATH-RESULTS  ..$  (RESOLVE-BUILDS PATH-BUILDS)
+          ?^  BLOCKS
+            (RETURN-BLOCKS BLOCKS)
           ::
-          ?^  error-message
-            (return-error error-message)
-          ::  tmi; remove type specializations
+          ?^  ERROR-MESSAGE
+            (RETURN-ERROR ERROR-MESSAGE)
+          ::  TMI; REMOVE TYPE SPECIALIZATIONS
           ::
-          =>  .(blocks *(list ^build), error-message *tang)
-          ::  core-builds: %core sub-builds to produce library vases
+          =>  .(BLOCKS *(LIST ^BUILD), ERROR-MESSAGE *TANG)
+          ::  CORE-BUILDS: %CORE SUB-BUILDS TO PRODUCE LIBRARY VASES
           ::
-          =/  core-builds  (gather-core-builds path-results)
+          =/  CORE-BUILDS  (GATHER-CORE-BUILDS PATH-RESULTS)
           ::
-          =^  core-results  ..$  (resolve-builds core-builds)
-          ?^  blocks
-            (return-blocks blocks)
+          =^  CORE-RESULTS  ..$  (RESOLVE-BUILDS CORE-BUILDS)
+          ?^  BLOCKS
+            (RETURN-BLOCKS BLOCKS)
           ::
-          ?^  error-message
-            (return-error error-message)
-          ::  reef-build: %reef build to produce standard library
+          ?^  ERROR-MESSAGE
+            (RETURN-ERROR ERROR-MESSAGE)
+          ::  REEF-BUILD: %REEF BUILD TO PRODUCE STANDARD LIBRARY
           ::
-          =/  reef-build=^build  [date.build [%reef disc.path-to-render]]
+          =/  REEF-BUILD=^BUILD  [DATE.BUILD [%REEF DISC.PATH-TO-RENDER]]
           ::
-          =^  reef-result  out  (depend-on reef-build)
-          ?~  reef-result
-            (return-blocks [reef-build]~)
+          =^  REEF-RESULT  OUT  (DEPEND-ON REEF-BUILD)
+          ?~  REEF-RESULT
+            (RETURN-BLOCKS [REEF-BUILD]~)
           ::
-          ?.  ?=([~ %success %reef *] reef-result)
-            (wrap-error reef-result)
-          ::  subject: tuple of imports and standard library
+          ?.  ?=([~ %SUCCESS %REEF *] REEF-RESULT)
+            (WRAP-ERROR REEF-RESULT)
+          ::  SUBJECT: TUPLE OF IMPORTS AND STANDARD LIBRARY
           ::
-          =/  subject=vase
-            (link-imports imports vase.u.reef-result core-results)
-          ::  tmi; remove type specializations
+          =/  SUBJECT=VASE
+            (LINK-IMPORTS IMPORTS VASE.U.REEF-RESULT CORE-RESULTS)
+          ::  TMI; REMOVE TYPE SPECIALIZATIONS
           ::
-          =>  .(blocks *(list ^build), error-message *tang)
-          ::  iterate over each crane
+          =>  .(BLOCKS *(LIST ^BUILD), ERROR-MESSAGE *TANG)
+          ::  ITERATE OVER EACH CRANE
           ::
-          =^  crane-result  ..$
-            (compose-cranes [%noun subject] cranes.scaffold)
-          ?:  ?=(%error -.crane-result)
-            (return-error message.crane-result)
-          ?:  ?=(%block -.crane-result)
-            (return-blocks builds.crane-result)
-          ::  combined-hoon: source hoons condensed into a single +hoon
+          =^  CRANE-RESULT  ..$
+            (COMPOSE-CRANES [%NOUN SUBJECT] CRANES.SCAFFOLD)
+          ?:  ?=(%ERROR -.CRANE-RESULT)
+            (RETURN-ERROR MESSAGE.CRANE-RESULT)
+          ?:  ?=(%BLOCK -.CRANE-RESULT)
+            (RETURN-BLOCKS BUILDS.CRANE-RESULT)
+          ::  COMBINED-HOON: SOURCE HOONS CONDENSED INTO A SINGLE +HOON
           ::
-          =/  combined-hoon=hoon  [%tssg sources.scaffold]
-          ::  compile :combined-hoon against :subject
+          =/  COMBINED-HOON=HOON  [%TSSG SOURCES.SCAFFOLD]
+          ::  COMPILE :COMBINED-HOON AGAINST :SUBJECT
           ::
-          =/  compile=^build
-            [date.build [%ride combined-hoon [%$ subject.crane-result]]]
+          =/  COMPILE=^BUILD
+            [DATE.BUILD [%RIDE COMBINED-HOON [%$ SUBJECT.CRANE-RESULT]]]
           ::
-          =^  compiled  out  (depend-on compile)
-          ::  compilation blocked; produce block on sub-build
+          =^  COMPILED  OUT  (DEPEND-ON COMPILE)
+          ::  COMPILATION BLOCKED; PRODUCE BLOCK ON SUB-BUILD
           ::
-          ?~  compiled
-            (return-blocks ~[compile])
-          ::  compilation failed; error out
+          ?~  COMPILED
+            (RETURN-BLOCKS ~[COMPILE])
+          ::  COMPILATION FAILED; ERROR OUT
           ::
-          ?.  ?=([~ %success %ride *] compiled)
-            (wrap-error compiled)
-          ::  compilation succeeded: produce resulting +vase
+          ?.  ?=([~ %SUCCESS %RIDE *] COMPILED)
+            (WRAP-ERROR COMPILED)
+          ::  COMPILATION SUCCEEDED: PRODUCE RESULTING +VASE
           ::
-          (return-result %success %plan vase.u.compiled)
-      ::  +compose-result: the result of a single composition
+          (RETURN-RESULT %SUCCESS %PLAN VASE.U.COMPILED)
+      ::  +COMPOSE-RESULT: THE RESULT OF A SINGLE COMPOSITION
       ::
-      +=  compose-result
-        $%  [%subject subject=cage]
-            [%block builds=(list ^build)]
-            [%error message=tang]
+      +=  COMPOSE-RESULT
+        $%  [%SUBJECT SUBJECT=CAGE]
+            [%BLOCK BUILDS=(LIST ^BUILD)]
+            [%ERROR MESSAGE=TANG]
         ==
-      ::  +compose-cranes: runs each crane and composes the results
+      ::  +COMPOSE-CRANES: RUNS EACH CRANE AND COMPOSES THE RESULTS
       ::
-      ::    For each crane in :cranes, runs it and composes its result into a
-      ::    new subject, which is returned if there are no errors or blocks.
+      ::    FOR EACH CRANE IN :CRANES, RUNS IT AND COMPOSES ITS RESULT INTO A
+      ::    NEW SUBJECT, WHICH IS RETURNED IF THERE ARE NO ERRORS OR BLOCKS.
       ::
-      ++  compose-cranes
-        |=  [subject=cage cranes=(list crane)]
-        ^-  $:  compose-result
-                _..compose-cranes
+      ++  COMPOSE-CRANES
+        |=  [SUBJECT=CAGE CRANES=(LIST CRANE)]
+        ^-  $:  COMPOSE-RESULT
+                _..COMPOSE-CRANES
             ==
         ::
-        ?~  cranes
-          [[%subject subject] ..compose-cranes]
+        ?~  CRANES
+          [[%SUBJECT SUBJECT] ..COMPOSE-CRANES]
         ::
-        =^  result  ..compose-cranes  (run-crane subject i.cranes)
-        ?+    -.result  [result ..compose-cranes]
+        =^  RESULT  ..COMPOSE-CRANES  (RUN-CRANE SUBJECT I.CRANES)
+        ?+    -.RESULT  [RESULT ..COMPOSE-CRANES]
         ::
-            %subject
-          $(cranes t.cranes, subject [%noun (slop q.subject.result q.subject)])
+            %SUBJECT
+          $(CRANES T.CRANES, SUBJECT [%NOUN (SLOP Q.SUBJECT.RESULT Q.SUBJECT)])
         ==
-      ::  +run-crane: runs an individual :crane against :subject
+      ::  +RUN-CRANE: RUNS AN INDIVIDUAL :CRANE AGAINST :SUBJECT
       ::
-      ++  run-crane
-        |=  [subject=cage =crane]
-        ^-  compose-cranes
+      ++  RUN-CRANE
+        |=  [SUBJECT=CAGE =CRANE]
+        ^-  COMPOSE-CRANES
         ::
-        |^  ?-  -.crane
-              %fssg  (run-fssg +.crane)
-              %fsbc  (run-fsbc +.crane)
-              %fsbr  (run-fsbr +.crane)
-              %fsts  (run-fsts +.crane)
-              %fscm  (run-fscm +.crane)
-              %fspm  (run-fspm +.crane)
-              %fscb  (run-fscb +.crane)
-              %fsdt  (run-fsdt +.crane)
-              %fssm  (run-fssm +.crane)
-              %fscl  (run-fscl +.crane)
-              %fskt  (run-fskt +.crane)
-              %fstr  (run-fstr +.crane)
-              %fszp  (run-fszp +.crane)
-              %fszy  (run-fszy +.crane)
+        |^  ?-  -.CRANE
+              %FSSG  (RUN-FSSG +.CRANE)
+              %FSBC  (RUN-FSBC +.CRANE)
+              %FSBR  (RUN-FSBR +.CRANE)
+              %FSTS  (RUN-FSTS +.CRANE)
+              %FSCM  (RUN-FSCM +.CRANE)
+              %FSPM  (RUN-FSPM +.CRANE)
+              %FSCB  (RUN-FSCB +.CRANE)
+              %FSDT  (RUN-FSDT +.CRANE)
+              %FSSM  (RUN-FSSM +.CRANE)
+              %FSCL  (RUN-FSCL +.CRANE)
+              %FSKT  (RUN-FSKT +.CRANE)
+              %FSTR  (RUN-FSTR +.CRANE)
+              %FSZP  (RUN-FSZP +.CRANE)
+              %FSZY  (RUN-FSZY +.CRANE)
             ==
-        ::  +run-fssg: runs the `/~` rune
+        ::  +RUN-FSSG: RUNS THE `/~` RUNE
         ::
-        ++  run-fssg
-          |=  =hoon
-          ^-  compose-cranes
+        ++  RUN-FSSG
+          |=  =HOON
+          ^-  COMPOSE-CRANES
           ::
-          =/  ride-build=^build
-            [date.build [%ride hoon [%$ subject]]]
-          =^  ride-result  out  (depend-on ride-build)
-          ?~  ride-result
-            [[%block [ride-build]~] ..run-crane]
-          ?:  ?=([~ %error *] ride-result)
-            [[%error [leaf+"/~ failed: " message.u.ride-result]] ..run-crane]
-          ?>  ?=([~ %success %ride *] ride-result)
-          [[%subject %noun vase.u.ride-result] ..run-crane]
-        ::  +run-fsbc: runs the `/$` rune
+          =/  RIDE-BUILD=^BUILD
+            [DATE.BUILD [%RIDE HOON [%$ SUBJECT]]]
+          =^  RIDE-RESULT  OUT  (DEPEND-ON RIDE-BUILD)
+          ?~  RIDE-RESULT
+            [[%BLOCK [RIDE-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] RIDE-RESULT)
+            [[%ERROR [LEAF+"/~ FAILED: " MESSAGE.U.RIDE-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %RIDE *] RIDE-RESULT)
+          [[%SUBJECT %NOUN VASE.U.RIDE-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSBC: RUNS THE `/$` RUNE
         ::
-        ++  run-fsbc
-          |=  =hoon
-          ^-  compose-cranes
+        ++  RUN-FSBC
+          |=  =HOON
+          ^-  COMPOSE-CRANES
           ::
-          =/  query-compile-build=^build
-            [date.build [%ride ((jock |) query-string) [%$ %noun !>(~)]]]
-          =^  query-compile-result  out  (depend-on query-compile-build)
-          ?~  query-compile-result
-            [[%block [query-compile-build]~] ..run-crane]
-          ?:  ?=([~ %error *] query-compile-result)
-            :-  [%error [leaf+"/; failed: " message.u.query-compile-result]]
-            ..run-crane
-          ?>  ?=([~ %success %ride *] query-compile-result)
+          =/  QUERY-COMPILE-BUILD=^BUILD
+            [DATE.BUILD [%RIDE ((JOCK |) QUERY-STRING) [%$ %NOUN !>(~)]]]
+          =^  QUERY-COMPILE-RESULT  OUT  (DEPEND-ON QUERY-COMPILE-BUILD)
+          ?~  QUERY-COMPILE-RESULT
+            [[%BLOCK [QUERY-COMPILE-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] QUERY-COMPILE-RESULT)
+            :-  [%ERROR [LEAF+"/; FAILED: " MESSAGE.U.QUERY-COMPILE-RESULT]]
+            ..RUN-CRANE
+          ?>  ?=([~ %SUCCESS %RIDE *] QUERY-COMPILE-RESULT)
           ::
-          =/  =beam
-            =,  path-to-render
-            [[ship.disc desk.disc [%da date.build]] spur]
-          =+  arguments=(slop !>(beam) vase.u.query-compile-result)
+          =/  =BEAM
+            =,  PATH-TO-RENDER
+            [[SHIP.DISC DESK.DISC [%DA DATE.BUILD]] SPUR]
+          =+  ARGUMENTS=(SLOP !>(BEAM) VASE.U.QUERY-COMPILE-RESULT)
           ::
-          =/  call-build=^build
-            [date.build [%call [%ride hoon [%$ subject]] [%$ %noun arguments]]]
-          =^  call-result  out  (depend-on call-build)
-          ?~  call-result
-            [[%block [call-build]~] ..run-crane]
-          ?:  ?=([~ %error *] call-result)
-            [[%error [leaf+"/; failed: " message.u.call-result]] ..run-crane]
-          ?>  ?=([~ %success %call *] call-result)
+          =/  CALL-BUILD=^BUILD
+            [DATE.BUILD [%CALL [%RIDE HOON [%$ SUBJECT]] [%$ %NOUN ARGUMENTS]]]
+          =^  CALL-RESULT  OUT  (DEPEND-ON CALL-BUILD)
+          ?~  CALL-RESULT
+            [[%BLOCK [CALL-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] CALL-RESULT)
+            [[%ERROR [LEAF+"/; FAILED: " MESSAGE.U.CALL-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %CALL *] CALL-RESULT)
           ::
-          [[%subject %noun vase.u.call-result] ..run-crane]
-        ::  +run-fsbr: runs the `/|` rune
+          [[%SUBJECT %NOUN VASE.U.CALL-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSBR: RUNS THE `/|` RUNE
         ::
-        ++  run-fsbr
-          |=  choices=(list ^crane)
-          ^-  compose-cranes
+        ++  RUN-FSBR
+          |=  CHOICES=(LIST ^CRANE)
+          ^-  COMPOSE-CRANES
           ::
-          ?~  choices
-            [[%error [leaf+"/| failed: out of options"]~] ..run-crane]
+          ?~  CHOICES
+            [[%ERROR [LEAF+"/| FAILED: OUT OF OPTIONS"]~] ..RUN-CRANE]
           ::
-          =^  child  ..run-crane  (run-crane subject i.choices)
-          ?.  ?=([%error *] child)
-            [child ..run-crane]
-          $(choices t.choices)
-        ::  +run-fsts: runs the `/=` rune
+          =^  CHILD  ..RUN-CRANE  (RUN-CRANE SUBJECT I.CHOICES)
+          ?.  ?=([%ERROR *] CHILD)
+            [CHILD ..RUN-CRANE]
+          $(CHOICES T.CHOICES)
+        ::  +RUN-FSTS: RUNS THE `/=` RUNE
         ::
-        ++  run-fsts
-          |=  [face=term sub-crane=^crane]
-          ^-  compose-cranes
+        ++  RUN-FSTS
+          |=  [FACE=TERM SUB-CRANE=^CRANE]
+          ^-  COMPOSE-CRANES
           ::
-          =^  child  ..run-crane  (run-crane subject sub-crane)
-          ?.  ?=([%subject *] child)
-            [child ..run-crane]
-          :_  ..run-crane
-          :*  %subject
-              p.subject.child
-              [[%face face p.q.subject.child] q.q.subject.child]
+          =^  CHILD  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+          ?.  ?=([%SUBJECT *] CHILD)
+            [CHILD ..RUN-CRANE]
+          :_  ..RUN-CRANE
+          :*  %SUBJECT
+              P.SUBJECT.CHILD
+              [[%FACE FACE P.Q.SUBJECT.CHILD] Q.Q.SUBJECT.CHILD]
           ==
-        ::  +run-fscm: runs the `/,` rune
+        ::  +RUN-FSCM: RUNS THE `/,` RUNE
         ::
-        ++  run-fscm
-          |=  cases=(list [=spur crane=^crane])
-          ^-  compose-cranes
+        ++  RUN-FSCM
+          |=  CASES=(LIST [=SPUR CRANE=^CRANE])
+          ^-  COMPOSE-CRANES
           ::
-          ?~  cases
-            [[%error [leaf+"/, failed: no match"]~] ..run-crane]
+          ?~  CASES
+            [[%ERROR [LEAF+"/, FAILED: NO MATCH"]~] ..RUN-CRANE]
           ::
-          ?.  .=  spur.i.cases
-              (scag (lent spur.i.cases) (flop spur.path-to-render))
-            $(cases t.cases)
+          ?.  .=  SPUR.I.CASES
+              (SCAG (LENT SPUR.I.CASES) (FLOP SPUR.PATH-TO-RENDER))
+            $(CASES T.CASES)
           ::
-          (run-crane subject crane.i.cases)
-        ::  +run-fspm: runs the `/&` rune
+          (RUN-CRANE SUBJECT CRANE.I.CASES)
+        ::  +RUN-FSPM: RUNS THE `/&` RUNE
         ::
-        ++  run-fspm
-          |=  [marks=(list mark) sub-crane=^crane]
-          ^-  compose-cranes
+        ++  RUN-FSPM
+          |=  [MARKS=(LIST MARK) SUB-CRANE=^CRANE]
+          ^-  COMPOSE-CRANES
           ::
-          =^  child  ..run-crane  (run-crane subject sub-crane)
-          ?.  ?=([%subject *] child)
-            [child ..run-crane]
+          =^  CHILD  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+          ?.  ?=([%SUBJECT *] CHILD)
+            [CHILD ..RUN-CRANE]
           ::
-          =/  cast-build=^build
-            :-  date.build
+          =/  CAST-BUILD=^BUILD
+            :-  DATE.BUILD
             |-
-            ^-  schematic
-            ?~  marks
-              ::  TODO: If we were keeping track of the mark across runes, this
-              ::  wouldn't have %noun here. This is a case where it might matter.
+            ^-  SCHEMATIC
+            ?~  MARKS
+              ::  TODO: IF WE WERE KEEPING TRACK OF THE MARK ACROSS RUNES, THIS
+              ::  WOULDN'T HAVE %NOUN HERE. THIS IS A CASE WHERE IT MIGHT MATTER.
               ::
-              [%$ subject.child]
-            [%cast disc.source-rail.scaffold i.marks $(marks t.marks)]
-          =^  cast-result  out  (depend-on cast-build)
-          ?~  cast-result
-            [[%block [cast-build]~] ..run-crane]
+              [%$ SUBJECT.CHILD]
+            [%CAST DISC.SOURCE-RAIL.SCAFFOLD I.MARKS $(MARKS T.MARKS)]
+          =^  CAST-RESULT  OUT  (DEPEND-ON CAST-BUILD)
+          ?~  CAST-RESULT
+            [[%BLOCK [CAST-BUILD]~] ..RUN-CRANE]
           ::
-          ?:  ?=([~ %error *] cast-result)
-            [[%error [leaf+"/& failed: " message.u.cast-result]] ..run-crane]
-          ?>  ?=([~ %success %cast *] cast-result)
+          ?:  ?=([~ %ERROR *] CAST-RESULT)
+            [[%ERROR [LEAF+"/& FAILED: " MESSAGE.U.CAST-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %CAST *] CAST-RESULT)
           ::
-          [[%subject cage.u.cast-result] ..run-crane]
-        ::  +run-fscb: runs the `/_` rune
+          [[%SUBJECT CAGE.U.CAST-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSCB: RUNS THE `/_` RUNE
         ::
-        ++  run-fscb
-          |=  sub-crane=^crane
-          ^-  compose-cranes
-          ::  perform a scry to get the contents of +path-to-render
+        ++  RUN-FSCB
+          |=  SUB-CRANE=^CRANE
+          ^-  COMPOSE-CRANES
+          ::  PERFORM A SCRY TO GET THE CONTENTS OF +PATH-TO-RENDER
           ::
-          =/  toplevel-build=^build
-            [date.build [%scry [%c %y path-to-render]]]
+          =/  TOPLEVEL-BUILD=^BUILD
+            [DATE.BUILD [%SCRY [%C %Y PATH-TO-RENDER]]]
           ::
-          =^  toplevel-result  out  (depend-on toplevel-build)
-          ?~  toplevel-result
-            [[%block ~[toplevel-build]] ..run-crane]
+          =^  TOPLEVEL-RESULT  OUT  (DEPEND-ON TOPLEVEL-BUILD)
+          ?~  TOPLEVEL-RESULT
+            [[%BLOCK ~[TOPLEVEL-BUILD]] ..RUN-CRANE]
           ::
-          ?:  ?=([~ %error *] toplevel-result)
-            :-  [%error [leaf+"/_ failed: " message.u.toplevel-result]]
-            ..run-crane
-          ?>  ?=([~ %success %scry *] toplevel-result)
+          ?:  ?=([~ %ERROR *] TOPLEVEL-RESULT)
+            :-  [%ERROR [LEAF+"/_ FAILED: " MESSAGE.U.TOPLEVEL-RESULT]]
+            ..RUN-CRANE
+          ?>  ?=([~ %SUCCESS %SCRY *] TOPLEVEL-RESULT)
           ::
-          =/  toplevel-arch=arch  ;;(arch q.q.cage.u.toplevel-result)
-          ::  sub-path: each possible sub-directory to check
+          =/  TOPLEVEL-ARCH=ARCH  ;;(ARCH Q.Q.CAGE.U.TOPLEVEL-RESULT)
+          ::  SUB-PATH: EACH POSSIBLE SUB-DIRECTORY TO CHECK
           ::
-          =/  sub-paths=(list @ta)
-            (turn ~(tap by dir.toplevel-arch) head)
-          ::  for each directory in :toplevel-arch, issue a sub-build
+          =/  SUB-PATHS=(LIST @TA)
+            (TURN ~(TAP BY DIR.TOPLEVEL-ARCH) HEAD)
+          ::  FOR EACH DIRECTORY IN :TOPLEVEL-ARCH, ISSUE A SUB-BUILD
           ::
-          =/  sub-builds=(list ^build)
-            %+  turn  sub-paths
-            |=  sub=@ta
-            ^-  ^build
-            :-  date.build
-            [%scry [%c %y path-to-render(spur [sub spur.path-to-render])]]
-          ::  results: accumulator for results of sub-builds
+          =/  SUB-BUILDS=(LIST ^BUILD)
+            %+  TURN  SUB-PATHS
+            |=  SUB=@TA
+            ^-  ^BUILD
+            :-  DATE.BUILD
+            [%SCRY [%C %Y PATH-TO-RENDER(SPUR [SUB SPUR.PATH-TO-RENDER])]]
+          ::  RESULTS: ACCUMULATOR FOR RESULTS OF SUB-BUILDS
           ::
-          =|  $=  results
-              (list [kid=^build sub-path=@ta results=(unit build-result)])
-          ::  resolve all the :sub-builds
+          =|  $=  RESULTS
+              (LIST [KID=^BUILD SUB-PATH=@TA RESULTS=(UNIT BUILD-RESULT)])
+          ::  RESOLVE ALL THE :SUB-BUILDS
           ::
-          =/  subs-results
-            |-  ^+  [results out]
-            ?~  sub-builds  [results out]
-            ?>  ?=(^ sub-paths)
+          =/  SUBS-RESULTS
+            |-  ^+  [RESULTS OUT]
+            ?~  SUB-BUILDS  [RESULTS OUT]
+            ?>  ?=(^ SUB-PATHS)
             ::
-            =/  kid=^build  i.sub-builds
-            =/  sub-path=@ta  i.sub-paths
+            =/  KID=^BUILD  I.SUB-BUILDS
+            =/  SUB-PATH=@TA  I.SUB-PATHS
             ::
-            =^  result  out  (depend-on kid)
-            =.  results  [[kid sub-path result] results]
+            =^  RESULT  OUT  (DEPEND-ON KID)
+            =.  RESULTS  [[KID SUB-PATH RESULT] RESULTS]
             ::
-            $(sub-builds t.sub-builds, sub-paths t.sub-paths)
-          ::  apply mutations from depending on sub-builds
+            $(SUB-BUILDS T.SUB-BUILDS, SUB-PATHS T.SUB-PATHS)
+          ::  APPLY MUTATIONS FROM DEPENDING ON SUB-BUILDS
           ::
-          =:  results  -.subs-results
-              out      +.subs-results
+          =:  RESULTS  -.SUBS-RESULTS
+              OUT      +.SUBS-RESULTS
           ==
-          ::  split :results into completed :mades and incomplete :blocks
+          ::  SPLIT :RESULTS INTO COMPLETED :MADES AND INCOMPLETE :BLOCKS
           ::
-          =+  ^=  split-results
-              (skid results |=([* * r=(unit build-result)] ?=(^ r)))
+          =+  ^=  SPLIT-RESULTS
+              (SKID RESULTS |=([* * R=(UNIT BUILD-RESULT)] ?=(^ R)))
           ::
-          =/  mades=_results   -.split-results
-          =/  blocks=_results  +.split-results
-          ::  if any builds blocked, produce them all in %blocks
+          =/  MADES=_RESULTS   -.SPLIT-RESULTS
+          =/  BLOCKS=_RESULTS  +.SPLIT-RESULTS
+          ::  IF ANY BUILDS BLOCKED, PRODUCE THEM ALL IN %BLOCKS
           ::
-          ?^  blocks
-            [[%block (turn `_results`blocks head)] ..run-crane]
-          ::  find the first error and return it if exists
+          ?^  BLOCKS
+            [[%BLOCK (TURN `_RESULTS`BLOCKS HEAD)] ..RUN-CRANE]
+          ::  FIND THE FIRST ERROR AND RETURN IT IF EXISTS
           ::
-          =/  errors=_results
-            %+  skim  results
-            |=  [* * r=(unit build-result)]
-            ?=([~ %error *] r)
-          ?^  errors
-            ?>  ?=([~ %error *] results.i.errors)
-            [[%error message.u.results.i.errors] ..run-crane]
-          ::  get a list of valid sub-paths
+          =/  ERRORS=_RESULTS
+            %+  SKIM  RESULTS
+            |=  [* * R=(UNIT BUILD-RESULT)]
+            ?=([~ %ERROR *] R)
+          ?^  ERRORS
+            ?>  ?=([~ %ERROR *] RESULTS.I.ERRORS)
+            [[%ERROR MESSAGE.U.RESULTS.I.ERRORS] ..RUN-CRANE]
+          ::  GET A LIST OF VALID SUB-PATHS
           ::
-          ::    :results is now a list of the :build-result of %cy on each path
-          ::    in :toplevel-arch. What we want is to now filter this list so
-          ::    that we filter files out.
+          ::    :RESULTS IS NOW A LIST OF THE :BUILD-RESULT OF %CY ON EACH PATH
+          ::    IN :TOPLEVEL-ARCH. WHAT WE WANT IS TO NOW FILTER THIS LIST SO
+          ::    THAT WE FILTER FILES OUT.
           ::
-          =/  sub-paths=(list [=rail sub-path=@ta])
-            %+  murn  results
-            |=  [build=^build sub-path=@ta result=(unit build-result)]
-            ^-  (unit [rail @ta])
+          =/  SUB-PATHS=(LIST [=RAIL SUB-PATH=@TA])
+            %+  MURN  RESULTS
+            |=  [BUILD=^BUILD SUB-PATH=@TA RESULT=(UNIT BUILD-RESULT)]
+            ^-  (UNIT [RAIL @TA])
             ::
-            ?>  ?=([@da %scry %c %y *] build)
-            ?>  ?=([~ %success %scry *] result)
-            =/  =arch  ;;(arch q.q.cage.u.result)
+            ?>  ?=([@DA %SCRY %C %Y *] BUILD)
+            ?>  ?=([~ %SUCCESS %SCRY *] RESULT)
+            =/  =ARCH  ;;(ARCH Q.Q.CAGE.U.RESULT)
             ::
-            ?~  dir.arch
+            ?~  DIR.ARCH
               ~
-            `[rail.resource.schematic.build sub-path]
-          ::  keep track of the original value so we can reset it
+            `[RAIL.RESOURCE.SCHEMATIC.BUILD SUB-PATH]
+          ::  KEEP TRACK OF THE ORIGINAL VALUE SO WE CAN RESET IT
           ::
-          =/  old-path-to-render  path-to-render
-          ::  apply each of the filtered :sub-paths to the :sub-crane.
+          =/  OLD-PATH-TO-RENDER  PATH-TO-RENDER
+          ::  APPLY EACH OF THE FILTERED :SUB-PATHS TO THE :SUB-CRANE.
           ::
-          =^  crane-results  ..run-crane
-            %+  roll  sub-paths
-            |=  $:  [=rail sub-path=@ta]
-                    $=  accumulator
-                    [(list [sub-path=@ta =compose-result]) _..run-crane]
+          =^  CRANE-RESULTS  ..RUN-CRANE
+            %+  ROLL  SUB-PATHS
+            |=  $:  [=RAIL SUB-PATH=@TA]
+                    $=  ACCUMULATOR
+                    [(LIST [SUB-PATH=@TA =COMPOSE-RESULT]) _..RUN-CRANE]
                 ==
-            =.  ..run-crane  +.accumulator
-            =.  path-to-render  rail
-            =^  result  ..run-crane  (run-crane subject sub-crane)
-            [[[sub-path result] -.accumulator] ..run-crane]
-          ::  set :path-to-render back
+            =.  ..RUN-CRANE  +.ACCUMULATOR
+            =.  PATH-TO-RENDER  RAIL
+            =^  RESULT  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+            [[[SUB-PATH RESULT] -.ACCUMULATOR] ..RUN-CRANE]
+          ::  SET :PATH-TO-RENDER BACK
           ::
-          =.  path-to-render  old-path-to-render
-          ::  if any sub-cranes error, return the first error
+          =.  PATH-TO-RENDER  OLD-PATH-TO-RENDER
+          ::  IF ANY SUB-CRANES ERROR, RETURN THE FIRST ERROR
           ::
-          =/  error-list=(list [@ta =compose-result])
-            %+  skim  crane-results
-            |=  [@ta =compose-result]
-            =(%error -.compose-result)
+          =/  ERROR-LIST=(LIST [@TA =COMPOSE-RESULT])
+            %+  SKIM  CRANE-RESULTS
+            |=  [@TA =COMPOSE-RESULT]
+            =(%ERROR -.COMPOSE-RESULT)
           ::
-          ?^  error-list
-            [compose-result.i.error-list ..run-crane]
-          ::  if any sub-cranes block, return all blocks
+          ?^  ERROR-LIST
+            [COMPOSE-RESULT.I.ERROR-LIST ..RUN-CRANE]
+          ::  IF ANY SUB-CRANES BLOCK, RETURN ALL BLOCKS
           ::
-          =/  block-list=(list ^build)
-            =|  block-list=(list ^build)
+          =/  BLOCK-LIST=(LIST ^BUILD)
+            =|  BLOCK-LIST=(LIST ^BUILD)
             |-
-            ^+  block-list
-            ?~  crane-results
-              block-list
-            ?.  ?=(%block -.compose-result.i.crane-results)
-              $(crane-results t.crane-results)
-            =.  block-list
-              (weld builds.compose-result.i.crane-results block-list)
-            $(crane-results t.crane-results)
+            ^+  BLOCK-LIST
+            ?~  CRANE-RESULTS
+              BLOCK-LIST
+            ?.  ?=(%BLOCK -.COMPOSE-RESULT.I.CRANE-RESULTS)
+              $(CRANE-RESULTS T.CRANE-RESULTS)
+            =.  BLOCK-LIST
+              (WELD BUILDS.COMPOSE-RESULT.I.CRANE-RESULTS BLOCK-LIST)
+            $(CRANE-RESULTS T.CRANE-RESULTS)
           ::
-          ?^  block-list
-            [[%block block-list] ..run-crane]
-          ::  put the data in map order
+          ?^  BLOCK-LIST
+            [[%BLOCK BLOCK-LIST] ..RUN-CRANE]
+          ::  PUT THE DATA IN MAP ORDER
           ::
-          =/  result-map=(map @ta vase)
-            %-  my
-            %+  turn  crane-results
-            |=  [path=@ta =compose-result]
-            ^-  (pair @ta vase)
+          =/  RESULT-MAP=(MAP @TA VASE)
+            %-  MY
+            %+  TURN  CRANE-RESULTS
+            |=  [PATH=@TA =COMPOSE-RESULT]
+            ^-  (PAIR @TA VASE)
             ::
-            ?>  ?=([%subject *] compose-result)
-            [path q.subject.compose-result]
-          ::  convert the map into a flat format for return
+            ?>  ?=([%SUBJECT *] COMPOSE-RESULT)
+            [PATH Q.SUBJECT.COMPOSE-RESULT]
+          ::  CONVERT THE MAP INTO A FLAT FORMAT FOR RETURN
           ::
-          ::    This step flattens the values out of the map for return. Let's
-          ::    say we're doing a /_ over a directory of files that just have a
-          ::    single @ud in them. We want the return value of /_ to have the
-          ::    nest in (map @ta @ud) instead of returning a (map @ta vase).
+          ::    THIS STEP FLATTENS THE VALUES OUT OF THE MAP FOR RETURN. LET'S
+          ::    SAY WE'RE DOING A /_ OVER A DIRECTORY OF FILES THAT JUST HAVE A
+          ::    SINGLE @UD IN THEM. WE WANT THE RETURN VALUE OF /_ TO HAVE THE
+          ::    NEST IN (MAP @TA @UD) INSTEAD OF RETURNING A (MAP @TA VASE).
           ::
-          =/  as-vase=vase
+          =/  AS-VASE=VASE
             |-
-            ^-  vase
+            ^-  VASE
             ::
-            ?~  result-map
-              [[%atom %n `0] 0]
+            ?~  RESULT-MAP
+              [[%ATOM %N `0] 0]
             ::
-            %+  slop
-              (slop [[%atom %ta ~] p.n.result-map] q.n.result-map)
-            (slop $(result-map l.result-map) $(result-map r.result-map))
+            %+  SLOP
+              (SLOP [[%ATOM %TA ~] P.N.RESULT-MAP] Q.N.RESULT-MAP)
+            (SLOP $(RESULT-MAP L.RESULT-MAP) $(RESULT-MAP R.RESULT-MAP))
           ::
-          [[%subject %noun as-vase] ..run-crane]
-        ::  +run-fsdt: runs the `/.` rune
+          [[%SUBJECT %NOUN AS-VASE] ..RUN-CRANE]
+        ::  +RUN-FSDT: RUNS THE `/.` RUNE
         ::
-        ++  run-fsdt
-          |=  sub-cranes=(list ^crane)
-          ^-  compose-cranes
+        ++  RUN-FSDT
+          |=  SUB-CRANES=(LIST ^CRANE)
+          ^-  COMPOSE-CRANES
           ::
-          =^  list-results  ..run-crane
-            %+  roll  sub-cranes
-            |=  $:  sub-crane=^crane
-                    accumulator=[(list compose-result) _..run-crane]
+          =^  LIST-RESULTS  ..RUN-CRANE
+            %+  ROLL  SUB-CRANES
+            |=  $:  SUB-CRANE=^CRANE
+                    ACCUMULATOR=[(LIST COMPOSE-RESULT) _..RUN-CRANE]
                 ==
-            =.  ..run-crane  +.accumulator
-            =^  result  ..run-crane  (run-crane subject sub-crane)
-            [[result -.accumulator] ..run-crane]
-          ::  if any sub-cranes error, return the first error
+            =.  ..RUN-CRANE  +.ACCUMULATOR
+            =^  RESULT  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+            [[RESULT -.ACCUMULATOR] ..RUN-CRANE]
+          ::  IF ANY SUB-CRANES ERROR, RETURN THE FIRST ERROR
           ::
-          =/  error-list=(list compose-result)
-            %+  skim  list-results
-            |=  =compose-result
-            =(%error -.compose-result)
+          =/  ERROR-LIST=(LIST COMPOSE-RESULT)
+            %+  SKIM  LIST-RESULTS
+            |=  =COMPOSE-RESULT
+            =(%ERROR -.COMPOSE-RESULT)
           ::
-          ?^  error-list
-            [i.error-list ..run-crane]
-          ::  if any sub-cranes block, return all blocks
+          ?^  ERROR-LIST
+            [I.ERROR-LIST ..RUN-CRANE]
+          ::  IF ANY SUB-CRANES BLOCK, RETURN ALL BLOCKS
           ::
-          =/  block-list=(list ^build)
-            =|  block-list=(list ^build)
+          =/  BLOCK-LIST=(LIST ^BUILD)
+            =|  BLOCK-LIST=(LIST ^BUILD)
             |-
-            ^+  block-list
-            ?~  list-results
-              block-list
-            ?.  ?=(%block -.i.list-results)
-              $(list-results t.list-results)
-            =.  block-list  (weld builds.i.list-results block-list)
-            $(list-results t.list-results)
+            ^+  BLOCK-LIST
+            ?~  LIST-RESULTS
+              BLOCK-LIST
+            ?.  ?=(%BLOCK -.I.LIST-RESULTS)
+              $(LIST-RESULTS T.LIST-RESULTS)
+            =.  BLOCK-LIST  (WELD BUILDS.I.LIST-RESULTS BLOCK-LIST)
+            $(LIST-RESULTS T.LIST-RESULTS)
           ::
-          ?^  block-list
-            [[%block block-list] ..run-crane]
-          ::  concatenate all the results together with null termination
+          ?^  BLOCK-LIST
+            [[%BLOCK BLOCK-LIST] ..RUN-CRANE]
+          ::  CONCATENATE ALL THE RESULTS TOGETHER WITH NULL TERMINATION
           ::
-          =.  list-results  (flop list-results)
+          =.  LIST-RESULTS  (FLOP LIST-RESULTS)
           ::
-          =/  final-result=vase
+          =/  FINAL-RESULT=VASE
             |-
-            ^-  vase
-            ?~  list-results
-              [[%atom %n `~] 0]
-            ?>  ?=(%subject -.i.list-results)
-            (slop q.subject.i.list-results $(list-results t.list-results))
+            ^-  VASE
+            ?~  LIST-RESULTS
+              [[%ATOM %N `~] 0]
+            ?>  ?=(%SUBJECT -.I.LIST-RESULTS)
+            (SLOP Q.SUBJECT.I.LIST-RESULTS $(LIST-RESULTS T.LIST-RESULTS))
           ::
-          [[%subject %noun final-result] ..run-crane]
-        ::  +run-fssm: runs the `/;` rune
+          [[%SUBJECT %NOUN FINAL-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSSM: RUNS THE `/;` RUNE
         ::
-        ++  run-fssm
-          |=  [=hoon sub-crane=^crane]
-          ^-  compose-cranes
+        ++  RUN-FSSM
+          |=  [=HOON SUB-CRANE=^CRANE]
+          ^-  COMPOSE-CRANES
           ::
-          =^  child  ..run-crane  (run-crane subject sub-crane)
-          ?.  ?=([%subject *] child)
-            [child ..run-crane]
+          =^  CHILD  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+          ?.  ?=([%SUBJECT *] CHILD)
+            [CHILD ..RUN-CRANE]
           ::
-          =/  call-build=^build
-            [date.build [%call [%ride hoon [%$ subject]] [%$ subject.child]]]
-          =^  call-result  out  (depend-on call-build)
-          ?~  call-result
-            [[%block [call-build]~] ..run-crane]
-          ?:  ?=([~ %error *] call-result)
-            [[%error [leaf+"/; failed: " message.u.call-result]] ..run-crane]
-          ?>  ?=([~ %success %call *] call-result)
+          =/  CALL-BUILD=^BUILD
+            [DATE.BUILD [%CALL [%RIDE HOON [%$ SUBJECT]] [%$ SUBJECT.CHILD]]]
+          =^  CALL-RESULT  OUT  (DEPEND-ON CALL-BUILD)
+          ?~  CALL-RESULT
+            [[%BLOCK [CALL-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] CALL-RESULT)
+            [[%ERROR [LEAF+"/; FAILED: " MESSAGE.U.CALL-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %CALL *] CALL-RESULT)
           ::
-          [[%subject %noun vase.u.call-result] ..run-crane]
-        ::  +run-fscl: runs the `/:` rune
+          [[%SUBJECT %NOUN VASE.U.CALL-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSCL: RUNS THE `/:` RUNE
         ::
-        ++  run-fscl
-          |=  [=truss sub-crane=^crane]
-          ^-  compose-cranes
+        ++  RUN-FSCL
+          |=  [=TRUSS SUB-CRANE=^CRANE]
+          ^-  COMPOSE-CRANES
           ::
-          =/  beam-to-render=beam
-            [[ship.disc desk.disc %ud 0] spur]:path-to-render
+          =/  BEAM-TO-RENDER=BEAM
+            [[SHIP.DISC DESK.DISC %UD 0] SPUR]:PATH-TO-RENDER
           ::
-          =/  hoon-parser  (vang & (en-beam beam-to-render))
+          =/  HOON-PARSER  (VANG & (EN-BEAM BEAM-TO-RENDER))
           ::
-          =+  tuz=(posh:hoon-parser truss)
-          ?~  tuz
-            [[%error [leaf+"/: failed: bad tusk: {<truss>}"]~] ..run-crane]
-          =+  pax=(plex:hoon-parser %clsg u.tuz)
-          ?~  pax
-            [[%error [leaf+"/: failed: bad path: {<u.tuz>}"]~] ..run-crane]
-          =+  bem=(de-beam u.pax)
-          ?~  bem
-            [[%error [leaf+"/: failed: bad beam: {<u.pax>}"]~] ..run-crane]
+          =+  TUZ=(POSH:HOON-PARSER TRUSS)
+          ?~  TUZ
+            [[%ERROR [LEAF+"/: FAILED: BAD TUSK: {<TRUSS>}"]~] ..RUN-CRANE]
+          =+  PAX=(PLEX:HOON-PARSER %CLSG U.TUZ)
+          ?~  PAX
+            [[%ERROR [LEAF+"/: FAILED: BAD PATH: {<U.TUZ>}"]~] ..RUN-CRANE]
+          =+  BEM=(DE-BEAM U.PAX)
+          ?~  BEM
+            [[%ERROR [LEAF+"/: FAILED: BAD BEAM: {<U.PAX>}"]~] ..RUN-CRANE]
           ::
-          =.  path-to-render  [[p q] s]:u.bem
-          (run-crane subject sub-crane)
-        ::  +run-fskt: runs the `/^` rune
+          =.  PATH-TO-RENDER  [[P Q] S]:U.BEM
+          (RUN-CRANE SUBJECT SUB-CRANE)
+        ::  +RUN-FSKT: RUNS THE `/^` RUNE
         ::
-        ++  run-fskt
-          |=  [=spec sub-crane=^crane]
-          ^-  compose-cranes
+        ++  RUN-FSKT
+          |=  [=SPEC SUB-CRANE=^CRANE]
+          ^-  COMPOSE-CRANES
           ::
-          =^  child  ..run-crane  (run-crane subject sub-crane)
-          ?.  ?=([%subject *] child)
-            [child ..run-crane]
+          =^  CHILD  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+          ?.  ?=([%SUBJECT *] CHILD)
+            [CHILD ..RUN-CRANE]
           ::
-          =/  bunt-build=^build
-            [date.build [%ride [%kttr spec] [%$ subject]]]
-          =^  bunt-result  out  (depend-on bunt-build)
-          ?~  bunt-result
-            [[%block [bunt-build]~] ..run-crane]
-          ?:  ?=([~ %error *] bunt-result)
-            [[%error [leaf+"/^ failed: " message.u.bunt-result]] ..run-crane]
-          ?>  ?=([~ %success %ride *] bunt-result)
+          =/  BUNT-BUILD=^BUILD
+            [DATE.BUILD [%RIDE [%KTTR SPEC] [%$ SUBJECT]]]
+          =^  BUNT-RESULT  OUT  (DEPEND-ON BUNT-BUILD)
+          ?~  BUNT-RESULT
+            [[%BLOCK [BUNT-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] BUNT-RESULT)
+            [[%ERROR [LEAF+"/^ FAILED: " MESSAGE.U.BUNT-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %RIDE *] BUNT-RESULT)
           ::
-          ?.  (~(nest ut p.vase.u.bunt-result) | p.q.subject.child)
-            [[%error [leaf+"/^ failed: nest-fail"]~] ..run-crane]
-          :_  ..run-crane
-          [%subject %noun [p.vase.u.bunt-result q.q.subject.child]]
-        ::  +run-fstr: runs the `/*` rune
+          ?.  (~(NEST UT P.VASE.U.BUNT-RESULT) | P.Q.SUBJECT.CHILD)
+            [[%ERROR [LEAF+"/^ FAILED: NEST-FAIL"]~] ..RUN-CRANE]
+          :_  ..RUN-CRANE
+          [%SUBJECT %NOUN [P.VASE.U.BUNT-RESULT Q.Q.SUBJECT.CHILD]]
+        ::  +RUN-FSTR: RUNS THE `/*` RUNE
         ::
-        ::    TODO: some duplicate code with +run-fscb
+        ::    TODO: SOME DUPLICATE CODE WITH +RUN-FSCB
         ::
-        ++  run-fstr
-          |=  sub-crane=^crane
-          ^-  compose-cranes
+        ++  RUN-FSTR
+          |=  SUB-CRANE=^CRANE
+          ^-  COMPOSE-CRANES
           ::
-          =/  tree-build=^build
-            [date.build [%scry [%c %t path-to-render]]]
+          =/  TREE-BUILD=^BUILD
+            [DATE.BUILD [%SCRY [%C %T PATH-TO-RENDER]]]
           ::
-          =^  tree-result  out  (depend-on tree-build)
-          ?~  tree-result
-            [[%block ~[tree-build]] ..run-crane]
+          =^  TREE-RESULT  OUT  (DEPEND-ON TREE-BUILD)
+          ?~  TREE-RESULT
+            [[%BLOCK ~[TREE-BUILD]] ..RUN-CRANE]
           ::
-          ?:  ?=([~ %error *] tree-result)
-            :-  [%error [%leaf "/* failed: "] message.u.tree-result]
-            ..run-crane
-          ?>  ?=([~ %success %scry *] tree-result)
+          ?:  ?=([~ %ERROR *] TREE-RESULT)
+            :-  [%ERROR [%LEAF "/* FAILED: "] MESSAGE.U.TREE-RESULT]
+            ..RUN-CRANE
+          ?>  ?=([~ %SUCCESS %SCRY *] TREE-RESULT)
           ::
-          =/  file-list=(list path)  ;;((list path) q.q.cage.u.tree-result)
-          ::  trim file extensions off the file paths
+          =/  FILE-LIST=(LIST PATH)  ;;((LIST PATH) Q.Q.CAGE.U.TREE-RESULT)
+          ::  TRIM FILE EXTENSIONS OFF THE FILE PATHS
           ::
-          ::    This is pretty ugly, but Ford expects :path-to-render not to
-          ::    have a file extension, so we need to trim it off each path.
+          ::    THIS IS PRETTY UGLY, BUT FORD EXPECTS :PATH-TO-RENDER NOT TO
+          ::    HAVE A FILE EXTENSION, SO WE NEED TO TRIM IT OFF EACH PATH.
           ::
-          =.  file-list
-            ::  deduplicate since multiple files could share a trimmed path
+          =.  FILE-LIST
+            ::  DEDUPLICATE SINCE MULTIPLE FILES COULD SHARE A TRIMMED PATH
             ::
-            =-  ~(tap in (~(gas in *(set path)) `(list path)`-))
-            %+  turn  file-list
-            |=  =path
-            ^+  path
-            (scag (sub (lent path) 1) path)
+            =-  ~(TAP IN (~(GAS IN *(SET PATH)) `(LIST PATH)`-))
+            %+  TURN  FILE-LIST
+            |=  =PATH
+            ^+  PATH
+            (SCAG (SUB (LENT PATH) 1) PATH)
           ::
-          =/  old-path-to-render  path-to-render
-          ::  apply each of the paths in :file-list to the :sub-crane
+          =/  OLD-PATH-TO-RENDER  PATH-TO-RENDER
+          ::  APPLY EACH OF THE PATHS IN :FILE-LIST TO THE :SUB-CRANE
           ::
-          =^  crane-results  ..run-crane
-            %+  roll  file-list
-            |=  $:  =path
-                    $=  accumulator
-                    [(list [=path =compose-result]) _..run-crane]
+          =^  CRANE-RESULTS  ..RUN-CRANE
+            %+  ROLL  FILE-LIST
+            |=  $:  =PATH
+                    $=  ACCUMULATOR
+                    [(LIST [=PATH =COMPOSE-RESULT]) _..RUN-CRANE]
                 ==
-            =.  ..run-crane  +.accumulator
-            =.  spur.path-to-render  (flop path)
+            =.  ..RUN-CRANE  +.ACCUMULATOR
+            =.  SPUR.PATH-TO-RENDER  (FLOP PATH)
             ::
-            =^  result  ..run-crane  (run-crane subject sub-crane)
-            [[[path result] -.accumulator] ..run-crane]
+            =^  RESULT  ..RUN-CRANE  (RUN-CRANE SUBJECT SUB-CRANE)
+            [[[PATH RESULT] -.ACCUMULATOR] ..RUN-CRANE]
           ::
-          =.  path-to-render  old-path-to-render
-          ::  if any sub-cranes error, return the first error
+          =.  PATH-TO-RENDER  OLD-PATH-TO-RENDER
+          ::  IF ANY SUB-CRANES ERROR, RETURN THE FIRST ERROR
           ::
-          =/  error-list=(list [=path =compose-result])
-            %+  skim  crane-results
-            |=  [=path =compose-result]
-            =(%error -.compose-result)
+          =/  ERROR-LIST=(LIST [=PATH =COMPOSE-RESULT])
+            %+  SKIM  CRANE-RESULTS
+            |=  [=PATH =COMPOSE-RESULT]
+            =(%ERROR -.COMPOSE-RESULT)
           ::
-          ?^  error-list
-            [compose-result.i.error-list ..run-crane]
-          ::  if any sub-cranes block, return all blocks
+          ?^  ERROR-LIST
+            [COMPOSE-RESULT.I.ERROR-LIST ..RUN-CRANE]
+          ::  IF ANY SUB-CRANES BLOCK, RETURN ALL BLOCKS
           ::
-          =/  block-list=(list ^build)
-            =|  block-list=(list ^build)
-            |-  ^+  block-list
-            ?~  crane-results  block-list
+          =/  BLOCK-LIST=(LIST ^BUILD)
+            =|  BLOCK-LIST=(LIST ^BUILD)
+            |-  ^+  BLOCK-LIST
+            ?~  CRANE-RESULTS  BLOCK-LIST
             ::
-            ?.  ?=(%block -.compose-result.i.crane-results)
-              $(crane-results t.crane-results)
-            =.  block-list
-              (weld builds.compose-result.i.crane-results block-list)
+            ?.  ?=(%BLOCK -.COMPOSE-RESULT.I.CRANE-RESULTS)
+              $(CRANE-RESULTS T.CRANE-RESULTS)
+            =.  BLOCK-LIST
+              (WELD BUILDS.COMPOSE-RESULT.I.CRANE-RESULTS BLOCK-LIST)
             ::
-            $(crane-results t.crane-results)
+            $(CRANE-RESULTS T.CRANE-RESULTS)
           ::
-          ?^  block-list
-            [[%block block-list] ..run-crane]
+          ?^  BLOCK-LIST
+            [[%BLOCK BLOCK-LIST] ..RUN-CRANE]
           ::
-          =/  result-map=(map path vase)
-            %-  my
-            %+  turn  crane-results
-            |=  [=path =compose-result]
-            ^-  (pair ^path vase)
+          =/  RESULT-MAP=(MAP PATH VASE)
+            %-  MY
+            %+  TURN  CRANE-RESULTS
+            |=  [=PATH =COMPOSE-RESULT]
+            ^-  (PAIR ^PATH VASE)
             ::
-            ?>  ?=(%subject -.compose-result)
-            [path q.subject.compose-result]
+            ?>  ?=(%SUBJECT -.COMPOSE-RESULT)
+            [PATH Q.SUBJECT.COMPOSE-RESULT]
           ::
-          =/  as-vase
-            =/  path-type  -:!>(*path)
-            |-  ^-  vase
-            ?~  result-map  [[%atom %n `0] 0]
+          =/  AS-VASE
+            =/  PATH-TYPE  -:!>(*PATH)
+            |-  ^-  VASE
+            ?~  RESULT-MAP  [[%ATOM %N `0] 0]
             ::
-            %+  slop
-              (slop [path-type p.n.result-map] q.n.result-map)
-            (slop $(result-map l.result-map) $(result-map r.result-map))
+            %+  SLOP
+              (SLOP [PATH-TYPE P.N.RESULT-MAP] Q.N.RESULT-MAP)
+            (SLOP $(RESULT-MAP L.RESULT-MAP) $(RESULT-MAP R.RESULT-MAP))
           ::
-          [[%subject %noun as-vase] ..run-crane]
-        ::  +run-fszp: runs the `/!mark/` "rune"
+          [[%SUBJECT %NOUN AS-VASE] ..RUN-CRANE]
+        ::  +RUN-FSZP: RUNS THE `/!MARK/` "RUNE"
         ::
-        ++  run-fszp
-          |=  =mark
-          ^-  compose-cranes
+        ++  RUN-FSZP
+          |=  =MARK
+          ^-  COMPOSE-CRANES
           ::
-          =/  hoon-path=rail
-            =,  path-to-render
-            [disc [%hoon spur]]
+          =/  HOON-PATH=RAIL
+            =,  PATH-TO-RENDER
+            [DISC [%HOON SPUR]]
           ::
-          =/  hood-build=^build  [date.build [%hood hoon-path]]
-          =^  hood-result  out  (depend-on hood-build)
-          ?~  hood-result
-            [[%block [hood-build]~] ..run-crane]
-          ?:  ?=([~ %error *] hood-result)
-            [[%error [leaf+"/! failed: " message.u.hood-result]] ..run-crane]
-          ?>  ?=([~ %success %hood *] hood-result)
+          =/  HOOD-BUILD=^BUILD  [DATE.BUILD [%HOOD HOON-PATH]]
+          =^  HOOD-RESULT  OUT  (DEPEND-ON HOOD-BUILD)
+          ?~  HOOD-RESULT
+            [[%BLOCK [HOOD-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] HOOD-RESULT)
+            [[%ERROR [LEAF+"/! FAILED: " MESSAGE.U.HOOD-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %HOOD *] HOOD-RESULT)
           ::
-          =/  plan-build=^build
-            :-  date.build
-            [%plan path-to-render query-string scaffold.u.hood-result]
-          =^  plan-result  out  (depend-on plan-build)
-          ?~  plan-result
-            [[%block [plan-build]~] ..run-crane]
-          ?:  ?=([~ %error *] plan-result)
-            [[%error [leaf+"/! failed: " message.u.plan-result]] ..run-crane]
-          ?>  ?=([~ %success %plan *] plan-result)
-          ::  if :mark is %noun, don't perform mark translation; just return
+          =/  PLAN-BUILD=^BUILD
+            :-  DATE.BUILD
+            [%PLAN PATH-TO-RENDER QUERY-STRING SCAFFOLD.U.HOOD-RESULT]
+          =^  PLAN-RESULT  OUT  (DEPEND-ON PLAN-BUILD)
+          ?~  PLAN-RESULT
+            [[%BLOCK [PLAN-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] PLAN-RESULT)
+            [[%ERROR [LEAF+"/! FAILED: " MESSAGE.U.PLAN-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %PLAN *] PLAN-RESULT)
+          ::  IF :MARK IS %NOUN, DON'T PERFORM MARK TRANSLATION; JUST RETURN
           ::
-          ::    If we were to verify the product type with %noun, this would
-          ::    cast to *, which would overwrite :vase.u.plan-result's actual
-          ::    product type
+          ::    IF WE WERE TO VERIFY THE PRODUCT TYPE WITH %NOUN, THIS WOULD
+          ::    CAST TO *, WHICH WOULD OVERWRITE :VASE.U.PLAN-RESULT'S ACTUAL
+          ::    PRODUCT TYPE
           ::
-          ?:  =(%noun mark)
-            [[%subject %noun vase.u.plan-result] ..run-crane]
+          ?:  =(%NOUN MARK)
+            [[%SUBJECT %NOUN VASE.U.PLAN-RESULT] ..RUN-CRANE]
           ::
-          =/  vale-build=^build
-            :-  date.build
-            [%vale disc.source-rail.scaffold mark q.vase.u.plan-result]
-          =^  vale-result  out  (depend-on vale-build)
-          ?~  vale-result
-            [[%block [vale-build]~] ..run-crane]
-          ?:  ?=([~ %error *] vale-result)
-            [[%error [leaf+"/! failed: " message.u.vale-result]] ..run-crane]
-          ?>  ?=([~ %success %vale *] vale-result)
+          =/  VALE-BUILD=^BUILD
+            :-  DATE.BUILD
+            [%VALE DISC.SOURCE-RAIL.SCAFFOLD MARK Q.VASE.U.PLAN-RESULT]
+          =^  VALE-RESULT  OUT  (DEPEND-ON VALE-BUILD)
+          ?~  VALE-RESULT
+            [[%BLOCK [VALE-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] VALE-RESULT)
+            [[%ERROR [LEAF+"/! FAILED: " MESSAGE.U.VALE-RESULT]] ..RUN-CRANE]
+          ?>  ?=([~ %SUCCESS %VALE *] VALE-RESULT)
           ::
-          [[%subject cage.u.vale-result] ..run-crane]
-        ::  +run-fszy: runs the `/mark/` "rune"
+          [[%SUBJECT CAGE.U.VALE-RESULT] ..RUN-CRANE]
+        ::  +RUN-FSZY: RUNS THE `/MARK/` "RUNE"
         ::
-        ++  run-fszy
-          |=  =mark
-          ^-  compose-cranes
+        ++  RUN-FSZY
+          |=  =MARK
+          ^-  COMPOSE-CRANES
           ::
-          =/  bake-build=^build
-            :-  date.build
-            [%bake mark query-string path-to-render]
-          =^  bake-result  out  (depend-on bake-build)
-          ?~  bake-result
-            [[%block [bake-build]~] ..run-crane]
-          ?:  ?=([~ %error *] bake-result)
-            :_  ..run-crane
-            [%error [leaf+"/{(trip mark)}/ failed: " message.u.bake-result]]
-          ?>  ?=([~ %success %bake *] bake-result)
+          =/  BAKE-BUILD=^BUILD
+            :-  DATE.BUILD
+            [%BAKE MARK QUERY-STRING PATH-TO-RENDER]
+          =^  BAKE-RESULT  OUT  (DEPEND-ON BAKE-BUILD)
+          ?~  BAKE-RESULT
+            [[%BLOCK [BAKE-BUILD]~] ..RUN-CRANE]
+          ?:  ?=([~ %ERROR *] BAKE-RESULT)
+            :_  ..RUN-CRANE
+            [%ERROR [LEAF+"/{(TRIP MARK)}/ FAILED: " MESSAGE.U.BAKE-RESULT]]
+          ?>  ?=([~ %SUCCESS %BAKE *] BAKE-RESULT)
           ::
-          [[%subject cage.u.bake-result] ..run-crane]
+          [[%SUBJECT CAGE.U.BAKE-RESULT] ..RUN-CRANE]
         --
-      ::  +gather-path-builds: produce %path builds to resolve import paths
+      ::  +GATHER-PATH-BUILDS: PRODUCE %PATH BUILDS TO RESOLVE IMPORT PATHS
       ::
-      ++  gather-path-builds
-        |=  imports=(list [prefix=?(%sur %lib) =cable])
-        ^-  (list ^build)
+      ++  GATHER-PATH-BUILDS
+        |=  IMPORTS=(LIST [PREFIX=?(%SUR %LIB) =CABLE])
+        ^-  (LIST ^BUILD)
         ::
-        %+  turn  imports
-        |=  [prefix=?(%sur %lib) =cable]
-        ^-  ^build
-        [date.build [%path disc.source-rail.scaffold prefix file-path.cable]]
-      ::  +resolve-builds: run a list of builds and collect results
+        %+  TURN  IMPORTS
+        |=  [PREFIX=?(%SUR %LIB) =CABLE]
+        ^-  ^BUILD
+        [DATE.BUILD [%PATH DISC.SOURCE-RAIL.SCAFFOLD PREFIX FILE-PATH.CABLE]]
+      ::  +RESOLVE-BUILDS: RUN A LIST OF BUILDS AND COLLECT RESULTS
       ::
-      ::    If a build blocks, put its +tang in :error-message and stop.
-      ::    All builds that block get put in :blocks. Results of
-      ::    successful builds are produced in :results.
+      ::    IF A BUILD BLOCKS, PUT ITS +TANG IN :ERROR-MESSAGE AND STOP.
+      ::    ALL BUILDS THAT BLOCK GET PUT IN :BLOCKS. RESULTS OF
+      ::    SUCCESSFUL BUILDS ARE PRODUCED IN :RESULTS.
       ::
-      ++  resolve-builds
-        =|  results=(list build-result)
-        |=  builds=(list ^build)
-        ^+  [results ..^$]
+      ++  RESOLVE-BUILDS
+        =|  RESULTS=(LIST BUILD-RESULT)
+        |=  BUILDS=(LIST ^BUILD)
+        ^+  [RESULTS ..^$]
         ::
-        ?~  builds
-          [results ..^$]
+        ?~  BUILDS
+          [RESULTS ..^$]
         ::
-        =^  result  out  (depend-on i.builds)
-        ?~  result
-          =.  blocks  [i.builds blocks]
-          $(builds t.builds)
+        =^  RESULT  OUT  (DEPEND-ON I.BUILDS)
+        ?~  RESULT
+          =.  BLOCKS  [I.BUILDS BLOCKS]
+          $(BUILDS T.BUILDS)
         ::
-        ?.  ?=(%success -.u.result)
-          =.  error-message  [[%leaf "%plan failed: "] message.u.result]
-          [results ..^$]
+        ?.  ?=(%SUCCESS -.U.RESULT)
+          =.  ERROR-MESSAGE  [[%LEAF "%PLAN FAILED: "] MESSAGE.U.RESULT]
+          [RESULTS ..^$]
         ::
-        =.  results  [u.result results]
-        $(builds t.builds)
-      ::  +gather-core-builds: produce %core builds from resolved paths
+        =.  RESULTS  [U.RESULT RESULTS]
+        $(BUILDS T.BUILDS)
+      ::  +GATHER-CORE-BUILDS: PRODUCE %CORE BUILDS FROM RESOLVED PATHS
       ::
-      ++  gather-core-builds
-        |=  path-results=(list build-result)
-        ^-  (list ^build)
-        %+  turn  path-results
-        |=  result=build-result
-        ^-  ^build
+      ++  GATHER-CORE-BUILDS
+        |=  PATH-RESULTS=(LIST BUILD-RESULT)
+        ^-  (LIST ^BUILD)
+        %+  TURN  PATH-RESULTS
+        |=  RESULT=BUILD-RESULT
+        ^-  ^BUILD
         ::
-        ?>  ?=([%success %path *] result)
+        ?>  ?=([%SUCCESS %PATH *] RESULT)
         ::
-        [date.build [%core rail.result]]
-      ::  +link-imports: link libraries and structures with standard library
+        [DATE.BUILD [%CORE RAIL.RESULT]]
+      ::  +LINK-IMPORTS: LINK LIBRARIES AND STRUCTURES WITH STANDARD LIBRARY
       ::
-      ::    Prepends each library vase onto the standard library vase.
-      ::    Wraps a face around each library to prevent namespace leakage
-      ::    unless imported as *lib-name.
+      ::    PREPENDS EACH LIBRARY VASE ONTO THE STANDARD LIBRARY VASE.
+      ::    WRAPS A FACE AROUND EACH LIBRARY TO PREVENT NAMESPACE LEAKAGE
+      ::    UNLESS IMPORTED AS *LIB-NAME.
       ::
-      ++  link-imports
-        |=  $:  imports=(list [?(%lib %sur) =cable])
-                reef=vase
-                core-results=(list build-result)
+      ++  LINK-IMPORTS
+        |=  $:  IMPORTS=(LIST [?(%LIB %SUR) =CABLE])
+                REEF=VASE
+                CORE-RESULTS=(LIST BUILD-RESULT)
             ==
-        ^-  vase
+        ^-  VASE
         ::
-        =/  subject=vase  reef
+        =/  SUBJECT=VASE  REEF
         ::
-        =/  core-vases=(list vase)
-          %+  turn  core-results
-          |=  result=build-result
-          ^-  vase
-          ?>  ?=([%success %core *] result)
-          vase.result
-        ::  link structures and libraries into a subject for compilation
+        =/  CORE-VASES=(LIST VASE)
+          %+  TURN  CORE-RESULTS
+          |=  RESULT=BUILD-RESULT
+          ^-  VASE
+          ?>  ?=([%SUCCESS %CORE *] RESULT)
+          VASE.RESULT
+        ::  LINK STRUCTURES AND LIBRARIES INTO A SUBJECT FOR COMPILATION
         ::
-        |-  ^+  subject
-        ?~  core-vases  subject
-        ?<  ?=(~ imports)
-        ::  cons this vase onto the head of the subject
+        |-  ^+  SUBJECT
+        ?~  CORE-VASES  SUBJECT
+        ?<  ?=(~ IMPORTS)
+        ::  CONS THIS VASE ONTO THE HEAD OF THE SUBJECT
         ::
-        =.  subject
-          %-  slop  :_  subject
-          ::  check if the programmer named the library
+        =.  SUBJECT
+          %-  SLOP  :_  SUBJECT
+          ::  CHECK IF THE PROGRAMMER NAMED THE LIBRARY
           ::
-          ?~  face.cable.i.imports
-            ::  no face assigned to this library, so use vase as-is
+          ?~  FACE.CABLE.I.IMPORTS
+            ::  NO FACE ASSIGNED TO THIS LIBRARY, SO USE VASE AS-IS
             ::
-            i.core-vases
-          ::  use the library name as a face to prevent namespace leakage
+            I.CORE-VASES
+          ::  USE THE LIBRARY NAME AS A FACE TO PREVENT NAMESPACE LEAKAGE
           ::
-          ^-  vase
-          [[%face u.face.cable.i.imports p.i.core-vases] q.i.core-vases]
+          ^-  VASE
+          [[%FACE U.FACE.CABLE.I.IMPORTS P.I.CORE-VASES] Q.I.CORE-VASES]
         ::
-        $(core-vases t.core-vases, imports t.imports)
+        $(CORE-VASES T.CORE-VASES, IMPORTS T.IMPORTS)
       --
     ::
-    ++  make-reef
-      ~%  %make-reef  ..^^$  ~
-      |=  =disc
-      ^-  build-receipt
+    ++  MAKE-REEF
+      ~%  %MAKE-REEF  ..^^$  ~
+      |=  =DISC
+      ^-  BUILD-RECEIPT
       ::
-      =/  hoon-scry
-        [date.build [%scry %c %x [disc /hoon/hoon/sys]]]
+      =/  HOON-SCRY
+        [DATE.BUILD [%SCRY %C %X [DISC /HOON/HOON/SYS]]]
       ::
-      =^  hoon-scry-result  out  (depend-on hoon-scry)
+      =^  HOON-SCRY-RESULT  OUT  (DEPEND-ON HOON-SCRY)
       ::
-      =/  arvo-scry
-        [date.build [%scry %c %x [disc /hoon/arvo/sys]]]
+      =/  ARVO-SCRY
+        [DATE.BUILD [%SCRY %C %X [DISC /HOON/ARVO/SYS]]]
       ::
-      =^  arvo-scry-result  out  (depend-on arvo-scry)
+      =^  ARVO-SCRY-RESULT  OUT  (DEPEND-ON ARVO-SCRY)
       ::
-      =/  zuse-scry
-        [date.build [%scry %c %x [disc /hoon/zuse/sys]]]
+      =/  ZUSE-SCRY
+        [DATE.BUILD [%SCRY %C %X [DISC /HOON/ZUSE/SYS]]]
       ::
-      =^  zuse-scry-result  out  (depend-on zuse-scry)
+      =^  ZUSE-SCRY-RESULT  OUT  (DEPEND-ON ZUSE-SCRY)
       ::
-      =|  blocks=(list ^build)
-      =?  blocks  ?=(~ hoon-scry-result)  [hoon-scry blocks]
-      =?  blocks  ?=(~ arvo-scry-result)  [arvo-scry blocks]
-      =?  blocks  ?=(~ zuse-scry-result)  [zuse-scry blocks]
+      =|  BLOCKS=(LIST ^BUILD)
+      =?  BLOCKS  ?=(~ HOON-SCRY-RESULT)  [HOON-SCRY BLOCKS]
+      =?  BLOCKS  ?=(~ ARVO-SCRY-RESULT)  [ARVO-SCRY BLOCKS]
+      =?  BLOCKS  ?=(~ ZUSE-SCRY-RESULT)  [ZUSE-SCRY BLOCKS]
       ::
-      ?^  blocks
-        (return-blocks blocks)
+      ?^  BLOCKS
+        (RETURN-BLOCKS BLOCKS)
       ::
-      ?.  ?=([~ %success %scry *] hoon-scry-result)
-        (wrap-error hoon-scry-result)
+      ?.  ?=([~ %SUCCESS %SCRY *] HOON-SCRY-RESULT)
+        (WRAP-ERROR HOON-SCRY-RESULT)
       ::
-      ?.  ?=([~ %success %scry *] arvo-scry-result)
-        (wrap-error arvo-scry-result)
+      ?.  ?=([~ %SUCCESS %SCRY *] ARVO-SCRY-RESULT)
+        (WRAP-ERROR ARVO-SCRY-RESULT)
       ::
-      ?.  ?=([~ %success %scry *] zuse-scry-result)
-        (wrap-error zuse-scry-result)
-      ::  short-circuit to :pit if asked for current %home desk
+      ?.  ?=([~ %SUCCESS %SCRY *] ZUSE-SCRY-RESULT)
+        (WRAP-ERROR ZUSE-SCRY-RESULT)
+      ::  SHORT-CIRCUIT TO :PIT IF ASKED FOR CURRENT %HOME DESK
       ::
-      ::    This avoids needing to recompile the kernel if we're asked
-      ::    for the kernel we're already running. Note that this fails
-      ::    referential transparency if |autoload is turned off.
+      ::    THIS AVOIDS NEEDING TO RECOMPILE THE KERNEL IF WE'RE ASKED
+      ::    FOR THE KERNEL WE'RE ALREADY RUNNING. NOTE THAT THIS FAILS
+      ::    REFERENTIAL TRANSPARENCY IF |AUTOLOAD IS TURNED OFF.
       ::
-      ?:  ?&  |(=(disc [our %home]) =(disc [our %base]))
-              ::  is :date.build the latest commit on the %home desk?
+      ?:  ?&  |(=(DISC [OUR %HOME]) =(DISC [OUR %BASE]))
+              ::  IS :DATE.BUILD THE LATEST COMMIT ON THE %HOME DESK?
               ::
-              ?|  =(now date.build)
+              ?|  =(NOW DATE.BUILD)
                   ::
-                  =/  =beam  [[our %home [%da date.build]] /hoon/hoon/sys]
+                  =/  =BEAM  [[OUR %HOME [%DA DATE.BUILD]] /HOON/HOON/SYS]
                   ::
-                  .=  (scry [%141 %noun] ~ %cw beam)
-                  (scry [%141 %noun] ~ %cw beam(r [%da now]))
+                  .=  (SCRY [%141 %NOUN] ~ %CW BEAM)
+                  (SCRY [%141 %NOUN] ~ %CW BEAM(R [%DA NOW]))
           ==  ==
         ::
-        (return-result %success %reef pit)
-      ::  omit case from path to prevent cache misses
+        (RETURN-RESULT %SUCCESS %REEF PIT)
+      ::  OMIT CASE FROM PATH TO PREVENT CACHE MISSES
       ::
-      =/  hoon-path=path
-        /(scot %p ship.disc)/(scot %tas desk.disc)/hoon/hoon/sys
-      =/  hoon-hoon=(each hoon tang)
-        %-  mule  |.
-        (rain hoon-path ;;(@t q.q.cage.u.hoon-scry-result))
-      ?:  ?=(%| -.hoon-hoon)
-        (return-error leaf+"ford: %reef failed to compile hoon" p.hoon-hoon)
+      =/  HOON-PATH=PATH
+        /(SCOT %P SHIP.DISC)/(SCOT %TAS DESK.DISC)/HOON/HOON/SYS
+      =/  HOON-HOON=(EACH HOON TANG)
+        %-  MULE  |.
+        (RAIN HOON-PATH ;;(@T Q.Q.CAGE.U.HOON-SCRY-RESULT))
+      ?:  ?=(%| -.HOON-HOON)
+        (RETURN-ERROR LEAF+"FORD: %REEF FAILED TO COMPILE HOON" P.HOON-HOON)
       ::
-      =/  arvo-path=path
-        /(scot %p ship.disc)/(scot %tas desk.disc)/hoon/arvo/sys
-      =/  arvo-hoon=(each hoon tang)
-        %-  mule  |.
-        (rain arvo-path ;;(@t q.q.cage.u.arvo-scry-result))
-      ?:  ?=(%| -.arvo-hoon)
-        (return-error leaf+"ford: %reef failed to compile arvo" p.arvo-hoon)
+      =/  ARVO-PATH=PATH
+        /(SCOT %P SHIP.DISC)/(SCOT %TAS DESK.DISC)/HOON/ARVO/SYS
+      =/  ARVO-HOON=(EACH HOON TANG)
+        %-  MULE  |.
+        (RAIN ARVO-PATH ;;(@T Q.Q.CAGE.U.ARVO-SCRY-RESULT))
+      ?:  ?=(%| -.ARVO-HOON)
+        (RETURN-ERROR LEAF+"FORD: %REEF FAILED TO COMPILE ARVO" P.ARVO-HOON)
       ::
-      =/  zuse-path=path
-        /(scot %p ship.disc)/(scot %tas desk.disc)/hoon/zuse/sys
-      =/  zuse-hoon=(each hoon tang)
-        %-  mule  |.
-        (rain zuse-path ;;(@t q.q.cage.u.zuse-scry-result))
-      ?:  ?=(%| -.zuse-hoon)
-        (return-error leaf+"ford: %reef failed to compile zuse" p.zuse-hoon)
+      =/  ZUSE-PATH=PATH
+        /(SCOT %P SHIP.DISC)/(SCOT %TAS DESK.DISC)/HOON/ZUSE/SYS
+      =/  ZUSE-HOON=(EACH HOON TANG)
+        %-  MULE  |.
+        (RAIN ZUSE-PATH ;;(@T Q.Q.CAGE.U.ZUSE-SCRY-RESULT))
+      ?:  ?=(%| -.ZUSE-HOON)
+        (RETURN-ERROR LEAF+"FORD: %REEF FAILED TO COMPILE ZUSE" P.ZUSE-HOON)
       ::
-      =/  zuse-build=^build
-        :*  date.build
-            %ride  p.zuse-hoon
-            ::  hoon for `..is` to grab the :pit out of the arvo core
+      =/  ZUSE-BUILD=^BUILD
+        :*  DATE.BUILD
+            %RIDE  P.ZUSE-HOON
+            ::  HOON FOR `..IS` TO GRAB THE :PIT OUT OF THE ARVO CORE
             ::
-            %ride  [%cnts ~[[%& 1] %is] ~]
-            %ride  p.arvo-hoon
-            %ride  [%$ 7]
-            %ride  p.hoon-hoon
-            [%$ %noun !>(~)]
+            %RIDE  [%CNTS ~[[%& 1] %IS] ~]
+            %RIDE  P.ARVO-HOON
+            %RIDE  [%$ 7]
+            %RIDE  P.HOON-HOON
+            [%$ %NOUN !>(~)]
         ==
       ::
-      =^  zuse-build-result  out  (depend-on zuse-build)
-      ?~  zuse-build-result
-        (return-blocks [zuse-build]~)
+      =^  ZUSE-BUILD-RESULT  OUT  (DEPEND-ON ZUSE-BUILD)
+      ?~  ZUSE-BUILD-RESULT
+        (RETURN-BLOCKS [ZUSE-BUILD]~)
       ::
-      ?.  ?=([~ %success %ride *] zuse-build-result)
-        (wrap-error zuse-build-result)
+      ?.  ?=([~ %SUCCESS %RIDE *] ZUSE-BUILD-RESULT)
+        (WRAP-ERROR ZUSE-BUILD-RESULT)
       ::
-      (return-result %success %reef vase.u.zuse-build-result)
+      (RETURN-RESULT %SUCCESS %REEF VASE.U.ZUSE-BUILD-RESULT)
     ::
-    ++  make-ride
-      ~%  %make-ride  ..^^$  ~
-      |=  [formula=hoon =schematic]
-      ^-  build-receipt
+    ++  MAKE-RIDE
+      ~%  %MAKE-RIDE  ..^^$  ~
+      |=  [FORMULA=HOON =SCHEMATIC]
+      ^-  BUILD-RECEIPT
       ::
-      =^  result  out  (depend-on [date.build schematic])
-      ?~  result
-        (return-blocks [date.build schematic]~)
+      =^  RESULT  OUT  (DEPEND-ON [DATE.BUILD SCHEMATIC])
+      ?~  RESULT
+        (RETURN-BLOCKS [DATE.BUILD SCHEMATIC]~)
       ::
-      =*  subject-vase  q:(result-to-cage u.result)
-      =/  slim-schematic=^schematic  [%slim p.subject-vase formula]
-      =^  slim-result  out  (depend-on [date.build slim-schematic])
-      ?~  slim-result
-        (return-blocks [date.build slim-schematic]~)
+      =*  SUBJECT-VASE  Q:(RESULT-TO-CAGE U.RESULT)
+      =/  SLIM-SCHEMATIC=^SCHEMATIC  [%SLIM P.SUBJECT-VASE FORMULA]
+      =^  SLIM-RESULT  OUT  (DEPEND-ON [DATE.BUILD SLIM-SCHEMATIC])
+      ?~  SLIM-RESULT
+        (RETURN-BLOCKS [DATE.BUILD SLIM-SCHEMATIC]~)
       ::
-      ?:  ?=([~ %error *] slim-result)
-        %-  return-error
-        :*  [%leaf "ford: %ride failed to compute type:"]
-            message.u.slim-result
+      ?:  ?=([~ %ERROR *] SLIM-RESULT)
+        %-  RETURN-ERROR
+        :*  [%LEAF "FORD: %RIDE FAILED TO COMPUTE TYPE:"]
+            MESSAGE.U.SLIM-RESULT
         ==
       ::
-      ?>  ?=([~ %success %slim *] slim-result)
+      ?>  ?=([~ %SUCCESS %SLIM *] SLIM-RESULT)
       ::
-      =/  =compiler-cache-key  [%ride formula subject-vase]
-      =^  cached-result  out  (access-cache compiler-cache-key)
-      ?^  cached-result
-        (return-result u.cached-result)
+      =/  =COMPILER-CACHE-KEY  [%RIDE FORMULA SUBJECT-VASE]
+      =^  CACHED-RESULT  OUT  (ACCESS-CACHE COMPILER-CACHE-KEY)
+      ?^  CACHED-RESULT
+        (RETURN-RESULT U.CACHED-RESULT)
       ::
-      =/  val
-        (mock [q.subject-vase nock.u.slim-result] intercepted-scry)
-      ::  val is a toon, which might be a list of blocks.
+      =/  VAL
+        (MOCK [Q.SUBJECT-VASE NOCK.U.SLIM-RESULT] INTERCEPTED-SCRY)
+      ::  VAL IS A TOON, WHICH MIGHT BE A LIST OF BLOCKS.
       ::
-      ?-    -.val
+      ?-    -.VAL
       ::
           %0
-        (return-result %success %ride [type.u.slim-result p.val])
+        (RETURN-RESULT %SUCCESS %RIDE [TYPE.U.SLIM-RESULT P.VAL])
       ::
           %1
-        =/  blocked-paths=(list path)  ((hard (list path)) p.val)
-        (blocked-paths-to-receipt %ride blocked-paths)
+        =/  BLOCKED-PATHS=(LIST PATH)  ((HARD (LIST PATH)) P.VAL)
+        (BLOCKED-PATHS-TO-RECEIPT %RIDE BLOCKED-PATHS)
       ::
           %2
-        (return-error [[%leaf "ford: %ride failed to execute:"] p.val])
+        (RETURN-ERROR [[%LEAF "FORD: %RIDE FAILED TO EXECUTE:"] P.VAL])
       ==
     ::
-    ++  make-same
-      ~%  %make-same  ..^^$  ~
-      |=  =schematic
-      ^-  build-receipt
+    ++  MAKE-SAME
+      ~%  %MAKE-SAME  ..^^$  ~
+      |=  =SCHEMATIC
+      ^-  BUILD-RECEIPT
       ::
-      =^  result  out  (depend-on [date.build schematic])
+      =^  RESULT  OUT  (DEPEND-ON [DATE.BUILD SCHEMATIC])
       ::
-      ?~  result
-        (return-blocks [date.build schematic]~)
-      (return-result u.result)
+      ?~  RESULT
+        (RETURN-BLOCKS [DATE.BUILD SCHEMATIC]~)
+      (RETURN-RESULT U.RESULT)
     ::
-    ++  make-scry
-      ~%  %make-scry  ..^^$  ~
-      |=  =resource
-      ^-  build-receipt
-      ::  construct a full +beam to make the scry request
+    ++  MAKE-SCRY
+      ~%  %MAKE-SCRY  ..^^$  ~
+      |=  =RESOURCE
+      ^-  BUILD-RECEIPT
+      ::  CONSTRUCT A FULL +BEAM TO MAKE THE SCRY REQUEST
       ::
-      =/  =beam          (extract-beam resource `date.build)
-      =/  =scry-request  [vane.resource care.resource beam]
-      ::  perform scry operation if we don't already know the result
+      =/  =BEAM          (EXTRACT-BEAM RESOURCE `DATE.BUILD)
+      =/  =SCRY-REQUEST  [VANE.RESOURCE CARE.RESOURCE BEAM]
+      ::  PERFORM SCRY OPERATION IF WE DON'T ALREADY KNOW THE RESULT
       ::
-      ::    Look up :scry-request in :scry-results.per-event to avoid
-      ::    rerunning a previously blocked +scry.
+      ::    LOOK UP :SCRY-REQUEST IN :SCRY-RESULTS.PER-EVENT TO AVOID
+      ::    RERUNNING A PREVIOUSLY BLOCKED +SCRY.
       ::
-      =/  scry-response
-        ?:  (~(has by scry-results) scry-request)
-          (~(get by scry-results) scry-request)
-        (scry [%141 %noun] ~ `@tas`(cat 3 [vane care]:resource) beam)
-      ::  scry blocked
+      =/  SCRY-RESPONSE
+        ?:  (~(HAS BY SCRY-RESULTS) SCRY-REQUEST)
+          (~(GET BY SCRY-RESULTS) SCRY-REQUEST)
+        (SCRY [%141 %NOUN] ~ `@TAS`(CAT 3 [VANE CARE]:RESOURCE) BEAM)
+      ::  SCRY BLOCKED
       ::
-      ?~  scry-response
-        (return-blocks ~)
-      ::  scry failed
+      ?~  SCRY-RESPONSE
+        (RETURN-BLOCKS ~)
+      ::  SCRY FAILED
       ::
-      ?~  u.scry-response
-        %-  return-error
-        :~  leaf+"scry failed for"
-            leaf+:(weld "%c" (trip care.resource) " " (spud (en-beam beam)))
+      ?~  U.SCRY-RESPONSE
+        %-  RETURN-ERROR
+        :~  LEAF+"SCRY FAILED FOR"
+            LEAF+:(WELD "%C" (TRIP CARE.RESOURCE) " " (SPUD (EN-BEAM BEAM)))
         ==
-      ::  scry succeeded
+      ::  SCRY SUCCEEDED
       ::
-      (return-result %success %scry u.u.scry-response)
+      (RETURN-RESULT %SUCCESS %SCRY U.U.SCRY-RESPONSE)
     ::
-    ++  make-slim
-      ~%  %make-slim  ..^^$  ~
-      |=  [subject-type=type formula=hoon]
-      ^-  build-receipt
+    ++  MAKE-SLIM
+      ~%  %MAKE-SLIM  ..^^$  ~
+      |=  [SUBJECT-TYPE=TYPE FORMULA=HOON]
+      ^-  BUILD-RECEIPT
       ::
-      =/  =compiler-cache-key  [%slim subject-type formula]
-      =^  cached-result  out  (access-cache compiler-cache-key)
-      ?^  cached-result
-        (return-result u.cached-result)
+      =/  =COMPILER-CACHE-KEY  [%SLIM SUBJECT-TYPE FORMULA]
+      =^  CACHED-RESULT  OUT  (ACCESS-CACHE COMPILER-CACHE-KEY)
+      ?^  CACHED-RESULT
+        (RETURN-RESULT U.CACHED-RESULT)
       ::
-      =/  compiled=(each (pair type nock) tang)
-        (mule |.((~(mint ut subject-type) [%noun formula])))
+      =/  COMPILED=(EACH (PAIR TYPE NOCK) TANG)
+        (MULE |.((~(MINT UT SUBJECT-TYPE) [%NOUN FORMULA])))
       ::
-      %_    out
-          result
-        ?-  -.compiled
-          %|  [%build-result %error [leaf+"ford: %slim failed: " p.compiled]]
-          %&  [%build-result %success %slim p.compiled]
+      %_    OUT
+          RESULT
+        ?-  -.COMPILED
+          %|  [%BUILD-RESULT %ERROR [LEAF+"FORD: %SLIM FAILED: " P.COMPILED]]
+          %&  [%BUILD-RESULT %SUCCESS %SLIM P.COMPILED]
         ==
       ==
-    ::  TODO: Take in +type instead of +vase?
+    ::  TODO: TAKE IN +TYPE INSTEAD OF +VASE?
     ::
-    ++  make-slit
-      ~%  %make-slit  ..^^$  ~
-      |=  [gate=vase sample=vase]
-      ^-  build-receipt
+    ++  MAKE-SLIT
+      ~%  %MAKE-SLIT  ..^^$  ~
+      |=  [GATE=VASE SAMPLE=VASE]
+      ^-  BUILD-RECEIPT
       ::
-      =/  =compiler-cache-key  [%slit p.gate p.sample]
-      =^  cached-result  out  (access-cache compiler-cache-key)
-      ?^  cached-result
-        (return-result u.cached-result)
+      =/  =COMPILER-CACHE-KEY  [%SLIT P.GATE P.SAMPLE]
+      =^  CACHED-RESULT  OUT  (ACCESS-CACHE COMPILER-CACHE-KEY)
+      ?^  CACHED-RESULT
+        (RETURN-RESULT U.CACHED-RESULT)
       ::
-      =/  product=(each type tang)
-        (mule |.((slit p.gate p.sample)))
+      =/  PRODUCT=(EACH TYPE TANG)
+        (MULE |.((SLIT P.GATE P.SAMPLE)))
       ::
-      %_    out
-          result
-        ?-  -.product
-          %|  :*  %build-result   %error
-                  :*  (~(dunk ut p.sample) %have)
-                      (~(dunk ut (~(peek ut p.gate) %free 6)) %want)
-                      leaf+"ford: %slit failed:"
-                      p.product
+      %_    OUT
+          RESULT
+        ?-  -.PRODUCT
+          %|  :*  %BUILD-RESULT   %ERROR
+                  :*  (~(DUNK UT P.SAMPLE) %HAVE)
+                      (~(DUNK UT (~(PEEK UT P.GATE) %FREE 6)) %WANT)
+                      LEAF+"FORD: %SLIT FAILED:"
+                      P.PRODUCT
                   ==
               ==
-          %&  [%build-result %success %slit p.product]
+          %&  [%BUILD-RESULT %SUCCESS %SLIT P.PRODUCT]
         ==
       ==
     ::
-    ++  make-volt
-      ~%  %make-volt  ..^^$  ~
-      |=  [=disc mark=term input=*]
-      ^-  build-receipt
+    ++  MAKE-VOLT
+      ~%  %MAKE-VOLT  ..^^$  ~
+      |=  [=DISC MARK=TERM INPUT=*]
+      ^-  BUILD-RECEIPT
       ::
-      =/  bunt-build=^build  [date.build [%bunt disc mark]]
+      =/  BUNT-BUILD=^BUILD  [DATE.BUILD [%BUNT DISC MARK]]
       ::
-      =^  bunt-result  out  (depend-on bunt-build)
-      ?~  bunt-result
-        (return-blocks [bunt-build]~)
+      =^  BUNT-RESULT  OUT  (DEPEND-ON BUNT-BUILD)
+      ?~  BUNT-RESULT
+        (RETURN-BLOCKS [BUNT-BUILD]~)
       ::
-      ?:  ?=([~ %error *] bunt-result)
-        %-  return-error
-        :-  [%leaf "ford: %volt {<mark>} on {<disc>} failed:"]
-        message.u.bunt-result
+      ?:  ?=([~ %ERROR *] BUNT-RESULT)
+        %-  RETURN-ERROR
+        :-  [%LEAF "FORD: %VOLT {<MARK>} ON {<DISC>} FAILED:"]
+        MESSAGE.U.BUNT-RESULT
       ::
-      ?>  ?=([~ %success %bunt *] bunt-result)
+      ?>  ?=([~ %SUCCESS %BUNT *] BUNT-RESULT)
       ::
-      =/  =build-result
-        [%success %volt [mark p.q.cage.u.bunt-result input]]
+      =/  =BUILD-RESULT
+        [%SUCCESS %VOLT [MARK P.Q.CAGE.U.BUNT-RESULT INPUT]]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-vale
-      ~%  %make-vale  ..^^$  ~
-      ::  TODO: better docs
+    ++  MAKE-VALE
+      ~%  %MAKE-VALE  ..^^$  ~
+      ::  TODO: BETTER DOCS
       ::
-      |=  [=disc mark=term input=*]
-      ^-  build-receipt
-      ::  don't validate for the %noun mark
+      |=  [=DISC MARK=TERM INPUT=*]
+      ^-  BUILD-RECEIPT
+      ::  DON'T VALIDATE FOR THE %NOUN MARK
       ::
-      ?:  =(%noun mark)
-        =/  =build-result  [%success %vale [%noun %noun input]]
+      ?:  =(%NOUN MARK)
+        =/  =BUILD-RESULT  [%SUCCESS %VALE [%NOUN %NOUN INPUT]]
         ::
-        (return-result build-result)
+        (RETURN-RESULT BUILD-RESULT)
       ::
-      =/  path-build  [date.build [%path disc %mar mark]]
+      =/  PATH-BUILD  [DATE.BUILD [%PATH DISC %MAR MARK]]
       ::
-      =^  path-result  out  (depend-on path-build)
-      ?~  path-result
-        (return-blocks [path-build]~)
+      =^  PATH-RESULT  OUT  (DEPEND-ON PATH-BUILD)
+      ?~  PATH-RESULT
+        (RETURN-BLOCKS [PATH-BUILD]~)
       ::
-      ?:  ?=([~ %error *] path-result)
-        %-  return-error
-        :-  leaf+"ford: %vale failed while searching for {<mark>}:"
-        message.u.path-result
+      ?:  ?=([~ %ERROR *] PATH-RESULT)
+        %-  RETURN-ERROR
+        :-  LEAF+"FORD: %VALE FAILED WHILE SEARCHING FOR {<MARK>}:"
+        MESSAGE.U.PATH-RESULT
       ::
-      ?>  ?=([~ %success %path *] path-result)
+      ?>  ?=([~ %SUCCESS %PATH *] PATH-RESULT)
       ::
-      =/  bunt-build=^build  [date.build [%bunt disc mark]]
+      =/  BUNT-BUILD=^BUILD  [DATE.BUILD [%BUNT DISC MARK]]
       ::
-      =^  bunt-result  out  (depend-on bunt-build)
-      ?~  bunt-result
-        (return-blocks [bunt-build]~)
+      =^  BUNT-RESULT  OUT  (DEPEND-ON BUNT-BUILD)
+      ?~  BUNT-RESULT
+        (RETURN-BLOCKS [BUNT-BUILD]~)
       ::
-      ?.  ?=([~ %success %bunt *] bunt-result)
-        (wrap-error bunt-result)
+      ?.  ?=([~ %SUCCESS %BUNT *] BUNT-RESULT)
+        (WRAP-ERROR BUNT-RESULT)
       ::
-      =/  mark-sample=vase  q.cage.u.bunt-result
+      =/  MARK-SAMPLE=VASE  Q.CAGE.U.BUNT-RESULT
       ::
-      =/  call-build=^build
-        :^    date.build
-            %call
-          ^=  gate
-          :*  %ride
-              ::  (ream 'noun:grab')
-              formula=`hoon`[%tsld [%wing ~[%noun]] [%wing ~[%grab]]]
-              subject=`schematic`[%core rail.u.path-result]
+      =/  CALL-BUILD=^BUILD
+        :^    DATE.BUILD
+            %CALL
+          ^=  GATE
+          :*  %RIDE
+              ::  (REAM 'NOUN:GRAB')
+              FORMULA=`HOON`[%TSLD [%WING ~[%NOUN]] [%WING ~[%GRAB]]]
+              SUBJECT=`SCHEMATIC`[%CORE RAIL.U.PATH-RESULT]
           ==
-        sample=[%$ %noun %noun input]
+        SAMPLE=[%$ %NOUN %NOUN INPUT]
       ::
-      =^  call-result  out  (depend-on call-build)
-      ?~  call-result
-        (return-blocks [call-build]~)
+      =^  CALL-RESULT  OUT  (DEPEND-ON CALL-BUILD)
+      ?~  CALL-RESULT
+        (RETURN-BLOCKS [CALL-BUILD]~)
       ::
-      ?:  ?=([~ %error *] call-result)
+      ?:  ?=([~ %ERROR *] CALL-RESULT)
         ::
-        %-  return-error
-        =/  =beam
-          [[ship.disc desk.disc %da date.build] spur.rail.u.path-result]
-        :*  :-  %leaf
-            "ford: %vale failed: invalid input for mark: {<(en-beam beam)>}"
-            message.u.call-result
+        %-  RETURN-ERROR
+        =/  =BEAM
+          [[SHIP.DISC DESK.DISC %DA DATE.BUILD] SPUR.RAIL.U.PATH-RESULT]
+        :*  :-  %LEAF
+            "FORD: %VALE FAILED: INVALID INPUT FOR MARK: {<(EN-BEAM BEAM)>}"
+            MESSAGE.U.CALL-RESULT
         ==
       ::
-      ?>  ?=([~ %success %call *] call-result)
-      =/  product=vase  vase.u.call-result
-      ::  +grab might produce the wrong type
+      ?>  ?=([~ %SUCCESS %CALL *] CALL-RESULT)
+      =/  PRODUCT=VASE  VASE.U.CALL-RESULT
+      ::  +GRAB MIGHT PRODUCE THE WRONG TYPE
       ::
-      ?.  (~(nest ut p.mark-sample) | p.product)
-        %-  return-error
-        :~  leaf+"ford: %vale failed"
-            leaf+"+grab has wrong type in mark {<mark>} on disc {<disc>}"
+      ?.  (~(NEST UT P.MARK-SAMPLE) | P.PRODUCT)
+        %-  RETURN-ERROR
+        :~  LEAF+"FORD: %VALE FAILED"
+            LEAF+"+GRAB HAS WRONG TYPE IN MARK {<MARK>} ON DISC {<DISC>}"
         ==
       ::
-      =/  =build-result
-        [%success %vale [mark p.mark-sample q.product]]
+      =/  =BUILD-RESULT
+        [%SUCCESS %VALE [MARK P.MARK-SAMPLE Q.PRODUCT]]
       ::
-      (return-result build-result)
+      (RETURN-RESULT BUILD-RESULT)
     ::
-    ++  make-walk
-      ~%  %make-walk  ..^^$  ~
-      |=  [=disc source=term target=term]
-      ^-  build-receipt
-      ::  define some types used in this gate
+    ++  MAKE-WALK
+      ~%  %MAKE-WALK  ..^^$  ~
+      |=  [=DISC SOURCE=TERM TARGET=TERM]
+      ^-  BUILD-RECEIPT
+      ::  DEFINE SOME TYPES USED IN THIS GATE
       ::
       =>  |%
-          ::  +load-node: a queued arm to run from a mark core
+          ::  +LOAD-NODE: A QUEUED ARM TO RUN FROM A MARK CORE
           ::
-          +=  load-node  [type=?(%grab %grow) mark=term]
-          ::  edge-jug: directed graph from :source mark to :target marks
+          +=  LOAD-NODE  [TYPE=?(%GRAB %GROW) MARK=TERM]
+          ::  EDGE-JUG: DIRECTED GRAPH FROM :SOURCE MARK TO :TARGET MARKS
           ::
-          ::    :source can be converted to :target either by running
-          ::    its own +grow arm, or by running the target's +grab arm.
+          ::    :SOURCE CAN BE CONVERTED TO :TARGET EITHER BY RUNNING
+          ::    ITS OWN +GROW ARM, OR BY RUNNING THE TARGET'S +GRAB ARM.
           ::
-          +=  edge-jug  (jug source=term [target=term arm=?(%grow %grab)])
-          ::  mark-path: a path through the mark graph
+          +=  EDGE-JUG  (JUG SOURCE=TERM [TARGET=TERM ARM=?(%GROW %GRAB)])
+          ::  MARK-PATH: A PATH THROUGH THE MARK GRAPH
           ::
-          ::    +mark-path represents a series of mark translation
-          ::    operations to be performed to 'walk' from one mark to another.
+          ::    +MARK-PATH REPRESENTS A SERIES OF MARK TRANSLATION
+          ::    OPERATIONS TO BE PERFORMED TO 'WALK' FROM ONE MARK TO ANOTHER.
           ::
-          ::    +mark-action is defined in Zuse. It represents a conversion
-          ::    from a source mark to a target mark, and it specifies
-          ::    whether it will use +grow or +grab.
+          ::    +MARK-ACTION IS DEFINED IN ZUSE. IT REPRESENTS A CONVERSION
+          ::    FROM A SOURCE MARK TO A TARGET MARK, AND IT SPECIFIES
+          ::    WHETHER IT WILL USE +GROW OR +GRAB.
           ::
-          +=  mark-path  (list mark-action)
+          +=  MARK-PATH  (LIST MARK-ACTION)
           --
       ::
-      |^  ^-  build-receipt
-          ?:  =(source target)
-            (return-result %success %walk ~)
-          ::  load all marks.
+      |^  ^-  BUILD-RECEIPT
+          ?:  =(SOURCE TARGET)
+            (RETURN-RESULT %SUCCESS %WALK ~)
+          ::  LOAD ALL MARKS.
           ::
-          =^  marks-result  out
-            (load-marks-reachable-from [[%grow source] [%grab target] ~])
-          ?~  -.marks-result
-            out
-          ::  find a path through the graph
+          =^  MARKS-RESULT  OUT
+            (LOAD-MARKS-REACHABLE-FROM [[%GROW SOURCE] [%GRAB TARGET] ~])
+          ?~  -.MARKS-RESULT
+            OUT
+          ::  FIND A PATH THROUGH THE GRAPH
           ::
-          ::    Make a list of individual mark translation actions which will
-          ::    take us from :source to :term.
+          ::    MAKE A LIST OF INDIVIDUAL MARK TRANSLATION ACTIONS WHICH WILL
+          ::    TAKE US FROM :SOURCE TO :TERM.
           ::
-          =/  path  (find-path-through u.-.marks-result)
-          ::  if there is no path between these marks, give an error message
+          =/  PATH  (FIND-PATH-THROUGH U.-.MARKS-RESULT)
+          ::  IF THERE IS NO PATH BETWEEN THESE MARKS, GIVE AN ERROR MESSAGE
           ::
-          ?~  path
-            ::  we failed; surface errors from +load-marks-reachable-from
+          ?~  PATH
+            ::  WE FAILED; SURFACE ERRORS FROM +LOAD-MARKS-REACHABLE-FROM
             ::
-            =/  braces  [[' ' ' ' ~] ['{' ~] ['}' ~]]
-            =/  errors=(list tank)
-              %-  zing
-              %+  turn  ~(tap in +.marks-result)
-              |=  [mark=term err=tang]
-              ^-  tang
-              :~  [%leaf :(weld "while compiling " (trip mark) ":")]
-                  [%rose braces err]
+            =/  BRACES  [[' ' ' ' ~] ['{' ~] ['}' ~]]
+            =/  ERRORS=(LIST TANK)
+              %-  ZING
+              %+  TURN  ~(TAP IN +.MARKS-RESULT)
+              |=  [MARK=TERM ERR=TANG]
+              ^-  TANG
+              :~  [%LEAF :(WELD "WHILE COMPILING " (TRIP MARK) ":")]
+                  [%ROSE BRACES ERR]
               ==
             ::
-            %_    out
-                result
-              :*  %build-result  %error
-                  :*  :-  %leaf
-                      ;:  weld
-                        "ford: no mark path from "  (trip source)  " to "
-                        (trip target)
+            %_    OUT
+                RESULT
+              :*  %BUILD-RESULT  %ERROR
+                  :*  :-  %LEAF
+                      ;:  WELD
+                        "FORD: NO MARK PATH FROM "  (TRIP SOURCE)  " TO "
+                        (TRIP TARGET)
                       ==
-                      errors
+                      ERRORS
               ==  ==
             ==
           ::
-          (return-result %success %walk path)
-      ::  +load-marks-reachable-from: partial mark graph loading
+          (RETURN-RESULT %SUCCESS %WALK PATH)
+      ::  +LOAD-MARKS-REACHABLE-FROM: PARTIAL MARK GRAPH LOADING
       ::
-      ::    While we can just load all marks in the %/mar directory, this is
-      ::    rather slow. What we do instead is traverse forwards and backwards
-      ::    from the source and target marks: we start at the source mark,
-      ::    check all the grow arms, and then check their grow arms. At the
-      ::    same time, we start from the target mark, check all the grab arms,
-      ::    and then check their grab arms. This gives us a much smaller
-      ::    dependency set than loading the entire %/mar directory.
+      ::    WHILE WE CAN JUST LOAD ALL MARKS IN THE %/MAR DIRECTORY, THIS IS
+      ::    RATHER SLOW. WHAT WE DO INSTEAD IS TRAVERSE FORWARDS AND BACKWARDS
+      ::    FROM THE SOURCE AND TARGET MARKS: WE START AT THE SOURCE MARK,
+      ::    CHECK ALL THE GROW ARMS, AND THEN CHECK THEIR GROW ARMS. AT THE
+      ::    SAME TIME, WE START FROM THE TARGET MARK, CHECK ALL THE GRAB ARMS,
+      ::    AND THEN CHECK THEIR GRAB ARMS. THIS GIVES US A MUCH SMALLER
+      ::    DEPENDENCY SET THAN LOADING THE ENTIRE %/MAR DIRECTORY.
       ::
-      ++  load-marks-reachable-from
-        |=  queued-nodes=(list load-node)
-        ::  list of nodes in the graph that we've already checked
+      ++  LOAD-MARKS-REACHABLE-FROM
+        |=  QUEUED-NODES=(LIST LOAD-NODE)
+        ::  LIST OF NODES IN THE GRAPH THAT WE'VE ALREADY CHECKED
         ::
-        =|  visited=(set load-node)
-        ::  graph of the available edges
+        =|  VISITED=(SET LOAD-NODE)
+        ::  GRAPH OF THE AVAILABLE EDGES
         ::
-        =|  =edge-jug
-        ::  compile-failures: mark files which didn't compile
+        =|  =EDGE-JUG
+        ::  COMPILE-FAILURES: MARK FILES WHICH DIDN'T COMPILE
         ::
-        =|  compile-failures=(map term tang)
+        =|  COMPILE-FAILURES=(MAP TERM TANG)
         ::
         |-
-        ^-  [[(unit ^edge-jug) _compile-failures] _out]
-        ::  no ?~ to prevent tmi
+        ^-  [[(UNIT ^EDGE-JUG) _COMPILE-FAILURES] _OUT]
+        ::  NO ?~ TO PREVENT TMI
         ::
-        ?:  =(~ queued-nodes)
-          [[`edge-jug compile-failures] out]
+        ?:  =(~ QUEUED-NODES)
+          [[`EDGE-JUG COMPILE-FAILURES] OUT]
         ::
-        =/  nodes-and-schematics
-          %+  turn  queued-nodes
-          |=  =load-node
-          ^-  [^load-node schematic]
-          :-  load-node
-          [%path disc %mar mark.load-node]
-        ::  get the path for each mark name
+        =/  NODES-AND-SCHEMATICS
+          %+  TURN  QUEUED-NODES
+          |=  =LOAD-NODE
+          ^-  [^LOAD-NODE SCHEMATIC]
+          :-  LOAD-NODE
+          [%PATH DISC %MAR MARK.LOAD-NODE]
+        ::  GET THE PATH FOR EACH MARK NAME
         ::
-        ::    For %path builds, any ambiguous path is just filtered out.
+        ::    FOR %PATH BUILDS, ANY AMBIGUOUS PATH IS JUST FILTERED OUT.
         ::
-        =^  maybe-path-results  out
-          %-  perform-schematics  :*
-            ;:  weld
-              "ford: %walk from "  (trip source)  " to "  (trip target)
-              " contained failures:"
+        =^  MAYBE-PATH-RESULTS  OUT
+          %-  PERFORM-SCHEMATICS  :*
+            ;:  WELD
+              "FORD: %WALK FROM "  (TRIP SOURCE)  " TO "  (TRIP TARGET)
+              " CONTAINED FAILURES:"
             ==
-            nodes-and-schematics
-            %filter-errors
-            *load-node
+            NODES-AND-SCHEMATICS
+            %FILTER-ERRORS
+            *LOAD-NODE
           ==
-        ?~  maybe-path-results
-          [[~ ~] out]
+        ?~  MAYBE-PATH-RESULTS
+          [[~ ~] OUT]
         ::
-        =/  nodes-and-cores
-          %+  turn  u.maybe-path-results
-          |=  [=load-node =build-result]
-          ^-  [^load-node schematic]
+        =/  NODES-AND-CORES
+          %+  TURN  U.MAYBE-PATH-RESULTS
+          |=  [=LOAD-NODE =BUILD-RESULT]
+          ^-  [^LOAD-NODE SCHEMATIC]
           ::
-          ?>  ?=([%success %path *] build-result)
+          ?>  ?=([%SUCCESS %PATH *] BUILD-RESULT)
           ::
-          :-  load-node
-          [%core rail.build-result]
+          :-  LOAD-NODE
+          [%CORE RAIL.BUILD-RESULT]
         ::
-        =^  maybe-core-results  out
-          %-  perform-schematics  :*
-            ;:  weld
-              "ford: %walk from "  (trip source)  " to "  (trip target)
-              " contained failures:"
+        =^  MAYBE-CORE-RESULTS  OUT
+          %-  PERFORM-SCHEMATICS  :*
+            ;:  WELD
+              "FORD: %WALK FROM "  (TRIP SOURCE)  " TO "  (TRIP TARGET)
+              " CONTAINED FAILURES:"
             ==
-            nodes-and-cores
-            %ignore-errors
-            *load-node
+            NODES-AND-CORES
+            %IGNORE-ERRORS
+            *LOAD-NODE
           ==
-        ?~  maybe-core-results
-          [[~ ~] out]
-        ::  clear the queue before we process the new results
+        ?~  MAYBE-CORE-RESULTS
+          [[~ ~] OUT]
+        ::  CLEAR THE QUEUE BEFORE WE PROCESS THE NEW RESULTS
         ::
-        =.  queued-nodes  ~
+        =.  QUEUED-NODES  ~
         ::
-        =/  cores  u.maybe-core-results
+        =/  CORES  U.MAYBE-CORE-RESULTS
         ::
         |-
-        ?~  cores
+        ?~  CORES
           ^$
-        ::  mark this node as visited
+        ::  MARK THIS NODE AS VISITED
         ::
-        =.  visited  (~(put in visited) key.i.cores)
-        ::  add core errors to compile failures
+        =.  VISITED  (~(PUT IN VISITED) KEY.I.CORES)
+        ::  ADD CORE ERRORS TO COMPILE FAILURES
         ::
-        =?  compile-failures  ?=([%error *] result.i.cores)
-          %+  ~(put by compile-failures)  mark.key.i.cores
-          message.result.i.cores
+        =?  COMPILE-FAILURES  ?=([%ERROR *] RESULT.I.CORES)
+          %+  ~(PUT BY COMPILE-FAILURES)  MARK.KEY.I.CORES
+          MESSAGE.RESULT.I.CORES
         ::
-        =/  target-arms=(list load-node)
-          ?.  ?=([%success %core *] result.i.cores)
+        =/  TARGET-ARMS=(LIST LOAD-NODE)
+          ?.  ?=([%SUCCESS %CORE *] RESULT.I.CORES)
             ~
-          ?:  =(%grow type.key.i.cores)
-            (get-arms-of-type %grow vase.result.i.cores)
-          (get-arms-of-type %grab vase.result.i.cores)
-        ::  filter places we know we've already been.
+          ?:  =(%GROW TYPE.KEY.I.CORES)
+            (GET-ARMS-OF-TYPE %GROW VASE.RESULT.I.CORES)
+          (GET-ARMS-OF-TYPE %GRAB VASE.RESULT.I.CORES)
+        ::  FILTER PLACES WE KNOW WE'VE ALREADY BEEN.
         ::
-        =.  target-arms
-          %+  skip  target-arms  ~(has in visited)
-        =.  queued-nodes  (weld target-arms queued-nodes)
+        =.  TARGET-ARMS
+          %+  SKIP  TARGET-ARMS  ~(HAS IN VISITED)
+        =.  QUEUED-NODES  (WELD TARGET-ARMS QUEUED-NODES)
         ::
-        =.  edge-jug
+        =.  EDGE-JUG
           |-
-          ?~  target-arms
-            edge-jug
+          ?~  TARGET-ARMS
+            EDGE-JUG
           ::
-          =.  edge-jug
-            ?-    type.i.target-arms
+          =.  EDGE-JUG
+            ?-    TYPE.I.TARGET-ARMS
             ::
-                %grab
-              (~(put ju edge-jug) mark.i.target-arms [mark.key.i.cores %grab])
+                %GRAB
+              (~(PUT JU EDGE-JUG) MARK.I.TARGET-ARMS [MARK.KEY.I.CORES %GRAB])
             ::
-                %grow
-              (~(put ju edge-jug) mark.key.i.cores [mark.i.target-arms %grow])
+                %GROW
+              (~(PUT JU EDGE-JUG) MARK.KEY.I.CORES [MARK.I.TARGET-ARMS %GROW])
             ==
-          $(target-arms t.target-arms)
+          $(TARGET-ARMS T.TARGET-ARMS)
         ::
-        $(cores t.cores)
+        $(CORES T.CORES)
       ::
-      ++  get-arms-of-type
-        |=  [type=?(%grab %grow) =vase]
-        ^-  (list load-node)
-        ::  it is valid for this node to not have a +grow arm.
+      ++  GET-ARMS-OF-TYPE
+        |=  [TYPE=?(%GRAB %GROW) =VASE]
+        ^-  (LIST LOAD-NODE)
+        ::  IT IS VALID FOR THIS NODE TO NOT HAVE A +GROW ARM.
         ::
-        ?.  (slob type p.vase)
+        ?.  (SLOB TYPE P.VASE)
           ~
         ::
-        %+  turn
-          (sloe p:(slap vase [%limb type]))
-        |=  arm=term
-        [type arm]
-      ::  +find-path-through: breadth first search over the mark graph
+        %+  TURN
+          (SLOE P:(SLAP VASE [%LIMB TYPE]))
+        |=  ARM=TERM
+        [TYPE ARM]
+      ::  +FIND-PATH-THROUGH: BREADTH FIRST SEARCH OVER THE MARK GRAPH
       ::
-      ++  find-path-through
-        |=  edges=edge-jug
-        ^-  mark-path
-        ::  the source node starts out visited
-        =/  visited-nodes=(set mark)  [source ~ ~]
-        ::  these paths are flopped so we're always inserting to the front.
-        =|  path-queue=(qeu mark-path)
-        ::  start the queue with all the edges which start at the source mark
+      ++  FIND-PATH-THROUGH
+        |=  EDGES=EDGE-JUG
+        ^-  MARK-PATH
+        ::  THE SOURCE NODE STARTS OUT VISITED
+        =/  VISITED-NODES=(SET MARK)  [SOURCE ~ ~]
+        ::  THESE PATHS ARE FLOPPED SO WE'RE ALWAYS INSERTING TO THE FRONT.
+        =|  PATH-QUEUE=(QEU MARK-PATH)
+        ::  START THE QUEUE WITH ALL THE EDGES WHICH START AT THE SOURCE MARK
         ::
-        =.  path-queue
-          =/  start-links  (find-links-in-edges edges source)
+        =.  PATH-QUEUE
+          =/  START-LINKS  (FIND-LINKS-IN-EDGES EDGES SOURCE)
           ::
           |-
-          ^+  path-queue
-          ?~  start-links
-            path-queue
+          ^+  PATH-QUEUE
+          ?~  START-LINKS
+            PATH-QUEUE
           ::
-          =.  path-queue  (~(put to path-queue) [i.start-links]~)
+          =.  PATH-QUEUE  (~(PUT TO PATH-QUEUE) [I.START-LINKS]~)
           ::
-          $(start-links t.start-links)
+          $(START-LINKS T.START-LINKS)
         ::
         |-
-        ^-  mark-path
+        ^-  MARK-PATH
         ::
-        ?:  =(~ path-queue)
-          ::  no path found
+        ?:  =(~ PATH-QUEUE)
+          ::  NO PATH FOUND
           ~
-        =^  current  path-queue  [p q]:~(get to path-queue)
-        ?>  ?=(^ current)
+        =^  CURRENT  PATH-QUEUE  [P Q]:~(GET TO PATH-QUEUE)
+        ?>  ?=(^ CURRENT)
         ::
-        ?:  =(target target.i.current)
-          ::  we have a completed path. paths in the queue are backwards
-          (flop current)
+        ?:  =(TARGET TARGET.I.CURRENT)
+          ::  WE HAVE A COMPLETED PATH. PATHS IN THE QUEUE ARE BACKWARDS
+          (FLOP CURRENT)
         ::
-        =+  next-steps=(find-links-in-edges edges target.i.current)
-        ::  filter out already visited nodes
+        =+  NEXT-STEPS=(FIND-LINKS-IN-EDGES EDGES TARGET.I.CURRENT)
+        ::  FILTER OUT ALREADY VISITED NODES
         ::
-        =.  next-steps
-          %+  skip  next-steps
-          |=  link=mark-action
-          (~(has in visited-nodes) source.link)
-        ::  then add the new ones to the set of already visited nodes
+        =.  NEXT-STEPS
+          %+  SKIP  NEXT-STEPS
+          |=  LINK=MARK-ACTION
+          (~(HAS IN VISITED-NODES) SOURCE.LINK)
+        ::  THEN ADD THE NEW ONES TO THE SET OF ALREADY VISITED NODES
         ::
-        =.  visited-nodes
-          (~(gas in visited-nodes) (turn next-steps |=(mark-action source)))
-        ::  now all next steps go in the queue
+        =.  VISITED-NODES
+          (~(GAS IN VISITED-NODES) (TURN NEXT-STEPS |=(MARK-ACTION SOURCE)))
+        ::  NOW ALL NEXT STEPS GO IN THE QUEUE
         ::
-        =.  path-queue
-          %-  ~(gas to path-queue)
-          %+  turn  next-steps
-          |=  new-link=mark-action
-          [new-link current]
+        =.  PATH-QUEUE
+          %-  ~(GAS TO PATH-QUEUE)
+          %+  TURN  NEXT-STEPS
+          |=  NEW-LINK=MARK-ACTION
+          [NEW-LINK CURRENT]
         ::
         $
-      ::  +find-links-in-edges: gets edges usable by +find-path-through
+      ::  +FIND-LINKS-IN-EDGES: GETS EDGES USABLE BY +FIND-PATH-THROUGH
       ::
-      ::    This deals with disambiguating between %grab and %grow so we always
-      ::    pick %grab over %grow.
+      ::    THIS DEALS WITH DISAMBIGUATING BETWEEN %GRAB AND %GROW SO WE ALWAYS
+      ::    PICK %GRAB OVER %GROW.
       ::
-      ++  find-links-in-edges
-        |=  [edges=edge-jug source=term]
-        ^-  (list mark-action)
+      ++  FIND-LINKS-IN-EDGES
+        |=  [EDGES=EDGE-JUG SOURCE=TERM]
+        ^-  (LIST MARK-ACTION)
         ::
-        =+  links=~(tap in (~(get ju edges) source))
+        =+  LINKS=~(TAP IN (~(GET JU EDGES) SOURCE))
         ::
-        =|  results=(set mark-action)
+        =|  RESULTS=(SET MARK-ACTION)
         |-
-        ^-  (list mark-action)
-        ?~  links
-          ~(tap in results)
+        ^-  (LIST MARK-ACTION)
+        ?~  LINKS
+          ~(TAP IN RESULTS)
         ::
-        ?-    arm.i.links
-            %grab
-          ::  if :results has a %grow entry, remove it before adding our %grab
-          =/  grow-entry=mark-action  [%grow source target.i.links]
-          =?  results  (~(has in results) grow-entry)
-            (~(del in results) grow-entry)
+        ?-    ARM.I.LINKS
+            %GRAB
+          ::  IF :RESULTS HAS A %GROW ENTRY, REMOVE IT BEFORE ADDING OUR %GRAB
+          =/  GROW-ENTRY=MARK-ACTION  [%GROW SOURCE TARGET.I.LINKS]
+          =?  RESULTS  (~(HAS IN RESULTS) GROW-ENTRY)
+            (~(DEL IN RESULTS) GROW-ENTRY)
           ::
-          =.  results  (~(put in results) [%grab source target.i.links])
-          $(links t.links)
+          =.  RESULTS  (~(PUT IN RESULTS) [%GRAB SOURCE TARGET.I.LINKS])
+          $(LINKS T.LINKS)
         ::
-            %grow
-          ::  if :results has a %grab entry, don't add a %grow entry
-          ?:  (~(has in results) [%grab source target.i.links])
-            $(links t.links)
+            %GROW
+          ::  IF :RESULTS HAS A %GRAB ENTRY, DON'T ADD A %GROW ENTRY
+          ?:  (~(HAS IN RESULTS) [%GRAB SOURCE TARGET.I.LINKS])
+            $(LINKS T.LINKS)
           ::
-          =.  results  (~(put in results) [%grow source target.i.links])
-          $(links t.links)
+          =.  RESULTS  (~(PUT IN RESULTS) [%GROW SOURCE TARGET.I.LINKS])
+          $(LINKS T.LINKS)
         ==
       --
-    ::  |utilities:make: helper arms
+    ::  |UTILITIES:MAKE: HELPER ARMS
     ::
-    ::+|  utilities
+    ::+|  UTILITIES
     ::
-    ::  +perform-schematics: helper function that performs a list of builds
+    ::  +PERFORM-SCHEMATICS: HELPER FUNCTION THAT PERFORMS A LIST OF BUILDS
     ::
-    ::    We often need to run a list of builds. This helper method will
-    ::    depend on all :builds, will return a +build-receipt of either the
-    ::    blocks or the first error, or a list of all completed results.
+    ::    WE OFTEN NEED TO RUN A LIST OF BUILDS. THIS HELPER METHOD WILL
+    ::    DEPEND ON ALL :BUILDS, WILL RETURN A +BUILD-RECEIPT OF EITHER THE
+    ::    BLOCKS OR THE FIRST ERROR, OR A LIST OF ALL COMPLETED RESULTS.
     ::
-    ::    This is a wet gate so individual callers can associate their own
-    ::    key types with schematics.
+    ::    THIS IS A WET GATE SO INDIVIDUAL CALLERS CAN ASSOCIATE THEIR OWN
+    ::    KEY TYPES WITH SCHEMATICS.
     ::
-    ++  perform-schematics
-      |*  $:  failure=tape
-              builds=(list [key=* =schematic])
-              on-error=?(%fail-on-errors %filter-errors %ignore-errors)
-              key-bunt=*
+    ++  PERFORM-SCHEMATICS
+      |*  $:  FAILURE=TAPE
+              BUILDS=(LIST [KEY=* =SCHEMATIC])
+              ON-ERROR=?(%FAIL-ON-ERRORS %FILTER-ERRORS %IGNORE-ERRORS)
+              KEY-BUNT=*
           ==
-      ^-  $:  (unit (list [key=_key-bunt result=build-result]))
-              _out
+      ^-  $:  (UNIT (LIST [KEY=_KEY-BUNT RESULT=BUILD-RESULT]))
+              _OUT
           ==
       ::
-      |^  =^  results  out
-            =|  results=(list [_key-bunt ^build (unit build-result)])
+      |^  =^  RESULTS  OUT
+            =|  RESULTS=(LIST [_KEY-BUNT ^BUILD (UNIT BUILD-RESULT)])
             |-
-            ^+  [results out]
+            ^+  [RESULTS OUT]
             ::
-            ?~  builds
-              [results out]
+            ?~  BUILDS
+              [RESULTS OUT]
             ::
-            =/  sub-build=^build  [date.build schematic.i.builds]
-            =^  result  out  (depend-on sub-build)
-            =.  results  [[key.i.builds sub-build result] results]
+            =/  SUB-BUILD=^BUILD  [DATE.BUILD SCHEMATIC.I.BUILDS]
+            =^  RESULT  OUT  (DEPEND-ON SUB-BUILD)
+            =.  RESULTS  [[KEY.I.BUILDS SUB-BUILD RESULT] RESULTS]
             ::
-            $(builds t.builds)
-          ?:  =(%fail-on-errors on-error)
-            (check-errors results)
-          ?:  =(%filter-errors on-error)
-            (filter-errors results)
-          (handle-rest results)
+            $(BUILDS T.BUILDS)
+          ?:  =(%FAIL-ON-ERRORS ON-ERROR)
+            (CHECK-ERRORS RESULTS)
+          ?:  =(%FILTER-ERRORS ON-ERROR)
+            (FILTER-ERRORS RESULTS)
+          (HANDLE-REST RESULTS)
       ::
-      ++  check-errors
-        |=  results=(list [_key-bunt ^build (unit build-result)])
+      ++  CHECK-ERRORS
+        |=  RESULTS=(LIST [_KEY-BUNT ^BUILD (UNIT BUILD-RESULT)])
         ::
-        =/  braces  [[' ' ' ' ~] ['{' ~] ['}' ~]]
-        =/  errors=(list tank)
-          %+  murn  results
-          |=  [* * result=(unit build-result)]
-          ^-  (unit tank)
-          ?.  ?=([~ %error *] result)
+        =/  BRACES  [[' ' ' ' ~] ['{' ~] ['}' ~]]
+        =/  ERRORS=(LIST TANK)
+          %+  MURN  RESULTS
+          |=  [* * RESULT=(UNIT BUILD-RESULT)]
+          ^-  (UNIT TANK)
+          ?.  ?=([~ %ERROR *] RESULT)
             ~
-          `[%rose braces message.u.result]
+          `[%ROSE BRACES MESSAGE.U.RESULT]
         ::
-        ?^  errors
+        ?^  ERRORS
           :-  ~
-          %-  return-error
-          :-  [%leaf failure]
-          errors
+          %-  RETURN-ERROR
+          :-  [%LEAF FAILURE]
+          ERRORS
         ::
-        (handle-rest results)
+        (HANDLE-REST RESULTS)
       ::
-      ++  filter-errors
-        |=  results=(list [_key-bunt ^build (unit build-result)])
-        =.  results
-          %+  skip  results
-          |=  [* * r=(unit build-result)]
-          ?=([~ %error *] r)
-        (handle-rest results)
+      ++  FILTER-ERRORS
+        |=  RESULTS=(LIST [_KEY-BUNT ^BUILD (UNIT BUILD-RESULT)])
+        =.  RESULTS
+          %+  SKIP  RESULTS
+          |=  [* * R=(UNIT BUILD-RESULT)]
+          ?=([~ %ERROR *] R)
+        (HANDLE-REST RESULTS)
       ::
-      ++  handle-rest
-        |=  results=(list [_key-bunt ^build (unit build-result)])
-        ::  if any sub-builds blocked, produce all blocked sub-builds
+      ++  HANDLE-REST
+        |=  RESULTS=(LIST [_KEY-BUNT ^BUILD (UNIT BUILD-RESULT)])
+        ::  IF ANY SUB-BUILDS BLOCKED, PRODUCE ALL BLOCKED SUB-BUILDS
         ::
-        =/  blocks=(list ^build)
-          %+  murn  `(list [* ^build (unit build-result)])`results
-          |=  [* sub=^build result=(unit build-result)]
-          ^-  (unit ^build)
-          ?^  result
+        =/  BLOCKS=(LIST ^BUILD)
+          %+  MURN  `(LIST [* ^BUILD (UNIT BUILD-RESULT)])`RESULTS
+          |=  [* SUB=^BUILD RESULT=(UNIT BUILD-RESULT)]
+          ^-  (UNIT ^BUILD)
+          ?^  RESULT
             ~
-          `sub
+          `SUB
         ::
-        ?^  blocks
-          [~ (return-blocks blocks)]
+        ?^  BLOCKS
+          [~ (RETURN-BLOCKS BLOCKS)]
         ::
-        :_  out
+        :_  OUT
         :-  ~
-        %+  turn  results
-        |*  [key=_key-bunt ^build result=(unit build-result)]
-        ^-  [_key-bunt build-result]
-        [key (need result)]
+        %+  TURN  RESULTS
+        |*  [KEY=_KEY-BUNT ^BUILD RESULT=(UNIT BUILD-RESULT)]
+        ^-  [_KEY-BUNT BUILD-RESULT]
+        [KEY (NEED RESULT)]
       --
-    ::  +wrap-error: wrap an error message around a failed sub-build
+    ::  +WRAP-ERROR: WRAP AN ERROR MESSAGE AROUND A FAILED SUB-BUILD
     ::
-    ++  wrap-error
-      |=  result=(unit build-result)
-      ^-  build-receipt
+    ++  WRAP-ERROR
+      |=  RESULT=(UNIT BUILD-RESULT)
+      ^-  BUILD-RECEIPT
       ::
-      ?>  ?=([~ %error *] result)
-      =/  message=tang
-        [[%leaf "ford: {<-.schematic.build>} failed: "] message.u.result]
+      ?>  ?=([~ %ERROR *] RESULT)
+      =/  MESSAGE=TANG
+        [[%LEAF "FORD: {<-.SCHEMATIC.BUILD>} FAILED: "] MESSAGE.U.RESULT]
       ::
-      (return-error message)
-    ::  +return-blocks: exit +make as a blocked build
+      (RETURN-ERROR MESSAGE)
+    ::  +RETURN-BLOCKS: EXIT +MAKE AS A BLOCKED BUILD
     ::
-    ++  return-blocks
-      |=  builds=(list ^build)
-      ^-  build-receipt
-      out(result [%blocks builds])
-    ::  +return-error: exit +make with a specific failure message
+    ++  RETURN-BLOCKS
+      |=  BUILDS=(LIST ^BUILD)
+      ^-  BUILD-RECEIPT
+      OUT(RESULT [%BLOCKS BUILDS])
+    ::  +RETURN-ERROR: EXIT +MAKE WITH A SPECIFIC FAILURE MESSAGE
     ::
-    ++  return-error
-      |=  =tang
-      ^-  build-receipt
-      out(result [%build-result %error tang])
-    ::  +return-result: exit +make with a completed build
+    ++  RETURN-ERROR
+      |=  =TANG
+      ^-  BUILD-RECEIPT
+      OUT(RESULT [%BUILD-RESULT %ERROR TANG])
+    ::  +RETURN-RESULT: EXIT +MAKE WITH A COMPLETED BUILD
     ::
-    ++  return-result
-      |=  =build-result
-      ^-  build-receipt
-      out(result [%build-result build-result])
+    ++  RETURN-RESULT
+      |=  =BUILD-RESULT
+      ^-  BUILD-RECEIPT
+      OUT(RESULT [%BUILD-RESULT BUILD-RESULT])
     ::
-    ++  access-cache
-      |=  =compiler-cache-key
-      ^-  [(unit build-result) _out]
+    ++  ACCESS-CACHE
+      |=  =COMPILER-CACHE-KEY
+      ^-  [(UNIT BUILD-RESULT) _OUT]
       ::
-      ?~  entry=(~(get by lookup.compiler-cache.state) compiler-cache-key)
-        [~ out(cache-access `[compiler-cache-key new=%.y])]
+      ?~  ENTRY=(~(GET BY LOOKUP.COMPILER-CACHE.STATE) COMPILER-CACHE-KEY)
+        [~ OUT(CACHE-ACCESS `[COMPILER-CACHE-KEY NEW=%.Y])]
       ::
-      [`val.u.entry out(cache-access `[compiler-cache-key new=%.n])]
+      [`VAL.U.ENTRY OUT(CACHE-ACCESS `[COMPILER-CACHE-KEY NEW=%.N])]
     ::
-    ++  depend-on
-      |=  kid=^build
-      ^-  [(unit build-result) _out]
+    ++  DEPEND-ON
+      |=  KID=^BUILD
+      ^-  [(UNIT BUILD-RESULT) _OUT]
       ::
-      ?:  =(kid build)
-        ~|  [%depend-on-self (build-to-tape kid)]
+      ?:  =(KID BUILD)
+        ~|  [%DEPEND-ON-SELF (BUILD-TO-TAPE KID)]
         !!
       ::
-      =.  sub-builds.out  [kid sub-builds.out]
-      ::  +access-build-record will mutate :results.state
+      =.  SUB-BUILDS.OUT  [KID SUB-BUILDS.OUT]
+      ::  +ACCESS-BUILD-RECORD WILL MUTATE :RESULTS.STATE
       ::
-      ::    It's okay to ignore this because the accessed-builds get gathered
-      ::    and merged during the +reduce step.
+      ::    IT'S OKAY TO IGNORE THIS BECAUSE THE ACCESSED-BUILDS GET GATHERED
+      ::    AND MERGED DURING THE +REDUCE STEP.
       ::
-      =/  maybe-build-record  -:(access-build-record kid)
-      ?~  maybe-build-record
-        [~ out]
+      =/  MAYBE-BUILD-RECORD  -:(ACCESS-BUILD-RECORD KID)
+      ?~  MAYBE-BUILD-RECORD
+        [~ OUT]
       ::
-      =*  build-record  u.maybe-build-record
-      ?:  ?=(%tombstone -.build-record)
-        [~ out]
+      =*  BUILD-RECORD  U.MAYBE-BUILD-RECORD
+      ?:  ?=(%TOMBSTONE -.BUILD-RECORD)
+        [~ OUT]
       ::
-      [`build-result.build-record out]
-    ::  +blocked-paths-to-receipt: handle the %2 case for mock
+      [`BUILD-RESULT.BUILD-RECORD OUT]
+    ::  +BLOCKED-PATHS-TO-RECEIPT: HANDLE THE %2 CASE FOR MOCK
     ::
-    ::    Multiple schematics handle +toon instances. This handles the %2 case
-    ::    for a +toon and transforms it into a +build-receipt so we depend on
-    ::    the blocked paths correctly.
+    ::    MULTIPLE SCHEMATICS HANDLE +TOON INSTANCES. THIS HANDLES THE %2 CASE
+    ::    FOR A +TOON AND TRANSFORMS IT INTO A +BUILD-RECEIPT SO WE DEPEND ON
+    ::    THE BLOCKED PATHS CORRECTLY.
     ::
-    ++  blocked-paths-to-receipt
-      |=  [name=term blocked-paths=(list path)]
-      ^-  build-receipt
+    ++  BLOCKED-PATHS-TO-RECEIPT
+      |=  [NAME=TERM BLOCKED-PATHS=(LIST PATH)]
+      ^-  BUILD-RECEIPT
       ::
-      =/  blocks-or-failures=(list (each ^build tank))
-        %+  turn  blocked-paths
-        |=  =path
+      =/  BLOCKS-OR-FAILURES=(LIST (EACH ^BUILD TANK))
+        %+  TURN  BLOCKED-PATHS
+        |=  =PATH
         ::
-        =/  scry-request=(unit scry-request)  (path-to-scry-request path)
-        ?~  scry-request
-          [%| [%leaf "ford: {<name>}: invalid scry path: {<path>}"]]
+        =/  SCRY-REQUEST=(UNIT SCRY-REQUEST)  (PATH-TO-SCRY-REQUEST PATH)
+        ?~  SCRY-REQUEST
+          [%| [%LEAF "FORD: {<NAME>}: INVALID SCRY PATH: {<PATH>}"]]
         ::
-        =*  case  r.beam.u.scry-request
+        =*  CASE  R.BEAM.U.SCRY-REQUEST
         ::
-        ?.  ?=(%da -.case)
-          [%| [%leaf "ford: {<name>}: invalid case in scry path: {<path>}"]]
+        ?.  ?=(%DA -.CASE)
+          [%| [%LEAF "FORD: {<NAME>}: INVALID CASE IN SCRY PATH: {<PATH>}"]]
         ::
-        =/  date=@da  p.case
+        =/  DATE=@DA  P.CASE
         ::
-        =/  resource=(unit resource)  (path-to-resource path)
-        ?~  resource
+        =/  RESOURCE=(UNIT RESOURCE)  (PATH-TO-RESOURCE PATH)
+        ?~  RESOURCE
           :-  %|
-          [%leaf "ford: {<name>}: invalid resource in scry path: {<path>}"]
+          [%LEAF "FORD: {<NAME>}: INVALID RESOURCE IN SCRY PATH: {<PATH>}"]
         ::
-        =/  sub-schematic=schematic  [%pin date %scry u.resource]
+        =/  SUB-SCHEMATIC=SCHEMATIC  [%PIN DATE %SCRY U.RESOURCE]
         ::
-        [%& `^build`[date sub-schematic]]
+        [%& `^BUILD`[DATE SUB-SCHEMATIC]]
       ::
-      =/  failed=tang
-        %+  murn  blocks-or-failures
-        |=  block=(each ^build tank)
-        ^-  (unit tank)
-        ?-  -.block
+      =/  FAILED=TANG
+        %+  MURN  BLOCKS-OR-FAILURES
+        |=  BLOCK=(EACH ^BUILD TANK)
+        ^-  (UNIT TANK)
+        ?-  -.BLOCK
           %&  ~
-          %|  `p.block
+          %|  `P.BLOCK
         ==
       ::
-      ?^  failed
-        ::  some failed
+      ?^  FAILED
+        ::  SOME FAILED
         ::
-        out(result [%build-result %error failed])
-      ::  no failures
+        OUT(RESULT [%BUILD-RESULT %ERROR FAILED])
+      ::  NO FAILURES
       ::
-      =/  blocks=(list ^build)
-        %+  turn  blocks-or-failures
-        |=  block=(each ^build tank)
-        ?>  ?=(%& -.block)
+      =/  BLOCKS=(LIST ^BUILD)
+        %+  TURN  BLOCKS-OR-FAILURES
+        |=  BLOCK=(EACH ^BUILD TANK)
+        ?>  ?=(%& -.BLOCK)
         ::
-        p.block
+        P.BLOCK
       ::
-      =.  out
-        %+  roll  blocks
-        |=  [block=^build accumulator=_out]
-        =.  out  accumulator
-        +:(depend-on [date.block schematic.block])
+      =.  OUT
+        %+  ROLL  BLOCKS
+        |=  [BLOCK=^BUILD ACCUMULATOR=_OUT]
+        =.  OUT  ACCUMULATOR
+        +:(DEPEND-ON [DATE.BLOCK SCHEMATIC.BLOCK])
       ::
-      (return-blocks blocks)
+      (RETURN-BLOCKS BLOCKS)
     --
-  ::  |utilities:per-event: helper arms
+  ::  |UTILITIES:PER-EVENT: HELPER ARMS
   ::
-  ::+|  utilities
+  ::+|  UTILITIES
   ::
-  ::  +add-build: store a fresh, unstarted build in the state
+  ::  +ADD-BUILD: STORE A FRESH, UNSTARTED BUILD IN THE STATE
   ::
-  ++  add-build
-    ~/  %add-build
-    |=  =build
-    ^+  state
-    ::  don't overwrite an existing entry
+  ++  ADD-BUILD
+    ~/  %ADD-BUILD
+    |=  =BUILD
+    ^+  STATE
+    ::  DON'T OVERWRITE AN EXISTING ENTRY
     ::
-    ?:  (~(has by builds.state) build)
-      state
+    ?:  (~(HAS BY BUILDS.STATE) BUILD)
+      STATE
     ::
-    %_    state
-        builds-by-schematic
-      (~(put by-schematic builds-by-schematic.state) build)
+    %_    STATE
+        BUILDS-BY-SCHEMATIC
+      (~(PUT BY-SCHEMATIC BUILDS-BY-SCHEMATIC.STATE) BUILD)
     ::
-        builds
-      %+  ~(put by builds.state)  build
-      =|  =build-status
-      build-status(state [%untried ~])
+        BUILDS
+      %+  ~(PUT BY BUILDS.STATE)  BUILD
+      =|  =BUILD-STATUS
+      BUILD-STATUS(STATE [%UNTRIED ~])
     ==
-  ::  +remove-builds: remove builds and their sub-builds
+  ::  +REMOVE-BUILDS: REMOVE BUILDS AND THEIR SUB-BUILDS
   ::
-  ++  remove-builds
-    ~/  %remove-builds
-    |=  builds=(list build)
+  ++  REMOVE-BUILDS
+    ~/  %REMOVE-BUILDS
+    |=  BUILDS=(LIST BUILD)
     ::
-    |^  ^+  state
+    |^  ^+  STATE
         ::
-        ?~  builds
-          state
+        ?~  BUILDS
+          STATE
         ::
-        ?~  maybe-build-status=(~(get by builds.state) i.builds)
-          $(builds t.builds)
-        =/  subs  ~(tap in ~(key by subs.u.maybe-build-status))
+        ?~  MAYBE-BUILD-STATUS=(~(GET BY BUILDS.STATE) I.BUILDS)
+          $(BUILDS T.BUILDS)
+        =/  SUBS  ~(TAP IN ~(KEY BY SUBS.U.MAYBE-BUILD-STATUS))
         ::
-        =^  removed  state  (remove-single-build i.builds u.maybe-build-status)
-        ?.  removed
-          $(builds t.builds)
+        =^  REMOVED  STATE  (REMOVE-SINGLE-BUILD I.BUILDS U.MAYBE-BUILD-STATUS)
+        ?.  REMOVED
+          $(BUILDS T.BUILDS)
         ::
-        $(builds (welp t.builds subs))
-    ::  +remove-build: stop storing :build in the state
+        $(BUILDS (WELP T.BUILDS SUBS))
+    ::  +REMOVE-BUILD: STOP STORING :BUILD IN THE STATE
     ::
-    ::    Removes all linkages to and from sub-builds
+    ::    REMOVES ALL LINKAGES TO AND FROM SUB-BUILDS
     ::
-    ++  remove-single-build
-      |=  [=build =build-status]
-      ^+  [removed=| state]
-      ::  never delete a build that something depends on
+    ++  REMOVE-SINGLE-BUILD
+      |=  [=BUILD =BUILD-STATUS]
+      ^+  [REMOVED=| STATE]
+      ::  NEVER DELETE A BUILD THAT SOMETHING DEPENDS ON
       ::
-      ?^  clients.build-status
-        [removed=| state]
-      ?^  requesters.build-status
-        [removed=| state]
-      ::  nothing depends on :build, so we'll remove it
+      ?^  CLIENTS.BUILD-STATUS
+        [REMOVED=| STATE]
+      ?^  REQUESTERS.BUILD-STATUS
+        [REMOVED=| STATE]
+      ::  NOTHING DEPENDS ON :BUILD, SO WE'LL REMOVE IT
       ::
-      :-  removed=&
+      :-  REMOVED=&
       ::
-      %_    state
-          builds-by-schematic
-        (~(del by-schematic builds-by-schematic.state) build)
+      %_    STATE
+          BUILDS-BY-SCHEMATIC
+        (~(DEL BY-SCHEMATIC BUILDS-BY-SCHEMATIC.STATE) BUILD)
       ::
-          builds
-        (~(del by builds.state) build)
+          BUILDS
+        (~(DEL BY BUILDS.STATE) BUILD)
       ==
     --
-  ::  +update-build-status: replace :build's +build-status by running a function
+  ::  +UPDATE-BUILD-STATUS: REPLACE :BUILD'S +BUILD-STATUS BY RUNNING A FUNCTION
   ::
-  ++  update-build-status
-    ~/  %update-build-status
-    |=  [=build update-func=$-(build-status build-status)]
-    ^-  [build-status builds=_builds.state]
+  ++  UPDATE-BUILD-STATUS
+    ~/  %UPDATE-BUILD-STATUS
+    |=  [=BUILD UPDATE-FUNC=$-(BUILD-STATUS BUILD-STATUS)]
+    ^-  [BUILD-STATUS BUILDS=_BUILDS.STATE]
     ::
-    =/  original=build-status
-      ~|  [%update-build (build-to-tape build)]
-      (~(got by builds.state) build)
-    =/  mutant=build-status  (update-func original)
+    =/  ORIGINAL=BUILD-STATUS
+      ~|  [%UPDATE-BUILD (BUILD-TO-TAPE BUILD)]
+      (~(GOT BY BUILDS.STATE) BUILD)
+    =/  MUTANT=BUILD-STATUS  (UPDATE-FUNC ORIGINAL)
     ::
-    [mutant (~(put by builds.state) build mutant)]
-  ::  +intercepted-scry: augment real scry with local %scry build results
+    [MUTANT (~(PUT BY BUILDS.STATE) BUILD MUTANT)]
+  ::  +INTERCEPTED-SCRY: AUGMENT REAL SCRY WITH LOCAL %SCRY BUILD RESULTS
   ::
-  ::    Try to deduplicate requests for possibly remote resources by looking up
-  ::    the result in local state if the real scry has no synchronous
-  ::    answer (it produced `~`).
+  ::    TRY TO DEDUPLICATE REQUESTS FOR POSSIBLY REMOTE RESOURCES BY LOOKING UP
+  ::    THE RESULT IN LOCAL STATE IF THE REAL SCRY HAS NO SYNCHRONOUS
+  ::    ANSWER (IT PRODUCED `~`).
   ::
-  ++  intercepted-scry
-    %-  sloy  ^-  slyd
-    ~/  %intercepted-scry
-    |=  [ref=* (unit (set monk)) =term =beam]
-    ^-  (unit (unit (cask)))
-    ::  if the actual scry produces a value, use that value; otherwise use local
+  ++  INTERCEPTED-SCRY
+    %-  SLOY  ^-  SLYD
+    ~/  %INTERCEPTED-SCRY
+    |=  [REF=* (UNIT (SET MONK)) =TERM =BEAM]
+    ^-  (UNIT (UNIT (CASK)))
+    ::  IF THE ACTUAL SCRY PRODUCES A VALUE, USE THAT VALUE; OTHERWISE USE LOCAL
     ::
-    =/  scry-response  (scry +<.$)
+    =/  SCRY-RESPONSE  (SCRY +<.$)
     ::
-    ?^  scry-response
-      scry-response
+    ?^  SCRY-RESPONSE
+      SCRY-RESPONSE
     ::
-    =/  vane=(unit %c)  ((soft ,%c) (end 3 1 term))
-    ?~  vane
+    =/  VANE=(UNIT %C)  ((SOFT ,%C) (END 3 1 TERM))
+    ?~  VANE
       ~
-    =/  care=(unit care:clay)  ((soft care:clay) (rsh 3 1 term))
-    ?~  care
+    =/  CARE=(UNIT CARE:CLAY)  ((SOFT CARE:CLAY) (RSH 3 1 TERM))
+    ?~  CARE
       ~
-    ?.  ?=(%da -.r.beam)
+    ?.  ?=(%DA -.R.BEAM)
       ~
-    =/  =resource  [u.vane u.care rail=[[p.beam q.beam] s.beam]]
-    =/  =build     [date=p.r.beam %scry resource]
-    ::  look up the scry result from our permanent state
+    =/  =RESOURCE  [U.VANE U.CARE RAIL=[[P.BEAM Q.BEAM] S.BEAM]]
+    =/  =BUILD     [DATE=P.R.BEAM %SCRY RESOURCE]
+    ::  LOOK UP THE SCRY RESULT FROM OUR PERMANENT STATE
     ::
-    ::    Note: we can't freshen :build's :last-accessed date because
-    ::    we can't mutate :state from this gate. %scry results might get
-    ::    deleted during %wipe more quickly than they should because of this.
+    ::    NOTE: WE CAN'T FRESHEN :BUILD'S :LAST-ACCESSED DATE BECAUSE
+    ::    WE CAN'T MUTATE :STATE FROM THIS GATE. %SCRY RESULTS MIGHT GET
+    ::    DELETED DURING %WIPE MORE QUICKLY THAN THEY SHOULD BECAUSE OF THIS.
     ::
-    =/  local-result  -:(access-build-record build)
-    ?~  local-result
+    =/  LOCAL-RESULT  -:(ACCESS-BUILD-RECORD BUILD)
+    ?~  LOCAL-RESULT
       ~
-    ?:  ?=(%tombstone -.u.local-result)
+    ?:  ?=(%TOMBSTONE -.U.LOCAL-RESULT)
       ~
     ::
-    =/  local-cage=cage  (result-to-cage build-result.u.local-result)
-    ::  if :local-result does not nest in :type, produce an error
+    =/  LOCAL-CAGE=CAGE  (RESULT-TO-CAGE BUILD-RESULT.U.LOCAL-RESULT)
+    ::  IF :LOCAL-RESULT DOES NOT NEST IN :TYPE, PRODUCE AN ERROR
     ::
-    ?.  -:(nets:wa +.ref `type`p.q.local-cage)
+    ?.  -:(NETS:WA +.REF `TYPE`P.Q.LOCAL-CAGE)
       [~ ~]
     ::
-    [~ ~ `(cask)`local-cage]
-  ::  +unblock-clients-on-duct: unblock and produce clients blocked on :build
+    [~ ~ `(CASK)`LOCAL-CAGE]
+  ::  +UNBLOCK-CLIENTS-ON-DUCT: UNBLOCK AND PRODUCE CLIENTS BLOCKED ON :BUILD
   ::
-  ++  unblock-clients-on-duct
-    =|  unblocked=(list build)
-    ~%  %unblock-clients-on-duct  +>+  ~
-    |=  =build
-    ^+  [unblocked builds.state]
+  ++  UNBLOCK-CLIENTS-ON-DUCT
+    =|  UNBLOCKED=(LIST BUILD)
+    ~%  %UNBLOCK-CLIENTS-ON-DUCT  +>+  ~
+    |=  =BUILD
+    ^+  [UNBLOCKED BUILDS.STATE]
     ::
-    =/  =build-status
-      ~|  [%unblocking (build-to-tape build)]
-      (~(got by builds.state) build)
+    =/  =BUILD-STATUS
+      ~|  [%UNBLOCKING (BUILD-TO-TAPE BUILD)]
+      (~(GOT BY BUILDS.STATE) BUILD)
     ::
-    =/  clients=(list ^build)  ~(tap in (~(get ju clients.build-status) [%duct duct]))
+    =/  CLIENTS=(LIST ^BUILD)  ~(TAP IN (~(GET JU CLIENTS.BUILD-STATUS) [%DUCT DUCT]))
     ::
     |-
-    ^+  [unblocked builds.state]
-    ?~  clients
-      [unblocked builds.state]
+    ^+  [UNBLOCKED BUILDS.STATE]
+    ?~  CLIENTS
+      [UNBLOCKED BUILDS.STATE]
     ::
-    =^  client-status  builds.state
-      %+  update-build-status  i.clients
-      |=  client-status=^build-status
+    =^  CLIENT-STATUS  BUILDS.STATE
+      %+  UPDATE-BUILD-STATUS  I.CLIENTS
+      |=  CLIENT-STATUS=^BUILD-STATUS
       ::
-      =.  subs.client-status
-        %+  ~(jab by subs.client-status)  build
-        |=  original=build-relation
-        original(blocked |)
+      =.  SUBS.CLIENT-STATUS
+        %+  ~(JAB BY SUBS.CLIENT-STATUS)  BUILD
+        |=  ORIGINAL=BUILD-RELATION
+        ORIGINAL(BLOCKED |)
       ::
-      =?    state.client-status
-          ?&  ?=(%blocked -.state.client-status)
+      =?    STATE.CLIENT-STATUS
+          ?&  ?=(%BLOCKED -.STATE.CLIENT-STATUS)
           ::
               ?!
-              %-  ~(any by subs.client-status)
-              |=(build-relation &(blocked verified))
+              %-  ~(ANY BY SUBS.CLIENT-STATUS)
+              |=(BUILD-RELATION &(BLOCKED VERIFIED))
           ==
         ::
-        [%unblocked ~]
-      client-status
+        [%UNBLOCKED ~]
+      CLIENT-STATUS
     ::
-    =?  unblocked  !?=(%blocked -.state.client-status)
-      [i.clients unblocked]
+    =?  UNBLOCKED  !?=(%BLOCKED -.STATE.CLIENT-STATUS)
+      [I.CLIENTS UNBLOCKED]
     ::
-    $(clients t.clients)
-  ::  +on-build-complete: handles completion of any build
+    $(CLIENTS T.CLIENTS)
+  ::  +ON-BUILD-COMPLETE: HANDLES COMPLETION OF ANY BUILD
   ::
-  ++  on-build-complete
-    ~/  %on-build-complete
-    |=  =build
-    ^+  ..execute
+  ++  ON-BUILD-COMPLETE
+    ~/  %ON-BUILD-COMPLETE
+    |=  =BUILD
+    ^+  ..EXECUTE
     ::
-    =.  ..execute  (cleanup-orphaned-provisional-builds build)
+    =.  ..EXECUTE  (CLEANUP-ORPHANED-PROVISIONAL-BUILDS BUILD)
     ::
-    =/  duct-status  (~(got by ducts.state) duct)
+    =/  DUCT-STATUS  (~(GOT BY DUCTS.STATE) DUCT)
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    ?:  (~(has in requesters.build-status) [%duct duct])
-      (on-root-build-complete build)
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    ?:  (~(HAS IN REQUESTERS.BUILD-STATUS) [%DUCT DUCT])
+      (ON-ROOT-BUILD-COMPLETE BUILD)
     ::
-    =^  unblocked-clients  builds.state  (unblock-clients-on-duct build)
-    =.  candidate-builds  (~(gas in candidate-builds) unblocked-clients)
+    =^  UNBLOCKED-CLIENTS  BUILDS.STATE  (UNBLOCK-CLIENTS-ON-DUCT BUILD)
+    =.  CANDIDATE-BUILDS  (~(GAS IN CANDIDATE-BUILDS) UNBLOCKED-CLIENTS)
     ::
-    ..execute
-  ::  +on-root-build-complete: handle completion or promotion of a root build
+    ..EXECUTE
+  ::  +ON-ROOT-BUILD-COMPLETE: HANDLE COMPLETION OR PROMOTION OF A ROOT BUILD
   ::
-  ::    When a build completes for a duct, we might have to send a %made move
-  ::    on the requesting duct and also do duct and build book-keeping.
+  ::    WHEN A BUILD COMPLETES FOR A DUCT, WE MIGHT HAVE TO SEND A %MADE MOVE
+  ::    ON THE REQUESTING DUCT AND ALSO DO DUCT AND BUILD BOOK-KEEPING.
   ::
-  ++  on-root-build-complete
-    ~/  %on-root-build-complete
-    |=  =build
-    ^+  ..execute
+  ++  ON-ROOT-BUILD-COMPLETE
+    ~/  %ON-ROOT-BUILD-COMPLETE
+    |=  =BUILD
+    ^+  ..EXECUTE
     ::
-    =;  res=_..execute
-        =/  duct-status=(unit duct-status)
-          (~(get by ducts.state.res) duct)
-        ?~  duct-status  res
-        ::  debugging assertions to try to track down failure in
-        ::  +copy-build-tree-as-provisional
+    =;  RES=_..EXECUTE
+        =/  DUCT-STATUS=(UNIT DUCT-STATUS)
+          (~(GET BY DUCTS.STATE.RES) DUCT)
+        ?~  DUCT-STATUS  RES
+        ::  DEBUGGING ASSERTIONS TO TRY TO TRACK DOWN FAILURE IN
+        ::  +COPY-BUILD-TREE-AS-PROVISIONAL
         ::
-        ~|  [%failed-to-preserve-live-build (build-to-tape build)]
-        ?>  ?=(%live -.live.u.duct-status)
-        ~|  %failed-2
-        ?>  ?=(^ last-sent.live.u.duct-status)
-        ~|  %failed-3
-        ?>  .=  build
-            [date.u.last-sent.live.u.duct-status root-schematic.u.duct-status]
-        ~|  %failed-4
-        ?>  (~(has by builds.state.res) build)
+        ~|  [%FAILED-TO-PRESERVE-LIVE-BUILD (BUILD-TO-TAPE BUILD)]
+        ?>  ?=(%LIVE -.LIVE.U.DUCT-STATUS)
+        ~|  %FAILED-2
+        ?>  ?=(^ LAST-SENT.LIVE.U.DUCT-STATUS)
+        ~|  %FAILED-3
+        ?>  .=  BUILD
+            [DATE.U.LAST-SENT.LIVE.U.DUCT-STATUS ROOT-SCHEMATIC.U.DUCT-STATUS]
+        ~|  %FAILED-4
+        ?>  (~(HAS BY BUILDS.STATE.RES) BUILD)
         ::
-        res
+        RES
     ::
-    =/  =build-status  (~(got by builds.state) build)
-    =/  =duct-status  (~(got by ducts.state) duct)
-    ::  make sure we have something to send
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
+    =/  =DUCT-STATUS  (~(GOT BY DUCTS.STATE) DUCT)
+    ::  MAKE SURE WE HAVE SOMETHING TO SEND
     ::
-    ?>  ?=([%complete %value *] state.build-status)
-    ::  send a %made move unless it's an unchanged live build
+    ?>  ?=([%COMPLETE %VALUE *] STATE.BUILD-STATUS)
+    ::  SEND A %MADE MOVE UNLESS IT'S AN UNCHANGED LIVE BUILD
     ::
-    =?    moves
+    =?    MOVES
         ?!
-        ?&  ?=(%live -.live.duct-status)
-            ?=(^ last-sent.live.duct-status)
+        ?&  ?=(%LIVE -.LIVE.DUCT-STATUS)
+            ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
             ::
-            =/  last-build-status
-              %-  ~(got by builds.state)
-              [date.u.last-sent.live.duct-status schematic.build]
+            =/  LAST-BUILD-STATUS
+              %-  ~(GOT BY BUILDS.STATE)
+              [DATE.U.LAST-SENT.LIVE.DUCT-STATUS SCHEMATIC.BUILD]
             ::
-            ?>  ?=(%complete -.state.last-build-status)
-            ?&  ?=(%value -.build-record.state.last-build-status)
+            ?>  ?=(%COMPLETE -.STATE.LAST-BUILD-STATUS)
+            ?&  ?=(%VALUE -.BUILD-RECORD.STATE.LAST-BUILD-STATUS)
             ::
-                .=  build-result.build-record.state.last-build-status
-                    build-result.build-record.state.build-status
+                .=  BUILD-RESULT.BUILD-RECORD.STATE.LAST-BUILD-STATUS
+                    BUILD-RESULT.BUILD-RECORD.STATE.BUILD-STATUS
         ==  ==
-      :_  moves
-      ^-  move
+      :_  MOVES
+      ^-  MOVE
       ::
-      :*  duct  %give  %made  date.build  %complete
-          build-result.build-record.state.build-status
+      :*  DUCT  %GIVE  %MADE  DATE.BUILD  %COMPLETE
+          BUILD-RESULT.BUILD-RECORD.STATE.BUILD-STATUS
       ==
     ::
-    ?-    -.live.duct-status
-        %once
-      =.  ducts.state  (~(del by ducts.state) duct)
-      =.  state  (move-root-to-cache build)
+    ?-    -.LIVE.DUCT-STATUS
+        %ONCE
+      =.  DUCTS.STATE  (~(DEL BY DUCTS.STATE) DUCT)
+      =.  STATE  (MOVE-ROOT-TO-CACHE BUILD)
       ::
-      ..execute
+      ..EXECUTE
     ::
-        %live
-      ::  clean up previous build
+        %LIVE
+      ::  CLEAN UP PREVIOUS BUILD
       ::
-      =?  state  ?=(^ last-sent.live.duct-status)
-        =/  old-build=^build  build(date date.u.last-sent.live.duct-status)
+      =?  STATE  ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
+        =/  OLD-BUILD=^BUILD  BUILD(DATE DATE.U.LAST-SENT.LIVE.DUCT-STATUS)
         ::
-        (remove-anchor-from-root old-build [%duct duct])
+        (REMOVE-ANCHOR-FROM-ROOT OLD-BUILD [%DUCT DUCT])
       ::
-      =/  resource-list=(list [=disc resources=(set resource)])
-        ~(tap by (collect-live-resources build))
-      ::  we can only handle a single subscription
+      =/  RESOURCE-LIST=(LIST [=DISC RESOURCES=(SET RESOURCE)])
+        ~(TAP BY (COLLECT-LIVE-RESOURCES BUILD))
+      ::  WE CAN ONLY HANDLE A SINGLE SUBSCRIPTION
       ::
-      ::    In the long term, we need Clay's interface to change so we can
-      ::    subscribe to multiple desks at the same time.
+      ::    IN THE LONG TERM, WE NEED CLAY'S INTERFACE TO CHANGE SO WE CAN
+      ::    SUBSCRIBE TO MULTIPLE DESKS AT THE SAME TIME.
       ::
-      ?:  (lth 1 (lent resource-list))
-        =.  ..execute
-          %+  send-incomplete  build  :~
-            [%leaf "root build {(build-to-tape build)}"]
-            [%leaf "on duct:"]
-            [%leaf "{<duct>}"]
-            [%leaf "tried to subscribe to multiple discs:"]
-            [%leaf "{<resource-list>}"]
+      ?:  (LTH 1 (LENT RESOURCE-LIST))
+        =.  ..EXECUTE
+          %+  SEND-INCOMPLETE  BUILD  :~
+            [%LEAF "ROOT BUILD {(BUILD-TO-TAPE BUILD)}"]
+            [%LEAF "ON DUCT:"]
+            [%LEAF "{<DUCT>}"]
+            [%LEAF "TRIED TO SUBSCRIBE TO MULTIPLE DISCS:"]
+            [%LEAF "{<RESOURCE-LIST>}"]
           ==
-        ::  delete this instead of caching it, since it wasn't right
+        ::  DELETE THIS INSTEAD OF CACHING IT, SINCE IT WASN'T RIGHT
         ::
-        =.  ducts.state  (~(del by ducts.state) duct)
-        =.  state  (remove-anchor-from-root build [%duct duct])
-        ..execute
+        =.  DUCTS.STATE  (~(DEL BY DUCTS.STATE) DUCT)
+        =.  STATE  (REMOVE-ANCHOR-FROM-ROOT BUILD [%DUCT DUCT])
+        ..EXECUTE
       ::
-      =/  subscription=(unit subscription)
-        ?~  resource-list
+      =/  SUBSCRIPTION=(UNIT SUBSCRIPTION)
+        ?~  RESOURCE-LIST
           ~
-        `[date.build disc.i.resource-list resources.i.resource-list]
+        `[DATE.BUILD DISC.I.RESOURCE-LIST RESOURCES.I.RESOURCE-LIST]
       ::
-      =?  ..execute  ?=(^ subscription)
-        (start-clay-subscription u.subscription)
+      =?  ..EXECUTE  ?=(^ SUBSCRIPTION)
+        (START-CLAY-SUBSCRIPTION U.SUBSCRIPTION)
       ::
-      =.  ducts.state
-        %+  ~(put by ducts.state)  duct
-        %_    duct-status
-            live
-          [%live in-progress=~ last-sent=`[date.build subscription]]
+      =.  DUCTS.STATE
+        %+  ~(PUT BY DUCTS.STATE)  DUCT
+        %_    DUCT-STATUS
+            LIVE
+          [%LIVE IN-PROGRESS=~ LAST-SENT=`[DATE.BUILD SUBSCRIPTION]]
         ==
       ::
-      ..execute
+      ..EXECUTE
     ==
-  ::  +send-incomplete: emit a move indicating we can't complete :build
+  ::  +SEND-INCOMPLETE: EMIT A MOVE INDICATING WE CAN'T COMPLETE :BUILD
   ::
-  ++  send-incomplete
-    |=  [=build message=tang]
-    ^+  ..execute
+  ++  SEND-INCOMPLETE
+    |=  [=BUILD MESSAGE=TANG]
+    ^+  ..EXECUTE
     ::
-    =.  moves
-      :_  moves
-      `move`[duct %give %made date.build %incomplete message]
+    =.  MOVES
+      :_  MOVES
+      `MOVE`[DUCT %GIVE %MADE DATE.BUILD %INCOMPLETE MESSAGE]
     ::
-    ..execute
-  ::  +cleanup-orphaned-provisional-builds: delete extraneous sub-builds
+    ..EXECUTE
+  ::  +CLEANUP-ORPHANED-PROVISIONAL-BUILDS: DELETE EXTRANEOUS SUB-BUILDS
   ::
-  ::    Remove unverified linkages to sub builds. If a sub-build has no other
-  ::    clients on this duct, then it is orphaned and we remove the duct from
-  ::    its subs and call +cleanup on it.
+  ::    REMOVE UNVERIFIED LINKAGES TO SUB BUILDS. IF A SUB-BUILD HAS NO OTHER
+  ::    CLIENTS ON THIS DUCT, THEN IT IS ORPHANED AND WE REMOVE THE DUCT FROM
+  ::    ITS SUBS AND CALL +CLEANUP ON IT.
   ::
-  ++  cleanup-orphaned-provisional-builds
-    ~/  %cleanup-orphaned-provisional-builds
-    |=  =build
-    ^+  ..execute
+  ++  CLEANUP-ORPHANED-PROVISIONAL-BUILDS
+    ~/  %CLEANUP-ORPHANED-PROVISIONAL-BUILDS
+    |=  =BUILD
+    ^+  ..EXECUTE
     ::
-    =/  =build-status  (~(got by builds.state) build)
+    =/  =BUILD-STATUS  (~(GOT BY BUILDS.STATE) BUILD)
     ::
-    =/  orphans=(list ^build)
-      %+  murn  ~(tap by subs.build-status)
-      |=  [sub=^build =build-relation]
-      ^-  (unit ^build)
+    =/  ORPHANS=(LIST ^BUILD)
+      %+  MURN  ~(TAP BY SUBS.BUILD-STATUS)
+      |=  [SUB=^BUILD =BUILD-RELATION]
+      ^-  (UNIT ^BUILD)
       ::
-      ?:  verified.build-relation
+      ?:  VERIFIED.BUILD-RELATION
         ~
-      `sub
-    ::  remove links to orphans in :build's +build-status
+      `SUB
+    ::  REMOVE LINKS TO ORPHANS IN :BUILD'S +BUILD-STATUS
     ::
-    =^  build-status  builds.state
-      %+  update-build-status  build
-      |=  build-status=^build-status
-      %_    build-status
-          subs
+    =^  BUILD-STATUS  BUILDS.STATE
+      %+  UPDATE-BUILD-STATUS  BUILD
+      |=  BUILD-STATUS=^BUILD-STATUS
+      %_    BUILD-STATUS
+          SUBS
         ::
-        |-  ^+  subs.build-status
-        ?~  orphans  subs.build-status
+        |-  ^+  SUBS.BUILD-STATUS
+        ?~  ORPHANS  SUBS.BUILD-STATUS
         ::
-        =.  subs.build-status  (~(del by subs.build-status) i.orphans)
+        =.  SUBS.BUILD-STATUS  (~(DEL BY SUBS.BUILD-STATUS) I.ORPHANS)
         ::
-        $(orphans t.orphans)
+        $(ORPHANS T.ORPHANS)
       ==
     ::
-    =/  =anchor  [%duct duct]
+    =/  =ANCHOR  [%DUCT DUCT]
     ::
-    |-  ^+  ..execute
-    ?~  orphans  ..execute
-    ::  remove link to :build in :i.orphan's +build-status
+    |-  ^+  ..EXECUTE
+    ?~  ORPHANS  ..EXECUTE
+    ::  REMOVE LINK TO :BUILD IN :I.ORPHAN'S +BUILD-STATUS
     ::
-    =^  orphan-status  builds.state
-      %+  update-build-status  i.orphans
-      |=  orphan-status=_build-status
-      %_  orphan-status
-        clients  (~(del ju clients.orphan-status) anchor build)
+    =^  ORPHAN-STATUS  BUILDS.STATE
+      %+  UPDATE-BUILD-STATUS  I.ORPHANS
+      |=  ORPHAN-STATUS=_BUILD-STATUS
+      %_  ORPHAN-STATUS
+        CLIENTS  (~(DEL JU CLIENTS.ORPHAN-STATUS) ANCHOR BUILD)
       ==
     ::
-    ?:  (~(has by clients.orphan-status) anchor)
-      $(orphans t.orphans)
-    ::  :build was the last client on this duct so remove it
+    ?:  (~(HAS BY CLIENTS.ORPHAN-STATUS) ANCHOR)
+      $(ORPHANS T.ORPHANS)
+    ::  :BUILD WAS THE LAST CLIENT ON THIS DUCT SO REMOVE IT
     ::
-    =.  builds.state  (remove-anchor-from-subs i.orphans anchor)
-    =.  state  (cleanup i.orphans)
-    $(orphans t.orphans)
-  ::  +access-build-record: access a +build-record, updating :last-accessed
+    =.  BUILDS.STATE  (REMOVE-ANCHOR-FROM-SUBS I.ORPHANS ANCHOR)
+    =.  STATE  (CLEANUP I.ORPHANS)
+    $(ORPHANS T.ORPHANS)
+  ::  +ACCESS-BUILD-RECORD: ACCESS A +BUILD-RECORD, UPDATING :LAST-ACCESSED
   ::
-  ::    Usage:
+  ::    USAGE:
   ::    ```
-  ::    =^  maybe-build-record  builds.state  (access-build-record build)
+  ::    =^  MAYBE-BUILD-RECORD  BUILDS.STATE  (ACCESS-BUILD-RECORD BUILD)
   ::    ```
   ::
-  ++  access-build-record
-    ~/  %access-build-record
-    |=  =build
-    ^-  [(unit build-record) _builds.state]
+  ++  ACCESS-BUILD-RECORD
+    ~/  %ACCESS-BUILD-RECORD
+    |=  =BUILD
+    ^-  [(UNIT BUILD-RECORD) _BUILDS.STATE]
     ::
-    ?~  maybe-build-status=(~(get by builds.state) build)
-      [~ builds.state]
+    ?~  MAYBE-BUILD-STATUS=(~(GET BY BUILDS.STATE) BUILD)
+      [~ BUILDS.STATE]
     ::
-    =/  =build-status  u.maybe-build-status
+    =/  =BUILD-STATUS  U.MAYBE-BUILD-STATUS
     ::
-    ?.  ?=(%complete -.state.build-status)
-      [~ builds.state]
+    ?.  ?=(%COMPLETE -.STATE.BUILD-STATUS)
+      [~ BUILDS.STATE]
     ::
-    ?:  ?=(%tombstone -.build-record.state.build-status)
-      [`build-record.state.build-status builds.state]
+    ?:  ?=(%TOMBSTONE -.BUILD-RECORD.STATE.BUILD-STATUS)
+      [`BUILD-RECORD.STATE.BUILD-STATUS BUILDS.STATE]
     ::
-    =.  last-accessed.build-record.state.build-status  now
+    =.  LAST-ACCESSED.BUILD-RECORD.STATE.BUILD-STATUS  NOW
     ::
-    :-  `build-record.state.build-status
-    (~(put by builds.state) build build-status)
-  ::  +cleanup: try to clean up a build and its sub-builds
+    :-  `BUILD-RECORD.STATE.BUILD-STATUS
+    (~(PUT BY BUILDS.STATE) BUILD BUILD-STATUS)
+  ::  +CLEANUP: TRY TO CLEAN UP A BUILD AND ITS SUB-BUILDS
   ::
-  ++  cleanup
-    ~/  %cleanup
-    |=  =build
-    ^+  state
-    ::   does this build even exist?!
+  ++  CLEANUP
+    ~/  %CLEANUP
+    |=  =BUILD
+    ^+  STATE
+    ::   DOES THIS BUILD EVEN EXIST?!
     ::
-    ?~  maybe-build-status=(~(get by builds.state) build)
-      state
+    ?~  MAYBE-BUILD-STATUS=(~(GET BY BUILDS.STATE) BUILD)
+      STATE
     ::
-    =/  =build-status  u.maybe-build-status
-    ::  never delete a build that something depends on
+    =/  =BUILD-STATUS  U.MAYBE-BUILD-STATUS
+    ::  NEVER DELETE A BUILD THAT SOMETHING DEPENDS ON
     ::
-    ?^  clients.build-status
-      state
-    ?^  requesters.build-status
-      state
+    ?^  CLIENTS.BUILD-STATUS
+      STATE
+    ?^  REQUESTERS.BUILD-STATUS
+      STATE
     ::
-    (remove-builds ~[build])
-  ::  +collect-live-resources: produces all live resources from sub-scrys
+    (REMOVE-BUILDS ~[BUILD])
+  ::  +COLLECT-LIVE-RESOURCES: PRODUCES ALL LIVE RESOURCES FROM SUB-SCRYS
   ::
-  ++  collect-live-resources
-    ~/  %collect-live-resources
-    |=  =build
-    ^-  (jug disc resource)
+  ++  COLLECT-LIVE-RESOURCES
+    ~/  %COLLECT-LIVE-RESOURCES
+    |=  =BUILD
+    ^-  (JUG DISC RESOURCE)
     ::
-    ?:  ?=(%scry -.schematic.build)
-      =*  resource  resource.schematic.build
-      (my [(extract-disc resource) (sy [resource]~)]~)
+    ?:  ?=(%SCRY -.SCHEMATIC.BUILD)
+      =*  RESOURCE  RESOURCE.SCHEMATIC.BUILD
+      (MY [(EXTRACT-DISC RESOURCE) (SY [RESOURCE]~)]~)
     ::
-    ?:  ?=(%pin -.schematic.build)
+    ?:  ?=(%PIN -.SCHEMATIC.BUILD)
       ~
     ::
-    =/  subs
-      ~|  [%collect-live-resource (build-to-tape build)]
-      ~(tap in ~(key by subs:(~(got by builds.state) build)))
-    =|  resources=(jug disc resource)
+    =/  SUBS
+      ~|  [%COLLECT-LIVE-RESOURCE (BUILD-TO-TAPE BUILD)]
+      ~(TAP IN ~(KEY BY SUBS:(~(GOT BY BUILDS.STATE) BUILD)))
+    =|  RESOURCES=(JUG DISC RESOURCE)
     |-
-    ?~  subs
-      resources
+    ?~  SUBS
+      RESOURCES
     ::
-    =/  sub-resources=(jug disc resource)  ^$(build i.subs)
-    =.  resources  (unify-jugs resources sub-resources)
-    $(subs t.subs)
-  ::  +collect-blocked-resources: produces all blocked resources from sub-scrys
+    =/  SUB-RESOURCES=(JUG DISC RESOURCE)  ^$(BUILD I.SUBS)
+    =.  RESOURCES  (UNIFY-JUGS RESOURCES SUB-RESOURCES)
+    $(SUBS T.SUBS)
+  ::  +COLLECT-BLOCKED-RESOURCES: PRODUCES ALL BLOCKED RESOURCES FROM SUB-SCRYS
   ::
-  ++  collect-blocked-sub-scrys
-    ~/  %collect-blocked-sub-scrys
-    |=  =build
-    ^-  (set scry-request)
+  ++  COLLECT-BLOCKED-SUB-SCRYS
+    ~/  %COLLECT-BLOCKED-SUB-SCRYS
+    |=  =BUILD
+    ^-  (SET SCRY-REQUEST)
     ::
-    ?:  ?=(%scry -.schematic.build)
-      =,  resource.schematic.build
-      =/  =scry-request
-        :+  vane  care
-        ^-  beam
-        [[ship.disc.rail desk.disc.rail [%da date.build]] spur.rail]
-      (sy [scry-request ~])
-    ::  only recurse on blocked sub-builds
+    ?:  ?=(%SCRY -.SCHEMATIC.BUILD)
+      =,  RESOURCE.SCHEMATIC.BUILD
+      =/  =SCRY-REQUEST
+        :+  VANE  CARE
+        ^-  BEAM
+        [[SHIP.DISC.RAIL DESK.DISC.RAIL [%DA DATE.BUILD]] SPUR.RAIL]
+      (SY [SCRY-REQUEST ~])
+    ::  ONLY RECURSE ON BLOCKED SUB-BUILDS
     ::
-    =/  subs=(list ^build)
-      %+  murn  ~(tap by subs:(~(got by builds.state) build))
-      |=  [sub=^build =build-relation]
-      ^-  (unit ^build)
+    =/  SUBS=(LIST ^BUILD)
+      %+  MURN  ~(TAP BY SUBS:(~(GOT BY BUILDS.STATE) BUILD))
+      |=  [SUB=^BUILD =BUILD-RELATION]
+      ^-  (UNIT ^BUILD)
       ::
-      ?.  blocked.build-relation
+      ?.  BLOCKED.BUILD-RELATION
         ~
-      `sub
+      `SUB
     ::
-    =|  scrys=(set scry-request)
+    =|  SCRYS=(SET SCRY-REQUEST)
     |-
-    ^+  scrys
-    ?~  subs
-      scrys
+    ^+  SCRYS
+    ?~  SUBS
+      SCRYS
     ::
-    =.  scrys  (~(uni in scrys) ^$(build i.subs))
-    $(subs t.subs)
-  ::  +start-clay-subscription: listen for changes in the filesystem
+    =.  SCRYS  (~(UNI IN SCRYS) ^$(BUILD I.SUBS))
+    $(SUBS T.SUBS)
+  ::  +START-CLAY-SUBSCRIPTION: LISTEN FOR CHANGES IN THE FILESYSTEM
   ::
-  ++  start-clay-subscription
-    ~/  %start-clay-subscription
-    |=  =subscription
-    ^+  ..execute
+  ++  START-CLAY-SUBSCRIPTION
+    ~/  %START-CLAY-SUBSCRIPTION
+    |=  =SUBSCRIPTION
+    ^+  ..EXECUTE
     ::
-    =/  already-subscribed=?
-      (~(has by pending-subscriptions.state) subscription)
+    =/  ALREADY-SUBSCRIBED=?
+      (~(HAS BY PENDING-SUBSCRIPTIONS.STATE) SUBSCRIPTION)
     ::
-    =.  pending-subscriptions.state
-      (put-request pending-subscriptions.state subscription duct)
-    ::  don't send a duplicate move if we're already subscribed
+    =.  PENDING-SUBSCRIPTIONS.STATE
+      (PUT-REQUEST PENDING-SUBSCRIPTIONS.STATE SUBSCRIPTION DUCT)
+    ::  DON'T SEND A DUPLICATE MOVE IF WE'RE ALREADY SUBSCRIBED
     ::
-    ?:  already-subscribed
-      ..execute
+    ?:  ALREADY-SUBSCRIBED
+      ..EXECUTE
     ::
-    =/  =wire  (clay-subscription-wire [date disc]:subscription)
+    =/  =WIRE  (CLAY-SUBSCRIPTION-WIRE [DATE DISC]:SUBSCRIPTION)
     ::
-    =/  =note
-      ::  request-contents: the set of [care path]s to subscribe to in clay
+    =/  =NOTE
+      ::  REQUEST-CONTENTS: THE SET OF [CARE PATH]S TO SUBSCRIBE TO IN CLAY
       ::
-      =/  request-contents=(set [care:clay path])
-        %-  sy  ^-  (list [care:clay path])
-        %+  murn  ~(tap in `(set resource)`resources.subscription)
-        |=  =resource  ^-  (unit [care:clay path])
+      =/  REQUEST-CONTENTS=(SET [CARE:CLAY PATH])
+        %-  SY  ^-  (LIST [CARE:CLAY PATH])
+        %+  MURN  ~(TAP IN `(SET RESOURCE)`RESOURCES.SUBSCRIPTION)
+        |=  =RESOURCE  ^-  (UNIT [CARE:CLAY PATH])
         ::
-        `[care.resource (flop spur.rail.resource)]
-      ::  if :request-contents is `~`, this code is incorrect
+        `[CARE.RESOURCE (FLOP SPUR.RAIL.RESOURCE)]
+      ::  IF :REQUEST-CONTENTS IS `~`, THIS CODE IS INCORRECT
       ::
-      ?<  ?=(~ request-contents)
-      ::  their: requestee +ship
+      ?<  ?=(~ REQUEST-CONTENTS)
+      ::  THEIR: REQUESTEE +SHIP
       ::
-      =+  [their desk]=disc.subscription
+      =+  [THEIR DESK]=DISC.SUBSCRIPTION
       ::
-      :^  %c  %warp  ship=their
-      ^-  riff:clay
-      [desk `[%mult `case`[%da date.subscription] request-contents]]
+      :^  %C  %WARP  SHIP=THEIR
+      ^-  RIFF:CLAY
+      [DESK `[%MULT `CASE`[%DA DATE.SUBSCRIPTION] REQUEST-CONTENTS]]
     ::
-    =.  moves  [`move`[duct [%pass wire note]] moves]
+    =.  MOVES  [`MOVE`[DUCT [%PASS WIRE NOTE]] MOVES]
     ::
-    ..execute
-  ::  +cancel-clay-subscription: remove a subscription on :duct
+    ..EXECUTE
+  ::  +CANCEL-CLAY-SUBSCRIPTION: REMOVE A SUBSCRIPTION ON :DUCT
   ::
-  ++  cancel-clay-subscription
-    ~/  %cancel-clay-subscription
-    |=  =subscription
-    ^+  ..execute
+  ++  CANCEL-CLAY-SUBSCRIPTION
+    ~/  %CANCEL-CLAY-SUBSCRIPTION
+    |=  =SUBSCRIPTION
+    ^+  ..EXECUTE
     ::
-    =^  originator  pending-subscriptions.state
-      (del-request pending-subscriptions.state subscription duct)
-    ::  if there are still other ducts on this subscription, don't send a move
+    =^  ORIGINATOR  PENDING-SUBSCRIPTIONS.STATE
+      (DEL-REQUEST PENDING-SUBSCRIPTIONS.STATE SUBSCRIPTION DUCT)
+    ::  IF THERE ARE STILL OTHER DUCTS ON THIS SUBSCRIPTION, DON'T SEND A MOVE
     ::
-    ?~  originator
-      ..execute
+    ?~  ORIGINATOR
+      ..EXECUTE
     ::
-    =/  =wire  (clay-subscription-wire [date disc]:subscription)
+    =/  =WIRE  (CLAY-SUBSCRIPTION-WIRE [DATE DISC]:SUBSCRIPTION)
     ::
-    =/  =note
-      =+  [their desk]=disc.subscription
-      [%c %warp ship=their `riff:clay`[desk ~]]
+    =/  =NOTE
+      =+  [THEIR DESK]=DISC.SUBSCRIPTION
+      [%C %WARP SHIP=THEIR `RIFF:CLAY`[DESK ~]]
     ::
-    =.  moves  [`move`[u.originator [%pass wire note]] moves]
+    =.  MOVES  [`MOVE`[U.ORIGINATOR [%PASS WIRE NOTE]] MOVES]
     ::
-    ..execute
-  ::  +clay-sub-wire: the wire to use for a clay subscription
+    ..EXECUTE
+  ::  +CLAY-SUB-WIRE: THE WIRE TO USE FOR A CLAY SUBSCRIPTION
   ::
-  ::    While it is possible for two different root builds to make
-  ::    subscriptions with the same wire, those wires will always be associated
-  ::    with different ducts, so there's no risk of duplicates.
+  ::    WHILE IT IS POSSIBLE FOR TWO DIFFERENT ROOT BUILDS TO MAKE
+  ::    SUBSCRIPTIONS WITH THE SAME WIRE, THOSE WIRES WILL ALWAYS BE ASSOCIATED
+  ::    WITH DIFFERENT DUCTS, SO THERE'S NO RISK OF DUPLICATES.
   ::
-  ++  clay-subscription-wire
-    |=  [date=@da =disc]
-    ^-  wire
+  ++  CLAY-SUBSCRIPTION-WIRE
+    |=  [DATE=@DA =DISC]
+    ^-  WIRE
     ::
-    =+  [their desk]=disc
+    =+  [THEIR DESK]=DISC
     ::
-    /clay-sub/(scot %p their)/[desk]/(scot %da date)
-  ::  +start-scry-request: kick off an asynchronous request for a resource
+    /CLAY-SUB/(SCOT %P THEIR)/[DESK]/(SCOT %DA DATE)
+  ::  +START-SCRY-REQUEST: KICK OFF AN ASYNCHRONOUS REQUEST FOR A RESOURCE
   ::
-  ++  start-scry-request
-    |=  =scry-request
-    ^+  ..execute
-    ::  if we are the first block depending on this scry, send a move
+  ++  START-SCRY-REQUEST
+    |=  =SCRY-REQUEST
+    ^+  ..EXECUTE
+    ::  IF WE ARE THE FIRST BLOCK DEPENDING ON THIS SCRY, SEND A MOVE
     ::
-    =/  already-started=?  (~(has by pending-scrys.state) scry-request)
+    =/  ALREADY-STARTED=?  (~(HAS BY PENDING-SCRYS.STATE) SCRY-REQUEST)
     ::
-    =.  pending-scrys.state
-      (put-request pending-scrys.state scry-request duct)
-    ::  don't send a duplicate move if we've already sent one
+    =.  PENDING-SCRYS.STATE
+      (PUT-REQUEST PENDING-SCRYS.STATE SCRY-REQUEST DUCT)
+    ::  DON'T SEND A DUPLICATE MOVE IF WE'VE ALREADY SENT ONE
     ::
-    ?:  already-started
-      ..execute
+    ?:  ALREADY-STARTED
+      ..EXECUTE
     ::
-    =/  =wire  (scry-request-wire scry-request)
+    =/  =WIRE  (SCRY-REQUEST-WIRE SCRY-REQUEST)
     ::
-    =/  =note
-      =,  scry-request
-      =/  =disc  [p q]:beam
-      :*  %c  %warp  their=ship.disc  desk.disc
-          `[%sing care case=r.beam (flop s.beam)]
+    =/  =NOTE
+      =,  SCRY-REQUEST
+      =/  =DISC  [P Q]:BEAM
+      :*  %C  %WARP  THEIR=SHIP.DISC  DESK.DISC
+          `[%SING CARE CASE=R.BEAM (FLOP S.BEAM)]
       ==
     ::
-    =.  moves  [`move`[duct [%pass wire note]] moves]
+    =.  MOVES  [`MOVE`[DUCT [%PASS WIRE NOTE]] MOVES]
     ::
-    ..execute
-  ::  +cancel-scry-request: cancel a pending asynchronous scry request
+    ..EXECUTE
+  ::  +CANCEL-SCRY-REQUEST: CANCEL A PENDING ASYNCHRONOUS SCRY REQUEST
   ::
-  ++  cancel-scry-request
-    |=  =scry-request
-    ^+  ..execute
+  ++  CANCEL-SCRY-REQUEST
+    |=  =SCRY-REQUEST
+    ^+  ..EXECUTE
     ::
-    =^  originator  pending-scrys.state
-      (del-request pending-scrys.state scry-request duct)
-    ::  if there are still other ducts on this subscription, don't send a move
+    =^  ORIGINATOR  PENDING-SCRYS.STATE
+      (DEL-REQUEST PENDING-SCRYS.STATE SCRY-REQUEST DUCT)
+    ::  IF THERE ARE STILL OTHER DUCTS ON THIS SUBSCRIPTION, DON'T SEND A MOVE
     ::
-    ?~  originator
-      ..execute
+    ?~  ORIGINATOR
+      ..EXECUTE
     ::
-    =/  =wire  (scry-request-wire scry-request)
+    =/  =WIRE  (SCRY-REQUEST-WIRE SCRY-REQUEST)
     ::
-    =/  =note
-      =+  [their desk]=[p q]:beam.scry-request
-      [%c %warp ship=their `riff:clay`[desk ~]]
+    =/  =NOTE
+      =+  [THEIR DESK]=[P Q]:BEAM.SCRY-REQUEST
+      [%C %WARP SHIP=THEIR `RIFF:CLAY`[DESK ~]]
     ::
-    =.  moves  [`move`[u.originator [%pass wire note]] moves]
+    =.  MOVES  [`MOVE`[U.ORIGINATOR [%PASS WIRE NOTE]] MOVES]
     ::
-    ..execute
-  ::  +scry-request-wire
+    ..EXECUTE
+  ::  +SCRY-REQUEST-WIRE
   ::
-  ++  scry-request-wire
-    |=  =scry-request
-    ^-  wire
-    (welp /scry-request (scry-request-to-path scry-request))
+  ++  SCRY-REQUEST-WIRE
+    |=  =SCRY-REQUEST
+    ^-  WIRE
+    (WELP /SCRY-REQUEST (SCRY-REQUEST-TO-PATH SCRY-REQUEST))
   --
 --
 ::
-::  end the =~
+::  END THE =~
 ::
 .  ==
 ::
-::::  vane interface
+::::  VANE INTERFACE
   ::
-::  begin with a default +axle as a blank slate
+::  BEGIN WITH A DEFAULT +AXLE AS A BLANK SLATE
 ::
-=|  ax=axle
-::  a vane is activated with identity, the current date, entropy,
-::  and a namespace function
+=|  AX=AXLE
+::  A VANE IS ACTIVATED WITH IDENTITY, THE CURRENT DATE, ENTROPY,
+::  AND A NAMESPACE FUNCTION
 ::
-|=  [our=ship now=@da eny=@uvJ scry-gate=sley]
-::  allow jets to be registered within this core
+|=  [OUR=SHIP NOW=@DA ENY=@UVJ SCRY-GATE=SLEY]
+::  ALLOW JETS TO BE REGISTERED WITHIN THIS CORE
 ::
-~%  %ford  ..is  ~
+~%  %FORD  ..IS  ~
 |%
-::  +call: handle a +task:able from arvo
+::  +CALL: HANDLE A +TASK:ABLE FROM ARVO
 ::
-::    Ford can be tasked with:
+::    FORD CAN BE TASKED WITH:
 ::
-::      %build: perform a build
-::      %keep: resize caches
-::      %kill: cancel a build
-::      %wipe: clear memory
+::      %BUILD: PERFORM A BUILD
+::      %KEEP: RESIZE CACHES
+::      %KILL: CANCEL A BUILD
+::      %WIPE: CLEAR MEMORY
 ::
-::    Most requests get converted into operations to be performed inside
-::    the +per-event core, which is Ford's main build engine.
+::    MOST REQUESTS GET CONVERTED INTO OPERATIONS TO BE PERFORMED INSIDE
+::    THE +PER-EVENT CORE, WHICH IS FORD'S MAIN BUILD ENGINE.
 ::
-++  call
-  |=  [=duct type=* wrapped-task=(hobo task:able)]
-  ^-  [(list move) _ford-gate]
-  ::  unwrap :task from :wrapped-task
+++  CALL
+  |=  [=DUCT TYPE=* WRAPPED-TASK=(HOBO TASK:ABLE)]
+  ^-  [(LIST MOVE) _FORD-GATE]
+  ::  UNWRAP :TASK FROM :WRAPPED-TASK
   ::
-  =/  task=task:able
-    ?.  ?=(%soft -.wrapped-task)
-      wrapped-task
-    ((hard task:able) p.wrapped-task)
-  ::  we wrap +per-event with a call that binds our event args
+  =/  TASK=TASK:ABLE
+    ?.  ?=(%SOFT -.WRAPPED-TASK)
+      WRAPPED-TASK
+    ((HARD TASK:ABLE) P.WRAPPED-TASK)
+  ::  WE WRAP +PER-EVENT WITH A CALL THAT BINDS OUR EVENT ARGS
   ::
-  =*  this-event  (per-event [our duct now scry-gate] state.ax)
+  =*  THIS-EVENT  (PER-EVENT [OUR DUCT NOW SCRY-GATE] STATE.AX)
   ::
-  ?-    -.task
-      ::  %build: request to perform a build
+  ?-    -.TASK
+      ::  %BUILD: REQUEST TO PERFORM A BUILD
       ::
-      %build
-    ::  perform the build indicated by :task
+      %BUILD
+    ::  PERFORM THE BUILD INDICATED BY :TASK
     ::
-    ::    We call :start-build on :this-event, which is the |per-event core
-    ::    with the our event-args already bound. :start-build performs the
-    ::    build and produces a pair of :moves and a mutant :state.
-    ::    We update our :state and produce it along with :moves.
+    ::    WE CALL :START-BUILD ON :THIS-EVENT, WHICH IS THE |PER-EVENT CORE
+    ::    WITH THE OUR EVENT-ARGS ALREADY BOUND. :START-BUILD PERFORMS THE
+    ::    BUILD AND PRODUCES A PAIR OF :MOVES AND A MUTANT :STATE.
+    ::    WE UPDATE OUR :STATE AND PRODUCE IT ALONG WITH :MOVES.
     ::
-    =/  =build  [now schematic.task]
-    =^  moves  state.ax  (start-build:this-event build live.task)
+    =/  =BUILD  [NOW SCHEMATIC.TASK]
+    =^  MOVES  STATE.AX  (START-BUILD:THIS-EVENT BUILD LIVE.TASK)
     ::
-    [moves ford-gate]
+    [MOVES FORD-GATE]
   ::
-      ::  %keep: keep :count cache entries
+      ::  %KEEP: KEEP :COUNT CACHE ENTRIES
       ::
-      %keep
+      %KEEP
     ::
-    =.  state.ax  (keep:this-event [compiler-cache build-cache]:task)
+    =.  STATE.AX  (KEEP:THIS-EVENT [COMPILER-CACHE BUILD-CACHE]:TASK)
     ::
-    [~ ford-gate]
+    [~ FORD-GATE]
   ::
-      ::  %kill: cancel a %build
+      ::  %KILL: CANCEL A %BUILD
       ::
-      %kill
+      %KILL
     ::
-    =^  moves  state.ax  cancel:this-event
+    =^  MOVES  STATE.AX  CANCEL:THIS-EVENT
     ::
-    [moves ford-gate]
+    [MOVES FORD-GATE]
   ::
-      ::  %sunk: foreign ship has lost continutity
+      ::  %SUNK: FOREIGN SHIP HAS LOST CONTINUTITY
       ::
-      %sunk
+      %SUNK
     ::
-    [~ ford-gate]
+    [~ FORD-GATE]
   ::
-      ::  %vega: learn of kernel upgrade
+      ::  %VEGA: LEARN OF KERNEL UPGRADE
       ::
-      ::    XX clear cache, rebuild live builds
+      ::    XX CLEAR CACHE, REBUILD LIVE BUILDS
       ::
-      %vega
+      %VEGA
     ::
-    [~ ford-gate]
+    [~ FORD-GATE]
   ::
-      ::  %wipe: wipe stored builds, clearing :percent-to-remove of the entries
+      ::  %WIPE: WIPE STORED BUILDS, CLEARING :PERCENT-TO-REMOVE OF THE ENTRIES
       ::
-      %wipe
+      %WIPE
     ::
-    =.  state.ax  (wipe:this-event percent-to-remove.task)
+    =.  STATE.AX  (WIPE:THIS-EVENT PERCENT-TO-REMOVE.TASK)
     ::
-    [~ ford-gate]
+    [~ FORD-GATE]
   ::
-      %wegh
-    :_  ford-gate
+      %WEGH
+    :_  FORD-GATE
     :_  ~
-    :^  duct  %give  %mass
-    ^-  mass
-    :+  %ford  %|
-    :~  builds+&+builds.state.ax
-        compiler-cache+&+compiler-cache.state.ax
-        dot+&+ax
+    :^  DUCT  %GIVE  %MASS
+    ^-  MASS
+    :+  %FORD  %|
+    :~  BUILDS+&+BUILDS.STATE.AX
+        COMPILER-CACHE+&+COMPILER-CACHE.STATE.AX
+        DOT+&+AX
     ==
   ==
-::  +take: receive a response from another vane
+::  +TAKE: RECEIVE A RESPONSE FROM ANOTHER VANE
 ::
-::    A +take is a response to a request that Ford made of another vane.
+::    A +TAKE IS A RESPONSE TO A REQUEST THAT FORD MADE OF ANOTHER VANE.
 ::
-::    Ford decodes the type of response based on the +wire in the +take.
-::    The possibilities are:
+::    FORD DECODES THE TYPE OF RESPONSE BASED ON THE +WIRE IN THE +TAKE.
+::    THE POSSIBILITIES ARE:
 ::
-::      %clay-sub: Clay notification of an update to a subscription
+::      %CLAY-SUB: CLAY NOTIFICATION OF AN UPDATE TO A SUBSCRIPTION
 ::
-::        If Ford receives this, it will rebuild one or more live builds,
-::        taking into account the new date and changed resources.
+::        IF FORD RECEIVES THIS, IT WILL REBUILD ONE OR MORE LIVE BUILDS,
+::        TAKING INTO ACCOUNT THE NEW DATE AND CHANGED RESOURCES.
 ::
-::      %scry-request: Clay response to a request for a resource
+::      %SCRY-REQUEST: CLAY RESPONSE TO A REQUEST FOR A RESOURCE
 ::
-::        If Ford receives this, it will continue building one or more builds
-::        that were blocked on this resource.
+::        IF FORD RECEIVES THIS, IT WILL CONTINUE BUILDING ONE OR MORE BUILDS
+::        THAT WERE BLOCKED ON THIS RESOURCE.
 ::
-::    The +sign gets converted into operations to be performed inside
-::    the +per-event core, which is Ford's main build engine.
+::    THE +SIGN GETS CONVERTED INTO OPERATIONS TO BE PERFORMED INSIDE
+::    THE +PER-EVENT CORE, WHICH IS FORD'S MAIN BUILD ENGINE.
 ::
-++  take
-  |=  [=wire =duct wrapped-sign=(hypo sign)]
-  ^-  [(list move) _ford-gate]
-  ::  unwrap :sign, ignoring unneeded +type in :p.wrapped-sign
+++  TAKE
+  |=  [=WIRE =DUCT WRAPPED-SIGN=(HYPO SIGN)]
+  ^-  [(LIST MOVE) _FORD-GATE]
+  ::  UNWRAP :SIGN, IGNORING UNNEEDED +TYPE IN :P.WRAPPED-SIGN
   ::
-  =/  =sign  q.wrapped-sign
-  ::  :wire must at least contain a tag for dispatching
+  =/  =SIGN  Q.WRAPPED-SIGN
+  ::  :WIRE MUST AT LEAST CONTAIN A TAG FOR DISPATCHING
   ::
-  ?>  ?=([@ *] wire)
+  ?>  ?=([@ *] WIRE)
   ::
-  |^  ^-  [(list move) _ford-gate]
+  |^  ^-  [(LIST MOVE) _FORD-GATE]
       ::
-      =^  moves  state.ax
-        ?+  i.wire     ~|([%bad-take-wire wire] !!)
-          %clay-sub      take-rebuilds
-          %scry-request  take-unblocks
+      =^  MOVES  STATE.AX
+        ?+  I.WIRE     ~|([%BAD-TAKE-WIRE WIRE] !!)
+          %CLAY-SUB      TAKE-REBUILDS
+          %SCRY-REQUEST  TAKE-UNBLOCKS
         ==
       ::
-      [moves ford-gate]
-    ::  +take-rebuilds: rebuild all live builds affected by the Clay changes
+      [MOVES FORD-GATE]
+    ::  +TAKE-REBUILDS: REBUILD ALL LIVE BUILDS AFFECTED BY THE CLAY CHANGES
     ::
-    ++  take-rebuilds
-      ^-  [(list move) ford-state]
+    ++  TAKE-REBUILDS
+      ^-  [(LIST MOVE) FORD-STATE]
       ::
-      ?>  ?=([%c %wris *] sign)
-      =+  [ship desk date]=(raid:wired t.wire ~[%p %tas %da])
-      =/  disc  [ship desk]
+      ?>  ?=([%C %WRIS *] SIGN)
+      =+  [SHIP DESK DATE]=(RAID:WIRED T.WIRE ~[%P %TAS %DA])
+      =/  DISC  [SHIP DESK]
       ::
-      =/  =subscription
-        ~|  [%ford-take-bad-clay-sub wire=wire duct=duct]
-        =/  =duct-status  (~(got by ducts.state.ax) duct)
-        ?>  ?=(%live -.live.duct-status)
-        ?>  ?=(^ last-sent.live.duct-status)
-        ?>  ?=(^ subscription.u.last-sent.live.duct-status)
-        u.subscription.u.last-sent.live.duct-status
+      =/  =SUBSCRIPTION
+        ~|  [%FORD-TAKE-BAD-CLAY-SUB WIRE=WIRE DUCT=DUCT]
+        =/  =DUCT-STATUS  (~(GOT BY DUCTS.STATE.AX) DUCT)
+        ?>  ?=(%LIVE -.LIVE.DUCT-STATUS)
+        ?>  ?=(^ LAST-SENT.LIVE.DUCT-STATUS)
+        ?>  ?=(^ SUBSCRIPTION.U.LAST-SENT.LIVE.DUCT-STATUS)
+        U.SUBSCRIPTION.U.LAST-SENT.LIVE.DUCT-STATUS
       ::
-      =/  ducts=(list ^duct)
-        ~|  [%ford-take-missing-subscription subscription]
-        (get-request-ducts pending-subscriptions.state.ax subscription)
+      =/  DUCTS=(LIST ^DUCT)
+        ~|  [%FORD-TAKE-MISSING-SUBSCRIPTION SUBSCRIPTION]
+        (GET-REQUEST-DUCTS PENDING-SUBSCRIPTIONS.STATE.AX SUBSCRIPTION)
       ::
-      =|  moves=(list move)
-      |-  ^+  [moves state.ax]
-      ?~  ducts  [moves state.ax]
+      =|  MOVES=(LIST MOVE)
+      |-  ^+  [MOVES STATE.AX]
+      ?~  DUCTS  [MOVES STATE.AX]
       ::
-      =*  event-args  [[our i.ducts now scry-gate] state.ax]
-      =*  rebuild  rebuild:(per-event event-args)
-      =^  duct-moves  state.ax
-        (rebuild subscription p.case.sign disc care-paths.sign)
+      =*  EVENT-ARGS  [[OUR I.DUCTS NOW SCRY-GATE] STATE.AX]
+      =*  REBUILD  REBUILD:(PER-EVENT EVENT-ARGS)
+      =^  DUCT-MOVES  STATE.AX
+        (REBUILD SUBSCRIPTION P.CASE.SIGN DISC CARE-PATHS.SIGN)
       ::
-      $(ducts t.ducts, moves (weld moves duct-moves))
-    ::  +take-unblocks: unblock all builds waiting on this scry request
+      $(DUCTS T.DUCTS, MOVES (WELD MOVES DUCT-MOVES))
+    ::  +TAKE-UNBLOCKS: UNBLOCK ALL BUILDS WAITING ON THIS SCRY REQUEST
     ::
-    ++  take-unblocks
-      ^-  [(list move) ford-state]
+    ++  TAKE-UNBLOCKS
+      ^-  [(LIST MOVE) FORD-STATE]
       ::
-      ?>  ?=([%c %writ *] sign)
-      ::  scry-request: the +scry-request we had previously blocked on
+      ?>  ?=([%C %WRIT *] SIGN)
+      ::  SCRY-REQUEST: THE +SCRY-REQUEST WE HAD PREVIOUSLY BLOCKED ON
       ::
-      =/  =scry-request
-        ~|  [%ford-take-bad-scry-request wire=wire duct=duct]
-        (need (path-to-scry-request t.wire))
-      ::  scry-result: parse a (unit cage) from :sign
+      =/  =SCRY-REQUEST
+        ~|  [%FORD-TAKE-BAD-SCRY-REQUEST WIRE=WIRE DUCT=DUCT]
+        (NEED (PATH-TO-SCRY-REQUEST T.WIRE))
+      ::  SCRY-RESULT: PARSE A (UNIT CAGE) FROM :SIGN
       ::
-      ::    If the result is `~`, the requested resource was not available.
+      ::    IF THE RESULT IS `~`, THE REQUESTED RESOURCE WAS NOT AVAILABLE.
       ::
-      =/  scry-result=(unit cage)
-        ?~  riot.sign
+      =/  SCRY-RESULT=(UNIT CAGE)
+        ?~  RIOT.SIGN
           ~
-        `r.u.riot.sign
+        `R.U.RIOT.SIGN
       ::
-      =/  ducts=(list ^duct)
-        ~|  [%ford-take-missing-scry-request scry-request]
-        (get-request-ducts pending-scrys.state.ax scry-request)
+      =/  DUCTS=(LIST ^DUCT)
+        ~|  [%FORD-TAKE-MISSING-SCRY-REQUEST SCRY-REQUEST]
+        (GET-REQUEST-DUCTS PENDING-SCRYS.STATE.AX SCRY-REQUEST)
       ::
-      =|  moves=(list move)
-      |-  ^+  [moves state.ax]
-      ?~  ducts  [moves state.ax]
+      =|  MOVES=(LIST MOVE)
+      |-  ^+  [MOVES STATE.AX]
+      ?~  DUCTS  [MOVES STATE.AX]
       ::
-      =*  event-args  [[our i.ducts now scry-gate] state.ax]
-      ::  unblock the builds that had blocked on :resource
+      =*  EVENT-ARGS  [[OUR I.DUCTS NOW SCRY-GATE] STATE.AX]
+      ::  UNBLOCK THE BUILDS THAT HAD BLOCKED ON :RESOURCE
       ::
-      =*  unblock  unblock:(per-event event-args)
-      =^  duct-moves  state.ax  (unblock scry-request scry-result)
+      =*  UNBLOCK  UNBLOCK:(PER-EVENT EVENT-ARGS)
+      =^  DUCT-MOVES  STATE.AX  (UNBLOCK SCRY-REQUEST SCRY-RESULT)
       ::
-      $(ducts t.ducts, moves (weld moves duct-moves))
+      $(DUCTS T.DUCTS, MOVES (WELD MOVES DUCT-MOVES))
   --
-::  +load: migrate old state to new state (called on vane reload)
+::  +LOAD: MIGRATE OLD STATE TO NEW STATE (CALLED ON VANE RELOAD)
 ::
-++  load
-  |=  old=axle
+++  LOAD
+  |=  OLD=AXLE
   ^+  ..^$
   ::
-  ~!  %loading
-  ..^$(ax old)
-::  +stay: produce current state
+  ~!  %LOADING
+  ..^$(AX OLD)
+::  +STAY: PRODUCE CURRENT STATE
 ::
-++  stay  `axle`ax
-::  +scry: request a path in the urbit namespace
+++  STAY  `AXLE`AX
+::  +SCRY: REQUEST A PATH IN THE URBIT NAMESPACE
 ::
-++  scry
+++  SCRY
   |=  *
   [~ ~]
-::  %utilities
+::  %UTILITIES
 ::
 ::+|
 ::
-++  ford-gate  ..$
+++  FORD-GATE  ..$
 --

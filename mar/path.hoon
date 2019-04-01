@@ -1,6 +1,6 @@
-|_  pax/path
-++  grab
+|_  PAX/PATH
+++  GRAB
   |%
-  ++  noun  path
+  ++  NOUN  PATH
   --
 --

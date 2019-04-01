@@ -1,217 +1,217 @@
-::  This library includes parsing functions for the json objects
-::  that Github's API produces.  In general, the conversion from
-::  JSON to urbit types should be performed in marks, so those
-::  marks should include this library.
+::  THIS LIBRARY INCLUDES PARSING FUNCTIONS FOR THE JSON OBJECTS
+::  THAT GITHUB'S API PRODUCES.  IN GENERAL, THE CONVERSION FROM
+::  JSON TO URBIT TYPES SHOULD BE PERFORMED IN MARKS, SO THOSE
+::  MARKS SHOULD INCLUDE THIS LIBRARY.
 ::
-/-  gh
-=,  format
+/-  GH
+=,  FORMAT
 |%
-++  repository
-  ^-  $-(json (unit repository:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'id'^id
-      'name'^so
-      'full_name'^so
-      'owner'^user
-      'private'^bo
-      'html_url'^so
-      'description'^so
-      'fork'^bo
-      'url'^so
-      'forks_url'^so
-      'keys_url'^so
-      'collaborators_url'^so
-      'teams_url'^so
-      'hooks_url'^so
-      'issue_events_url'^so
-      'events_url'^so
-      'assignees_url'^so
-      'branches_url'^so
-      'tags_url'^so
-      'blobs_url'^so
-      'git_tags_url'^so
-      'git_refs_url'^so
-      'trees_url'^so
-      'statuses_url'^so
-      'languages_url'^so
-      'stargazers_url'^so
-      'contributors_url'^so
-      'subscribers_url'^so
-      'subscription_url'^so
-      'commits_url'^so
-      'git_commits_url'^so
-      'comments_url'^so
-      'issue_comment_url'^so
-      'contents_url'^so
-      'compare_url'^so
-      'merges_url'^so
-      'archive_url'^so
-      'downloads_url'^so
-      'issues_url'^so
-      'pulls_url'^so
-      'milestones_url'^so
-      'notifications_url'^so
-      'labels_url'^so
-      'releases_url'^so
-      'created_at'^so
-      'updated_at'^so
-      'pushed_at'^so
-      'git_url'^so
-      'ssh_url'^so
-      'clone_url'^so
-      'svn_url'^so
-      'homepage'^some
-      'size'^ni
-      'stargazers_count'^ni
-      'watchers_count'^ni
-      'language'^some
-      'has_issues'^bo
-      'has_downloads'^bo
-      'has_wiki'^bo
-      'has_pages'^bo
-      'forks_count'^ni
-      'mirror_url'^some
-      'open_issues_count'^ni
-      'forks'^ni
-      'open_issues'^ni
-      'watchers'^ni
-      'default_branch'^so
+++  REPOSITORY
+  ^-  $-(JSON (UNIT REPOSITORY:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'ID'^ID
+      'NAME'^SO
+      'FULL_NAME'^SO
+      'OWNER'^USER
+      'PRIVATE'^BO
+      'HTML_URL'^SO
+      'DESCRIPTION'^SO
+      'FORK'^BO
+      'URL'^SO
+      'FORKS_URL'^SO
+      'KEYS_URL'^SO
+      'COLLABORATORS_URL'^SO
+      'TEAMS_URL'^SO
+      'HOOKS_URL'^SO
+      'ISSUE_EVENTS_URL'^SO
+      'EVENTS_URL'^SO
+      'ASSIGNEES_URL'^SO
+      'BRANCHES_URL'^SO
+      'TAGS_URL'^SO
+      'BLOBS_URL'^SO
+      'GIT_TAGS_URL'^SO
+      'GIT_REFS_URL'^SO
+      'TREES_URL'^SO
+      'STATUSES_URL'^SO
+      'LANGUAGES_URL'^SO
+      'STARGAZERS_URL'^SO
+      'CONTRIBUTORS_URL'^SO
+      'SUBSCRIBERS_URL'^SO
+      'SUBSCRIPTION_URL'^SO
+      'COMMITS_URL'^SO
+      'GIT_COMMITS_URL'^SO
+      'COMMENTS_URL'^SO
+      'ISSUE_COMMENT_URL'^SO
+      'CONTENTS_URL'^SO
+      'COMPARE_URL'^SO
+      'MERGES_URL'^SO
+      'ARCHIVE_URL'^SO
+      'DOWNLOADS_URL'^SO
+      'ISSUES_URL'^SO
+      'PULLS_URL'^SO
+      'MILESTONES_URL'^SO
+      'NOTIFICATIONS_URL'^SO
+      'LABELS_URL'^SO
+      'RELEASES_URL'^SO
+      'CREATED_AT'^SO
+      'UPDATED_AT'^SO
+      'PUSHED_AT'^SO
+      'GIT_URL'^SO
+      'SSH_URL'^SO
+      'CLONE_URL'^SO
+      'SVN_URL'^SO
+      'HOMEPAGE'^SOME
+      'SIZE'^NI
+      'STARGAZERS_COUNT'^NI
+      'WATCHERS_COUNT'^NI
+      'LANGUAGE'^SOME
+      'HAS_ISSUES'^BO
+      'HAS_DOWNLOADS'^BO
+      'HAS_WIKI'^BO
+      'HAS_PAGES'^BO
+      'FORKS_COUNT'^NI
+      'MIRROR_URL'^SOME
+      'OPEN_ISSUES_COUNT'^NI
+      'FORKS'^NI
+      'OPEN_ISSUES'^NI
+      'WATCHERS'^NI
+      'DEFAULT_BRANCH'^SO
   ==
-++  commit
-  ^-  $-(json (unit commit:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'sha'^so
-      'url'^so
-      'author'^author
-      'committer'^author
-      'message'^so
-      'tree'^point
-      'parents'^(ar point)
-      'verification'^verification
+++  COMMIT
+  ^-  $-(JSON (UNIT COMMIT:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'SHA'^SO
+      'URL'^SO
+      'AUTHOR'^AUTHOR
+      'COMMITTER'^AUTHOR
+      'MESSAGE'^SO
+      'TREE'^POINT
+      'PARENTS'^(AR POINT)
+      'VERIFICATION'^VERIFICATION
   ==
-++  user
-  ^-  $-(json (unit user:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'login'^so
-      'id'^id
-      'avatar_url'^so
-      'gravatar_id'^so
-      'url'^so
-      'html_url'^so
-      'followers_url'^so
-      'following_url'^so
-      'gists_url'^so
-      'starred_url'^so
-      'subscriptions_url'^so
-      'organizations_url'^so
-      'repos_url'^so
-      'events_url'^so
-      'received_events_url'^so
-      'type'^so
-      'site_admin'^bo
+++  USER
+  ^-  $-(JSON (UNIT USER:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'LOGIN'^SO
+      'ID'^ID
+      'AVATAR_URL'^SO
+      'GRAVATAR_ID'^SO
+      'URL'^SO
+      'HTML_URL'^SO
+      'FOLLOWERS_URL'^SO
+      'FOLLOWING_URL'^SO
+      'GISTS_URL'^SO
+      'STARRED_URL'^SO
+      'SUBSCRIPTIONS_URL'^SO
+      'ORGANIZATIONS_URL'^SO
+      'REPOS_URL'^SO
+      'EVENTS_URL'^SO
+      'RECEIVED_EVENTS_URL'^SO
+      'TYPE'^SO
+      'SITE_ADMIN'^BO
   ==
-++  issue
-  ^-  $-(json (unit issue:gh))
-  |=  jon/json
-  =-  (bind - |*(issue/* `issue:gh`[jon issue]))
-  %.  jon
-  =+  dejs-soft
-  %-  ot  :~
-      'url'^so
-      'labels_url'^so
-      'comments_url'^so
-      'events_url'^so
-      'html_url'^so
-      'id'^id
-      'number'^ni
-      'title'^so
-      'user'^user::|+(* (some *user:gh))
-      'labels'^(ar label)::|+(* (some *(list label:gh)))::(ar label)
-      'state'^so
-      'locked'^bo
-      'assignee'^(mu user)::|+(* (some *(unit user:gh)))::(mu user)
-      'milestone'^some
-      'comments'^ni
-      'created_at'^so
-      'updated_at'^so
-      'closed_at'^(mu so)
-      'body'^so
+++  ISSUE
+  ^-  $-(JSON (UNIT ISSUE:GH))
+  |=  JON/JSON
+  =-  (BIND - |*(ISSUE/* `ISSUE:GH`[JON ISSUE]))
+  %.  JON
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'URL'^SO
+      'LABELS_URL'^SO
+      'COMMENTS_URL'^SO
+      'EVENTS_URL'^SO
+      'HTML_URL'^SO
+      'ID'^ID
+      'NUMBER'^NI
+      'TITLE'^SO
+      'USER'^USER::|+(* (SOME *USER:GH))
+      'LABELS'^(AR LABEL)::|+(* (SOME *(LIST LABEL:GH)))::(AR LABEL)
+      'STATE'^SO
+      'LOCKED'^BO
+      'ASSIGNEE'^(MU USER)::|+(* (SOME *(UNIT USER:GH)))::(MU USER)
+      'MILESTONE'^SOME
+      'COMMENTS'^NI
+      'CREATED_AT'^SO
+      'UPDATED_AT'^SO
+      'CLOSED_AT'^(MU SO)
+      'BODY'^SO
   ==
-++  author
-  ^-  $-(json (unit author:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'date'^so
-      'name'^so
-      'email'^so
+++  AUTHOR
+  ^-  $-(JSON (UNIT AUTHOR:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'DATE'^SO
+      'NAME'^SO
+      'EMAIL'^SO
   ==
-++  point
-  ^-  $-(json (unit point:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'url'^so
-      'sha'^so
+++  POINT
+  ^-  $-(JSON (UNIT POINT:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'URL'^SO
+      'SHA'^SO
   ==
-++  verification
-  ^-  $-(json (unit verification:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'verified'^bo
-      'reason'^so
-      'signature'^(mu so)
-      'payload'^(mu so)
+++  VERIFICATION
+  ^-  $-(JSON (UNIT VERIFICATION:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'VERIFIED'^BO
+      'REASON'^SO
+      'SIGNATURE'^(MU SO)
+      'PAYLOAD'^(MU SO)
   ==
-++  label
-  ^-  $-(json (unit label:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'url'^so
-      'name'^so
-      'color'^so
+++  LABEL
+  ^-  $-(JSON (UNIT LABEL:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'URL'^SO
+      'NAME'^SO
+      'COLOR'^SO
   ==
-++  comment
-  ^-  $-(json (unit comment:gh))
-  =+  dejs-soft
-  %-  ot  :~
-      'url'^so
-      'html_url'^so
-      'issue_url'^so
-      'id'^id
-      'user'^user
-      'created_at'^so
-      'updated_at'^so
-      'body'^so
+++  COMMENT
+  ^-  $-(JSON (UNIT COMMENT:GH))
+  =+  DEJS-SOFT
+  %-  OT  :~
+      'URL'^SO
+      'HTML_URL'^SO
+      'ISSUE_URL'^SO
+      'ID'^ID
+      'USER'^USER
+      'CREATED_AT'^SO
+      'UPDATED_AT'^SO
+      'BODY'^SO
   ==
-++  id  no:dejs-soft
-++  print-issue
-  |=  issue:gh
-  =,  format
-  ^-  wain
-  =+  c=(cury cat 3)
-  :*  :(c 'title: ' title ' (#' (rsh 3 2 (scot %ui number)) ')')
-      (c 'state: ' state)
-      (c 'creator: ' login.user)
-      (c 'created-at: ' created-at)
-      (c 'assignee: ' ?~(assignee 'none' login.u.assignee))
+++  ID  NO:DEJS-SOFT
+++  PRINT-ISSUE
+  |=  ISSUE:GH
+  =,  FORMAT
+  ^-  WAIN
+  =+  C=(CURY CAT 3)
+  :*  :(C 'TITLE: ' TITLE ' (#' (RSH 3 2 (SCOT %UI NUMBER)) ')')
+      (C 'STATE: ' STATE)
+      (C 'CREATOR: ' LOGIN.USER)
+      (C 'CREATED-AT: ' CREATED-AT)
+      (C 'ASSIGNEE: ' ?~(ASSIGNEE 'NONE' LOGIN.U.ASSIGNEE))
     ::
-      %+  c  'labels: '
-      ?~  labels  ''
-      |-  ^-  @t
-      ?~  t.labels  name.i.labels
-      :(c name.i.t.labels ', ' $(t.labels t.t.labels))
+      %+  C  'LABELS: '
+      ?~  LABELS  ''
+      |-  ^-  @T
+      ?~  T.LABELS  NAME.I.LABELS
+      :(C NAME.I.T.LABELS ', ' $(T.LABELS T.T.LABELS))
     ::
-      (c 'comments: ' (rsh 3 2 (scot %ui comments)))
-      (c 'url: ' url)
+      (C 'COMMENTS: ' (RSH 3 2 (SCOT %UI COMMENTS)))
+      (C 'URL: ' URL)
       ''
-      %+  turn  (to-wain body)  ::  strip carriage returns
-      |=  l/@t
-      ?:  =('' l)
-        l
-      ?.  =('\0d' (rsh 3 (dec (met 3 l)) l))
-        l
-      (end 3 (dec (met 3 l)) l)
+      %+  TURN  (TO-WAIN BODY)  ::  STRIP CARRIAGE RETURNS
+      |=  L/@T
+      ?:  =('' L)
+        L
+      ?.  =('\0D' (RSH 3 (DEC (MET 3 L)) L))
+        L
+      (END 3 (DEC (MET 3 L)) L)
   ==
 --

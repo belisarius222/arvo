@@ -1,131 +1,131 @@
 ::
-::::  /hoon/glass/gen
+::::  /HOON/GLASS/GEN
   ::
 /?    310
 ::
 ::::
   ::
-:-  %say
-|=  $:  {now/@da eny/@uvJ bec/beak}
+:-  %SAY
+|=  $:  {NOW/@DA ENY/@UVJ BEC/BEAK}
         *
     ==
-=<  [%noun ~]
+=<  [%NOUN ~]
 =>  |%
-    ++  wasp                                            ::  arvo effect
-      $%  {$wack p/@uvJ}                                ::  add entropy
-          {$what p/(list (pair path (pair term noun)))} ::  reset reptile
-          {$whom p/@p}                                  ::  id and boot
+    ++  WASP                                            ::  ARVO EFFECT
+      $%  {$WACK P/@UVJ}                                ::  ADD ENTROPY
+          {$WHAT P/(LIST (PAIR PATH (PAIR TERM NOUN)))} ::  RESET REPTILE
+          {$WHOM P/@P}                                  ::  ID AND BOOT
       ==
     --
 ::
-::  deterministic test
+::  DETERMINISTIC TEST
 ::
-=.  eny  0v0
+=.  ENY  0V0
 ::
-::  build arvo with existing compiler
+::  BUILD ARVO WITH EXISTING COMPILER
 ::
 |^  ^-  *
     ::
-    ::  neo: root path to boot system, `/~me/[desk]/now/neo`
+    ::  NEO: ROOT PATH TO BOOT SYSTEM, `/~ME/[DESK]/NOW/NEO`
     ::
-    =+  neo=`path`/(scot %p p.bec)/[q.bec]/(scot %da now)/neo
+    =+  NEO=`PATH`/(SCOT %P P.BEC)/[Q.BEC]/(SCOT %DA NOW)/NEO
     ::
-    ::  arvo-source: hoon source file producing arvo kernel, `neo/arvo`
+    ::  ARVO-SOURCE: HOON SOURCE FILE PRODUCING ARVO KERNEL, `NEO/ARVO`
     ::
-    =+  arvo-source=.^(@t %cx (welp neo /arvo/hoon))
+    =+  ARVO-SOURCE=.^(@T %CX (WELP NEO /ARVO/HOON))
     ::
-    ::  arvo-twig: parsed arvo source
+    ::  ARVO-TWIG: PARSED ARVO SOURCE
     ::
-    ~&  [%parsing `@p`(mug arvo-source)]
-    =+  arvo-twig=(ream arvo-source)
-    ~&  %parsed
+    ~&  [%PARSING `@P`(MUG ARVO-SOURCE)]
+    =+  ARVO-TWIG=(REAM ARVO-SOURCE)
+    ~&  %PARSED
     ::
-    ::  arvo-kernel: a living urbit
+    ::  ARVO-KERNEL: A LIVING URBIT
     ::
-    ~&  [%compiling `@p`(mug arvo-twig)]
-    =+  arvo-kernel=+:(slap !>(..ream) arvo-twig)
-    ~&  %compiled
+    ~&  [%COMPILING `@P`(MUG ARVO-TWIG)]
+    =+  ARVO-KERNEL=+:(SLAP !>(..REAM) ARVO-TWIG)
+    ~&  %COMPILED
     ::
-    ::  events: list of events to feed our urbit
+    ::  EVENTS: LIST OF EVENTS TO FEED OUR URBIT
     ::
-    ~&  %loading
-    =+  events=main-events
-    ~&  [%loaded `@p`(mug events)]
+    ~&  %LOADING
+    =+  EVENTS=MAIN-EVENTS
+    ~&  [%LOADED `@P`(MUG EVENTS)]
     ::
-    ::  execute events
+    ::  EXECUTE EVENTS
     ::
-    =+  number=0
+    =+  NUMBER=0
     |-  ^-  *
-    ?~  events  arvo-kernel
-    ~&  number+number
+    ?~  EVENTS  ARVO-KERNEL
+    ~&  NUMBER+NUMBER
     %=  $
-      events       t.events
-      number       +(number)
-      arvo-kernel  .*(arvo-kernel(+< i.events) -.arvo-kernel)
+      EVENTS       T.EVENTS
+      NUMBER       +(NUMBER)
+      ARVO-KERNEL  .*(ARVO-KERNEL(+< I.EVENTS) -.ARVO-KERNEL)
     ==
 ::
-++  main-events
-  =.  now  ~2017.3.1
-  =+  mov=main-moves
-  |-  ^-  (list (pair @da ovum))
-  ?~  mov  ~
-  :-  [now i.mov]
-  $(mov t.mov, now (add now (bex 48)))
+++  MAIN-EVENTS
+  =.  NOW  ~2017.3.1
+  =+  MOV=MAIN-MOVES
+  |-  ^-  (LIST (PAIR @DA OVUM))
+  ?~  MOV  ~
+  :-  [NOW I.MOV]
+  $(MOV T.MOV, NOW (ADD NOW (BEX 48)))
 ::
-++  main-moves
-  ^-  (list ovum)
-  :~  [[%$ ~] [%what boot-files]]
-      ::  [[%$ ~] [%whom ~zod]]
+++  MAIN-MOVES
+  ^-  (LIST OVUM)
+  :~  [[%$ ~] [%WHAT BOOT-FILES]]
+      ::  [[%$ ~] [%WHOM ~ZOD]]
   ==
-++  boot-files
-  ^-  (list (pair path (pair term noun)))
+++  BOOT-FILES
+  ^-  (LIST (PAIR PATH (PAIR TERM NOUN)))
   ::
-  ::  userspace:
+  ::  USERSPACE:
   ::
-  ::    /app    %gall applications
-  ::    /gen    :dojo generators
-  ::    /lib    %ford libraries
-  ::    /mar    %ford marks
-  ::    /sur    %ford structures
-  ::    /ren    %ford renderers
-  ::    /web    %eyre web content
-  ::    /sys    system files
-  ::    /neo    new system files
+  ::    /APP    %GALL APPLICATIONS
+  ::    /GEN    :DOJO GENERATORS
+  ::    /LIB    %FORD LIBRARIES
+  ::    /MAR    %FORD MARKS
+  ::    /SUR    %FORD STRUCTURES
+  ::    /REN    %FORD RENDERERS
+  ::    /WEB    %EYRE WEB CONTENT
+  ::    /SYS    SYSTEM FILES
+  ::    /NEO    NEW SYSTEM FILES
   ::
-  (user-files /neo ~)
+  (USER-FILES /NEO ~)
 ::
-++  user-files                                      ::  userspace loading
-  |=  ::  sal: all spurs to load from
+++  USER-FILES                                      ::  USERSPACE LOADING
+  |=  ::  SAL: ALL SPURS TO LOAD FROM
       ::
-      sal/(list spur)
-  ^-  (list (pair path (pair term noun)))
+      SAL/(LIST SPUR)
+  ^-  (LIST (PAIR PATH (PAIR TERM NOUN)))
   ::
-  ::  hav: all user files
+  ::  HAV: ALL USER FILES
   ::
-  =|  hav/(list (pair path (pair term noun)))
-  |-  ^+  hav
-  ?~  sal  ~
-  =.  hav  $(sal t.sal)
+  =|  HAV/(LIST (PAIR PATH (PAIR TERM NOUN)))
+  |-  ^+  HAV
+  ?~  SAL  ~
+  =.  HAV  $(SAL T.SAL)
   ::
-  ::  tyl: spur
+  ::  TYL: SPUR
   ::
-  =/  tyl  i.sal
-  |-  ^+  hav
+  =/  TYL  I.SAL
+  |-  ^+  HAV
   ::
-  ::  pax: full path at `tyl`
-  ::  lon: directory at `tyl`
+  ::  PAX: FULL PATH AT `TYL`
+  ::  LON: DIRECTORY AT `TYL`
   ::
-  =/  pax  (en-beam:format bec tyl)
-  =/  lon  .^(arch %cy pax)
-  =?  hav  ?=(^ fil.lon)
+  =/  PAX  (EN-BEAM:FORMAT BEC TYL)
+  =/  LON  .^(ARCH %CY PAX)
+  =?  HAV  ?=(^ FIL.LON)
       ::
-      ::  install only hoon files for now
+      ::  INSTALL ONLY HOON FILES FOR NOW
       ::
-      ?.  ?=({$hoon *} tyl)  hav
-      :_(hav [(flop `path`t.tyl) [%hoon .^(@t %cx pax)]])
+      ?.  ?=({$HOON *} TYL)  HAV
+      :_(HAV [(FLOP `PATH`T.TYL) [%HOON .^(@T %CX PAX)]])
   ::
-  =/  all  ~(tap by dir.lon)
-  |-  ^+  hav
-  ?~  all  hav
-  $(all t.all, hav ^$(tyl [p.i.all tyl]))
+  =/  ALL  ~(TAP BY DIR.LON)
+  |-  ^+  HAV
+  ?~  ALL  HAV
+  $(ALL T.ALL, HAV ^$(TYL [P.I.ALL TYL]))
 --

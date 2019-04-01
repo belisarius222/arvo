@@ -1,286 +1,286 @@
 ::
-::::  /lib/hall/hoon
+::::  /LIB/HALL/HOON
   ::
-/-    *hall
+/-    *HALL
 ::
 ::::
   ::
-|_  bol/bowl:gall
+|_  BOL/BOWL:GALL
 ::
-::TODO  add to zuse?
-++  true-self
-  |=  [our/ship now/@da who/ship]
-  ?.  ?=($earl (clan:title who))  who
-  (sein:title our now who)
+::TODO  ADD TO ZUSE?
+++  TRUE-SELF
+  |=  [OUR/SHIP NOW/@DA WHO/SHIP]
+  ?.  ?=($EARL (CLAN:TITLE WHO))  WHO
+  (SEIN:TITLE OUR NOW WHO)
 ::
-++  above
-  |=  [our/ship now/@da who/ship]
-  ?:  ?=($czar (clan:title who))  ~zod
-  (sein:title our now who)
+++  ABOVE
+  |=  [OUR/SHIP NOW/@DA WHO/SHIP]
+  ?:  ?=($CZAR (CLAN:TITLE WHO))  ~ZOD
+  (SEIN:TITLE OUR NOW WHO)
 ::
-++  said-url                                            ::  app url
-  |=  url/purl:eyre
-  :^  ost.bol  %poke  /said-url
-  :+  [our.bol %hall]  %hall-action
-  ^-  action
-  :+  %phrase
-    [[our.bol %inbox] ~ ~]
-  [%app dap.bol %lin | (crip (en-purl:html url))]~   :: XX
+++  SAID-URL                                            ::  APP URL
+  |=  URL/PURL:EYRE
+  :^  OST.BOL  %POKE  /SAID-URL
+  :+  [OUR.BOL %HALL]  %HALL-ACTION
+  ^-  ACTION
+  :+  %PHRASE
+    [[OUR.BOL %INBOX] ~ ~]
+  [%APP DAP.BOL %LIN | (CRIP (EN-PURL:HTML URL))]~   :: XX
 ::
-++  said                                                ::  app message
-  |=  mes/(list tank)
-  :-  %hall-action
-  ^-  action
-  :-  %phrase
-  :-  [[our.bol %inbox] ~ ~]
-  |-  ^-  (list speech)
-  ?~  mes  ~
-  :_  $(mes t.mes)
-  ^-  speech
-  [%app dap.bol %lin | (crip ~(ram re i.mes))]
+++  SAID                                                ::  APP MESSAGE
+  |=  MES/(LIST TANK)
+  :-  %HALL-ACTION
+  ^-  ACTION
+  :-  %PHRASE
+  :-  [[OUR.BOL %INBOX] ~ ~]
+  |-  ^-  (LIST SPEECH)
+  ?~  MES  ~
+  :_  $(MES T.MES)
+  ^-  SPEECH
+  [%APP DAP.BOL %LIN | (CRIP ~(RAM RE I.MES))]
 ::
-++  uniq
-  ^-  {serial _eny.bol}
-  [(shaf %serial eny.bol) (shax eny.bol)]
+++  UNIQ
+  ^-  {SERIAL _ENY.BOL}
+  [(SHAF %SERIAL ENY.BOL) (SHAX ENY.BOL)]
 ::
-::TODO  add to zuse?
-++  simple-wrap
-  |=  {txt/tape wyd/@ud}
-  ^-  (list tape)
-  ?~  txt  ~
-  =+  ^-  {end/@ud nex/?}
-    ?:  (lte (lent txt) wyd)  [(lent txt) &]
-    =+  ace=(find " " (flop (scag +(wyd) `tape`txt)))
-    ?~  ace  [wyd |]
-    [(sub wyd u.ace) &]
-  :-  (tufa (scag end `(list @)`txt))
-  $(txt (slag ?:(nex +(end) end) `tape`txt))
+::TODO  ADD TO ZUSE?
+++  SIMPLE-WRAP
+  |=  {TXT/TAPE WYD/@UD}
+  ^-  (LIST TAPE)
+  ?~  TXT  ~
+  =+  ^-  {END/@UD NEX/?}
+    ?:  (LTE (LENT TXT) WYD)  [(LENT TXT) &]
+    =+  ACE=(FIND " " (FLOP (SCAG +(WYD) `TAPE`TXT)))
+    ?~  ACE  [WYD |]
+    [(SUB WYD U.ACE) &]
+  :-  (TUFA (SCAG END `(LIST @)`TXT))
+  $(TXT (SLAG ?:(NEX +(END) END) `TAPE`TXT))
 ::
-++  range-to-path
-  ::    msg range to path
+++  RANGE-TO-PATH
+  ::    MSG RANGE TO PATH
   ::
-  ::  turns a range structure into a path used for
-  ::  subscriptions.
+  ::  TURNS A RANGE STRUCTURE INTO A PATH USED FOR
+  ::  SUBSCRIPTIONS.
   ::
-  |=  ran/range
-  ^-  path
-  ?~  ran  ~
-  :-  (place-to-knot hed.u.ran)
-  ?~  tal.u.ran  ~
-  [(place-to-knot u.tal.u.ran) ~]
+  |=  RAN/RANGE
+  ^-  PATH
+  ?~  RAN  ~
+  :-  (PLACE-TO-KNOT HED.U.RAN)
+  ?~  TAL.U.RAN  ~
+  [(PLACE-TO-KNOT U.TAL.U.RAN) ~]
 ::
-++  place-to-knot
-  ::    msg pointer to path component
+++  PLACE-TO-KNOT
+  ::    MSG POINTER TO PATH COMPONENT
   ::
-  ::  turns a place structure into a knot for use in
-  ::  subscription paths.
+  ::  TURNS A PLACE STRUCTURE INTO A KNOT FOR USE IN
+  ::  SUBSCRIPTION PATHS.
   ::
-  |=  pla/place
-  ^-  knot
-  ?.  ?=($sd -.pla)  (scot -.pla +.pla)
-  (cat 3 '-' (scot %ud (abs:si +.pla)))
+  |=  PLA/PLACE
+  ^-  KNOT
+  ?.  ?=($SD -.PLA)  (SCOT -.PLA +.PLA)
+  (CAT 3 '-' (SCOT %UD (ABS:SI +.PLA)))
 ::
-++  path-to-range
-  ::    path to msg range
+++  PATH-TO-RANGE
+  ::    PATH TO MSG RANGE
   ::
-  ::  turns the tail of a subscription path into a
-  ::  range structure, skipping over non-range terms.
+  ::  TURNS THE TAIL OF A SUBSCRIPTION PATH INTO A
+  ::  RANGE STRUCTURE, SKIPPING OVER NON-RANGE TERMS.
   ::
-  |=  pax/path
-  ^-  range
-  ?~  pax  ~
-  =/  hes/(unit place)  (rush i.pax placer)
-  ::  skip past non-number parts of path.
-  ?~  hes  $(pax t.pax)
-  :+  ~  u.hes
-  ?~  t.pax  ~
-  (rush i.t.pax placer)
+  |=  PAX/PATH
+  ^-  RANGE
+  ?~  PAX  ~
+  =/  HES/(UNIT PLACE)  (RUSH I.PAX PLACER)
+  ::  SKIP PAST NON-NUMBER PARTS OF PATH.
+  ?~  HES  $(PAX T.PAX)
+  :+  ~  U.HES
+  ?~  T.PAX  ~
+  (RUSH I.T.PAX PLACER)
 ::
-++  placer
-  ::  parse a range place
-  ;~  pose
-    (stag %ud dem:ag)
+++  PLACER
+  ::  PARSE A RANGE PLACE
+  ;~  POSE
+    (STAG %UD DEM:AG)
   ::
-    =-  (stag %da (sear - crub:so))
-    |=  a/dime
-    ^-  (unit @da)
-    ?:(?=($da p.a) `q.a ~)
+    =-  (STAG %DA (SEAR - CRUB:SO))
+    |=  A/DIME
+    ^-  (UNIT @DA)
+    ?:(?=($DA P.A) `Q.A ~)
   ::
-    %+  stag  %sd
-    %+  cook  (cury new:si |)
-    ;~(pfix hep dem:ag)
+    %+  STAG  %SD
+    %+  COOK  (CURY NEW:SI |)
+    ;~(PFIX HEP DEM:AG)
   ==
 ::
-++  change-glyphs                                       ::  ...
+++  CHANGE-GLYPHS                                       ::  ...
   ::
-  |=  {gys/(jug char audience) bin/? gyf/char aud/audience}
-  ^+  gys
-  ::  simple bind.
-  ?:  bin  (~(put ju gys) gyf aud)
-  ::  unbind all of glyph.
-  ?~  aud  (~(del by gys) gyf)
-  ::  unbind single.
-  (~(del ju gys) gyf aud)
+  |=  {GYS/(JUG CHAR AUDIENCE) BIN/? GYF/CHAR AUD/AUDIENCE}
+  ^+  GYS
+  ::  SIMPLE BIND.
+  ?:  BIN  (~(PUT JU GYS) GYF AUD)
+  ::  UNBIND ALL OF GLYPH.
+  ?~  AUD  (~(DEL BY GYS) GYF)
+  ::  UNBIND SINGLE.
+  (~(DEL JU GYS) GYF AUD)
 ::
-++  change-nicks
-  ::    change nick map
+++  CHANGE-NICKS
+  ::    CHANGE NICK MAP
   ::
-  ::  changes a nickname in a map, adding if it doesn't
-  ::  yet exist, removing if the nickname is empty.
+  ::  CHANGES A NICKNAME IN A MAP, ADDING IF IT DOESN'T
+  ::  YET EXIST, REMOVING IF THE NICKNAME IS EMPTY.
   ::
-  |=  {nis/(map ship cord) who/ship nic/cord}
-  ^+  nis
-  ?:  =(nic '')
-    (~(del by nis) who)
-  (~(put by nis) who nic)
+  |=  {NIS/(MAP SHIP CORD) WHO/SHIP NIC/CORD}
+  ^+  NIS
+  ?:  =(NIC '')
+    (~(DEL BY NIS) WHO)
+  (~(PUT BY NIS) WHO NIC)
 ::
-++  change-config
-  ::  applies a config diff to the given config.
+++  CHANGE-CONFIG
+  ::  APPLIES A CONFIG DIFF TO THE GIVEN CONFIG.
   ::
-  |=  {cof/config dif/diff-config}
-  ^+  cof
-  ?-  -.dif
-    $full     cof.dif
-    $caption  cof(cap cap.dif)
-    $filter   cof(fit fit.dif)
-    $remove   cof
-    $read     cof(red red.dif)
+  |=  {COF/CONFIG DIF/DIFF-CONFIG}
+  ^+  COF
+  ?-  -.DIF
+    $FULL     COF.DIF
+    $CAPTION  COF(CAP CAP.DIF)
+    $FILTER   COF(FIT FIT.DIF)
+    $REMOVE   COF
+    $READ     COF(RED RED.DIF)
   ::
-      $usage
-    %=  cof
-        tag
-      %.  tas.dif
-      ?:  add.dif
-        ~(uni in tag.cof)
-      ~(dif in tag.cof)
+      $USAGE
+    %=  COF
+        TAG
+      %.  TAS.DIF
+      ?:  ADD.DIF
+        ~(UNI IN TAG.COF)
+      ~(DIF IN TAG.COF)
     ==
   ::
-      $source
-    %=  cof
-        src
-      %.  src.dif
-      ?:  add.dif
-        ~(put in src.cof)
-      ~(del in src.cof)
+      $SOURCE
+    %=  COF
+        SRC
+      %.  SRC.DIF
+      ?:  ADD.DIF
+        ~(PUT IN SRC.COF)
+      ~(DEL IN SRC.COF)
     ==
   ::
-      $permit
-    %=  cof
-        sis.con
-      %.  sis.dif
-      ?:  add.dif
-        ~(uni in sis.con.cof)
-      ~(dif in sis.con.cof)
+      $PERMIT
+    %=  COF
+        SIS.CON
+      %.  SIS.DIF
+      ?:  ADD.DIF
+        ~(UNI IN SIS.CON.COF)
+      ~(DIF IN SIS.CON.COF)
     ==
   ::
-      $secure
-    %=  cof
-        sec.con
-      sec.dif
+      $SECURE
+    %=  COF
+        SEC.CON
+      SEC.DIF
     ::
-        sis.con
-      ?.  .=  ?=(?($white $green) sec.dif)
-              ?=(?($white $green) sec.con.cof)
+        SIS.CON
+      ?.  .=  ?=(?($WHITE $GREEN) SEC.DIF)
+              ?=(?($WHITE $GREEN) SEC.CON.COF)
         ~
-      sis.con.cof
+      SIS.CON.COF
     ==
   ==
 ::
-++  change-status
-  ::  applies a status diff to the given status.
+++  CHANGE-STATUS
+  ::  APPLIES A STATUS DIFF TO THE GIVEN STATUS.
   ::
-  |=  {sat/status dif/diff-status}
-  ^+  sat
-  ?-  -.dif
-    $full       sat.dif
-    $presence   sat(pec pec.dif)
-    $remove     sat
+  |=  {SAT/STATUS DIF/DIFF-STATUS}
+  ^+  SAT
+  ?-  -.DIF
+    $FULL       SAT.DIF
+    $PRESENCE   SAT(PEC PEC.DIF)
+    $REMOVE     SAT
   ::
-      $human
-    %=  sat
-        man
-      ?-  -.dif.dif
-        $full     man.dif.dif
-        $true     [han.man.sat tru.dif.dif]
-        $handle   [han.dif.dif tru.man.sat]
+      $HUMAN
+    %=  SAT
+        MAN
+      ?-  -.DIF.DIF
+        $FULL     MAN.DIF.DIF
+        $TRUE     [HAN.MAN.SAT TRU.DIF.DIF]
+        $HANDLE   [HAN.DIF.DIF TRU.MAN.SAT]
       ==
     ==
   ==
 ::
-::TODO  annotate all!
-++  depa                                              ::  de-pathing core
-  =>  |%  ++  grub  *                                 ::  result
-          ++  weir  (list coin)                       ::  parsed wire
-          ++  fist  $-(weir grub)                     ::  reparser instance
+::TODO  ANNOTATE ALL!
+++  DEPA                                              ::  DE-PATHING CORE
+  =>  |%  ++  GRUB  *                                 ::  RESULT
+          ++  WEIR  (LIST COIN)                       ::  PARSED WIRE
+          ++  FIST  $-(WEIR GRUB)                     ::  REPARSER INSTANCE
       --
   |%
   ::
-  ++  al
-    |*  {hed/$-(coin *) tal/fist}
-    |=  wir/weir  ^+  [*hed *tal]
-    ?~  wir  !!
-    [(hed i.wir) (tal t.wir)]
+  ++  AL
+    |*  {HED/$-(COIN *) TAL/FIST}
+    |=  WIR/WEIR  ^+  [*HED *TAL]
+    ?~  WIR  !!
+    [(HED I.WIR) (TAL T.WIR)]
   ::
-  ++  at
-    |*  typ/{@tas (pole @tas)}
-    =+  [i-typ t-typ]=typ
-    |=  wer/weir
-    ^-  (tup:dray:wired i-typ t-typ)  ::  ie, (tup %p %tas ~) is {@p @tas}
-    ?~  wer  !!
-    ?~  t-typ
-      ?^  t.wer  !!
-      ((do i-typ) i.wer)
-    :-  ((do i-typ) i.wer)
-    (^$(typ t-typ) t.wer)
+  ++  AT
+    |*  TYP/{@TAS (POLE @TAS)}
+    =+  [I-TYP T-TYP]=TYP
+    |=  WER/WEIR
+    ^-  (TUP:DRAY:WIRED I-TYP T-TYP)  ::  IE, (TUP %P %TAS ~) IS {@P @TAS}
+    ?~  WER  !!
+    ?~  T-TYP
+      ?^  T.WER  !!
+      ((DO I-TYP) I.WER)
+    :-  ((DO I-TYP) I.WER)
+    (^$(TYP T-TYP) T.WER)
   ::
-  ++  mu                                              ::  true unit
-    |*  wit/fist
-    |=  wer/weir
-    ?~(wer ~ (some (wit wer)))
+  ++  MU                                              ::  TRUE UNIT
+    |*  WIT/FIST
+    |=  WER/WEIR
+    ?~(WER ~ (SOME (WIT WER)))
   ::
-  ++  af                                              ::  object as frond
-    |*  buk/(pole {cord fist})
-    |=  wer/weir
-    ?>  ?=({{$$ $tas @tas} *} wer)
-    ?~  buk  !!
-    =+  [[tag wit] t-buk]=buk
-    ?:  =(tag q.p.i.wer)
-      [tag ~|(tag+`@tas`tag (wit t.wer))]
-    ?~  t-buk  ~|(bad-tag+`@tas`q.p.i.wer !!)
-    (^$(buk t-buk) wer)
+  ++  AF                                              ::  OBJECT AS FROND
+    |*  BUK/(POLE {CORD FIST})
+    |=  WER/WEIR
+    ?>  ?=({{$$ $TAS @TAS} *} WER)
+    ?~  BUK  !!
+    =+  [[TAG WIT] T-BUK]=BUK
+    ?:  =(TAG Q.P.I.WER)
+      [TAG ~|(TAG+`@TAS`TAG (WIT T.WER))]
+    ?~  T-BUK  ~|(BAD-TAG+`@TAS`Q.P.I.WER !!)
+    (^$(BUK T-BUK) WER)
   ::
-  ++  or
-    =+  typ=$:|-($@(@tas {@tas $}))
+  ++  OR
+    =+  TYP=$:|-($@(@TAS {@TAS $}))
     |@  ++  $
-          |=  con/coin
-          ::^-  _(snag *@ (turn (limo typ) |*(a/@tas [a (odo:raid:wired a)])))
-          ?>  ?=($$ -.con)
-          =/  i-typ  ?@(typ typ -.typ)
-          ?:  =(i-typ p.p.con)
-            :-  i-typ
-            ^-  (odo:raid:wired i-typ)
-            q.p.con
-          ?@  typ  ~|(%bad-odor !!)
-          (^$(typ +.typ) con)
+          |=  CON/COIN
+          ::^-  _(SNAG *@ (TURN (LIMO TYP) |*(A/@TAS [A (ODO:RAID:WIRED A)])))
+          ?>  ?=($$ -.CON)
+          =/  I-TYP  ?@(TYP TYP -.TYP)
+          ?:  =(I-TYP P.P.CON)
+            :-  I-TYP
+            ^-  (ODO:RAID:WIRED I-TYP)
+            Q.P.CON
+          ?@  TYP  ~|(%BAD-ODOR !!)
+          (^$(TYP +.TYP) CON)
     --
   ::
-  ++  do
-    |*  typ/@tas
-    =/  typecheck  `@tas`typ
-    |=  con/coin
-    ^-  (odo:raid:wired typ)
-    ?.  ?=($$ -.con)  ~|(%not-dime !!)
-    ?.  =(typ p.p.con)  ~|(bad-odor+`@tas`p.p.con !!)
-    q.p.con
+  ++  DO
+    |*  TYP/@TAS
+    =/  TYPECHECK  `@TAS`TYP
+    |=  CON/COIN
+    ^-  (ODO:RAID:WIRED TYP)
+    ?.  ?=($$ -.CON)  ~|(%NOT-DIME !!)
+    ?.  =(TYP P.P.CON)  ~|(BAD-ODOR+`@TAS`P.P.CON !!)
+    Q.P.CON
   ::
-  ++  ul                                              ::  null
-    |=(wer/weir ?~(wer ~ !!))
+  ++  UL                                              ::  NULL
+    |=(WER/WEIR ?~(WER ~ !!))
   ::
-  ++  un
-    |*  wit/$-(coin *)
-    |=  wer/weir  ^+  *wit
-    ?~  wer  !!
-    ?^  t.wer  !!
-    (wit i.wer)
+  ++  UN
+    |*  WIT/$-(COIN *)
+    |=  WER/WEIR  ^+  *WIT
+    ?~  WER  !!
+    ?^  T.WER  !!
+    (WIT I.WER)
   --
 --

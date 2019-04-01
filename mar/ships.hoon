@@ -1,15 +1,15 @@
 ::
-::::  /hoon/ships/mar
+::::  /HOON/SHIPS/MAR
   ::
 /?    310
-=,  format
-|_  all/(list ship)
-++  grab  |%
-          ++  noun  (list ship)
-          ++  json  (ar (su fed:ag)):dejs
+=,  FORMAT
+|_  ALL/(LIST SHIP)
+++  GRAB  |%
+          ++  NOUN  (LIST SHIP)
+          ++  JSON  (AR (SU FED:AG)):DEJS
           --
-++  grow  |%
-          ++  json  `^json`[%a (turn all ship:enjs)]
+++  GROW  |%
+          ++  JSON  `^JSON`[%A (TURN ALL SHIP:ENJS)]
           --
-++  grad  %json
+++  GRAD  %JSON
 --

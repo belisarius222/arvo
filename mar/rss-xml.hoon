@@ -1,10 +1,10 @@
 ::
-::::  /hoon/rss-xml/mar
+::::  /HOON/RSS-XML/MAR
   ::
 /?  310
 ::
-:: alias
-/:  /===/mar/xml
-    /!noun/
+:: ALIAS
+/:  /===/MAR/XML
+    /!NOUN/
 ::
 -

@@ -1,6 +1,6 @@
-^-  manx
+^-  MANX
 
-;div
-  ;div(urb-component "InboxPage");
-  ;input(type "hidden", name "urb-metadata", urb-structure-type "header-inbox");
+;DIV
+  ;DIV(URB-COMPONENT "INBOXPAGE");
+  ;INPUT(TYPE "HIDDEN", NAME "URB-METADATA", URB-STRUCTURE-TYPE "HEADER-INBOX");
 ==

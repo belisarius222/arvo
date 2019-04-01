@@ -1,33 +1,33 @@
-::  This structure is the hoon equivalent of the labels resource used by the
-::  gmail api
+::  THIS STRUCTURE IS THE HOON EQUIVALENT OF THE LABELS RESOURCE USED BY THE
+::  GMAIL API
 
 
 |%
-++  label-list-visibility
-  $?  $'labelHide'            ::  Do not show the label in the label list
-      $'labelShow'            ::  Show the label in the label list. (Default)
-      $'labelShowIfUnread'    ::  Show the label if any unread msgs w/that label.
+++  LABEL-LIST-VISIBILITY
+  $?  $'LABELHIDE'            ::  DO NOT SHOW THE LABEL IN THE LABEL LIST
+      $'LABELSHOW'            ::  SHOW THE LABEL IN THE LABEL LIST. (DEFAULT)
+      $'LABELSHOWIFUNREAD'    ::  SHOW THE LABEL IF ANY UNREAD MSGS W/THAT LABEL.
   ==
-++  message-list-visibility
-  $?  $hide                    ::  Do not show the label in the message list.
-      $show                    ::  Show the label in the message list. (Default)
+++  MESSAGE-LIST-VISIBILITY
+  $?  $HIDE                    ::  DO NOT SHOW THE LABEL IN THE MESSAGE LIST.
+      $SHOW                    ::  SHOW THE LABEL IN THE MESSAGE LIST. (DEFAULT)
   ==
 --
 
 |%
-::  label request is the body of the post request you send to gmail to create
-::  a labels resource
-++  label-req  {llv/label-list-visibility mlv/message-list-visibility name/@t}
+::  LABEL REQUEST IS THE BODY OF THE POST REQUEST YOU SEND TO GMAIL TO CREATE
+::  A LABELS RESOURCE
+++  LABEL-REQ  {LLV/LABEL-LIST-VISIBILITY MLV/MESSAGE-LIST-VISIBILITY NAME/@T}
 
-::  the label resource returned by gmail in response to your successful request
-++  label  *
+::  THE LABEL RESOURCE RETURNED BY GMAIL IN RESPONSE TO YOUR SUCCESSFUL REQUEST
+++  LABEL  *
 
-++  label-req-to-json  !!
-::  XX belongs in a lib/
-::   |=  label-req
-::   %-  jobe  :^
-::   ['name' `json`s+name]
-::   ['labelListVisibility' `json`s+(crip (sifo `cord`llv))]
-::   ['messageListVisibility' `json`s+(crip (sifo `cord`mlv))]
+++  LABEL-REQ-TO-JSON  !!
+::  XX BELONGS IN A LIB/
+::   |=  LABEL-REQ
+::   %-  JOBE  :^
+::   ['NAME' `JSON`S+NAME]
+::   ['LABELLISTVISIBILITY' `JSON`S+(CRIP (SIFO `CORD`LLV))]
+::   ['MESSAGELISTVISIBILITY' `JSON`S+(CRIP (SIFO `CORD`MLV))]
 ::   ~
 --

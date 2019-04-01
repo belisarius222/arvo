@@ -1,589 +1,589 @@
 ::
-::::  /app/collections/hoon
+::::  /APP/COLLECTIONS/HOON
   ::
 /?  309
-/-  hall
-/+  collections
+/-  HALL
+/+  COLLECTIONS
 ::
-::  cols:
+::  COLS:
 ::
-::    run collections-item renderer on children of /web/collections
-::    combine with a bunted config in a +collection structure defined in
-::    /lib/collections because the top level collection has no config file
+::    RUN COLLECTIONS-ITEM RENDERER ON CHILDREN OF /WEB/COLLECTIONS
+::    COMBINE WITH A BUNTED CONFIG IN A +COLLECTION STRUCTURE DEFINED IN
+::    /LIB/COLLECTIONS BECAUSE THE TOP LEVEL COLLECTION HAS NO CONFIG FILE
 ::
-::    whenever any of the clay files that compose this renderer change, this app
-::    will recompile and the +prep arm will fire. we then check which files
-::    changed and notify the corresponding hall circle of that change
+::    WHENEVER ANY OF THE CLAY FILES THAT COMPOSE THIS RENDERER CHANGE, THIS APP
+::    WILL RECOMPILE AND THE +PREP ARM WILL FIRE. WE THEN CHECK WHICH FILES
+::    CHANGED AND NOTIFY THE CORRESPONDING HALL CIRCLE OF THAT CHANGE
 ::
-/=  cols
-  /^  collection:collections
-  /;  |=  a=(map knot item:collections)
-      [*config:collections a]
-  /:  /===/web/collections  /_  /collections-item/
+/=  COLS
+  /^  COLLECTION:COLLECTIONS
+  /;  |=  A=(MAP KNOT ITEM:COLLECTIONS)
+      [*CONFIG:COLLECTIONS A]
+  /:  /===/WEB/COLLECTIONS  /_  /COLLECTIONS-ITEM/
 ::
-=,  collections
-=,  space:userlib
+=,  COLLECTIONS
+=,  SPACE:USERLIB
 ::
-::  state:
+::  STATE:
 ::
-::    stores the collection built by above by :cols so that we can compare old
-::    and new versions whenever the rendered data changes
+::    STORES THE COLLECTION BUILT BY ABOVE BY :COLS SO THAT WE CAN COMPARE OLD
+::    AND NEW VERSIONS WHENEVER THE RENDERED DATA CHANGES
 ::
-~%  %landscape  ..^is  ~
-|_  [bol=bowl:gall sta=state]
+~%  %LANDSCAPE  ..^IS  ~
+|_  [BOL=BOWL:GALL STA=STATE]
 ::
-::  +this: app core subject
+::  +THIS: APP CORE SUBJECT
 ::
-++  this  .
+++  THIS  .
 ::
-::  +prep:
+::  +PREP:
 ::
-::    on initial boot, create top level hall circle for collections, called %c
+::    ON INITIAL BOOT, CREATE TOP LEVEL HALL CIRCLE FOR COLLECTIONS, CALLED %C
 ::
-::    on subsequent compiles, call +ta-update:ta on the old collection data,
-::    then update state to store the new collection data
+::    ON SUBSEQUENT COMPILES, CALL +TA-UPDATE:TA ON THE OLD COLLECTION DATA,
+::    THEN UPDATE STATE TO STORE THE NEW COLLECTION DATA
 ::
-++  prep
-  ~/  %land-prep
-  |=  old=(unit state)
-  ^-  (quip move _this)
-  ?~  old
-    :_  this
-    ;:  welp
-      =<  ta-done
-      (~(ta-hall-create-circle ta ~ bol) /c 'collections')
+++  PREP
+  ~/  %LAND-PREP
+  |=  OLD=(UNIT STATE)
+  ^-  (QUIP MOVE _THIS)
+  ?~  OLD
+    :_  THIS
+    ;:  WELP
+      =<  TA-DONE
+      (~(TA-HALL-CREATE-CIRCLE TA ~ BOL) /C 'COLLECTIONS')
     ::
-      :~  [ost.bol %peer /circles [our.bol %hall] /circles/[(scot %p our.bol)]]
-          [ost.bol %peer /inbox [our.bol %hall] /circle/inbox/config/grams]
-          [ost.bol %peer /invites [our.bol %hall] /circle/i/grams]
+      :~  [OST.BOL %PEER /CIRCLES [OUR.BOL %HALL] /CIRCLES/[(SCOT %P OUR.BOL)]]
+          [OST.BOL %PEER /INBOX [OUR.BOL %HALL] /CIRCLE/INBOX/CONFIG/GRAMS]
+          [OST.BOL %PEER /INVITES [OUR.BOL %HALL] /CIRCLE/I/GRAMS]
         ::
-      ::    ?.  =(%duke (clan:title our.bol))
+      ::    ?.  =(%DUKE (CLAN:TITLE OUR.BOL))
       ::      ~
       ::    :_  ~
-      ::    :*  ost.bol  %poke  /client-action  [our.bol %hall]
-      ::        %hall-action  %source  %inbox  &
-      ::        (sy [[(^sein:title our.bol) %urbit-meta] ~]~)
+      ::    :*  OST.BOL  %POKE  /CLIENT-ACTION  [OUR.BOL %HALL]
+      ::        %HALL-ACTION  %SOURCE  %INBOX  &
+      ::        (SY [[(^SEIN:TITLE OUR.BOL) %URBIT-META] ~]~)
       ::    ==
       ==
     ==
-  ?-    -.u.old
+  ?-    -.U.OLD
       %0
-    =/  mow=(list move)
-      =<  ta-done
-      (~(ta-update ta ~ bol) col.u.old cols)
-    :-  mow
-    %=  this
-      sta  [%0 cols str.u.old]
+    =/  MOW=(LIST MOVE)
+      =<  TA-DONE
+      (~(TA-UPDATE TA ~ BOL) COL.U.OLD COLS)
+    :-  MOW
+    %=  THIS
+      STA  [%0 COLS STR.U.OLD]
     ==
   ==
 ::
-::  +mack:
+::  +MACK:
 ::
-::    recieve acknowledgement for permissions changes, print error if it failed
+::    RECIEVE ACKNOWLEDGEMENT FOR PERMISSIONS CHANGES, PRINT ERROR IF IT FAILED
 ::
-++  mack
-  |=  [wir=wire err=(unit tang)]
-  ^-  (quip move _this)
-  ?~  err
-    [~ this]
-  (mean u.err)
+++  MACK
+  |=  [WIR=WIRE ERR=(UNIT TANG)]
+  ^-  (QUIP MOVE _THIS)
+  ?~  ERR
+    [~ THIS]
+  (MEAN U.ERR)
 ::
-::  +coup: recieve acknowledgement for poke, print error if it failed
+::  +COUP: RECIEVE ACKNOWLEDGEMENT FOR POKE, PRINT ERROR IF IT FAILED
 ::
-++  coup
-  |=  [wir=wire err=(unit tang)]
-  ^-  (quip move _this)
-  ?~  err
-    [~ this]
-  (mean u.err)
+++  COUP
+  |=  [WIR=WIRE ERR=(UNIT TANG)]
+  ^-  (QUIP MOVE _THIS)
+  ?~  ERR
+    [~ THIS]
+  (MEAN U.ERR)
 ::
-::  +poke-collections-action:
+::  +POKE-COLLECTIONS-ACTION:
 ::
-::    the main interface for creating and deleting collections and items
+::    THE MAIN INTERFACE FOR CREATING AND DELETING COLLECTIONS AND ITEMS
 ::
-++  poke-collections-action
-  ~/  %coll-poke-collections-action
-  |=  act=action
-  ^-  (quip move _this)
-  ?:  =(who.act our.bol)
-    :_  this
-    =<  ta-done
-    (~(ta-act ta ~ bol) act)
-  ::  forward poke if its not meant for us
+++  POKE-COLLECTIONS-ACTION
+  ~/  %COLL-POKE-COLLECTIONS-ACTION
+  |=  ACT=ACTION
+  ^-  (QUIP MOVE _THIS)
+  ?:  =(WHO.ACT OUR.BOL)
+    :_  THIS
+    =<  TA-DONE
+    (~(TA-ACT TA ~ BOL) ACT)
+  ::  FORWARD POKE IF ITS NOT MEANT FOR US
   ::
-  :_  this
+  :_  THIS
   :_  ~
-  :*  ost.bol  %poke
-      /forward-collections-action
-      [who.act %collections]
-      %collections-action  act
+  :*  OST.BOL  %POKE
+      /FORWARD-COLLECTIONS-ACTION
+      [WHO.ACT %COLLECTIONS]
+      %COLLECTIONS-ACTION  ACT
   ==
 ::
-::  +poke-json
+::  +POKE-JSON
 ::
-::    utility for setting whether or not to display the onboarding page
+::    UTILITY FOR SETTING WHETHER OR NOT TO DISPLAY THE ONBOARDING PAGE
 ::
-++  poke-json
-  ~/  %coll-poke-json
-  |=  jon=json
-  ^-  (quip move _this)
-  ?:  ?=([%o [[%onboard %b ?] ~ ~]] jon)
-    :_  this
-    =<  ta-done
-    (~(ta-write ta ~ bol) /web/landscape/onboard/json [%json !>(jon)])
-  [~ this]
+++  POKE-JSON
+  ~/  %COLL-POKE-JSON
+  |=  JON=JSON
+  ^-  (QUIP MOVE _THIS)
+  ?:  ?=([%O [[%ONBOARD %B ?] ~ ~]] JON)
+    :_  THIS
+    =<  TA-DONE
+    (~(TA-WRITE TA ~ BOL) /WEB/LANDSCAPE/ONBOARD/JSON [%JSON !>(JON)])
+  [~ THIS]
 ::
-::  +poke-collections-command
+::  +POKE-COLLECTIONS-COMMAND
 ::
-++  poke-collections-command
-  |=  cod=command
-  ^-  (quip move _this)
-  ?-    -.cod
-      %chat-invite
-    :_  this
-    :-  :*  ost.bol
-            %poke
-            /permit
-            [our.bol %hall]
-            %hall-action
-            %permit
-            nom.cod
-            %.y
-            who.cod
+++  POKE-COLLECTIONS-COMMAND
+  |=  COD=COMMAND
+  ^-  (QUIP MOVE _THIS)
+  ?-    -.COD
+      %CHAT-INVITE
+    :_  THIS
+    :-  :*  OST.BOL
+            %POKE
+            /PERMIT
+            [OUR.BOL %HALL]
+            %HALL-ACTION
+            %PERMIT
+            NOM.COD
+            %.Y
+            WHO.COD
         ==
-    %+  turn  ~(tap in who.cod)
-    |=  guy=@p
-    ^-  move
-    :*  ost.bol
-        %poke
-        /invite
-        [our.bol %hall]
-        %hall-action
-        %phrase
-        aud=(sy [guy %i] ~)
-        ses=[%inv & our.bol nom.cod]~
+    %+  TURN  ~(TAP IN WHO.COD)
+    |=  GUY=@P
+    ^-  MOVE
+    :*  OST.BOL
+        %POKE
+        /INVITE
+        [OUR.BOL %HALL]
+        %HALL-ACTION
+        %PHRASE
+        AUD=(SY [GUY %I] ~)
+        SES=[%INV & OUR.BOL NOM.COD]~
     ==
     ::
-      %collection-invite
-    :_  this
-    :-  :*  ost.bol
-            %poke
-            /permit
-            [our.bol %hall]
-            %hall-action
-            %permit
-            nom.cod
-            %.y
-            who.cod
+      %COLLECTION-INVITE
+    :_  THIS
+    :-  :*  OST.BOL
+            %POKE
+            /PERMIT
+            [OUR.BOL %HALL]
+            %HALL-ACTION
+            %PERMIT
+            NOM.COD
+            %.Y
+            WHO.COD
         ==
-    %+  turn  ~(tap in who.cod)
-    |=  guy=@p
-    ^-  move
-    :*  ost.bol
-        %poke
-        /invite
-        [our.bol %hall]
-        %hall-action
-        %phrase
-        aud=(sy [guy %i] ~)
-        ses=[%app col.cod [%inv & our.bol nom.cod]]~
+    %+  TURN  ~(TAP IN WHO.COD)
+    |=  GUY=@P
+    ^-  MOVE
+    :*  OST.BOL
+        %POKE
+        /INVITE
+        [OUR.BOL %HALL]
+        %HALL-ACTION
+        %PHRASE
+        AUD=(SY [GUY %I] ~)
+        SES=[%APP COL.COD [%INV & OUR.BOL NOM.COD]]~
     ==
   ==
 ::
-::  +peer:
+::  +PEER:
 ::
-++  peer
-  |=  wir=wire
-  ^-  (quip move _this)
-  ::~&  peer-prize+str.sta
-  :_  this
-  [ost.bol %diff %collections-prize str.sta]~
+++  PEER
+  |=  WIR=WIRE
+  ^-  (QUIP MOVE _THIS)
+  ::~&  PEER-PRIZE+STR.STA
+  :_  THIS
+  [OST.BOL %DIFF %COLLECTIONS-PRIZE STR.STA]~
 ::
-::  +reap: recieve acknowledgement for peer, retry on failure
+::  +REAP: RECIEVE ACKNOWLEDGEMENT FOR PEER, RETRY ON FAILURE
 ::
-++  reap
-  |=  [wir=wire err=(unit tang)]
-  ^-  (quip move _this)
-  ::~&  reap+[wir =(~ err)]
-  ?~  err
-    ::  XX send message to users inbox
-    [~ this]
-  ?~  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
-  ?+  i.wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  REAP
+  |=  [WIR=WIRE ERR=(UNIT TANG)]
+  ^-  (QUIP MOVE _THIS)
+  ::~&  REAP+[WIR =(~ ERR)]
+  ?~  ERR
+    ::  XX SEND MESSAGE TO USERS INBOX
+    [~ THIS]
+  ?~  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
+  ?+  I.WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-      %circles
-    :_  this
-    [ost.bol %peer /circles [our.bol %hall] /circles/[(scot %p our.bol)]]~
+      %CIRCLES
+    :_  THIS
+    [OST.BOL %PEER /CIRCLES [OUR.BOL %HALL] /CIRCLES/[(SCOT %P OUR.BOL)]]~
   ::
-      %inbox
-    :_  this
-    [ost.bol %peer /inbox [our.bol %hall] /circle/inbox/config/grams]~
+      %INBOX
+    :_  THIS
+    [OST.BOL %PEER /INBOX [OUR.BOL %HALL] /CIRCLE/INBOX/CONFIG/GRAMS]~
   ::
-      %invites
-    :_  this
-    [ost.bol %peer /invites [our.bol %hall] /circle/i/grams]~
+      %INVITES
+    :_  THIS
+    [OST.BOL %PEER /INVITES [OUR.BOL %HALL] /CIRCLE/I/GRAMS]~
   ::
-      %our
-    ?<  ?=(~ t.wir)
-    :_  this
-    [ost.bol %peer /our/[i.t.wir] [our.bol %hall] /circle/[i.t.wir]/config]~
+      %OUR
+    ?<  ?=(~ T.WIR)
+    :_  THIS
+    [OST.BOL %PEER /OUR/[I.T.WIR] [OUR.BOL %HALL] /CIRCLE/[I.T.WIR]/CONFIG]~
   ==
 ::
-::  +quit:
+::  +QUIT:
 ::
-++  quit
-  |=  wir=wire
-  ^-  (quip move _this)
-  ?~  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
-  ?+  i.wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  QUIT
+  |=  WIR=WIRE
+  ^-  (QUIP MOVE _THIS)
+  ?~  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
+  ?+  I.WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-      %circles
-    :_  this
-    [ost.bol %peer /circles [our.bol %hall] /circles/[(scot %p our.bol)]]~
+      %CIRCLES
+    :_  THIS
+    [OST.BOL %PEER /CIRCLES [OUR.BOL %HALL] /CIRCLES/[(SCOT %P OUR.BOL)]]~
   ::
-      %inbox
-    :_  this
-    [ost.bol %peer /inbox [our.bol %hall] /circle/inbox/config/grams]~
+      %INBOX
+    :_  THIS
+    [OST.BOL %PEER /INBOX [OUR.BOL %HALL] /CIRCLE/INBOX/CONFIG/GRAMS]~
   ::
-      %invites
-    :_  this
-    [ost.bol %peer /invites [our.bol %hall] /circle/i/grams]~
+      %INVITES
+    :_  THIS
+    [OST.BOL %PEER /INVITES [OUR.BOL %HALL] /CIRCLE/I/GRAMS]~
   ::
-      %our
-    ?<  ?=(~ t.wir)
-    :_  this
-    [ost.bol %peer /our/[i.t.wir] [our.bol %hall] /circle/[i.t.wir]/config]~
+      %OUR
+    ?<  ?=(~ T.WIR)
+    :_  THIS
+    [OST.BOL %PEER /OUR/[I.T.WIR] [OUR.BOL %HALL] /CIRCLE/[I.T.WIR]/CONFIG]~
   ==
 ::
-::  +diff-hall-prize:
+::  +DIFF-HALL-PRIZE:
 ::
-++  diff-hall-prize
-  |=  [wir=wire piz=prize:hall]
-  ^-  (quip move _this)
+++  DIFF-HALL-PRIZE
+  |=  [WIR=WIRE PIZ=PRIZE:HALL]
+  ^-  (QUIP MOVE _THIS)
   ::
   ::
-  ::~&  prize+[wir piz]
-  ?~  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
-  ?+  i.wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+  ::~&  PRIZE+[WIR PIZ]
+  ?~  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
+  ?+  I.WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-  ::  %circles: subscribe to the configuration of each of our circles
+  ::  %CIRCLES: SUBSCRIBE TO THE CONFIGURATION OF EACH OF OUR CIRCLES
   ::
-      %circles
-    ?>  ?=(%circles -.piz)
-    =/  noms=(set name:hall)  (~(dif in cis.piz) (sy ~[%inbox %i %public]))
-    :_  this(our-circles.str.sta (~(uni in our-circles.str.sta) noms))
-    ^-  (list move)
-    %+  turn  ~(tap in noms)
-    |=  nom=name:hall
-    ^-  move
-    [ost.bol %peer /our/[nom] [our.bol %hall] /circle/[nom]/config]
+      %CIRCLES
+    ?>  ?=(%CIRCLES -.PIZ)
+    =/  NOMS=(SET NAME:HALL)  (~(DIF IN CIS.PIZ) (SY ~[%INBOX %I %PUBLIC]))
+    :_  THIS(OUR-CIRCLES.STR.STA (~(UNI IN OUR-CIRCLES.STR.STA) NOMS))
+    ^-  (LIST MOVE)
+    %+  TURN  ~(TAP IN NOMS)
+    |=  NOM=NAME:HALL
+    ^-  MOVE
+    [OST.BOL %PEER /OUR/[NOM] [OUR.BOL %HALL] /CIRCLE/[NOM]/CONFIG]
   ::
-  ::  %inbox: fill inbox config, messages and remote configs with prize data
+  ::  %INBOX: FILL INBOX CONFIG, MESSAGES AND REMOTE CONFIGS WITH PRIZE DATA
   ::
-      %inbox
-    ?>  ?=(%circle -.piz)
+      %INBOX
+    ?>  ?=(%CIRCLE -.PIZ)
     :-  ~
-    %=    this
-        con.inbox.str.sta  `loc.cos.piz
+    %=    THIS
+        CON.INBOX.STR.STA  `LOC.COS.PIZ
     ::
-        env.inbox.str.sta  nes.piz
+        ENV.INBOX.STR.STA  NES.PIZ
     ::
-        circles.str.sta
-      %-  ~(uni in circles.str.sta)
-      ^-  (map circle:hall (unit config:hall))
-      (~(run by rem.cos.piz) |=(a=config:hall `a))
+        CIRCLES.STR.STA
+      %-  ~(UNI IN CIRCLES.STR.STA)
+      ^-  (MAP CIRCLE:HALL (UNIT CONFIG:HALL))
+      (~(RUN BY REM.COS.PIZ) |=(A=CONFIG:HALL `A))
     ==
   ::
-  ::  %invites: fill invite messages with prize data
+  ::  %INVITES: FILL INVITE MESSAGES WITH PRIZE DATA
   ::
-      %invites
-    ?>  ?=(%circle -.piz)
+      %INVITES
+    ?>  ?=(%CIRCLE -.PIZ)
     :-  ~
-    %=  this
-      invites.str.sta  nes.piz
+    %=  THIS
+      INVITES.STR.STA  NES.PIZ
     ==
   ::
-  ::  %our:
+  ::  %OUR:
   ::
-      %our
-    ?>  ?=(%circle -.piz)
-    =/  nom=name:hall  &2:wir
-    ::  XX todo: send rumor or let config-change handle it?
+      %OUR
+    ?>  ?=(%CIRCLE -.PIZ)
+    =/  NOM=NAME:HALL  &2:WIR
+    ::  XX TODO: SEND RUMOR OR LET CONFIG-CHANGE HANDLE IT?
     ::
     :-  ~
-    %=    this
-        circles.str.sta
-      (~(put by circles.str.sta) [our.bol nom] `loc.cos.piz)
+    %=    THIS
+        CIRCLES.STR.STA
+      (~(PUT BY CIRCLES.STR.STA) [OUR.BOL NOM] `LOC.COS.PIZ)
     ::
-      our-circles.str.sta  (~(put in our-circles.str.sta) nom)
+      OUR-CIRCLES.STR.STA  (~(PUT IN OUR-CIRCLES.STR.STA) NOM)
     ==
   ==
 ::
-::  +diff-hall-rumor
+::  +DIFF-HALL-RUMOR
 ::
-++  diff-hall-rumor
-  |=  [wir=wire rum=rumor:hall]
-  ^-  (quip move _this)
-  ::~&  rumor+[wir rum]
-  ?~  wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
-  =;  upd=[mow=(list move) sta=_this]
-    :_  sta.upd
-    %+  welp  mow.upd
-    %+  turn  (prey:pubsub:userlib /primary bol)
-    |=  [=bone *]
-    [bone %diff %hall-rumor rum]
-  ?+  i.wir
-    (mean [leaf+"invalid wire for diff: {(spud wir)}"]~)
+++  DIFF-HALL-RUMOR
+  |=  [WIR=WIRE RUM=RUMOR:HALL]
+  ^-  (QUIP MOVE _THIS)
+  ::~&  RUMOR+[WIR RUM]
+  ?~  WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
+  =;  UPD=[MOW=(LIST MOVE) STA=_THIS]
+    :_  STA.UPD
+    %+  WELP  MOW.UPD
+    %+  TURN  (PREY:PUBSUB:USERLIB /PRIMARY BOL)
+    |=  [=BONE *]
+    [BONE %DIFF %HALL-RUMOR RUM]
+  ?+  I.WIR
+    (MEAN [LEAF+"INVALID WIRE FOR DIFF: {(SPUD WIR)}"]~)
   ::
-  ::  %circles:
+  ::  %CIRCLES:
   ::
-      %circles
-    ::~&  %circles
-    ?>  ?=(%circles -.rum)
-    =?    dms.str.sta
-        ?&  (is-dm-circle our.bol cir.rum)
-          !(~(has by dms.str.sta) cir.rum)
+      %CIRCLES
+    ::~&  %CIRCLES
+    ?>  ?=(%CIRCLES -.RUM)
+    =?    DMS.STR.STA
+        ?&  (IS-DM-CIRCLE OUR.BOL CIR.RUM)
+          !(~(HAS BY DMS.STR.STA) CIR.RUM)
         ==
-      (~(put by dms.str.sta) cir.rum our.bol ~)
-    ?:  add.rum
-      :_  this(our-circles.str.sta (~(put in our-circles.str.sta) cir.rum))
-      [ost.bol %peer /our/[cir.rum] [our.bol %hall] /circle/[cir.rum]/config]~
-    :_  this(our-circles.str.sta (~(del in our-circles.str.sta) cir.rum))
-    [ost.bol %pull /our/[cir.rum] [our.bol %hall] ~]~
+      (~(PUT BY DMS.STR.STA) CIR.RUM OUR.BOL ~)
+    ?:  ADD.RUM
+      :_  THIS(OUR-CIRCLES.STR.STA (~(PUT IN OUR-CIRCLES.STR.STA) CIR.RUM))
+      [OST.BOL %PEER /OUR/[CIR.RUM] [OUR.BOL %HALL] /CIRCLE/[CIR.RUM]/CONFIG]~
+    :_  THIS(OUR-CIRCLES.STR.STA (~(DEL IN OUR-CIRCLES.STR.STA) CIR.RUM))
+    [OST.BOL %PULL /OUR/[CIR.RUM] [OUR.BOL %HALL] ~]~
   ::
-  ::  %inbox:
+  ::  %INBOX:
   ::
-      %inbox
-    ?>  ?=(%circle -.rum)
-    ?+  -.rum.rum
-      ::~&  inbox-unprocessed-rumor+rum.rum
-      [~ this]
+      %INBOX
+    ?>  ?=(%CIRCLE -.RUM)
+    ?+  -.RUM.RUM
+      ::~&  INBOX-UNPROCESSED-RUMOR+RUM.RUM
+      [~ THIS]
     ::
-    ::  %remove:
+    ::  %REMOVE:
     ::
-        %remove
-      ::~&  %inbox-remove
-        ::~&  %removed-story
-      [~ this]
+        %REMOVE
+      ::~&  %INBOX-REMOVE
+        ::~&  %REMOVED-STORY
+      [~ THIS]
     ::
-    ::  %gram: inbox has recieved messages
+    ::  %GRAM: INBOX HAS RECIEVED MESSAGES
     ::
-        %gram
-      ::~&  %inbox-gram
-      ::  XX TODO: handle stack trace message when foreign circle is killed?
+        %GRAM
+      ::~&  %INBOX-GRAM
+      ::  XX TODO: HANDLE STACK TRACE MESSAGE WHEN FOREIGN CIRCLE IS KILLED?
       ::
-      ?:  (is-dm-circle src.rum.rum)
-        =/  dms=[ini=ship env=(list envelope:hall)]
-          (~(got by dms.str.sta) nom.src.rum.rum)
-        =.  env.dms  [nev.rum.rum env.dms]
+      ?:  (IS-DM-CIRCLE SRC.RUM.RUM)
+        =/  DMS=[INI=SHIP ENV=(LIST ENVELOPE:HALL)]
+          (~(GOT BY DMS.STR.STA) NOM.SRC.RUM.RUM)
+        =.  ENV.DMS  [NEV.RUM.RUM ENV.DMS]
         :-  ~
-        %=  this
-          env.inbox.str.sta  [nev.rum.rum env.inbox.str.sta]
-          dms.str.sta        (~(put by dms.str.sta) nom.src.rum.rum dms)
+        %=  THIS
+          ENV.INBOX.STR.STA  [NEV.RUM.RUM ENV.INBOX.STR.STA]
+          DMS.STR.STA        (~(PUT BY DMS.STR.STA) NOM.SRC.RUM.RUM DMS)
         ==
-      :-  ~  ::(send-rumor [%new-msg %inbox nev.rum.rum])
-      this(env.inbox.str.sta [nev.rum.rum env.inbox.str.sta])
+      :-  ~  ::(SEND-RUMOR [%NEW-MSG %INBOX NEV.RUM.RUM])
+      THIS(ENV.INBOX.STR.STA [NEV.RUM.RUM ENV.INBOX.STR.STA])
     ::
-    ::  %config: inbox config has changed
+    ::  %CONFIG: INBOX CONFIG HAS CHANGED
     ::
-        %config
-      =*  circ  cir.rum.rum
-      ?+  -.dif.rum.rum
-        ::~&  inbox-unprocessed-config+dif.rum.rum
-        [~ this]
+        %CONFIG
+      =*  CIRC  CIR.RUM.RUM
+      ?+  -.DIF.RUM.RUM
+        ::~&  INBOX-UNPROCESSED-CONFIG+DIF.RUM.RUM
+        [~ THIS]
       ::
-      ::  %remove: circle has been erased
+      ::  %REMOVE: CIRCLE HAS BEEN ERASED
       ::
-          %remove
-        ::~&  %inbox-config-remove
-        :-  ~  ::(send-rumor %config-change cir.rum.rum ~)
-        %=    this
-            circles.str.sta
-          (~(del by circles.str.sta) cir.rum.rum)
+          %REMOVE
+        ::~&  %INBOX-CONFIG-REMOVE
+        :-  ~  ::(SEND-RUMOR %CONFIG-CHANGE CIR.RUM.RUM ~)
+        %=    THIS
+            CIRCLES.STR.STA
+          (~(DEL BY CIRCLES.STR.STA) CIR.RUM.RUM)
         ==
       ::
-      ::  %source: the sources of our inbox have changed
+      ::  %SOURCE: THE SOURCES OF OUR INBOX HAVE CHANGED
       ::
-          %source
-        ::~&  %inbox-config-source
-        ?.  =(circ [our.bol %inbox])
-          [~ this]
-        ::  we've added a source to our inbox
+          %SOURCE
+        ::~&  %INBOX-CONFIG-SOURCE
+        ?.  =(CIRC [OUR.BOL %INBOX])
+          [~ THIS]
+        ::  WE'VE ADDED A SOURCE TO OUR INBOX
         ::
-        ?>  ?=(^ con.inbox.str.sta)
-        ?:  add.dif.rum.rum
-          =/  conf=config:hall
-            %=  u.con.inbox.str.sta
-              src  (~(put in src.u.con.inbox.str.sta) src.dif.rum.rum)
+        ?>  ?=(^ CON.INBOX.STR.STA)
+        ?:  ADD.DIF.RUM.RUM
+          =/  CONF=CONFIG:HALL
+            %=  U.CON.INBOX.STR.STA
+              SRC  (~(PUT IN SRC.U.CON.INBOX.STR.STA) SRC.DIF.RUM.RUM)
             ==
-          :-  ~  ::(send-rumor %config-change [our.bol %inbox] `conf)
-          %=    this
-              con.inbox.str.sta  `conf
+          :-  ~  ::(SEND-RUMOR %CONFIG-CHANGE [OUR.BOL %INBOX] `CONF)
+          %=    THIS
+              CON.INBOX.STR.STA  `CONF
           ::
-              circles.str.sta
-            ?:  (~(has by circles.str.sta) cir.src.dif.rum.rum)
-              circles.str.sta
-            (~(put by circles.str.sta) cir.src.dif.rum.rum ~)
+              CIRCLES.STR.STA
+            ?:  (~(HAS BY CIRCLES.STR.STA) CIR.SRC.DIF.RUM.RUM)
+              CIRCLES.STR.STA
+            (~(PUT BY CIRCLES.STR.STA) CIR.SRC.DIF.RUM.RUM ~)
           ==
-        ::  we've removed a source from our inbox
+        ::  WE'VE REMOVED A SOURCE FROM OUR INBOX
         ::
-        =/  conf=config:hall
-          %=  u.con.inbox.str.sta
-            src  (~(del in src.u.con.inbox.str.sta) src.dif.rum.rum)
+        =/  CONF=CONFIG:HALL
+          %=  U.CON.INBOX.STR.STA
+            SRC  (~(DEL IN SRC.U.CON.INBOX.STR.STA) SRC.DIF.RUM.RUM)
           ==
-        ::~&  inbox+conf
-        :-  ~  ::(send-rumor %config-change [our.bol %inbox] `conf)
-        %=    this
-            con.inbox.str.sta  `conf
+        ::~&  INBOX+CONF
+        :-  ~  ::(SEND-RUMOR %CONFIG-CHANGE [OUR.BOL %INBOX] `CONF)
+        %=    THIS
+            CON.INBOX.STR.STA  `CONF
         ::
-            circles.str.sta
-          ?:  =(our.bol hos.cir.src.dif.rum.rum)
-            circles.str.sta
-          (~(del by circles.str.sta) cir.src.dif.rum.rum)
+            CIRCLES.STR.STA
+          ?:  =(OUR.BOL HOS.CIR.SRC.DIF.RUM.RUM)
+            CIRCLES.STR.STA
+          (~(DEL BY CIRCLES.STR.STA) CIR.SRC.DIF.RUM.RUM)
         ==
       ::
-      ::  %full: recieved a full config update for one of our sources
+      ::  %FULL: RECIEVED A FULL CONFIG UPDATE FOR ONE OF OUR SOURCES
       ::
-          %full
-        ::~&  %inbox-config-full
-        =*  conf  cof.dif.rum.rum
-        :-  ~  ::(send-rumor %config-change circ `conf)
-        %=  this
-          circles.str.sta  (~(put by circles.str.sta) circ `conf)
+          %FULL
+        ::~&  %INBOX-CONFIG-FULL
+        =*  CONF  COF.DIF.RUM.RUM
+        :-  ~  ::(SEND-RUMOR %CONFIG-CHANGE CIRC `CONF)
+        %=  THIS
+          CIRCLES.STR.STA  (~(PUT BY CIRCLES.STR.STA) CIRC `CONF)
         ==
       ::
-      ::  %read: recieved a read reciept
+      ::  %READ: RECIEVED A READ RECIEPT
       ::
-          %read
-        ?.  =([our.bol %inbox] cir.rum.rum)
-          [~ this]
-        ?>  ?=(^ con.inbox.str.sta)
+          %READ
+        ?.  =([OUR.BOL %INBOX] CIR.RUM.RUM)
+          [~ THIS]
+        ?>  ?=(^ CON.INBOX.STR.STA)
         :-  ~
-        %=  this
-          red.u.con.inbox.str.sta  red.dif.rum.rum
+        %=  THIS
+          RED.U.CON.INBOX.STR.STA  RED.DIF.RUM.RUM
         ==
       ==
     ==
   ::
-  ::  %invites:
+  ::  %INVITES:
   ::
-      %invites
-    ::~&  %invites
-    ?>  ?=(%circle -.rum)
-    ?>  ?=(%gram -.rum.rum)
-    ?+  -.sep.gam.nev.rum.rum
-      [~ this(invites.str.sta [nev.rum.rum invites.str.sta])]
+      %INVITES
+    ::~&  %INVITES
+    ?>  ?=(%CIRCLE -.RUM)
+    ?>  ?=(%GRAM -.RUM.RUM)
+    ?+  -.SEP.GAM.NEV.RUM.RUM
+      [~ THIS(INVITES.STR.STA [NEV.RUM.RUM INVITES.STR.STA])]
     ::
-        %inv
-      =/  circ=circle:hall  cir.sep.gam.nev.rum.rum
-      ?:  (is-dm-circle circ)
-        =/  who=(set ship)  (sy (rash nom.circ (more dot fed:ag)))
-        =/  act=poke  [%hall-action %newdm who]
-        :-  [ost.bol %poke /join-dm [our.bol %hall] act]~
-        %=  this
-          invites.str.sta  [nev.rum.rum invites.str.sta]
-          dms.str.sta      (~(put by dms.str.sta) nom.circ hos.circ ~)
+        %INV
+      =/  CIRC=CIRCLE:HALL  CIR.SEP.GAM.NEV.RUM.RUM
+      ?:  (IS-DM-CIRCLE CIRC)
+        =/  WHO=(SET SHIP)  (SY (RASH NOM.CIRC (MORE DOT FED:AG)))
+        =/  ACT=POKE  [%HALL-ACTION %NEWDM WHO]
+        :-  [OST.BOL %POKE /JOIN-DM [OUR.BOL %HALL] ACT]~
+        %=  THIS
+          INVITES.STR.STA  [NEV.RUM.RUM INVITES.STR.STA]
+          DMS.STR.STA      (~(PUT BY DMS.STR.STA) NOM.CIRC HOS.CIRC ~)
         ==
-      =/  act=poke  [%hall-action %source %inbox & (sy [circ ~] ~)]
+      =/  ACT=POKE  [%HALL-ACTION %SOURCE %INBOX & (SY [CIRC ~] ~)]
       :-  ~
-      this(invites.str.sta [nev.rum.rum invites.str.sta])
+      THIS(INVITES.STR.STA [NEV.RUM.RUM INVITES.STR.STA])
     ==
   ::
-  ::  %our:
+  ::  %OUR:
   ::
-      %our
-    ?>  ?=(%circle -.rum)
-    ?+  -.rum.rum
-      ::~&  our-unprocessed-rumor+rum.rum
-      [~ this]
+      %OUR
+    ?>  ?=(%CIRCLE -.RUM)
+    ?+  -.RUM.RUM
+      ::~&  OUR-UNPROCESSED-RUMOR+RUM.RUM
+      [~ THIS]
     ::
-    ::  %remove:
+    ::  %REMOVE:
     ::
-        %remove
-        ::~&  %our-remove
-      [~ this]
+        %REMOVE
+        ::~&  %OUR-REMOVE
+      [~ THIS]
     ::
-    ::  %config:
+    ::  %CONFIG:
     ::
-        %config
-      =*  circ  cir.rum.rum
-      =*  diff  dif.rum.rum
-      ?+  -.diff
-        ::~&  our-unprocessed-config+diff
-        [~ this]
+        %CONFIG
+      =*  CIRC  CIR.RUM.RUM
+      =*  DIFF  DIF.RUM.RUM
+      ?+  -.DIFF
+        ::~&  OUR-UNPROCESSED-CONFIG+DIFF
+        [~ THIS]
       ::
-      ::  %full: recieved a full config update for one of our sources
+      ::  %FULL: RECIEVED A FULL CONFIG UPDATE FOR ONE OF OUR SOURCES
       ::
-          %full
-        ::~&  %our-config-full
-        =*  conf  cof.dif.rum.rum
-        :-  ~  ::(send-rumor %config-change circ `conf)
-        %=  this
-          circles.str.sta  (~(put by circles.str.sta) circ `conf)
+          %FULL
+        ::~&  %OUR-CONFIG-FULL
+        =*  CONF  COF.DIF.RUM.RUM
+        :-  ~  ::(SEND-RUMOR %CONFIG-CHANGE CIRC `CONF)
+        %=  THIS
+          CIRCLES.STR.STA  (~(PUT BY CIRCLES.STR.STA) CIRC `CONF)
         ==
       ::
-      ::  %read: recieved a read reciept
+      ::  %READ: RECIEVED A READ RECIEPT
       ::
-          %read
-        =/  conf  (need (~(got by circles.str.sta) circ))
-        =.  red.conf  red.dif.rum.rum
+          %READ
+        =/  CONF  (NEED (~(GOT BY CIRCLES.STR.STA) CIRC))
+        =.  RED.CONF  RED.DIF.RUM.RUM
         :-  ~
-        %=  this
-          circles.str.sta  (~(put by circles.str.sta) circ `conf)
+        %=  THIS
+          CIRCLES.STR.STA  (~(PUT BY CIRCLES.STR.STA) CIRC `CONF)
         ==
       ==
     ==
   ==
 ::
-::  +send-rumor: send a rumor to all subscribers
+::  +SEND-RUMOR: SEND A RUMOR TO ALL SUBSCRIBERS
 ::
-++  send-rumor
-  |=  rum=rumor
-  ::~&  send-rumor+rum
-  ^-  (list move)
-  %+  turn  (prey:pubsub:userlib /primary bol)
-  |=  [=bone *]
-  [bone %diff %collections-rumor rum]
+++  SEND-RUMOR
+  |=  RUM=RUMOR
+  ::~&  SEND-RUMOR+RUM
+  ^-  (LIST MOVE)
+  %+  TURN  (PREY:PUBSUB:USERLIB /PRIMARY BOL)
+  |=  [=BONE *]
+  [BONE %DIFF %COLLECTIONS-RUMOR RUM]
 ::
-::  +poke-noun: debugging stuff
+::  +POKE-NOUN: DEBUGGING STUFF
 ::
-++  poke-noun
-  |=  a=@tas
-  ^-  (quip move _this)
-  ?+    a
-    [~ this]
+++  POKE-NOUN
+  |=  A=@TAS
+  ^-  (QUIP MOVE _THIS)
+  ?+    A
+    [~ THIS]
   ::
-      %check-all-subs
-    ~&  'here are all incoming subs'
-    ~&  ^-  (list (pair ship path))
-        %+  turn  ~(tap by sup.bol)
-        |=  [b=bone s=ship p=path]
-        ^-  (pair ship path)
-        [s p]
-    [~ this]
+      %CHECK-ALL-SUBS
+    ~&  'HERE ARE ALL INCOMING SUBS'
+    ~&  ^-  (LIST (PAIR SHIP PATH))
+        %+  TURN  ~(TAP BY SUP.BOL)
+        |=  [B=BONE S=SHIP P=PATH]
+        ^-  (PAIR SHIP PATH)
+        [S P]
+    [~ THIS]
   ::
-      %print-state
-    ~&  str.sta
-    [~ this]
+      %PRINT-STATE
+    ~&  STR.STA
+    [~ THIS]
   ::
-      %rebuild-subs
-    :_  this
-    :~  [ost.bol %peer /circles [our.bol %hall] /circles/[(scot %p our.bol)]]
-        [ost.bol %peer /inbox [our.bol %hall] /circle/inbox/config/grams]
-        [ost.bol %peer /invites [our.bol %hall] /circle/i/grams]
+      %REBUILD-SUBS
+    :_  THIS
+    :~  [OST.BOL %PEER /CIRCLES [OUR.BOL %HALL] /CIRCLES/[(SCOT %P OUR.BOL)]]
+        [OST.BOL %PEER /INBOX [OUR.BOL %HALL] /CIRCLE/INBOX/CONFIG/GRAMS]
+        [OST.BOL %PEER /INVITES [OUR.BOL %HALL] /CIRCLE/I/GRAMS]
     ==
   ==
 ::
-++  is-dm-circle
-  |=  circ=circle:hall
+++  IS-DM-CIRCLE
+  |=  CIRC=CIRCLE:HALL
   ^-  ?
   ?=  ^
-  (rush nom.circ (more dot fed:ag))
+  (RUSH NOM.CIRC (MORE DOT FED:AG))
 --

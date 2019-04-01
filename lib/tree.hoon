@@ -1,34 +1,34 @@
 ::
-::::  /hoon/tree/lib
+::::  /HOON/TREE/LIB
   ::
 /?    314
 ::
 |%
-++  getall                                              :: search in manx
-  |=  tag/(list mane)
-  |=  ele/manx  ^-  marl
-  ?:  (lien tag |=(a/mane =(a n.g.ele)))
-    ~[ele]
-  (zing (turn c.ele ..$))
+++  GETALL                                              :: SEARCH IN MANX
+  |=  TAG/(LIST MANE)
+  |=  ELE/MANX  ^-  MARL
+  ?:  (LIEN TAG |=(A/MANE =(A N.G.ELE)))
+    ~[ELE]
+  (ZING (TURN C.ELE ..$))
 ::
-::  a.b_c.d => [[%a %b] [%c %d]]
-::  a.b_c, a_b__c => [[%a %b] %c]
-::  a_b_c, a__b_c => [%a [%b %c]]
-++  read-schem                                          :: decode gapped noun
-  =<  (cook to-noun (cook build-grove apex))
+::  A.B_C.D => [[%A %B] [%C %D]]
+::  A.B_C, A_B__C => [[%A %B] %C]
+::  A_B_C, A__B_C => [%A [%B %C]]
+++  READ-SCHEM                                          :: DECODE GAPPED NOUN
+  =<  (COOK TO-NOUN (COOK BUILD-GROVE APEX))
   |%
-  ++  noun  $@(term {noun noun})       ::  shadow
-  ::  improper list of possible entry points
-  ++  grove  $@(term {gap/@ sealed/noun pending/grove})
-  ++  apex  ;~(plug sym (star ;~(plug delim sym)))
-  ++  delim  ;~(pose (cold 0 dot) (cook lent (plus cab)))
-  ++  to-noun  |=(a/grove ?@(a a [sealed.a $(a pending.a)]))
-  ++  build-grove
-    |=  {a/grove b/(list {p/@u q/term})}  ^-  grove
-    %+  roll  b  =<  .(acc a)
-    |=  {{gap/@u v/term} acc/grove}  ^-  grove
-    ?@  acc            [gap acc v]
-    ?:  (gth gap gap.acc)  [gap (to-noun acc) v]
-    acc(pending $(acc pending.acc))
+  ++  NOUN  $@(TERM {NOUN NOUN})       ::  SHADOW
+  ::  IMPROPER LIST OF POSSIBLE ENTRY POINTS
+  ++  GROVE  $@(TERM {GAP/@ SEALED/NOUN PENDING/GROVE})
+  ++  APEX  ;~(PLUG SYM (STAR ;~(PLUG DELIM SYM)))
+  ++  DELIM  ;~(POSE (COLD 0 DOT) (COOK LENT (PLUS CAB)))
+  ++  TO-NOUN  |=(A/GROVE ?@(A A [SEALED.A $(A PENDING.A)]))
+  ++  BUILD-GROVE
+    |=  {A/GROVE B/(LIST {P/@U Q/TERM})}  ^-  GROVE
+    %+  ROLL  B  =<  .(ACC A)
+    |=  {{GAP/@U V/TERM} ACC/GROVE}  ^-  GROVE
+    ?@  ACC            [GAP ACC V]
+    ?:  (GTH GAP GAP.ACC)  [GAP (TO-NOUN ACC) V]
+    ACC(PENDING $(ACC PENDING.ACC))
   --
 --

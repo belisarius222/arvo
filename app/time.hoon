@@ -1,19 +1,19 @@
 ::
-::::  /hoon/time/app
+::::  /HOON/TIME/APP
   ::
 /?    310
 |%
-++  card  {$wait wire @da}
+++  CARD  {$WAIT WIRE @DA}
 --
-|_  {bowl:gall ~}
-++  poke-noun
+|_  {BOWL:GALL ~}
+++  POKE-NOUN
   |=  *
   :_  +>.$  :_  ~
-  [ost %wait /(scot %da now) +(now)]
+  [OST %WAIT /(SCOT %DA NOW) +(NOW)]
 ::
-++  wake
-  |=  {wir/wire ~}
-  ?>  ?=({@ ~} wir)
-  ~&  [%took `@dr`(sub now (slav %da i.wir))]
+++  WAKE
+  |=  {WIR/WIRE ~}
+  ?>  ?=({@ ~} WIR)
+  ~&  [%TOOK `@DR`(SUB NOW (SLAV %DA I.WIR))]
   [~ +>.$]
 --

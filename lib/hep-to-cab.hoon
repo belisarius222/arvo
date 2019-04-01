@@ -1,25 +1,25 @@
-::   rewrite query string keys
+::   REWRITE QUERY STRING KEYS
 ::
-::::  /hoon/hep-to-cab/lib
+::::  /HOON/HEP-TO-CAB/LIB
   ::
 /?    310
 ::
-::::  ~fyr
+::::  ~FYR
   ::
-=<  term
+=<  TERM
 |%
-++  gsub                                            ::  replace chars
-  |=  {a/@t b/@t t/@t}
-  ^-  @t
-  ?:  =('' t)  t
-  %+  mix  (lsh 3 1 $(t (rsh 3 1 t)))
-  =+  c=(end 3 1 t)
-  ?:(=(a c) b c)
+++  GSUB                                            ::  REPLACE CHARS
+  |=  {A/@T B/@T T/@T}
+  ^-  @T
+  ?:  =('' T)  T
+  %+  MIX  (LSH 3 1 $(T (RSH 3 1 T)))
+  =+  C=(END 3 1 T)
+  ?:(=(A C) B C)
 ::
-++  term  |=(a/^term (gsub '-' '_' a))              ::  single atom
-++  path  |=(a/^path (turn a term))                 ::  path elements
-++  quay                                            ::  query string keys
-  |=  a/quay:eyre  ^+  a
-  %+  turn  a
-  |=({p/@t q/@t} [(term p) q])
+++  TERM  |=(A/^TERM (GSUB '-' '_' A))              ::  SINGLE ATOM
+++  PATH  |=(A/^PATH (TURN A TERM))                 ::  PATH ELEMENTS
+++  QUAY                                            ::  QUERY STRING KEYS
+  |=  A/QUAY:EYRE  ^+  A
+  %+  TURN  A
+  |=({P/@T Q/@T} [(TERM P) Q])
 --

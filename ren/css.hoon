@@ -1,9 +1,9 @@
-::  /!css/ in /===web/pack
+::  /!CSS/ IN /===WEB/PACK
 ::
-::::  /hoon/css/ren
+::::  /HOON/CSS/REN
   ::
 /?    310
-/,  /web/pack/css  /!css/
+/,  /WEB/PACK/CSS  /!CSS/
     /              /~  !!
 ==
 -.-

@@ -1,359 +1,359 @@
-:: Three ways we interact with this app
-:: 1. .^(%gx /=gh=/endpoint)
-:: 2. [%peer [our %gh] /endpoint]
-:: 3. :gh &gh-poke %post /gists json-data
+:: THREE WAYS WE INTERACT WITH THIS APP
+:: 1. .^(%GX /=GH=/ENDPOINT)
+:: 2. [%PEER [OUR %GH] /ENDPOINT]
+:: 3. :GH &GH-POKE %POST /GISTS JSON-DATA
 
 
-::  This is a driver for the Github API v3.
+::  THIS IS A DRIVER FOR THE GITHUB API V3.
 ::
-::  You can interact with this in a few different ways:
+::  YOU CAN INTERACT WITH THIS IN A FEW DIFFERENT WAYS:
 ::
-::    - .^(%gx /=gh=/read{/endpoint}) or subscribe to
-::      /scry/x/read{/endpoint} for authenticated reads.
+::    - .^(%GX /=GH=/READ{/ENDPOINT}) OR SUBSCRIBE TO
+::      /SCRY/X/READ{/ENDPOINT} FOR AUTHENTICATED READS.
 ::
-::    - subscribe to /scry/x/listen/{owner}/{repo}/{events...}
-::      for webhook-powered event notifications.  For event list,
-::      see https://developer.github.com/webhooks/.
+::    - SUBSCRIBE TO /SCRY/X/LISTEN/{OWNER}/{REPO}/{EVENTS...}
+::      FOR WEBHOOK-POWERED EVENT NOTIFICATIONS.  FOR EVENT LIST,
+::      SEE HTTPS://DEVELOPER.GITHUB.COM/WEBHOOKS/.
 ::
-::  See the%github app for example usage.
+::  SEE THE%GITHUB APP FOR EXAMPLE USAGE.
 ::
 /?  314
-/-  rfc, gmail-label, gmail-message
-/+  http
+/-  RFC, GMAIL-LABEL, GMAIL-MESSAGE
+/+  HTTP
 ::::
 ::
 |%
-::  Splits a path into the endpoint prefix and the remainder,
-::  which is assumed to be a path within the JSON object.  We
-::  choose the longest legal endpoint prefix.
+::  SPLITS A PATH INTO THE ENDPOINT PREFIX AND THE REMAINDER,
+::  WHICH IS ASSUMED TO BE A PATH WITHIN THE JSON OBJECT.  WE
+::  CHOOSE THE LONGEST LEGAL ENDPOINT PREFIX.
 ::
-++  split
-  |=  pax/path
-  ::  =-  ~&  [%pax pax - (valid-endpoint pax)]  -
-  =+  l=(lent pax)
-  |-  ^-  {path path}
-  ?:  ?=(valid-get-endpoint (scag l pax))
-    [(scag l pax) (slag l pax)]
-  ?~  l
-    ~&  %bad-endpoint
-    ~|(%bad-endpoint !!)
-  $(l (dec l))
+++  SPLIT
+  |=  PAX/PATH
+  ::  =-  ~&  [%PAX PAX - (VALID-ENDPOINT PAX)]  -
+  =+  L=(LENT PAX)
+  |-  ^-  {PATH PATH}
+  ?:  ?=(VALID-GET-ENDPOINT (SCAG L PAX))
+    [(SCAG L PAX) (SLAG L PAX)]
+  ?~  L
+    ~&  %BAD-ENDPOINT
+    ~|(%BAD-ENDPOINT !!)
+  $(L (DEC L))
 ::
-::  These are all the github GET endpoints, sorted with
-::  `env LC_ALL=C sort`
+::  THESE ARE ALL THE GITHUB GET ENDPOINTS, SORTED WITH
+::  `ENV LC_ALL=C SORT`
 ::
-::  end-points include required query parameters
-++  valid-get-endpoint
-  $?  {$drafts id/@t $~}
-      {$drafts $~}
-      {$history $~}
-      {$labels id/@t $~}
-      {$labels $~}
-      {$messages id/@t $attachments id/@t $~}
-      {$messages id/@t $~}
-      {$messages $~}
-      {$profile $~}
-      {$threads id/@t $~}
-      {$threads $~}
+::  END-POINTS INCLUDE REQUIRED QUERY PARAMETERS
+++  VALID-GET-ENDPOINT
+  $?  {$DRAFTS ID/@T $~}
+      {$DRAFTS $~}
+      {$HISTORY $~}
+      {$LABELS ID/@T $~}
+      {$LABELS $~}
+      {$MESSAGES ID/@T $ATTACHMENTS ID/@T $~}
+      {$MESSAGES ID/@T $~}
+      {$MESSAGES $~}
+      {$PROFILE $~}
+      {$THREADS ID/@T $~}
+      {$THREADS $~}
   ==
 
-++  vaild-post-endpoint
-  $?  {$drafts $send $~}
-      {$drafts $~}
-      {$messages id/@t $modify $~}
-      {$messages id/@t $trash $~}
-      {$messages id/@t $untrash $~}
-      {$messages $import $~}
-      {$messages $send $~}
-      {$messages $~}
-      {$labels $~}
-      {$threads id/@t $trash $~}
-      {$threads id/@t $untrash $~}
-      {$threads id/@t $modify}
-      {$stop $~}
-      {$watch $~}
+++  VAILD-POST-ENDPOINT
+  $?  {$DRAFTS $SEND $~}
+      {$DRAFTS $~}
+      {$MESSAGES ID/@T $MODIFY $~}
+      {$MESSAGES ID/@T $TRASH $~}
+      {$MESSAGES ID/@T $UNTRASH $~}
+      {$MESSAGES $IMPORT $~}
+      {$MESSAGES $SEND $~}
+      {$MESSAGES $~}
+      {$LABELS $~}
+      {$THREADS ID/@T $TRASH $~}
+      {$THREADS ID/@T $UNTRASH $~}
+      {$THREADS ID/@T $MODIFY}
+      {$STOP $~}
+      {$WATCH $~}
   ==
 
-++  valid-delete-endpoint
-  $?  {$drafts id/@t $~}
-      {$labels id/@t $~}
-      {$messages id/@t $~}
-      {$thread id/@t $~}
+++  VALID-DELETE-ENDPOINT
+  $?  {$DRAFTS ID/@T $~}
+      {$LABELS ID/@T $~}
+      {$MESSAGES ID/@T $~}
+      {$THREAD ID/@T $~}
   ==
-++  valid-put-endpoint
-  $?  {$drafts id/@t $~}
-      {$labels id/@t $~}
+++  VALID-PUT-ENDPOINT
+  $?  {$DRAFTS ID/@T $~}
+      {$LABELS ID/@T $~}
   ==
-++  valid-patch-endpoint
-  $?  {$labels id/@t $~}
+++  VALID-PATCH-ENDPOINT
+  $?  {$LABELS ID/@T $~}
   ==
 --
-::/-  gmail
-::  /ape/gh/split.hoon defines ++split, which splits a request
-::  at the end of the longest possible endpoint.
+::/-  GMAIL
+::  /APE/GH/SPLIT.HOON DEFINES ++SPLIT, WHICH SPLITS A REQUEST
+::  AT THE END OF THE LONGEST POSSIBLE ENDPOINT.
 ::
-=,  mimes:html
-=,  html
-=>  |%                              :: => only used for indentation
-    ++  move  (pair bone card)
-    ++  subscription-result
-      $%  {$arch arch}
-          {$json json}
-          {$null ~}
-          {$inbox (list {message-id/@t thread-id/@t})}
-          {$message from/@t subject/@t}
+=,  MIMES:HTML
+=,  HTML
+=>  |%                              :: => ONLY USED FOR INDENTATION
+    ++  MOVE  (PAIR BONE CARD)
+    ++  SUBSCRIPTION-RESULT
+      $%  {$ARCH ARCH}
+          {$JSON JSON}
+          {$NULL ~}
+          {$INBOX (LIST {MESSAGE-ID/@T THREAD-ID/@T})}
+          {$MESSAGE FROM/@T SUBJECT/@T}
       ==
-    ++  card
-      $%  {$diff subscription-result}
-          {$hiss wire {~ ~} $httr {$hiss hiss:eyre}}
+    ++  CARD
+      $%  {$DIFF SUBSCRIPTION-RESULT}
+          {$HISS WIRE {~ ~} $HTTR {$HISS HISS:EYRE}}
       ==
-    ++  easy-ot
-      =,  dejs-soft:format
-      |*  {key/@t parser/fist}
-      (ot [key parser] ~)
-    ++  sifo-google
-      |=  a/cord  ^-  cord
-      =;  fel  (crip (scan (en-base64 a) fel))
-      (star ;~(pose (cold '-' (just '+')) (cold '_' (just '/')) next))
-    ++  ofis-google
-      |=  a/cord  ^-  cord
-      =;  fel  (de-base64 (crip (rash a fel)))
-      (star ;~(pose (cold '+' (just '-')) (cold '/' (just '_')) next))
+    ++  EASY-OT
+      =,  DEJS-SOFT:FORMAT
+      |*  {KEY/@T PARSER/FIST}
+      (OT [KEY PARSER] ~)
+    ++  SIFO-GOOGLE
+      |=  A/CORD  ^-  CORD
+      =;  FEL  (CRIP (SCAN (EN-BASE64 A) FEL))
+      (STAR ;~(POSE (COLD '-' (JUST '+')) (COLD '_' (JUST '/')) NEXT))
+    ++  OFIS-GOOGLE
+      |=  A/CORD  ^-  CORD
+      =;  FEL  (DE-BASE64 (CRIP (RASH A FEL)))
+      (STAR ;~(POSE (COLD '+' (JUST '-')) (COLD '/' (JUST '_')) NEXT))
     --
 ::
-=,  gall
-|_  $:  hid/bowl  count/@
-        web-hooks/(map @t {id/@t listeners/(set bone)})
-        received-ids/(list @t)
+=,  GALL
+|_  $:  HID/BOWL  COUNT/@
+        WEB-HOOKS/(MAP @T {ID/@T LISTENERS/(SET BONE)})
+        RECEIVED-IDS/(LIST @T)
     ==
 
-::  We can't actually give the response to pretty much anything
-::  without blocking, so we just block unconditionally.
+::  WE CAN'T ACTUALLY GIVE THE RESPONSE TO PRETTY MUCH ANYTHING
+::  WITHOUT BLOCKING, SO WE JUST BLOCK UNCONDITIONALLY.
 ::
-++  prep  ~&  'prep'  _`.  ::
+++  PREP  ~&  'PREP'  _`.  ::
 ::
-++  peek
-  |=  {ren/@tas pax/path}
-  ^-  (unit (unit (pair mark *)))
+++  PEEK
+  |=  {REN/@TAS PAX/PATH}
+  ^-  (UNIT (UNIT (PAIR MARK *)))
   ~
 ::
-++  peer-scry
-  |=  pax/path
-  ^-  {(list move) _+>.$}
-  ?>  ?=({care:clay ^} pax)                             ::  assert %u
-  =>  (help i.pax i.t.pax t.t.pax)
-  =>  scry
-  %=  make-move
-    count  +(count)
+++  PEER-SCRY
+  |=  PAX/PATH
+  ^-  {(LIST MOVE) _+>.$}
+  ?>  ?=({CARE:CLAY ^} PAX)                             ::  ASSERT %U
+  =>  (HELP I.PAX I.T.PAX T.T.PAX)
+  =>  SCRY
+  %=  MAKE-MOVE
+    COUNT  +(COUNT)
   ==
 ::
-++  poke-email
-  |=  {adr/@ta tyl/tape mez/wall}  ^-  (quip move _+>)
-  ?>  =(our.hid src.hid)
-  %-  poke-gmail-req  :*
-    %post
-    /messages/send
-    ~['uploadType'^%simple]
-    ['urbit' 'urbit.org'] :: [(crip "urbit+{<our.hid>}") 'urbit.org']
+++  POKE-EMAIL
+  |=  {ADR/@TA TYL/TAPE MEZ/WALL}  ^-  (QUIP MOVE _+>)
+  ?>  =(OUR.HID SRC.HID)
+  %-  POKE-GMAIL-REQ  :*
+    %POST
+    /MESSAGES/SEND
+    ~['UPLOADTYPE'^%SIMPLE]
+    ['URBIT' 'URBIT.ORG'] :: [(CRIP "URBIT+{<OUR.HID>}") 'URBIT.ORG']
   ::
-    =-  (rash adr -)
-    [;~((glue vat) . .)]:(cook crip (plus ;~(less vat next)))  :: /[^@]+@[^@]+/
+    =-  (RASH ADR -)
+    [;~((GLUE VAT) . .)]:(COOK CRIP (PLUS ;~(LESS VAT NEXT)))  :: /[^@]+@[^@]+/
   ::
-    (crip tyl)
-    (of-wain:format (turn mez crip))
+    (CRIP TYL)
+    (OF-WAIN:FORMAT (TURN MEZ CRIP))
   ==
 ::
-++  poke-gmail-req
-  |=  $:  method/meth:eyre  endpoint/path  quy/quay:eyre
-          mes/message:rfc
-          :: label-req:gmail-label
+++  POKE-GMAIL-REQ
+  |=  $:  METHOD/METH:EYRE  ENDPOINT/PATH  QUY/QUAY:EYRE
+          MES/MESSAGE:RFC
+          :: LABEL-REQ:GMAIL-LABEL
       ==
-  ^-  {(list move) _+>.$}
-  ?>  ?=(valid-get-endpoint endpoint)
-  ?>  =(our.hid src.hid)
+  ^-  {(LIST MOVE) _+>.$}
+  ?>  ?=(VALID-GET-ENDPOINT ENDPOINT)
+  ?>  =(OUR.HID SRC.HID)
   :_  +>.$  :_  ~
-  ^-  move
-  :*  ost.hid  %hiss  /poke/[method]  `~  %httr  %hiss
-      ^-  purl:eyre
-      :+  [& ~ [%& /com/googleapis/www]]
-        [~ gmail+v1+users+me+`valid-get-endpoint`endpoint]
-      `quay:eyre`[[%alt %json] ~]
+  ^-  MOVE
+  :*  OST.HID  %HISS  /POKE/[METHOD]  `~  %HTTR  %HISS
+      ^-  PURL:EYRE
+      :+  [& ~ [%& /COM/GOOGLEAPIS/WWW]]
+        [~ GMAIL+V1+USERS+ME+`VALID-GET-ENDPOINT`ENDPOINT]
+      `QUAY:EYRE`[[%ALT %JSON] ~]
   ::
-      :+  method  `math:eyre`(malt ~[content-type+['application/json']~])
-      =/  hoon-json-object
-        (frond:enjs:format %raw s+(sifo-google (message-to-rfc822:rfc mes)))
-      =+  request-body=(as-octt (en-json hoon-json-object))
-      (some request-body)
-      ::(some (en-json label-req-to-json:gmail-label label-req:gmail-label ~)) XX
+      :+  METHOD  `MATH:EYRE`(MALT ~[CONTENT-TYPE+['APPLICATION/JSON']~])
+      =/  HOON-JSON-OBJECT
+        (FROND:ENJS:FORMAT %RAW S+(SIFO-GOOGLE (MESSAGE-TO-RFC822:RFC MES)))
+      =+  REQUEST-BODY=(AS-OCTT (EN-JSON HOON-JSON-OBJECT))
+      (SOME REQUEST-BODY)
+      ::(SOME (EN-JSON LABEL-REQ-TO-JSON:GMAIL-LABEL LABEL-REQ:GMAIL-LABEL ~)) XX
   ==
 ::
-::  HTTP response.  We make sure the response is good, then
-::  produce the result (as JSON) to whoever sent the request.
+::  HTTP RESPONSE.  WE MAKE SURE THE RESPONSE IS GOOD, THEN
+::  PRODUCE THE RESULT (AS JSON) TO WHOEVER SENT THE REQUEST.
 ::
 
-++  sigh-httr
-  |=  {wir/wire res/httr:eyre}
-  ^-  {(list move) _+>.$}
-  :: ~&  wir+wir
-  ?.  ?=({care:clay @ @ @ *} wir)
-    ::  pokes don't return anything
-    ~&  sigh-poke+p.res
+++  SIGH-HTTR
+  |=  {WIR/WIRE RES/HTTR:EYRE}
+  ^-  {(LIST MOVE) _+>.$}
+  :: ~&  WIR+WIR
+  ?.  ?=({CARE:CLAY @ @ @ *} WIR)
+    ::  POKES DON'T RETURN ANYTHING
+    ~&  SIGH-POKE+P.RES
     [~ +>.$]
-  =+  arg=(path (cue (slav %uv i.t.t.wir)))
-  :: ~&  ittwir+i.t.t.wir
+  =+  ARG=(PATH (CUE (SLAV %UV I.T.T.WIR)))
+  :: ~&  ITTWIR+I.T.T.WIR
   :_  +>.$  :_  ~
-  :+  ost.hid  %diff
-  ?+  i.wir  null+~
-      $x
-    =,  enjs:format
-    ?~  r.res
-      json+(pairs err+s+%empty-response code+(numb p.res) ~)
-    =+  jon=(rush q.u.r.res apex:de-json)
-    ?~  jon
-      json+(pairs err+s+%bad-json code+(numb p.res) body+s+q.u.r.res ~)
-    ?.  =(2 (div p.res 100))
-      json+(pairs err+s+%request-rejected code+(numb p.res) msg+u.jon ~)
+  :+  OST.HID  %DIFF
+  ?+  I.WIR  NULL+~
+      $X
+    =,  ENJS:FORMAT
+    ?~  R.RES
+      JSON+(PAIRS ERR+S+%EMPTY-RESPONSE CODE+(NUMB P.RES) ~)
+    =+  JON=(RUSH Q.U.R.RES APEX:DE-JSON)
+    ?~  JON
+      JSON+(PAIRS ERR+S+%BAD-JSON CODE+(NUMB P.RES) BODY+S+Q.U.R.RES ~)
+    ?.  =(2 (DIV P.RES 100))
+      JSON+(PAIRS ERR+S+%REQUEST-REJECTED CODE+(NUMB P.RES) MSG+U.JON ~)
     ::
-    ::  Once we know we have good data, we drill into the JSON
-    ::  to find the specific piece of data referred to by 'arg'
+    ::  ONCE WE KNOW WE HAVE GOOD DATA, WE DRILL INTO THE JSON
+    ::  TO FIND THE SPECIFIC PIECE OF DATA REFERRED TO BY 'ARG'
     ::
-  |-  ^-  subscription-result
-  ?~  arg
-    =+  switch=t.t.t.t.wir
-    ?+  switch  [%json `json`u.jon]
-      {$messages ~}
-    =/  new-mezes
-      ((ot messages+(ar (ot id+so 'threadId'^so ~)) ~):dejs-soft:format u.jon)
-    ::%+  turn  new-mezes
-    ::|=  id
-    ::?<  ?=(~ new-mezes)
-    ::=.  received-ids  [new-mezes received-ids]
-    ::~&  received-ids
-    ::=.  received
-    [%inbox (need new-mezes)]
+  |-  ^-  SUBSCRIPTION-RESULT
+  ?~  ARG
+    =+  SWITCH=T.T.T.T.WIR
+    ?+  SWITCH  [%JSON `JSON`U.JON]
+      {$MESSAGES ~}
+    =/  NEW-MEZES
+      ((OT MESSAGES+(AR (OT ID+SO 'THREADID'^SO ~)) ~):DEJS-SOFT:FORMAT U.JON)
+    ::%+  TURN  NEW-MEZES
+    ::|=  ID
+    ::?<  ?=(~ NEW-MEZES)
+    ::=.  RECEIVED-IDS  [NEW-MEZES RECEIVED-IDS]
+    ::~&  RECEIVED-IDS
+    ::=.  RECEIVED
+    [%INBOX (NEED NEW-MEZES)]
       ::
-      {$messages @t ~}
+      {$MESSAGES @T ~}
       ::
-    :: =+  body-parser==+(jo (ot body+(ot data+(cu ofis-google so) ~) ~)) :: (ok /body/data so):jo
-    :: ~&  %.(u.jon (om (om |=(a/json (some -.a))):jo))
-    :: ~&  %.(u.jon (ot headers+(cu milt (ar (ot name+so value+so ~))) ~))
-    =+  ^-  $:  headers/{from/@t subject/@t}
-                ::body-text/wain
+    :: =+  BODY-PARSER==+(JO (OT BODY+(OT DATA+(CU OFIS-GOOGLE SO) ~) ~)) :: (OK /BODY/DATA SO):JO
+    :: ~&  %.(U.JON (OM (OM |=(A/JSON (SOME -.A))):JO))
+    :: ~&  %.(U.JON (OT HEADERS+(CU MILT (AR (OT NAME+SO VALUE+SO ~))) ~))
+    =+  ^-  $:  HEADERS/{FROM/@T SUBJECT/@T}
+                ::BODY-TEXT/WAIN
             ==
-        ~|  u.jon
-        =-  (need (reparse u.jon))
-        ^=  reparse
-        =,  dejs-soft:format
-        =+  ^=  from-and-subject
-            |=  a/(map @t @t)  ^-  {@t @t}
-            [(~(got by a) 'From') (~(got by a) 'Subject')]
-        =+  ^=  text-body
-            |=  a/(list {@t @t})  ^-  wain
-            %-  to-wain
-            %-  ofis-google
-            (~(got by (~(gas by *(map @t @t)) a)) 'text/plain')
-        %+  easy-ot  %payload
-        %-  ot  :~
-          headers+(cu from-and-subject (cu ~(gas by *(map @t @t)) (ar (ot name+so value+so ~))))
-          :: parts+(cu text-body (ar (ot 'mimeType'^so body+(ot data+so ~) ~)))
+        ~|  U.JON
+        =-  (NEED (REPARSE U.JON))
+        ^=  REPARSE
+        =,  DEJS-SOFT:FORMAT
+        =+  ^=  FROM-AND-SUBJECT
+            |=  A/(MAP @T @T)  ^-  {@T @T}
+            [(~(GOT BY A) 'FROM') (~(GOT BY A) 'SUBJECT')]
+        =+  ^=  TEXT-BODY
+            |=  A/(LIST {@T @T})  ^-  WAIN
+            %-  TO-WAIN
+            %-  OFIS-GOOGLE
+            (~(GOT BY (~(GAS BY *(MAP @T @T)) A)) 'TEXT/PLAIN')
+        %+  EASY-OT  %PAYLOAD
+        %-  OT  :~
+          HEADERS+(CU FROM-AND-SUBJECT (CU ~(GAS BY *(MAP @T @T)) (AR (OT NAME+SO VALUE+SO ~))))
+          :: PARTS+(CU TEXT-BODY (AR (OT 'MIMETYPE'^SO BODY+(OT DATA+SO ~) ~)))
         ==
-    :: =+  parsed-headers==+(jo ((ot payload+(easy-ot 'headers' (ar some)) ~) u.jon)) ::
-    :: =+  parsed-message==+(jo ((ot payload+(easy-ot 'parts' (ar body-parser)) ~) u.jon)) ::
-    ::~&  [headers body-text]
-    ::=+  body==+(jo ((ot body+(easy-ot 'body' (easy-ot 'data' so))) parsed-message))
-    [%message headers]
+    :: =+  PARSED-HEADERS==+(JO ((OT PAYLOAD+(EASY-OT 'HEADERS' (AR SOME)) ~) U.JON)) ::
+    :: =+  PARSED-MESSAGE==+(JO ((OT PAYLOAD+(EASY-OT 'PARTS' (AR BODY-PARSER)) ~) U.JON)) ::
+    ::~&  [HEADERS BODY-TEXT]
+    ::=+  BODY==+(JO ((OT BODY+(EASY-OT 'BODY' (EASY-OT 'DATA' SO))) PARSED-MESSAGE))
+    [%MESSAGE HEADERS]
     ==
   ::
-  =+  dir=((om:dejs-soft:format some) u.jon)
-  ?~  dir  json+(pairs:enjs:format err+s+%no-children ~)
-  =+  new-jon=(~(get by u.dir) i.arg)
-  `subscription-result`$(arg t.arg, u.jon ?~(new-jon ~ u.new-jon))
-           ::  redo with next argument
+  =+  DIR=((OM:DEJS-SOFT:FORMAT SOME) U.JON)
+  ?~  DIR  JSON+(PAIRS:ENJS:FORMAT ERR+S+%NO-CHILDREN ~)
+  =+  NEW-JON=(~(GET BY U.DIR) I.ARG)
+  `SUBSCRIPTION-RESULT`$(ARG T.ARG, U.JON ?~(NEW-JON ~ U.NEW-JON))
+           ::  REDO WITH NEXT ARGUMENT
   ::
-    $y
-  ?~  r.res
-    ~&  [err+s+%empty-response code+(numb:enjs:format p.res)]
-      arch+*arch
-  =+  jon=(rush q.u.r.res apex:de-json)
-  ?~  jon
-    ~&  [err+s+%bad-json code+(numb:enjs:format p.res) body+s+q.u.r.res]
-    arch+*arch
-  ?.  =(2 (div p.res 100))
-    ~&  [err+s+%request-rejected code+(numb:enjs:format p.res) msg+u.jon]
-    arch+*arch
+    $Y
+  ?~  R.RES
+    ~&  [ERR+S+%EMPTY-RESPONSE CODE+(NUMB:ENJS:FORMAT P.RES)]
+      ARCH+*ARCH
+  =+  JON=(RUSH Q.U.R.RES APEX:DE-JSON)
+  ?~  JON
+    ~&  [ERR+S+%BAD-JSON CODE+(NUMB:ENJS:FORMAT P.RES) BODY+S+Q.U.R.RES]
+    ARCH+*ARCH
+  ?.  =(2 (DIV P.RES 100))
+    ~&  [ERR+S+%REQUEST-REJECTED CODE+(NUMB:ENJS:FORMAT P.RES) MSG+U.JON]
+    ARCH+*ARCH
     ::
-    ::  Once we know we have good data, we drill into the JSON
-    ::  to find the specific piece of data referred to by 'arg'
+    ::  ONCE WE KNOW WE HAVE GOOD DATA, WE DRILL INTO THE JSON
+    ::  TO FIND THE SPECIFIC PIECE OF DATA REFERRED TO BY 'ARG'
     ::
-    |-  ^-  subscription-result
-    =+  dir=((om:dejs-soft:format some) u.jon)
-    ?~  dir
-      [%arch `(shax (jam u.jon)) ~]
-    ?~  arg
-      [%arch `(shax (jam u.jon)) (~(run by u.dir) ,~)]
-    =+  new-jon=(~(get by u.dir) i.arg)
-    $(arg t.arg, u.jon ?~(new-jon ~ u.new-jon))
+    |-  ^-  SUBSCRIPTION-RESULT
+    =+  DIR=((OM:DEJS-SOFT:FORMAT SOME) U.JON)
+    ?~  DIR
+      [%ARCH `(SHAX (JAM U.JON)) ~]
+    ?~  ARG
+      [%ARCH `(SHAX (JAM U.JON)) (~(RUN BY U.DIR) ,~)]
+    =+  NEW-JON=(~(GET BY U.DIR) I.ARG)
+    $(ARG T.ARG, U.JON ?~(NEW-JON ~ U.NEW-JON))
   ==
 ::
-++  sigh-tang  |=({a/wire b/tang} (mean >gmail+a< b))
-++  sigh
-  |=  a/*
-  ~&  a+a
+++  SIGH-TANG  |=({A/WIRE B/TANG} (MEAN >GMAIL+A< B))
+++  SIGH
+  |=  A/*
+  ~&  A+A
   :_  +>.$  ~
 ::
-++  help
-  |=  {ren/care:clay style/@tas pax/path}
-  =^  query  pax
-    =+  xap=(flop pax)
-    ?~  xap  [~ ~]
-    =+  query=(rush i.xap ;~(pfix wut yquy:de-purl))
-    ?~  query  [~ pax]
-    [u.query (flop t.xap)]
-  =^  arg  pax  ~|(pax [+ -]:(split pax))
-  ~|  [pax=pax arg=arg query=query]
-  =|  mow/(list move)
+++  HELP
+  |=  {REN/CARE:CLAY STYLE/@TAS PAX/PATH}
+  =^  QUERY  PAX
+    =+  XAP=(FLOP PAX)
+    ?~  XAP  [~ ~]
+    =+  QUERY=(RUSH I.XAP ;~(PFIX WUT YQUY:DE-PURL))
+    ?~  QUERY  [~ PAX]
+    [U.QUERY (FLOP T.XAP)]
+  =^  ARG  PAX  ~|(PAX [+ -]:(SPLIT PAX))
+  ~|  [PAX=PAX ARG=ARG QUERY=QUERY]
+  =|  MOW/(LIST MOVE)
   |%
-  ::  Resolve core
+  ::  RESOLVE CORE
   ::
-  ++  make-move
-    ^-  {(list move) _+>.$}
-    [(flop mow) +>.$]
+  ++  MAKE-MOVE
+    ^-  {(LIST MOVE) _+>.$}
+    [(FLOP MOW) +>.$]
     ::
-  ++  endpoint-to-purl
-    |=  endpoint/path
-    ^-  purl:eyre
-    %+  scan
-      "https://www.googleapis.com/gmail/v1/users/me{<`path`endpoint>}"
-    auri:de-purl
-    ::  Send an HTTP req
-  ++  send-http
-    |=  hiz/hiss:eyre
+  ++  ENDPOINT-TO-PURL
+    |=  ENDPOINT/PATH
+    ^-  PURL:EYRE
+    %+  SCAN
+      "HTTPS://WWW.GOOGLEAPIS.COM/GMAIL/V1/USERS/ME{<`PATH`ENDPOINT>}"
+    AURI:DE-PURL
+    ::  SEND AN HTTP REQ
+  ++  SEND-HTTP
+    |=  HIZ/HISS:EYRE
     ^+  +>
-    =+  wir=`wire`[ren (scot %ud count) (scot %uv (jam arg)) style pax]
-    =+  new-move=[ost.hid %hiss wir `~ %httr [%hiss hiz]]
-    +>.$(mow [new-move mow])
+    =+  WIR=`WIRE`[REN (SCOT %UD COUNT) (SCOT %UV (JAM ARG)) STYLE PAX]
+    =+  NEW-MOVE=[OST.HID %HISS WIR `~ %HTTR [%HISS HIZ]]
+    +>.$(MOW [NEW-MOVE MOW])
   ::
-  ++  scry
+  ++  SCRY
     ^+  .
-    ?+  style  ~|(%invalid-style !!)
-      $read   read
-::        $listen listen
+    ?+  STYLE  ~|(%INVALID-STYLE !!)
+      $READ   READ
+::        $LISTEN LISTEN
     ==
-  :: Standard GET request
-  ++  read  (send-http (endpoint-to-purl pax) %get ~ ~)
+  :: STANDARD GET REQUEST
+  ++  READ  (SEND-HTTP (ENDPOINT-TO-PURL PAX) %GET ~ ~)
 
-  ::  Subscription request
-::    ++  listen
+  ::  SUBSCRIPTION REQUEST
+::    ++  LISTEN
 ::      ^+  .
-::      =+  events=?>(?=([@ @ *] pax) t.t.pax)
+::      =+  EVENTS=?>(?=([@ @ *] PAX) T.T.PAX)
 ::      |-  ^+  +>.$
-::      ?~  events
+::      ?~  EVENTS
 ::        +>.$
-::      ?:  (~(has by web-hooks) i.events)                ::  if hook exists
-::        =.  +>.$  (update-hook i.events)
-::        $(events t.events)
-::      =.  +>.$  (create-hook i.events)
-::      $(events t.events)
+::      ?:  (~(HAS BY WEB-HOOKS) I.EVENTS)                ::  IF HOOK EXISTS
+::        =.  +>.$  (UPDATE-HOOK I.EVENTS)
+::        $(EVENTS T.EVENTS)
+::      =.  +>.$  (CREATE-HOOK I.EVENTS)
+::      $(EVENTS T.EVENTS)
     ::
   --
 --

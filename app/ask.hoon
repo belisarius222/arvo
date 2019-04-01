@@ -1,154 +1,154 @@
 ::
-::::  /hoon/ask/app
+::::  /HOON/ASK/APP
   ::
 /?    310
-/+    sole, prey
-=,    sole
+/+    SOLE, PREY
+=,    SOLE
 |%
-  ++  card
-    $%  {$diff $sole-effect sole-effect}
+  ++  CARD
+    $%  {$DIFF $SOLE-EFFECT SOLE-EFFECT}
     ==
-  ++  invited  ?($new $sent $ignored)
-  ++  email  @t
+  ++  INVITED  ?($NEW $SENT $IGNORED)
+  ++  EMAIL  @T
 --
 ::
-=,  gall
-|_  $:  bow/bowl
-        adr/(map email {time invited})
-        sos/(map bone sole-share)
-        wom/(unit ship)
-        admins/(set ship)
+=,  GALL
+|_  $:  BOW/BOWL
+        ADR/(MAP EMAIL {TIME INVITED})
+        SOS/(MAP BONE SOLE-SHARE)
+        WOM/(UNIT SHIP)
+        ADMINS/(SET SHIP)
     ==
-++  prompt
-  ^-  sole-prompt
-  ?~  wom  [& %ask-ship ":womb-ship? ~"]
-  =/  new  new-adrs
-  ?~  new  [& %$ "<listening> (0) [l,a,i,w,?]"]
-  [& %$ ": approve {<ask.i.new>}? ({<(lent new)>}) [y,n,l,a,i,w,?]"]
+++  PROMPT
+  ^-  SOLE-PROMPT
+  ?~  WOM  [& %ASK-SHIP ":WOMB-SHIP? ~"]
+  =/  NEW  NEW-ADRS
+  ?~  NEW  [& %$ "<LISTENING> (0) [L,A,I,W,?]"]
+  [& %$ ": APPROVE {<ASK.I.NEW>}? ({<(LENT NEW)>}) [Y,N,L,A,I,W,?]"]
 ::
-++  peer-sole
-  |=  path
-  ^-  (quip {bone card} _+>)
-  ~|  [%not-in-whitelist src.bow]
-  ?>  |((~(has in admins) src.bow) =(our.bow src.bow))
-  :_  +>.$(sos (~(put by sos) ost.bow *sole-share))
-  =-  [(effect %mor pro+prompt -)]~
-  =+  all=adrs
-  [(render all) (turn all put-mail)]
+++  PEER-SOLE
+  |=  PATH
+  ^-  (QUIP {BONE CARD} _+>)
+  ~|  [%NOT-IN-WHITELIST SRC.BOW]
+  ?>  |((~(HAS IN ADMINS) SRC.BOW) =(OUR.BOW SRC.BOW))
+  :_  +>.$(SOS (~(PUT BY SOS) OST.BOW *SOLE-SHARE))
+  =-  [(EFFECT %MOR PRO+PROMPT -)]~
+  =+  ALL=ADRS
+  [(RENDER ALL) (TURN ALL PUT-MAIL)]
 ::
-++  render                            :: show list of invites
-  |=  a/(list {time email invited})  ^-  sole-effect
-  ?:  =(~ a)  txt+"~"
-  tan+(flop (turn a message))
+++  RENDER                            :: SHOW LIST OF INVITES
+  |=  A/(LIST {TIME EMAIL INVITED})  ^-  SOLE-EFFECT
+  ?:  =(~ A)  TXT+"~"
+  TAN+(FLOP (TURN A MESSAGE))
 ::
-++  adrs
-  =-  (sort - |=([a=[=time *] b=[=time *]] (lth time.a time.b)))
-  %+  turn  ~(tap by adr)
-  |=({a/email b/time c/invited} [tym=b ask=a inv=c])
+++  ADRS
+  =-  (SORT - |=([A=[=TIME *] B=[=TIME *]] (LTH TIME.A TIME.B)))
+  %+  TURN  ~(TAP BY ADR)
+  |=({A/EMAIL B/TIME C/INVITED} [TYM=B ASK=A INV=C])
 ::
-++  new-adrs  (skim adrs |=({@ @ inv/invited} =(%new inv)))
-++  ignored-adrs  (skim adrs |=({@ @ inv/invited} =(%ignored inv)))
-++  effect  |=(fec/sole-effect [ost.bow %diff %sole-effect fec])
-++  message
-  |=  {now/time ask/@t inv/invited}  ^-  tank
-  =.  now  (sub now (mod now ~s1))
-  leaf+"ask: {<inv>} {<now>} {(trip ask)}"
+++  NEW-ADRS  (SKIM ADRS |=({@ @ INV/INVITED} =(%NEW INV)))
+++  IGNORED-ADRS  (SKIM ADRS |=({@ @ INV/INVITED} =(%IGNORED INV)))
+++  EFFECT  |=(FEC/SOLE-EFFECT [OST.BOW %DIFF %SOLE-EFFECT FEC])
+++  MESSAGE
+  |=  {NOW/TIME ASK/@T INV/INVITED}  ^-  TANK
+  =.  NOW  (SUB NOW (MOD NOW ~S1))
+  LEAF+"ASK: {<INV>} {<NOW>} {(TRIP ASK)}"
 ::
-++  put-mail   |=({@ ask/@t inv/invited} =+(pax=(rash ask unix-path) [%sav pax `@t`inv]))
-++  unix-path  ::  split into path of "name" and "extension"
-  ;~  (glue dot)
-    (cook crip (star ;~(less dot next)))
-    ;~(plug (cook crip (star next)) (easy ~))
+++  PUT-MAIL   |=({@ ASK/@T INV/INVITED} =+(PAX=(RASH ASK UNIX-PATH) [%SAV PAX `@T`INV]))
+++  UNIX-PATH  ::  SPLIT INTO PATH OF "NAME" AND "EXTENSION"
+  ;~  (GLUE DOT)
+    (COOK CRIP (STAR ;~(LESS DOT NEXT)))
+    ;~(PLUG (COOK CRIP (STAR NEXT)) (EASY ~))
   ==
 ::
-++  poke-ask-admins
-  |=  a/(set ship)
-  ?>  =(our.bow src.bow)
-  `+>.$(admins a)
+++  POKE-ASK-ADMINS
+  |=  A/(SET SHIP)
+  ?>  =(OUR.BOW SRC.BOW)
+  `+>.$(ADMINS A)
 ::
-++  poke-ask-mail
-  |=  ask/@t
-  ^-  (quip {bone card} _+>)
-  ~|  have-mail+ask
-  ?<  (~(has by adr) ask)
-  =.  adr  (~(put by adr) ask now.bow %new) :: XX electroplating
+++  POKE-ASK-MAIL
+  |=  ASK/@T
+  ^-  (QUIP {BONE CARD} _+>)
+  ~|  HAVE-MAIL+ASK
+  ?<  (~(HAS BY ADR) ASK)
+  =.  ADR  (~(PUT BY ADR) ASK NOW.BOW %NEW) :: XX ELECTROPLATING
   :_  +>.$
-  =/  new  [now.bow ask %new]
-  =+  [mez=[(message new)]~ pro=prompt sav=(put-mail new)]
-  %+  turn  (prey /sole bow)
-  |=({ost/bone ^} (effect(ost.bow ost) %mor tan+mez pro+prompt sav ~))
+  =/  NEW  [NOW.BOW ASK %NEW]
+  =+  [MEZ=[(MESSAGE NEW)]~ PRO=PROMPT SAV=(PUT-MAIL NEW)]
+  %+  TURN  (PREY /SOLE BOW)
+  |=({OST/BONE ^} (EFFECT(OST.BOW OST) %MOR TAN+MEZ PRO+PROMPT SAV ~))
 ::
-++  poke-sole-action
-  |=  act/sole-action
-  ^-  (quip {bone card} _+>)
-  =/  som  (~(got by sos) ost.bow)
-  ?-    -.act
-      $clr  `+>.$
-      $ret
-    ?^  wom  [[(effect mor+help)]~ +>.$]    :: show help
-    ?:  =(~ buf.som)  [[(effect txt+"Please enter womb ship")]~ +>.$]
-    =/  try  (rose (tufa buf.som) fed:ag)
-    ?.  ?=({%& ^} try)
-      [[(effect bel+~)]~ +>.$]
-    =>  .(wom p.try)  :: XX TMI
-    (transmit set+~ pro+prompt ~)   :: XX handle multiple links?
+++  POKE-SOLE-ACTION
+  |=  ACT/SOLE-ACTION
+  ^-  (QUIP {BONE CARD} _+>)
+  =/  SOM  (~(GOT BY SOS) OST.BOW)
+  ?-    -.ACT
+      $CLR  `+>.$
+      $RET
+    ?^  WOM  [[(EFFECT MOR+HELP)]~ +>.$]    :: SHOW HELP
+    ?:  =(~ BUF.SOM)  [[(EFFECT TXT+"PLEASE ENTER WOMB SHIP")]~ +>.$]
+    =/  TRY  (ROSE (TUFA BUF.SOM) FED:AG)
+    ?.  ?=({%& ^} TRY)
+      [[(EFFECT BEL+~)]~ +>.$]
+    =>  .(WOM P.TRY)  :: XX TMI
+    (TRANSMIT SET+~ PRO+PROMPT ~)   :: XX HANDLE MULTIPLE LINKS?
   ::
-      $det                              :: reject all input
-    =^  inv  som  (~(transceive sole som) +.act)
-    =.  sos  (~(put by sos) ost.bow som)
-    ?~  wom
-      =/  try  (rose (tufa buf.som) fed:ag)
-      ?:  -.try  `+>.$
-      (transmit inv bel+~ ~)
-    ?:  =(`*`"?" buf.som)  (transmit inv help)
-    ?:  =(`*`"a" buf.som)  (transmit inv (render adrs) ~)
-    ?:  =(`*`"l" buf.som)  (transmit inv (render new-adrs) ~)
-    ?:  =(`*`"i" buf.som)  (transmit inv (render ignored-adrs) ~)
-    ?:  =(`*`"n" buf.som)
-      =/  new  new-adrs
-      ?~  new  (transmit inv bel+~ ~)
-      =.  inv.i.new  %ignored
-      =.  adr  (~(put by adr) ask.i.new [tym inv]:i.new)
-      (transmit inv tan+[(message i.new)]~ pro+prompt ~)
-    ?:  =(`*`"y" buf.som)
-      =/  new  new-adrs
-      ?~  new  (transmit inv bel+~ ~)
-      =.  inv.i.new  %sent  :: XX pending
-      =-  [[(invite ask.i.new) -<] ->]
-      =.  adr  (~(put by adr) ask.i.new [tym inv]:i.new)
-      (transmit inv tan+[(message i.new)]~ pro+prompt ~)
-    ?:  =(`*`"w" buf.som)
-      =>  .(wom ~)  :: XX TMI
-      (transmit inv pro+prompt ~)
-    (transmit inv bel+~ ~)
+      $DET                              :: REJECT ALL INPUT
+    =^  INV  SOM  (~(TRANSCEIVE SOLE SOM) +.ACT)
+    =.  SOS  (~(PUT BY SOS) OST.BOW SOM)
+    ?~  WOM
+      =/  TRY  (ROSE (TUFA BUF.SOM) FED:AG)
+      ?:  -.TRY  `+>.$
+      (TRANSMIT INV BEL+~ ~)
+    ?:  =(`*`"?" BUF.SOM)  (TRANSMIT INV HELP)
+    ?:  =(`*`"A" BUF.SOM)  (TRANSMIT INV (RENDER ADRS) ~)
+    ?:  =(`*`"L" BUF.SOM)  (TRANSMIT INV (RENDER NEW-ADRS) ~)
+    ?:  =(`*`"I" BUF.SOM)  (TRANSMIT INV (RENDER IGNORED-ADRS) ~)
+    ?:  =(`*`"N" BUF.SOM)
+      =/  NEW  NEW-ADRS
+      ?~  NEW  (TRANSMIT INV BEL+~ ~)
+      =.  INV.I.NEW  %IGNORED
+      =.  ADR  (~(PUT BY ADR) ASK.I.NEW [TYM INV]:I.NEW)
+      (TRANSMIT INV TAN+[(MESSAGE I.NEW)]~ PRO+PROMPT ~)
+    ?:  =(`*`"Y" BUF.SOM)
+      =/  NEW  NEW-ADRS
+      ?~  NEW  (TRANSMIT INV BEL+~ ~)
+      =.  INV.I.NEW  %SENT  :: XX PENDING
+      =-  [[(INVITE ASK.I.NEW) -<] ->]
+      =.  ADR  (~(PUT BY ADR) ASK.I.NEW [TYM INV]:I.NEW)
+      (TRANSMIT INV TAN+[(MESSAGE I.NEW)]~ PRO+PROMPT ~)
+    ?:  =(`*`"W" BUF.SOM)
+      =>  .(WOM ~)  :: XX TMI
+      (TRANSMIT INV PRO+PROMPT ~)
+    (TRANSMIT INV BEL+~ ~)
   ==
-++  transmit
-  |=  {inv/sole-edit mor/(list sole-effect)}
-  =/  som  (~(got by sos) ost.bow)
-  =^  det  som  (~(transmit sole som) inv)
-  =.  sos  (~(put by sos) ost.bow som)
-  [[(effect mor+[det+det mor])]~ +>.$]
+++  TRANSMIT
+  |=  {INV/SOLE-EDIT MOR/(LIST SOLE-EFFECT)}
+  =/  SOM  (~(GOT BY SOS) OST.BOW)
+  =^  DET  SOM  (~(TRANSMIT SOLE SOM) INV)
+  =.  SOS  (~(PUT BY SOS) OST.BOW SOM)
+  [[(EFFECT MOR+[DET+DET MOR])]~ +>.$]
 ::
-++  help
-  ^-  (list sole-effect)
-  =-  (scan - (more (just '\0a') (stag %txt (star prn))))
-  %+  welp
-    ?~  [new-adrs]  ""
+++  HELP
+  ^-  (LIST SOLE-EFFECT)
+  =-  (SCAN - (MORE (JUST '\0A') (STAG %TXT (STAR PRN))))
+  %+  WELP
+    ?~  [NEW-ADRS]  ""
     """
-    y - invite current ask
-    n - ignore current ask
+    Y - INVITE CURRENT ASK
+    N - IGNORE CURRENT ASK
 
     """
   """
-  l - list new asks
-  i - list ignored asks
-  a - list all asks
-  w - reset womb ship
-  ? - print help
+  L - LIST NEW ASKS
+  I - LIST IGNORED ASKS
+  A - LIST ALL ASKS
+  W - RESET WOMB SHIP
+  ? - PRINT HELP
   """
 ::
-++  invite
-  |=  ask/email
-  ~|  %ask-stub-invite
+++  INVITE
+  |=  ASK/EMAIL
+  ~|  %ASK-STUB-INVITE
   !!
 --

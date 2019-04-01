@@ -1,14 +1,14 @@
 ::
-::::  /hoon/curl/app
+::::  /HOON/CURL/APP
   ::
 /?    310
 ::
-|_  {{^ ^ ost/@ ^} ~}
-++  poke  |*(a/{mark *} :_(+> [ost %hiss / `~ %wain a]~))
-::++  poke-purl  |=(a/purl :_(+> [ost %hiss / %wain %purl a]~))
-++  poke-tape  |=(a/tape (poke %purl (scan a auri:de-purl:html)))
-++  poke-hiss  |=(a/hiss:eyre (poke %hiss a))
-++  poke-noun  poke-hiss
-++  sigh-wain  |=({* a/wain} ~&(a `+>))
-++  sigh-tang  |=({* a/tang} (mean a))
+|_  {{^ ^ OST/@ ^} ~}
+++  POKE  |*(A/{MARK *} :_(+> [OST %HISS / `~ %WAIN A]~))
+::++  POKE-PURL  |=(A/PURL :_(+> [OST %HISS / %WAIN %PURL A]~))
+++  POKE-TAPE  |=(A/TAPE (POKE %PURL (SCAN A AURI:DE-PURL:HTML)))
+++  POKE-HISS  |=(A/HISS:EYRE (POKE %HISS A))
+++  POKE-NOUN  POKE-HISS
+++  SIGH-WAIN  |=({* A/WAIN} ~&(A `+>))
+++  SIGH-TANG  |=({* A/TANG} (MEAN A))
 --
