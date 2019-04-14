@@ -6724,6 +6724,7 @@
     {$zpcm p/hoon q/hoon}                               ::  !,
     {$zpbn p/hoon}                                      ::  !>
     {$zpmc p/hoon q/hoon}                               ::  !;
+    [%zptr result=hoon subject=hoon =hoon]              ::  !*
     {$zpts p/hoon}                                      ::  !=
     {$zpvt p/(list wing) q/hoon r/hoon}                 ::  !@
     {$zpwt p/$@(p/@ {p/@ q/@}) q/hoon}                  ::  !?
@@ -10273,6 +10274,22 @@
       ?>  (~(nest ut p:!>(*type)) & ref)
       [(nice (cell ref p.vos)) (cons [%1 burp(sut p.vos)] q.vos)]
     ::
+        [%zptr *]
+      !:
+      =/  result-type=type  (play result.gen)
+      ::
+      :-  result-type
+      =<  +
+      %_    $
+          gen
+        ^-  hoon
+        :+  %cncl  [%limb %eve]
+        :~  [%tsld [%$ 2] %zpbn result.gen]
+            [%zpbn subject.gen]
+            hoon.gen
+        ==
+      ==
+    ::
         {$zpts *}   [(nice %noun) [%1 q:$(vet |, gen p.gen)]]
         {$zpvt *}   ?:((feel p.gen) $(gen q.gen) $(gen r.gen))
     ::
@@ -10725,6 +10742,7 @@
       {$zpcm *}  (play p.gen)
       {$lost *}  %void
       {$zpmc *}  (cell $(gen p.gen) $(gen q.gen))
+      [%zptr *]  (play result.gen)
       {$zpts *}  %noun
       {$zpvt *}  ?:((feel p.gen) $(gen q.gen) $(gen r.gen))
       {$zpzp *}  %void
@@ -11489,6 +11507,13 @@
 ++  cain  sell                                          ::  $-(vase tank)
 ++  noah  text                                          ::  $-(vase tape)
 ++  onan  seer                                          ::  $-(vise vase)
+++  eve
+  |=  [=result=type subject=[=type value=*] =hoon]
+  ^-  *
+  ::
+  .*  value.subject
+  +:(~(mint ut type.subject) result-type hoon)
+::
 ++  text                                                ::  tape pretty-print
   |=  vax/vase  ^-  tape
   ~(ram re (sell vax))
@@ -14066,6 +14091,7 @@
         [%zpcm *]  (rune '!,' ~ ~ (hoons ~[p q]:x))
         [%zpbn *]  (rune '!>' ~ ~ (hoons ~[p]:x))
         [%zpmc *]  (rune '!;' ~ ~ (hoons ~[p q]:x))
+        [%zptr *]  (rune '!*' ~ ~ (hoons ~[result subject hoon]:x))
         [%zpts *]  (rune '!=' ~ ~ (hoons ~[p]:x))
         [%zpvt *]  (rune '!@' ~ ~ (wingseq p.x) (hoons ~[q r]:x))
         [%zpwt *]  (hn q.x)                             ::  Ignore p.x
@@ -16694,6 +16720,7 @@
                   ['>' (rune ban %zpbn expa)]
                   ['@' (rune vat %zpvt expy)]
                   ['=' (rune tis %zpts expa)]
+                  ['*' (rune tar %zptr expc)]
                   ['?' (rune wut %zpwt hinh)]
               ==
             ==
